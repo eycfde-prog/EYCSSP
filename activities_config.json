@@ -1,0 +1,25 @@
+{
+  "activities": {
+    "AS": {
+      "name": "Homophones Challenge",
+      "grading_type": "fuzzy_match",
+      "acceptable_score": 0.85,
+      "tasks": {
+        "day_1": {
+          "release_time": "2026-02-15 08:00:00",
+          "model_answers": ["sun", "son", "sea", "see", "to", "too", "here", "hear", "no", "know"]
+        }
+      }
+    },
+    "DX": {
+      "name": "Dictation X",
+      "grading_type": "ocr_ai",
+      "tasks": {
+        "day_2": {
+          "release_time": "2026-02-16 08:00:00",
+          "model_paragraph": "The quick brown fox jumps over the lazy dog."
+        }
+      }
+    }
+  }
+}
