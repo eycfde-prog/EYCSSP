@@ -1,1 +1,29 @@
 
+name: EYC Grading System Trigger
+
+on:
+  repository_dispatch:
+    types: [new_submission]
+
+jobs:
+  grade:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: Install Dependencies
+        run: |
+          pip install -r backend/requirements.txt
+
+      - name: Run Grader
+        env:
+          GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
+          SUBMISSION_DATA: ${{ github.event.client_payload.data }}
+        run: |
+          python backend/main_grader.py
