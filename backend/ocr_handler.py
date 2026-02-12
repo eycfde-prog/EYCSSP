@@ -2,10 +2,12 @@ import easyocr
 import cv2
 import numpy as np
 import requests
+import re
+import difflib
 
 class DXProcessor:
     def __init__(self):
-        # تحميل القاموس مرة واحدة
+        # تحميل القاموس الإنجليزي
         self.reader = easyocr.Reader(['en'], gpu=False)
 
     def download_public_image(self, url):
@@ -26,20 +28,39 @@ class DXProcessor:
             print(f"❌ Image Download Error: {e}")
         return None
 
+    def grade_dictation(self, student_text, model_text):
+        """مقارنة مرنة تعتمد على الكلمات المفتاحية لتجاوز أخطاء الـ OCR البسيطة"""
+        # تنظيف النصوص من الرموز وتحويلها لكلمات
+        s_words = set(re.findall(r'\w+', student_text.lower()))
+        m_words = set(re.findall(r'\w+', model_text.lower()))
+        
+        if not m_words:
+            return 0
+        
+        # حساب كم كلمة نموذجية ظهرت في نتيجة الـ OCR
+        matches = s_words.intersection(m_words)
+        score_ratio = len(matches) / len(m_words)
+        
+        print(f"📊 Words Matched: {len(matches)}/{len(m_words)}")
+        
+        # إذا كانت النسبة أعلى من 60% نعتبرها درجة كاملة (10/10)
+        if score_ratio >= 0.6:
+            return 10
+        # غير ذلك نحسب النسبة من 10
+        return round(score_ratio * 10)
+
     def process_dx(self, image_url, model_text):
         """تحويل الصورة لنص ومقارنته بالنموذج"""
         image = self.download_public_image(image_url)
         if image is None:
             return 0, "Download Failed"
             
+        # استخراج النص من الصورة
         results = self.reader.readtext(image, detail=0)
         student_text = " ".join(results)
-        print(f"🔍 OCR Result: {student_text}")
+        print(f"🔍 OCR Raw Result: {student_text}")
         
-        import difflib
-        ratio = difflib.SequenceMatcher(None, student_text.lower().strip(), model_text.lower().strip()).ratio()
+        # استخدام دالة التصحيح المرنة
+        grade = self.grade_dictation(student_text, model_text)
         
-        # إذا كانت النسبة أعلى من 70% نعتبرها درجة كاملة (لأن الـ OCR قد يخطئ قليلاً)
-        if ratio > 0.70:
-            return 10, student_text
-        return round(ratio * 10), student_text
+        return grade, student_text
