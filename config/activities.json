@@ -1,13 +1,10 @@
 {
   "AS": {
-    "1": {"answers": ["sun", "sea", "to", "no"], "points": 5},
-    "2": {"answers": ["meat", "meet", "buy", "by"], "points": 5}
+    "1": {
+      "answers": ["sun", "sea", "to", "no"],
+      "points": 5
+    }
   },
-  "GS": {
-    "1": {"answers": ["goes", "studying"], "points": 10}
-  }
-}
-{
   "DX": {
     "1": {
       "model_text": "The quick brown fox jumps over the lazy dog",
