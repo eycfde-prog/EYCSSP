@@ -38,3 +38,19 @@ def process_submissions():
 
 if __name__ == "__main__":
     print("Grader Engine is Ready...")
+
+from ocr_handler import DXProcessor
+
+# تهيئة معالج الصور
+dx_engine = DXProcessor()
+
+def handle_dx_activity(drive_url, model_paragraph):
+    # استخراج الـ ID من رابط جوجل درايف
+    file_id = drive_url.split('id=')[-1] 
+    
+    # ملاحظة: سنحتاج للحصول على Token من الـ Service Account هنا
+    # تم تبسيط الكود للعرض، وسأكمل لك الربط في الخطوة القادمة
+    print(f"Processing DX Mission for File ID: {file_id}")
+    
+    # (سيتم إضافة كود سحب الصورة والـ OCR هنا)
+    return "DX Mission Processed"
