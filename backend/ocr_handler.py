@@ -28,14 +28,28 @@ class DXProcessor:
             print(f"❌ Image Download Error: {e}")
         return None
 
-    def grade_dictation(self, student_text, model_text):
+   def grade_dictation(self, student_text, model_text):
         """مقارنة مرنة تعتمد على الكلمات المفتاحية لتجاوز أخطاء الـ OCR البسيطة"""
+        # الرد النموذجي المدمج
+        model_text = """
+        R-down-down. up - semi
+        circle and slash down.
+        r. down and up with
+        curve. between 2 Lines.
+        S-curve up - slash
+        """
+        
         # تنظيف النصوص من الرموز وتحويلها لكلمات
         s_words = set(re.findall(r'\w+', student_text.lower()))
         m_words = set(re.findall(r'\w+', model_text.lower()))
         
         if not m_words:
             return 0
+
+        # حساب النسبة المئوية للكلمات الصحيحة
+        matches = s_words.intersection(m_words)
+        score = (len(matches) / len(m_words)) * 100
+        return round(score, 2)
         
         # حساب كم كلمة نموذجية ظهرت في نتيجة الـ OCR
         matches = s_words.intersection(m_words)
