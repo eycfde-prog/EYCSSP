@@ -94,3 +94,31 @@ def process_submissions():
 
 if __name__ == "__main__":
     process_submissions()
+
+def log_to_notes(email, activity, error_msg, extracted_text=""):
+    """تسجيل التنبيهات في ورقة Notes للمراجعة اليدوية"""
+    try:
+        info = json.loads(os.environ.get('GCP_SERVICE_ACCOUNT_KEY'))
+        creds = service_account.Credentials.from_service_account_info(
+            info, scopes=['https://www.googleapis.com/auth/spreadsheets']
+        )
+        service = build('sheets', 'v4', credentials=creds)
+        spreadsheet_id = '1-21tDcpqJGRtTUf4MCsuOHrcmZAq3tV34fbQU5wGRws'
+        
+        timestamp = vars = __import__('datetime').datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        values = [[timestamp, email, activity, error_msg, extracted_text]]
+        
+        service.spreadsheets().values().append(
+            spreadsheetId=spreadsheet_id,
+            range="Notes!A:E",
+            valueInputOption="USER_ENTERED",
+            body={"values": values}
+        ).execute()
+        print(f"⚠️ Alert logged to Notes for {email}")
+    except Exception as e:
+        print(f"❌ Failed to log to Notes: {e}")
+
+# تعديل بسيط في دالة process_submissions داخل main_grader.py لاستخدام التنبيهات:
+# إذا كانت final_grade < 5 في نشاط DX، نقوم بعمل log للمراجعة
+# if act_code == 'DX' and final_grade < 5:
+#     log_to_notes(email, f"{act_code} Task {task_num}", "Low Score / Manual Review Needed", student_text)
