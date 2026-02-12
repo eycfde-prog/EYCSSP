@@ -78,18 +78,11 @@ def process_submissions():
             final_grade, _ = dx_engine.process_dx(student_answer, model_text)
             
         # 2. منطق تصحيح النصوص (AS, GS, إلخ)
+# 2. منطق تصحيح النصوص (AS, GS, إلخ)
         else:
             model_ans = config.get('answers', [])
-            # (يمكنك استخدام دالة fuzzy_grade هنا)
-            from difflib import SequenceMatcher
-            # ... دالة التصحيح ...
-            final_grade = 5 # مؤقتاً للتجربة
-
-        if final_grade > 0:
-            update_sheet_grade(email, final_grade)
-
-    except Exception as e:
-        print(f"❌ Error: {e}")
+            final_grade = fuzzy_grade(student_answer, model_ans, config.get('points', 5))
+            print(f"🎯 Final Grade: {final_grade}")
 
 if __name__ == "__main__":
     process_submissions()
