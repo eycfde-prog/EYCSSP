@@ -18,15 +18,11 @@ jobs:
 
       - name: Install Dependencies
         run: |
-          if [ -f backend/requirements.txt ]; then
-            pip install -r backend/requirements.txt
-          else
-            pip install google-auth google-api-python-client google-auth-httplib2 easyocr opencv-python-headless pandas requests
-          fi
+          pip install google-auth google-api-python-client google-auth-httplib2 easyocr opencv-python-headless pandas requests
 
       - name: Run Grader
         env:
           GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
-          SUBMISSION_DATA: "${{ github.event.client_payload.data }}"
+          SUBMISSION_DATA: ${{ github.event.client_payload.data }}
         run: |
           python backend/main_grader.py
