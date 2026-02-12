@@ -32,9 +32,23 @@ def fuzzy_grade(student_answer, model_answers, max_points=5):
 
 # 3. محرك الأتمتة الرئيسي
 def process_submissions():
-    # سيتم ربط هذا الجزء بـ Webhook لاحقاً لاستقبال البيانات من الأرينا
-    # حالياً هذا هو الهيكل الذي سيعالج البيانات
-    pass
+def process_submissions():
+    # قراءة البيانات المرسلة من GitHub Action
+    raw_data = os.environ.get('SUBMISSION_DATA')
+    if not raw_data:
+        print("No data received.")
+        return
+
+    data = json.loads(raw_data)
+    print(f"Processing submission for: {data.get('email')}")
+    
+    # هنا سيتم استدعاء دوال التصحيح بناءً على actCode
+    if data.get('actCode') == 'AS':
+        # مثال لتشغيل التصحيح (سنقوم بربطه بالـ JSON لاحقاً)
+        print(f"Correcting AS Activity. Student Answer: {data.get('answer')}")
+
+if __name__ == "__main__":
+    process_submissions()
 
 if __name__ == "__main__":
     print("Grader Engine is Ready...")
