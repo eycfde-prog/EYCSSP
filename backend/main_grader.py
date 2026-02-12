@@ -8,18 +8,27 @@ from ocr_handler import DXProcessor
 # تهيئة المحركات
 dx_engine = DXProcessor()
 
+def fuzzy_grade(student_answer, model_answers, max_points=5):
+    if not student_answer or not model_answers: return 0
+    s_list = [a.strip().lower() for a in str(student_answer).split(',')]
+    m_list = [m.strip().lower() for m in model_answers]
+    correct = 0
+    for i, s_ans in enumerate(s_list):
+        if i < len(m_list):
+            ratio = difflib.SequenceMatcher(None, s_ans, m_list[i]).ratio()
+            if ratio >= 0.85: correct += 1
+    return round((correct / len(m_list)) * max_points) if m_list else 0
+
 def load_activity_config(act_code, task_num):
-    """تحميل إعدادات المهمة من ملف الـ JSON"""
     try:
-        with open('config/activities.json', 'r') as f:
+        with open('config/activities.json', 'r', encoding='utf-8') as f:
             config = json.load(f)
         return config.get(act_code, {}).get(str(task_num))
     except Exception as e:
-        print(f"❌ Error loading config: {e}")
+        print(f"❌ JSON Config Error: {e}")
         return None
 
 def update_sheet_grade(email, grade):
-    """تحديث الدرجة في جوجل شيت"""
     try:
         info = json.loads(os.environ.get('GCP_SERVICE_ACCOUNT_KEY'))
         creds = service_account.Credentials.from_service_account_info(
@@ -35,22 +44,21 @@ def update_sheet_grade(email, grade):
         for i, row in enumerate(rows):
             if len(row) > 1 and row[1] == email:
                 row_num = i + 1
-                # قراءة التوكنز الحالية
-                current_val = sheet.values().get(spreadsheetId=spreadsheet_id, range=f"Sheet1!F{row_num}").execute()
+                cell_range = f"Sheet1!F{row_num}"
+                current_val = sheet.values().get(spreadsheetId=spreadsheet_id, range=cell_range).execute()
                 current_tokens = int(current_val.get('values', [[0]])[0][0] or 0)
                 
-                # تحديث القيمة
                 new_tokens = current_tokens + grade
                 sheet.values().update(
                     spreadsheetId=spreadsheet_id,
-                    range=f"Sheet1!F{row_num}",
+                    range=cell_range,
                     valueInputOption="USER_ENTERED",
                     body={"values": [[new_tokens]]}
                 ).execute()
-                print(f"✅ Sheet updated: {email} now has {new_tokens} tokens")
+                print(f"✅ Success! {email} total tokens: {new_tokens}")
                 return True
     except Exception as e:
-        print(f"❌ Sheet update error: {e}")
+        print(f"❌ Sheet Update Failed: {e}")
     return False
 
 def process_submissions():
@@ -62,25 +70,27 @@ def process_submissions():
         email = data.get('email')
         act_code = data.get('actCode')
         task_num = data.get('taskNum')
-        student_answer = data.get('answer')
+        answer = data.get('answer')
 
-        # تحميل الإعدادات من JSON
+        print(f"🚀 Processing {act_code} Task {task_num} for {email}")
+
         config = load_activity_config(act_code, task_num)
         if not config:
-            print(f"⚠️ No config found for {act_code} task {task_num}")
+            print(f"⚠️ No config for {act_code}_{task_num}")
             return
 
         final_grade = 0
-        
-        # 1. منطق تصحيح الـ OCR (نشاط DX)
         if act_code == 'DX':
-            model_text = config.get('model_text', '')
-            final_grade, _ = dx_engine.process_dx(student_answer, model_text)
-            
-        # 2. منطق تصحيح النصوص (AS, GS, إلخ)
-# 2. منطق تصحيح النصوص (AS, GS, إلخ)
+            final_grade, _ = dx_engine.process_dx(answer, config.get('model_text', ''))
         else:
-            model_ans = config.get('answers', [])
-            final_grade = fuzzy_grade(student_answer, model_ans, config.get('points', 5))
-            print(f"🎯 Final Grade: {final_grade}")
+            final_grade = fuzzy_grade(answer, config.get('answers', []), config.get('points', 5))
 
+        print(f"🎯 Calculated Grade: {final_grade}")
+        if final_grade > 0:
+            update_sheet_grade(email, final_grade)
+            
+    except Exception as e:
+        print(f"❌ Global Error: {e}")
+
+if __name__ == "__main__":
+    process_submissions()
