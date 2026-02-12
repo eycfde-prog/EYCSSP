@@ -1,6 +1,5 @@
 import os
 import json
-import difflib
 import re
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
@@ -10,7 +9,7 @@ from ocr_handler import DXProcessor
 dx_engine = DXProcessor()
 
 def log_to_notes(email, activity, error_msg, extracted_text=""):
-    """تسجيل التنبيهات في ورقة Notes للمراجعة اليدوية"""
+    """تسجيل التنبيهات في ورقة Notes"""
     try:
         info = json.loads(os.environ.get('GCP_SERVICE_ACCOUNT_KEY'))
         creds = service_account.Credentials.from_service_account_info(
@@ -68,17 +67,14 @@ def update_sheet_grade(email, grade):
 def process_submissions():
     raw_data = os.environ.get('SUBMISSION_DATA')
     if not raw_data: return
-
     try:
         data = json.loads(raw_data)
-        email = data.get('email')
+        email = data.get('email', 'Unknown')
         act_code = data.get('actCode')
         task_num = data.get('taskNum')
         answer = data.get('answer')
 
         print(f"🚀 Processing {act_code} Task {task_num}")
-
-        # تحميل الإعدادات من JSON
         with open('config/activities.json', 'r', encoding='utf-8') as f:
             full_config = json.load(f)
         config = full_config.get(act_code, {}).get(str(task_num))
@@ -90,18 +86,16 @@ def process_submissions():
         final_grade = 0
         student_text = ""
 
-if act_code == 'DX':
+        if act_code == 'DX':
             model_text = config.get('model_text', '')
+            # استدعاء الدالة من الكلاس بشكل صحيح
             final_grade, student_text = dx_engine.process_dx(answer, model_text)
-            
-            # تسجيل في النوتس دائماً لنرى النتائج في البداية
+            # تسجيل التقرير في النوتس دائماً لنرى النتائج
             log_to_notes(email, f"DX-{task_num}", f"Grade: {final_grade}/10", student_text)
         
         elif act_code == 'AS':
-            from ocr_handler import difflib # استخدام الدالة الموجودة
-            model_ans = config.get('answers', [])
-            # منطق الـ AS البسيط
-            final_grade = 5 # (يمكنك دمج دالة fuzzy_grade هنا لاحقاً)
+            # منطق الـ AS (اختياري حالياً)
+            final_grade = 5 
 
         if final_grade > 0:
             update_sheet_grade(email, final_grade)
