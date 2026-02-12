@@ -1,4 +1,3 @@
-
 name: EYC Grading System Trigger
 
 on:
@@ -24,6 +23,6 @@ jobs:
       - name: Run Grader
         env:
           GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
-          SUBMISSION_DATA: ${{ github.event.client_payload.data }}
+          SUBMISSION_DATA: ${{ toJson(github.event.client_payload.data) }}
         run: |
           python backend/main_grader.py
