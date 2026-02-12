@@ -7,7 +7,7 @@ from difflib import SequenceMatcher
 
 class DXProcessor:
     def __init__(self):
-        # تحميل القاموس مرة واحدة
+        # تحميل القاموس الإنجليزي
         self.reader = easyocr.Reader(['en'], gpu=False)
 
     def download_public_image(self, url):
@@ -27,7 +27,7 @@ class DXProcessor:
         return None
 
     def grade_dictation(self, student_text, model_text):
-        """مقارنة مرنة للكلمات لتجاوز أخطاء الـ OCR"""
+        """مقارنة مرنة لتجاوز أخطاء الـ OCR"""
         s_words = re.findall(r'\w+', student_text.lower())
         m_words = re.findall(r'\w+', model_text.lower())
         if not m_words: return 0
@@ -36,27 +36,28 @@ class DXProcessor:
         temp_s_words = list(s_words)
         for m_word in m_words:
             best_ratio = 0
-            best_idx = -1
+            best_index = -1
             for i, s_word in enumerate(temp_s_words):
                 ratio = SequenceMatcher(None, m_word, s_word).ratio()
                 if ratio > best_ratio:
                     best_ratio = ratio
-                    best_idx = i
-            if best_ratio >= 0.7: # نسبة سماح بوجود خطأ حرفي
+                    best_index = i
+            if best_ratio >= 0.75: # خفضنا النسبة قليلاً لتكون أكثر مرونة
                 matched_count += 1
-                if best_idx != -1: temp_s_words.pop(best_idx)
+                if best_index != -1: temp_s_words.pop(best_index)
         
-        return round((matched_count / len(m_words)) * 10, 2)
+        score = (matched_count / len(m_words)) * 10
+        return round(score)
 
     def process_dx(self, image_url, model_text):
-        """الدالة الأساسية التي يستدعيها المحرك الرئيسي"""
+        """هذه هي الدالة التي كان يفتقدها المحرك"""
         image = self.download_public_image(image_url)
         if image is None:
             return 0, "Download Failed"
             
         results = self.reader.readtext(image, detail=0)
         student_text = " ".join(results)
-        print(f"🔍 OCR Result: {student_text}")
+        print(f"🔍 OCR Raw Result: {student_text}")
         
         grade = self.grade_dictation(student_text, model_text)
         return grade, student_text
