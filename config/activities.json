@@ -7,3 +7,11 @@
     "1": {"answers": ["goes", "studying"], "points": 10}
   }
 }
+{
+  "DX": {
+    "1": {
+      "model_text": "The quick brown fox jumps over the lazy dog",
+      "points": 10
+    }
+  }
+}
