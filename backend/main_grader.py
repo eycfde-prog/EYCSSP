@@ -13,6 +13,7 @@ def fuzzy_grade(student_answer, model_answers, max_points=5):
     correct_count = 0
     for i, s_ans in enumerate(student_list):
         if i < len(model_list):
+            # قياس نسبة التشابه بين الكلمتين
             ratio = difflib.SequenceMatcher(None, s_ans, model_list[i]).ratio()
             if ratio >= 0.85: 
                 correct_count += 1
@@ -22,7 +23,7 @@ def fuzzy_grade(student_answer, model_answers, max_points=5):
 
 def process_submissions():
     """المحرك الرئيسي - يقرأ البيانات ويعالجها"""
-    # الحصول على البيانات من بيئة GitHub
+    # الحصول على البيانات المرسلة من GitHub Action
     raw_data = os.environ.get('SUBMISSION_DATA')
     
     if not raw_data:
@@ -38,7 +39,7 @@ def process_submissions():
 
         # منطق التصحيح المبدئي لنشاط AS
         if data.get('actCode') == 'AS':
-            # مثال لإجابات نموذجية (سنربطها لاحقاً بملف JSON)
+            # سنقوم بربط هذه الإجابات بملف JSON الخارجي لاحقاً
             model_ans = ["sun", "sea", "to", "no"] 
             result = fuzzy_grade(data.get('answer'), model_ans)
             print(f"🎯 Final Grade: {result}/5")
