@@ -91,7 +91,36 @@ def process_submissions():
             # استدعاء الدالة من الكلاس بشكل صحيح
             final_grade, student_text = dx_engine.process_dx(answer, model_text)
             # تسجيل التقرير في النوتس دائماً لنرى النتائج
-            log_to_notes(email, f"DX-{task_num}", f"Grade: {final_grade}/10", student_text)
+           def log_to_notes(email, activity, error_msg, extracted_text=""):
+    """تسجيل التنبيهات في ورقة Notes للمراجعة اليدوية"""
+    key_raw = os.environ.get('GCP_SERVICE_ACCOUNT_KEY')
+    if not key_raw:
+        print("❌ CRITICAL: GCP_SERVICE_ACCOUNT_KEY is missing from Environment Secrets!")
+        return
+
+    try:
+        info = json.loads(key_raw)
+        creds = service_account.Credentials.from_service_account_info(
+            info, scopes=['https://www.googleapis.com/auth/spreadsheets']
+        )
+        service = build('sheets', 'v4', credentials=creds)
+        spreadsheet_id = '1-21tDcpqJGRtTUf4MCsuOHrcmZAq3tV34fbQU5wGRws'
+        
+        from datetime import datetime
+        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        values = [[timestamp, email, activity, error_msg, extracted_text]]
+        
+        service.spreadsheets().values().append(
+            spreadsheetId=spreadsheet_id,
+            range="Notes!A:E",
+            valueInputOption="USER_ENTERED",
+            body={"values": values}
+        ).execute()
+        print(f"⚠️ Logged to Notes for {email}")
+    except json.JSONDecodeError:
+        print("❌ Error: GCP_SERVICE_ACCOUNT_KEY is not a valid JSON string!")
+    except Exception as e:
+        print(f"❌ Notes Log Error: {str(e)}")
         
         elif act_code == 'AS':
             # منطق الـ AS (اختياري حالياً)
