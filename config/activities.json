@@ -7,33 +7,3 @@
     "1": {"answers": ["goes", "studying"], "points": 10}
   }
 }
-def update_sheet_grade(email, grade):
-    """تحديث الدرجة في جوجل شيت مباشرة"""
-    info = json.loads(os.environ.get('GCP_SERVICE_ACCOUNT_KEY'))
-    creds = service_account.Credentials.from_service_account_info(
-        info, scopes=['https://www.googleapis.com/auth/spreadsheets']
-    )
-    service = build('sheets', 'v4', credentials=creds)
-    spreadsheet_id = '1-21tDcpqJGRtTUf4MCsuOHrcmZAq3tV34fbQU5wGRws'
-    
-    # البحث عن سطر الطالب بالإيميل
-    sheet = service.spreadsheets()
-    result = sheet.values().get(spreadsheetId=spreadsheet_id, range="Sheet1!A:B").execute()
-    rows = result.get('values', [])
-    
-    for i, row in enumerate(rows):
-        if len(row) > 1 and row[1] == email:
-            row_num = i + 1
-            # تحديث العمود رقم 6 (Tokens)
-            current_val_res = sheet.values().get(spreadsheetId=spreadsheet_id, range=f"Sheet1!F{row_num}").execute()
-            current_tokens = int(current_val_res.get('values', [[0]])[0][0] or 0)
-            
-            new_tokens = current_tokens + grade
-            sheet.values().update(
-                spreadsheetId=spreadsheet_id,
-                range=f"Sheet1!F{row_num}",
-                valueInputOption="USER_ENTERED",
-                body={"values": [[new_tokens]]}
-            ).execute()
-            print(f"✅ Sheet updated for {email}: +{grade} tokens")
-            break
