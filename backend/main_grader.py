@@ -90,11 +90,11 @@ def process_submissions():
         final_grade = 0
         student_text = ""
 
-        if act_code == 'DX':
+if act_code == 'DX':
             model_text = config.get('model_text', '')
             final_grade, student_text = dx_engine.process_dx(answer, model_text)
             
-            # تسجيل في النوتس إذا كانت الدرجة ضعيفة أو للفحص
+            # تسجيل في النوتس دائماً لنرى النتائج في البداية
             log_to_notes(email, f"DX-{task_num}", f"Grade: {final_grade}/10", student_text)
         
         elif act_code == 'AS':
