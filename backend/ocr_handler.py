@@ -27,34 +27,8 @@ class DXProcessor:
         return None
 
     def grade_dictation(self, student_text, model_text):
-        """مقارنة مرنة لتجاوز أخطاء الـ OCR"""
-        s_words = re.findall(r'\w+', student_text.lower())
-        m_words = re.findall(r'\w+', model_text.lower())
-        if not m_words: return 0
-        
-        matched_count = 0
-        temp_s_words = list(s_words)
-        for m_word in m_words:
-            best_ratio = 0
-            best_index = -1
-            for i, s_word in enumerate(temp_s_words):
-                ratio = SequenceMatcher(None, m_word, s_word).ratio()
-                if ratio > best_ratio:
-                    best_ratio = ratio
-                    best_index = i
-            if best_ratio >= 0.75: # خفضنا النسبة قليلاً لتكون أكثر مرونة
-                matched_count += 1
-                if best_index != -1: temp_s_words.pop(best_index)
-        
-        score = (matched_count / len(m_words)) * 10
-        return round(score)
-
-    def process_dx(self, image_url, model_text):
-"""مقارنة مرنة جداً تعتمد على وجود الكلمات الأساسية"""
-        import re
-        from difflib import SequenceMatcher
-
-        # 1. تنظيف النص المستخرج من أي رموز غريبة (نترك فقط الحروف والمسافات)
+        """مقارنة مرنة جداً تعتمد على وجود الكلمات الأساسية"""
+        # 1. تنظيف النص المستخرج من أي رموز غريبة
         clean_student = re.sub(r'[^a-zA-Z\s]', '', student_text.lower())
         s_words = clean_student.split()
         
@@ -67,17 +41,12 @@ class DXProcessor:
         matched_count = 0
         used_indices = set()
 
-        # 3. لكل كلمة في النموذج، ابحث عن أقرب شبيه لها في كلام الطالب
+        # 3. البحث عن الكلمات المتشابهة
         for m_word in m_words:
-            if len(m_word) < 2: continue # تجاهل الحروف المفردة
-            
+            if len(m_word) < 2: continue
             for i, s_word in enumerate(s_words):
                 if i in used_indices: continue
-                
-                # حساب نسبة التشابه بين الكلمتين
                 ratio = SequenceMatcher(None, m_word, s_word).ratio()
-                
-                # إذا كانت الكلمة مطابقة بنسبة 70% (تسمح بخطأ حرف أو حرفين)
                 if ratio >= 0.70:
                     matched_count += 1
                     used_indices.add(i)
@@ -86,3 +55,16 @@ class DXProcessor:
         score = (matched_count / len(m_words)) * 10
         print(f"📊 Final Matches: {matched_count}/{len(m_words)}")
         return round(score)
+
+    def process_dx(self, image_url, model_text):
+        """تحويل الصورة لنص ومقارنته بالنموذج"""
+        image = self.download_public_image(image_url)
+        if image is None:
+            return 0, "Download Failed"
+            
+        results = self.reader.readtext(image, detail=0)
+        student_text = " ".join(results)
+        print(f"🔍 OCR Raw Result: {student_text}")
+        
+        grade = self.grade_dictation(student_text, model_text)
+        return grade, student_text
