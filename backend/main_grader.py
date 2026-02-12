@@ -84,5 +84,3 @@ def process_submissions():
             final_grade = fuzzy_grade(student_answer, model_ans, config.get('points', 5))
             print(f"🎯 Final Grade: {final_grade}")
 
-if __name__ == "__main__":
-    process_submissions()
