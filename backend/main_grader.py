@@ -3,7 +3,7 @@ import json
 import difflib
 
 def fuzzy_grade(student_answer, model_answers, max_points=5):
-    """منطق تصحيح الكلمات (نشاط AS, GS, LS) - يسمح بخطأ بسيط"""
+    """منطق تصحيح الكلمات - يسمح بخطأ بسيط"""
     if not student_answer or not model_answers:
         return 0
         
@@ -13,7 +13,6 @@ def fuzzy_grade(student_answer, model_answers, max_points=5):
     correct_count = 0
     for i, s_ans in enumerate(student_list):
         if i < len(model_list):
-            # قياس نسبة التشابه بين الكلمتين
             ratio = difflib.SequenceMatcher(None, s_ans, model_list[i]).ratio()
             if ratio >= 0.85: 
                 correct_count += 1
@@ -23,7 +22,6 @@ def fuzzy_grade(student_answer, model_answers, max_points=5):
 
 def process_submissions():
     """المحرك الرئيسي - يقرأ البيانات ويعالجها"""
-    # الحصول على البيانات المرسلة من GitHub Action
     raw_data = os.environ.get('SUBMISSION_DATA')
     
     if not raw_data:
@@ -31,17 +29,21 @@ def process_submissions():
         return
 
     try:
-        # فك تشفير النص القادم من App Script
+        # فك تشفير البيانات القادمة من GitHub Action
         data = json.loads(raw_data)
-        print(f"✅ Processing submission for: {data.get('email')}")
-        print(f"📊 Activity Code: {data.get('actCode')}")
-        print(f"✍️ Student Answer: {data.get('answer')}")
+        
+        email = data.get('email', 'Unknown')
+        act_code = data.get('actCode', 'N/A')
+        answer = data.get('answer', '')
 
-        # منطق التصحيح المبدئي لنشاط AS
-        if data.get('actCode') == 'AS':
-            # سنقوم بربط هذه الإجابات بملف JSON الخارجي لاحقاً
+        print(f"✅ Processing submission for: {email}")
+        print(f"📊 Activity Code: {act_code}")
+        print(f"✍️ Student Answer: {answer}")
+
+        # اختبار أولي لنشاط AS
+        if act_code == 'AS':
             model_ans = ["sun", "sea", "to", "no"] 
-            result = fuzzy_grade(data.get('answer'), model_ans)
+            result = fuzzy_grade(answer, model_ans)
             print(f"🎯 Final Grade: {result}/5")
             
     except Exception as e:
