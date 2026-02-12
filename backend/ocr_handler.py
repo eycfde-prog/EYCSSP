@@ -28,53 +28,38 @@ class DXProcessor:
             print(f"❌ Image Download Error: {e}")
         return None
 
-   def grade_dictation(self, student_text, model_text):
-        """مقارنة مرنة تعتمد على الكلمات المفتاحية لتجاوز أخطاء الـ OCR البسيطة"""
-        # الرد النموذجي المدمج
-        model_text = """
-        R-down-down. up - semi
-        circle and slash down.
-        r. down and up with
-        curve. between 2 Lines.
-        S-curve up - slash
-        """
-        
-        # تنظيف النصوص من الرموز وتحويلها لكلمات
-        s_words = set(re.findall(r'\w+', student_text.lower()))
-        m_words = set(re.findall(r'\w+', model_text.lower()))
-        
-        if not m_words:
-            return 0
+import re
+from difflib import SequenceMatcher
 
-        # حساب النسبة المئوية للكلمات الصحيحة
-        matches = s_words.intersection(m_words)
-        score = (len(matches) / len(m_words)) * 100
-        return round(score, 2)
-        
-        # حساب كم كلمة نموذجية ظهرت في نتيجة الـ OCR
-        matches = s_words.intersection(m_words)
-        score_ratio = len(matches) / len(m_words)
-        
-        print(f"📊 Words Matched: {len(matches)}/{len(m_words)}")
-        
-        # إذا كانت النسبة أعلى من 60% نعتبرها درجة كاملة (10/10)
-        if score_ratio >= 0.6:
-            return 10
-        # غير ذلك نحسب النسبة من 10
-        return round(score_ratio * 10)
+def grade_dictation(self, student_text, model_text):
+    """
+    مقارنة مرنة تعتمد على الكلمات المفتاحية مع التحقق من تشابه الحروف لتجاوز أخطاء الـ OCR
+    """
+    s_words = re.findall(r'\w+', student_text.lower())
+    m_words = re.findall(r'\w+', model_text.lower())
+    
+    if not m_words:
+        return 0
+    
+    matched_count = 0
+    temp_s_words = list(s_words)
 
-    def process_dx(self, image_url, model_text):
-        """تحويل الصورة لنص ومقارنته بالنموذج"""
-        image = self.download_public_image(image_url)
-        if image is None:
-            return 0, "Download Failed"
-            
-        # استخراج النص من الصورة
-        results = self.reader.readtext(image, detail=0)
-        student_text = " ".join(results)
-        print(f"🔍 OCR Raw Result: {student_text}")
+    for m_word in m_words:
+        best_ratio = 0
+        best_index = -1
         
-        # استخدام دالة التصحيح المرنة
-        grade = self.grade_dictation(student_text, model_text)
+        for i, s_word in enumerate(temp_s_words):
+            # حساب نسبة التشابه بين الكلمتين
+            ratio = SequenceMatcher(None, m_word, s_word).ratio()
+            if ratio > best_ratio:
+                best_ratio = ratio
+                best_index = i
         
-        return grade, student_text
+        # السماح بوجود خطأ حرف واحد (عادة النسبة > 0.8 تعني اختلاف حرف في كلمات متوسطة الطول)
+        if best_ratio >= 0.8:
+            matched_count += 1
+            if best_index != -1:
+                temp_s_words.pop(best_index)
+
+    score = (matched_count / len(m_words)) * 100
+    return round(score, 2)
