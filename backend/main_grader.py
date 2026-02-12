@@ -1,24 +1,29 @@
 import os
 import json
 import re
+from datetime import datetime
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
 from ocr_handler import DXProcessor
 
-# تهيئة المحرك
+# 1. تهيئة المحرك
 dx_engine = DXProcessor()
 
 def log_to_notes(email, activity, error_msg, extracted_text=""):
-    """تسجيل التنبيهات في ورقة Notes"""
+    """تسجيل التنبيهات في ورقة Notes للمراجعة اليدوية"""
+    key_raw = os.environ.get('GCP_SERVICE_ACCOUNT_KEY')
+    if not key_raw:
+        print("❌ CRITICAL: GCP_SERVICE_ACCOUNT_KEY is missing!")
+        return
+
     try:
-        info = json.loads(os.environ.get('GCP_SERVICE_ACCOUNT_KEY'))
+        info = json.loads(key_raw)
         creds = service_account.Credentials.from_service_account_info(
             info, scopes=['https://www.googleapis.com/auth/spreadsheets']
         )
         service = build('sheets', 'v4', credentials=creds)
         spreadsheet_id = '1-21tDcpqJGRtTUf4MCsuOHrcmZAq3tV34fbQU5wGRws'
         
-        from datetime import datetime
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         values = [[timestamp, email, activity, error_msg, extracted_text]]
         
@@ -30,12 +35,15 @@ def log_to_notes(email, activity, error_msg, extracted_text=""):
         ).execute()
         print(f"⚠️ Logged to Notes for {email}")
     except Exception as e:
-        print(f"❌ Notes Log Error: {e}")
+        print(f"❌ Notes Log Error: {str(e)}")
 
 def update_sheet_grade(email, grade):
-    """تحديث الدرجة في الشيت"""
+    """تحديث الدرجة في الشيت الرئيسي"""
+    key_raw = os.environ.get('GCP_SERVICE_ACCOUNT_KEY')
+    if not key_raw: return False
+
     try:
-        info = json.loads(os.environ.get('GCP_SERVICE_ACCOUNT_KEY'))
+        info = json.loads(key_raw)
         creds = service_account.Credentials.from_service_account_info(
             info, scopes=['https://www.googleapis.com/auth/spreadsheets']
         )
@@ -58,15 +66,17 @@ def update_sheet_grade(email, grade):
                     valueInputOption="USER_ENTERED",
                     body={"values": [[current + grade]]}
                 ).execute()
-                print(f"✅ Grade Updated: +{grade}")
+                print(f"✅ Grade Updated for {email}: +{grade}")
                 return True
     except Exception as e:
-        print(f"❌ Sheet Error: {e}")
+        print(f"❌ Sheet Update Error: {e}")
     return False
 
 def process_submissions():
+    """المحرك الرئيسي لمعالجة البيانات"""
     raw_data = os.environ.get('SUBMISSION_DATA')
     if not raw_data: return
+
     try:
         data = json.loads(raw_data)
         email = data.get('email', 'Unknown')
@@ -74,13 +84,15 @@ def process_submissions():
         task_num = data.get('taskNum')
         answer = data.get('answer')
 
-        print(f"🚀 Processing {act_code} Task {task_num}")
+        print(f"🚀 Processing {act_code} Task {task_num} for {email}")
+
+        # تحميل الإعدادات من JSON
         with open('config/activities.json', 'r', encoding='utf-8') as f:
             full_config = json.load(f)
         config = full_config.get(act_code, {}).get(str(task_num))
 
         if not config:
-            print("⚠️ Config not found")
+            print(f"⚠️ Config not found for {act_code}-{task_num}")
             return
 
         final_grade = 0
@@ -88,42 +100,12 @@ def process_submissions():
 
         if act_code == 'DX':
             model_text = config.get('model_text', '')
-            # استدعاء الدالة من الكلاس بشكل صحيح
             final_grade, student_text = dx_engine.process_dx(answer, model_text)
-            # تسجيل التقرير في النوتس دائماً لنرى النتائج
-           def log_to_notes(email, activity, error_msg, extracted_text=""):
-    """تسجيل التنبيهات في ورقة Notes للمراجعة اليدوية"""
-    key_raw = os.environ.get('GCP_SERVICE_ACCOUNT_KEY')
-    if not key_raw:
-        print("❌ CRITICAL: GCP_SERVICE_ACCOUNT_KEY is missing from Environment Secrets!")
-        return
-
-    try:
-        info = json.loads(key_raw)
-        creds = service_account.Credentials.from_service_account_info(
-            info, scopes=['https://www.googleapis.com/auth/spreadsheets']
-        )
-        service = build('sheets', 'v4', credentials=creds)
-        spreadsheet_id = '1-21tDcpqJGRtTUf4MCsuOHrcmZAq3tV34fbQU5wGRws'
-        
-        from datetime import datetime
-        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        values = [[timestamp, email, activity, error_msg, extracted_text]]
-        
-        service.spreadsheets().values().append(
-            spreadsheetId=spreadsheet_id,
-            range="Notes!A:E",
-            valueInputOption="USER_ENTERED",
-            body={"values": values}
-        ).execute()
-        print(f"⚠️ Logged to Notes for {email}")
-    except json.JSONDecodeError:
-        print("❌ Error: GCP_SERVICE_ACCOUNT_KEY is not a valid JSON string!")
-    except Exception as e:
-        print(f"❌ Notes Log Error: {str(e)}")
+            # استدعاء الدالة المسؤولة عن التسجيل (تم تعريفها بالأعلى)
+            log_to_notes(email, f"DX-{task_num}", f"Grade: {final_grade}/10", student_text)
         
         elif act_code == 'AS':
-            # منطق الـ AS (اختياري حالياً)
+            # منطق الـ AS (إجابة ثابتة للتجربة)
             final_grade = 5 
 
         if final_grade > 0:
