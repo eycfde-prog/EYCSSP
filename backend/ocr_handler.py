@@ -50,14 +50,39 @@ class DXProcessor:
         return round(score)
 
     def process_dx(self, image_url, model_text):
-        """هذه هي الدالة التي كان يفتقدها المحرك"""
-        image = self.download_public_image(image_url)
-        if image is None:
-            return 0, "Download Failed"
-            
-        results = self.reader.readtext(image, detail=0)
-        student_text = " ".join(results)
-        print(f"🔍 OCR Raw Result: {student_text}")
+"""مقارنة مرنة جداً تعتمد على وجود الكلمات الأساسية"""
+        import re
+        from difflib import SequenceMatcher
+
+        # 1. تنظيف النص المستخرج من أي رموز غريبة (نترك فقط الحروف والمسافات)
+        clean_student = re.sub(r'[^a-zA-Z\s]', '', student_text.lower())
+        s_words = clean_student.split()
         
-        grade = self.grade_dictation(student_text, model_text)
-        return grade, student_text
+        # 2. تنظيف نص النموذج
+        clean_model = re.sub(r'[^a-zA-Z\s]', '', model_text.lower())
+        m_words = clean_model.split()
+        
+        if not m_words: return 0
+        
+        matched_count = 0
+        used_indices = set()
+
+        # 3. لكل كلمة في النموذج، ابحث عن أقرب شبيه لها في كلام الطالب
+        for m_word in m_words:
+            if len(m_word) < 2: continue # تجاهل الحروف المفردة
+            
+            for i, s_word in enumerate(s_words):
+                if i in used_indices: continue
+                
+                # حساب نسبة التشابه بين الكلمتين
+                ratio = SequenceMatcher(None, m_word, s_word).ratio()
+                
+                # إذا كانت الكلمة مطابقة بنسبة 70% (تسمح بخطأ حرف أو حرفين)
+                if ratio >= 0.70:
+                    matched_count += 1
+                    used_indices.add(i)
+                    break 
+
+        score = (matched_count / len(m_words)) * 10
+        print(f"📊 Final Matches: {matched_count}/{len(m_words)}")
+        return round(score)
