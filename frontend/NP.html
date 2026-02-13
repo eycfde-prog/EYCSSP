@@ -6,70 +6,137 @@
     <title>Golden Ear | Voice Lab | EYC</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
     <style>
-        :root { --neon-gold: #ffcc00; --neon-blue: #00f2ff; --glass: rgba(10, 10, 15, 0.95); }
+        :root { 
+            --neon-gold: #ffcc00; 
+            --neon-blue: #00f2ff; 
+            --glass: rgba(10, 10, 15, 0.95); 
+            --glow: 0 0 15px rgba(255, 204, 0, 0.3);
+        }
         
         body { 
-            font-family: 'Rajdhani', sans-serif; background: transparent; color: white; 
-            margin: 0; padding: 10px; direction: ltr; overflow-x: hidden;
+            font-family: 'Rajdhani', sans-serif; 
+            background: transparent; 
+            color: white; 
+            margin: 0; 
+            padding: 15px; 
+            direction: ltr; 
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
-        .ge-container { max-width: 100%; margin: 0 auto; text-align: center; }
+        .ge-container { 
+            width: 100%; 
+            max-width: 500px; 
+            margin: 0 auto; 
+            text-align: center; 
+        }
 
         .header-ge h1 { 
-            font-family: 'Orbitron'; color: var(--neon-gold); 
-            letter-spacing: 3px; font-size: 1.4rem; margin-bottom: 5px;
+            font-family: 'Orbitron'; 
+            color: var(--neon-gold); 
+            letter-spacing: 2px; 
+            font-size: 1.2rem; 
+            margin: 0 0 15px 0;
+            text-shadow: var(--glow);
+        }
+
+        /* Selection Grid - Moved Up for better UX */
+        .actions-grid {
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            gap: 10px; 
+            margin-bottom: 20px;
+        }
+
+        .action-group {
+            background: rgba(255,255,255,0.05); 
+            padding: 10px; 
+            border-radius: 12px;
+            border: 1px solid rgba(0, 242, 255, 0.2);
+            transition: 0.3s;
+        }
+
+        .action-group:focus-within {
+            border-color: var(--neon-gold);
+            box-shadow: var(--glow);
+        }
+
+        .action-group label {
+            display: block; 
+            font-family: 'Orbitron'; 
+            font-size: 9px; 
+            color: var(--neon-blue); 
+            margin-bottom: 5px;
+            text-align: left;
+        }
+
+        select {
+            width: 100%; 
+            background: #0b0b0f; 
+            color: white; 
+            border: 1px solid #333;
+            padding: 6px; 
+            font-family: 'Rajdhani'; 
+            font-size: 0.85rem; 
+            outline: none;
+            border-radius: 5px;
         }
 
         /* Avatar System */
         .avatar-vault {
-            position: relative; width: 180px; height: 180px; margin: 0 auto 20px;
+            position: relative; 
+            width: 160px; 
+            height: 160px; 
+            margin: 10px auto 20px;
             background: radial-gradient(circle, rgba(0, 242, 255, 0.1) 0%, transparent 70%);
-            border-radius: 50%; padding: 20px;
+            border-radius: 50%;
         }
 
         .avatar-part {
-            position: absolute; width: 100%; height: 100%; top: 0; left: 0;
-            object-fit: contain; transition: 0.3s ease;
+            position: absolute; 
+            width: 100%; 
+            height: 100%; 
+            top: 0; 
+            left: 0;
+            object-fit: contain; 
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
         /* Audio Controls */
         .audio-module {
-            background: var(--glass); border: 1px solid var(--neon-gold);
-            padding: 15px; border-radius: 15px; margin-bottom: 20px;
+            background: var(--glass); 
+            border: 1px solid var(--neon-gold);
+            padding: 12px; 
+            border-radius: 20px; 
+            margin-bottom: 10px;
+            box-shadow: var(--glow);
         }
 
-        audio { width: 100%; height: 35px; filter: invert(100%) hue-rotate(180deg) brightness(1.5); }
-
-        /* Selection Grid */
-        .actions-grid {
-            display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px;
-        }
-
-        .action-group {
-            background: rgba(255,255,255,0.05); padding: 10px; border-radius: 10px;
-            border: 1px solid rgba(255,255,255,0.1);
-        }
-
-        .action-group label {
-            display: block; font-family: 'Orbitron'; font-size: 10px; 
-            color: var(--neon-blue); margin-bottom: 8px;
-        }
-
-        select {
-            width: 100%; background: #000; color: white; border: 1px solid #333;
-            padding: 8px; font-family: 'Rajdhani'; font-size: 0.9rem; outline: none;
+        audio { 
+            width: 100%; 
+            height: 35px; 
+            filter: invert(100%) hue-rotate(180deg) brightness(1.5); 
         }
 
         .status-bar {
-            font-family: 'Orbitron'; font-size: 11px; color: var(--neon-gold);
-            text-transform: uppercase; margin-top: 10px;
+            font-family: 'Orbitron'; 
+            font-size: 10px; 
+            color: var(--neon-gold);
+            text-transform: uppercase; 
+            margin-top: 8px;
+            letter-spacing: 1px;
         }
 
         /* Mobile Adjustments */
         @media (max-width: 480px) {
-            .header-ge h1 { font-size: 1.2rem; }
-            .avatar-vault { width: 140px; height: 140px; }
-            .actions-grid { grid-template-columns: 1fr; }
+            body { padding: 10px; }
+            .header-ge h1 { font-size: 1.1rem; }
+            .avatar-vault { width: 150px; height: 150px; }
+            /* Keep it 2 columns on mobile to save space vertically */
+            .actions-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
+            .action-group { padding: 8px; }
         }
     </style>
 </head>
@@ -78,21 +145,6 @@
 <div class="ge-container">
     <div class="header-ge">
         <h1 id="ge-title">GOLDEN EAR MISSION</h1>
-    </div>
-
-    <div class="avatar-vault">
-        <img src="assets/avatar/base.png" class="avatar-part" id="part-base">
-        <img src="assets/avatar/head_normal.png" class="avatar-part" id="part-head">
-        <img src="assets/avatar/mouth_normal.png" class="avatar-part" id="part-mouth">
-        <img src="assets/avatar/hands_normal.png" class="avatar-part" id="part-hands">
-        <img src="assets/avatar/legs_normal.png" class="avatar-part" id="part-legs">
-    </div>
-
-    <div class="audio-module">
-        <audio id="ge-audio" controls controlsList="nodownload">
-            <source src="" type="audio/mpeg">
-        </audio>
-        <div class="status-bar">Audio Feed Active</div>
     </div>
 
     <div class="actions-grid">
@@ -131,6 +183,21 @@
             </select>
         </div>
     </div>
+
+    <div class="avatar-vault">
+        <img src="assets/avatar/base.png" class="avatar-part" id="part-base">
+        <img src="assets/avatar/head_normal.png" class="avatar-part" id="part-head">
+        <img src="assets/avatar/mouth_normal.png" class="avatar-part" id="part-mouth">
+        <img src="assets/avatar/hands_normal.png" class="avatar-part" id="part-hands">
+        <img src="assets/avatar/legs_normal.png" class="avatar-part" id="part-legs">
+    </div>
+
+    <div class="audio-module">
+        <audio id="ge-audio" controls controlsList="nodownload">
+            <source src="" type="audio/mpeg">
+        </audio>
+        <div class="status-bar">Audio Feed Active</div>
+    </div>
 </div>
 
 <script>
@@ -138,22 +205,23 @@
     const taskNum = urlParams.get('task') || "1";
 
     function initGE() {
-        // Load Audio
         const audio = document.getElementById('ge-audio');
         audio.src = `assets/geaudio/ge${taskNum}.mp3`;
-        
         document.getElementById('ge-title').innerText = `GOLDEN EAR: MISSION ${taskNum.padStart(2, '0')}`;
     }
 
-    // تم تعديل هذه الوظيفة لتعمل مع الفم وبقية الأجزاء
     function updateAvatar(part, state) {
         const element = document.getElementById(`part-${part}`);
         if (element) {
+            // إضافة لمسة حركية بسيطة عند التغيير
+            element.style.transform = "scale(1.05)";
             element.src = `assets/avatar/${part}_${state}.png`;
+            setTimeout(() => {
+                element.style.transform = "scale(1)";
+            }, 200);
         }
     }
 
-    // Communication with Parent Arena
     window.addEventListener('message', function(event) {
         if (event.data.type === 'REQUEST_GE_DATA') {
             const data = {
