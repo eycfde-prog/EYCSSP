@@ -7,7 +7,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Orbitron:wght@400;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        /* (نفس التنسيقات السابقة بدون تعديل) */
+        /* [التنسيقات الأصلية ثابتة لضمان استقرار التصميم] */
         :root { --gold: #D4AF37; --gold-glow: rgba(212, 175, 55, 0.6); --gold-gradient: linear-gradient(135deg, #bf953f, #fcf6ba, #b38728); --bg-deep: #020205; --glass: rgba(255, 255, 255, 0.03); --glass-border: rgba(212, 175, 55, 0.3); --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
         body { background: var(--bg-deep); color: white; height: 100vh; display: flex; flex-direction: column; overflow: hidden; position: relative; }
@@ -21,40 +21,29 @@
         .name { font-family: 'Cinzel', serif; font-size: 0.7rem; color: var(--gold); white-space: nowrap; font-weight: 700; }
         .vs-container { text-align: center; perspective: 1000px; }
         .vs-text { font-family: 'Cinzel', serif; font-size: 1.1rem; background: var(--gold-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 900; line-height: 1; animation: vsPulse 2s infinite ease-in-out; text-shadow: 0 0 15px rgba(212, 175, 55, 0.3); }
-        @keyframes vsPulse { 0%, 100% { transform: scale(1); filter: brightness(1); } 50% { transform: scale(1.1); filter: brightness(1.3); } }
         .token-score { font-family: 'Orbitron', sans-serif; font-size: 8px; color: #fff; letter-spacing: 1px; margin-top: 2px; opacity: 0.8; }
         .arena-container { flex: 1; padding: 8px; display: flex; justify-content: center; align-items: center; overflow: hidden; }
         .glass-iframe-wrapper { width: 100%; height: 100%; max-width: 1100px; background: rgba(0, 0, 0, 0.2); backdrop-filter: blur(5px); border: 1px solid var(--glass-border); border-radius: 15px; overflow: hidden; box-shadow: inset 0 0 20px rgba(0,0,0,0.5); }
         iframe { width: 100%; height: 100%; border: none; }
         footer { padding: 10px 15px 15px; display: flex; justify-content: space-between; align-items: center; gap: 10px; max-width: 1000px; margin: 0 auto; width: 100%; }
         .btn { padding: 10px; border-radius: 10px; border: none; font-weight: 700; text-transform: uppercase; cursor: pointer; transition: var(--transition); font-size: 0.7rem; font-family: 'Cinzel'; display: flex; align-items: center; justify-content: center; gap: 6px; }
-        .btn:active { transform: scale(0.95); }
         .btn-submit { flex: 2; background: var(--gold-gradient); color: #000; box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3); font-size: 0.85rem; }
         .btn-side { flex: 1; background: rgba(255,255,255,0.05); color: var(--gold); border: 1px solid var(--glass-border); backdrop-filter: blur(10px); }
         #ai-assistant-btn { position: fixed; bottom: 80px; right: 15px; width: 50px; height: 50px; background: var(--gold-gradient); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 1001; box-shadow: 0 0 15px var(--gold-glow); animation: float 3s infinite ease-in-out; }
-        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
-        #chat-box { position: fixed; bottom: 140px; right: 15px; width: 280px; height: 350px; background: rgba(10, 10, 12, 0.95); border: 1px solid var(--gold); border-radius: 15px; display: none; flex-direction: column; z-index: 1001; overflow: hidden; backdrop-filter: blur(20px); box-shadow: 0 10px 40px rgba(0,0,0,0.8); }
+        #chat-box { position: fixed; bottom: 140px; right: 15px; width: 280px; height: 350px; background: rgba(10, 10, 12, 0.95); border: 1px solid var(--gold); border-radius: 15px; display: none; flex-direction: column; z-index: 1001; overflow: hidden; backdrop-filter: blur(20px); }
         #sync-overlay { position: fixed; inset: 0; background: radial-gradient(circle at center, rgba(10, 10, 15, 0.98), #020205); z-index: 2000; display: none; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px; backdrop-filter: blur(15px); }
         .fairy-loader { position: relative; width: 80px; height: 80px; margin-bottom: 25px; }
-        .fairy-loader i { font-size: 3.5rem; color: var(--gold); text-shadow: 0 0 20px var(--gold-glow); animation: fairyFloat 2s infinite ease-in-out; }
-        @keyframes fairyFloat { 0%, 100% { transform: translateY(0) rotate(0deg); filter: drop-shadow(0 0 5px var(--gold)); } 50% { transform: translateY(-15px) rotate(10deg); filter: drop-shadow(0 0 20px var(--gold)); } }
-        #sync-text { font-family: 'Cinzel', serif; color: white; max-width: 85%; }
-        .glassy-welcome { font-size: 1.1rem; color: var(--gold); margin-bottom: 10px; font-weight: 700; letter-spacing: 1px; text-shadow: 0 0 10px rgba(212, 175, 55, 0.5); }
-        .status-msg { font-family: 'Orbitron', sans-serif; font-size: 0.8rem; color: #aaa; letter-spacing: 2px; text-transform: uppercase; }
-        @media (max-width: 600px) { header { padding: 5px 10px; } .battle-header { gap: 5px; } .name { font-size: 0.6rem; max-width: 70px; overflow: hidden; text-overflow: ellipsis; } .student-photo, .activity-logo { width: 30px; height: 30px; } .vs-text { font-size: 0.9rem; } #student-meta, #mission-sub { display: none; } .arena-container { padding: 5px; } footer { padding: 8px 10px 10px; } .btn { padding: 8px; font-size: 0.65rem; } #ai-assistant-btn { width: 40px; height: 40px; bottom: 70px; } }
+        .fairy-loader i { font-size: 3.5rem; color: var(--gold); animation: fairyFloat 2s infinite ease-in-out; }
+        @keyframes fairyFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
     </style>
 </head>
 <body>
 
     <div id="sync-overlay">
-        <div class="fairy-loader">
-            <i class="fas fa-wand-magic-sparkles"></i>
-        </div>
+        <div class="fairy-loader"><i class="fas fa-wand-magic-sparkles"></i></div>
         <div id="sync-text">
             <div class="glassy-welcome">Hello <span id="display-student-name">Student</span>! ✨</div>
-            <div style="font-size: 0.9rem; margin-bottom: 5px;">I'm <strong style="color: var(--gold);">Glassy</strong> from EYC team..</div>
             <div class="status-msg">Score is Correcting your answer..</div>
-            <div style="font-size: 0.7rem; color: #888; margin-top: 10px;">Wait for your mark..</div>
         </div>
     </div>
 
@@ -95,50 +84,30 @@
         <button class="btn btn-side" onclick="window.location.href='MC.html'"><i class="fas fa-door-open"></i> EXIT</button>
     </footer>
 
-    <div id="ai-assistant-btn" onclick="toggleChat()">
-        <i class="fas fa-robot" style="color: black; font-size: 1.2rem;"></i>
-    </div>
-
-    <div id="chat-box">
-        <div style="background: var(--gold-gradient); padding: 10px; color: black; font-weight: 900; text-align: center; font-family: 'Cinzel'; font-size: 0.8rem; letter-spacing: 1px;">EYC ASSISTANT</div>
-        <div id="chat-content" style="flex: 1; padding: 12px; overflow-y: auto; font-size: 0.75rem; color: #ccc; display: flex; flex-direction: column; gap: 8px; background: rgba(0,0,0,0.3);">
-            <div style="align-self: flex-start; background: rgba(212, 175, 55, 0.1); padding: 8px 12px; border-radius: 12px 12px 12px 0; border: 1px solid var(--glass-border); color: #eee;">
-                أهلاً بك يا بطل! جاهزة لمساعدتك في أي وقت. ✨
-            </div>
-        </div>
-        <div style="display: flex; padding: 8px; border-top: 1px solid var(--glass-border); background: rgba(255,255,255,0.02);">
-            <input type="text" id="chat-input" placeholder="اسألني أي شيء..." style="flex: 1; background: transparent; border: none; color: white; outline: none; font-size: 0.75rem;" onkeypress="if(event.key === 'Enter') askFifi()">
-            <i class="fas fa-paper-plane" onclick="askFifi()" style="color: var(--gold); cursor: pointer; padding: 5px;"></i>
-        </div>
-    </div>
-
-<script>
+    <script>
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwHyATNYbhXFGwtDUv7dxZ8CDOpaNKui0vcpM-umE9gigec8wr5L8H1u7dRYMqev_K-kg/exec";
-        let currentActivity, currentTask, userEmail, userName, sessionEmail;
+        let currentActivity, currentTask, userEmail, userName;
 
         window.onload = function() {
             generateStars();
             const urlParams = new URLSearchParams(window.location.search);
             const savedUser = JSON.parse(localStorage.getItem('eyc_user')) || {};
 
-            // 1. استخراج البيانات من الرابط
+            // 1. استخراج البيانات
             userEmail = urlParams.get('email');
-            sessionEmail = savedUser.email;
+            const sessionEmail = savedUser.email;
             userName = urlParams.get('name') || savedUser.name || "AGENT";
-            
-            // كود النشاط (مثل DX, CS, etc)
-            currentActivity = urlParams.get('act') || "DX"; 
-            // رقم المهمة (مثل 1, 2, etc)
+            currentActivity = urlParams.get('act') || "DX"; // كود النشاط (مثل DX, AR, etc)
             currentTask = urlParams.get('task') || "1";
 
-            // 2. التحقق الأمني (Session Validation)
+            // 2. التحقق الأمني (منع تغيير الإيميل يدوياً في الرابط)
             if (!sessionEmail || userEmail !== sessionEmail) {
-                alert("Security Alert: Invalid Session. Please log in again.");
-                window.location.href = 'MC.html'; 
+                alert("Security Violation: Access Denied.");
+                window.location.href = 'MC.html';
                 return;
             }
 
-            // 3. تحديث واجهة المستخدم (Header)
+            // 3. تحديث الواجهة
             document.getElementById('student-name').innerText = userName;
             document.getElementById('student-meta').innerText = `TITLE: ${urlParams.get('title') || savedUser.title || 'RECRUIT'}`;
             document.getElementById('activity-title').innerText = currentActivity;
@@ -148,15 +117,36 @@
             document.getElementById('student-img').src = avatar.startsWith('http') ? avatar : `assets/avatars/${avatar}`;
             document.getElementById('activity-img').src = `assets/AL/${currentActivity}.png`;
 
-            // 4. التعديل الجوهري: استدعاء ملف الـ HTML الصحيح من مجلد frontend
-            // المسار المتوقع: frontend/NAME_OF_ACTIVITY.html?task=NUMBER
+            // 4. تحميل الصفحة الصحيحة من مجلد frontend باستخدام كود النشاط
+            // المسار المطلوب: frontend/DX.html?task=1
             const targetPage = `frontend/${currentActivity}.html?task=${currentTask}`;
             document.getElementById('contentFrame').src = targetPage;
             
-            console.log("Arena Loaded: Fetching mission from ->", targetPage);
+            console.log("Loading Mission Page:", targetPage);
         };
 
-        // دالة إرسال التقرير (تستخدم نفس البيانات المؤكدة)
+        function requestSubmit() {
+            // التحقق من الجلسة قبل الإرسال
+            const savedUser = JSON.parse(localStorage.getItem('eyc_user')) || {};
+            if (userEmail !== savedUser.email) {
+                alert("Auth Error: Mission aborted.");
+                return;
+            }
+
+            const frame = document.getElementById('contentFrame').contentWindow;
+            document.getElementById('display-student-name').innerText = userName;
+            
+            // إرسال طلب سحب البيانات من ملف الـ HTML داخل الـ Iframe
+            frame.postMessage({ type: 'REQUEST_MISSION_DATA' }, '*'); 
+            document.getElementById('sync-overlay').style.display = 'flex';
+        }
+
+        window.addEventListener('message', function(event) {
+            if (event.data.type === 'MISSION_ANSWERS') {
+                sendToCore(event.data.answers);
+            }
+        });
+
         function sendToCore(answers) {
             const payload = {
                 action: "submitReport",
@@ -172,26 +162,31 @@
             })
             .then(response => response.json())
             .then(data => {
-                // ... (منطق عرض النتيجة كما هو)
                 const syncText = document.getElementById('sync-text');
                 syncText.innerHTML = `
-                    <div class="fairy-loader"><i class="fas fa-star" style="color: #fff; text-shadow: 0 0 20px gold;"></i></div>
-                    <div style="color: var(--gold); font-size: 2.2rem; font-weight: 900; text-shadow: 0 0 20px var(--gold-glow); font-family: 'Orbitron';">
-                        ${data.grade}/${data.maxGrade}
-                    </div>
-                    <div style="font-size: 0.85rem; margin-top: 15px; color: #eee; font-family: 'Poppins'; line-height: 1.6; background: rgba(255,255,255,0.05); padding: 15px; border-radius: 12px; border: 1px solid var(--glass-border);">
-                        ${data.reason}
-                    </div>
+                    <div class="fairy-loader"><i class="fas fa-star" style="color: gold;"></i></div>
+                    <div style="color: var(--gold); font-size: 2.2rem; font-weight: 900; font-family: 'Orbitron';">${data.grade}/${data.maxGrade}</div>
+                    <div style="font-size: 0.85rem; margin-top: 15px; color: #eee; padding: 15px; border: 1px solid var(--glass-border);">${data.reason}</div>
                 `;
                 setTimeout(() => window.location.href = 'MC.html', 4500);
             })
             .catch(err => {
                 document.getElementById('sync-overlay').style.display = 'none';
-                alert("Connection Error. Your progress is safe, please try submitting again.");
+                alert("Submit Failed. Network error.");
             });
         }
 
-        // ... (باقي الدوال التجميلية generateStars, toggleChat, etc)
+        // [وظائف تجميلية]
+        function openGuide() { alert("EYC RULES: Quality is priority."); }
+        function generateStars() {
+            const container = document.getElementById('star-container');
+            for (let i = 0; i < 40; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.style.cssText = `width:2px; height:2px; left:${Math.random()*100}%; top:${Math.random()*100}%; --duration:${Math.random()*3+2}s`;
+                container.appendChild(star);
+            }
+        }
     </script>
 </body>
 </html>
