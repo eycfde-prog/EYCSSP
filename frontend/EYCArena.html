@@ -86,7 +86,7 @@
         }
         .token-score { font-family: 'Orbitron', sans-serif; font-size: 8px; color: #fff; letter-spacing: 1px; margin-top: 2px; opacity: 0.8; }
 
-        /* Arena Layout */
+        /* Arena Layout (Focus on Mobile View) */
         .arena-container { 
             flex: 1; 
             padding: 8px; 
@@ -190,89 +190,30 @@
             box-shadow: 0 10px 40px rgba(0,0,0,0.8); 
         }
 
-        /* Overlay Styles */
-        #sync-overlay { 
-            position: fixed; 
-            inset: 0; 
-            background: radial-gradient(circle at center, rgba(10, 10, 15, 0.98), #020205); 
-            z-index: 2000; 
-            display: none; 
-            flex-direction: column; 
-            justify-content: center; 
-            align-items: center; 
-            text-align: center; 
-            padding: 20px; 
-            backdrop-filter: blur(15px); 
-        }
-
-        .fairy-loader {
-            position: relative;
-            width: 80px;
-            height: 80px;
-            margin-bottom: 25px;
-        }
-
-        .fairy-loader i {
-            font-size: 3.5rem;
-            color: var(--gold);
-            text-shadow: 0 0 20px var(--gold-glow);
-            animation: fairyFloat 2s infinite ease-in-out;
-        }
-
-        @keyframes fairyFloat {
-            0%, 100% { transform: translateY(0) rotate(0deg); filter: drop-shadow(0 0 5px var(--gold)); }
-            50% { transform: translateY(-15px) rotate(10deg); filter: drop-shadow(0 0 20px var(--gold)); }
-        }
-
-        #sync-text {
-            font-family: 'Cinzel', serif;
-            color: white;
-            max-width: 85%;
-        }
-
-        .glassy-welcome {
-            font-size: 1.1rem;
-            color: var(--gold);
-            margin-bottom: 10px;
-            font-weight: 700;
-            letter-spacing: 1px;
-            text-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
-        }
-
-        .status-msg {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 0.8rem;
-            color: #aaa;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-        }
-
+        /* Mobile Adjustments */
         @media (max-width: 600px) {
             header { padding: 5px 10px; }
             .battle-header { gap: 5px; }
             .name { font-size: 0.6rem; max-width: 70px; overflow: hidden; text-overflow: ellipsis; }
             .student-photo, .activity-logo { width: 30px; height: 30px; }
             .vs-text { font-size: 0.9rem; }
-            #student-meta, #mission-sub { display: none; }
+            #student-meta, #mission-sub { display: none; } /* توفير مساحة للموبايل */
+            
+            /* تحسين الرؤية عند فتح الكيبورد */
             .arena-container { padding: 5px; }
             footer { padding: 8px 10px 10px; }
             .btn { padding: 8px; font-size: 0.65rem; }
             #ai-assistant-btn { width: 40px; height: 40px; bottom: 70px; }
         }
+
+        #sync-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 2000; display: none; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px; backdrop-filter: blur(10px); }
     </style>
 </head>
 <body>
 
     <div id="sync-overlay">
-        <div class="fairy-loader">
-            <i class="fas fa-wand-magic-sparkles"></i>
-        </div>
-        <div id="sync-text">
-            <div class="glassy-welcome">Hello <span id="display-student-name">Student</span>! ✨</div>
-            <div style="font-size: 0.9rem; margin-bottom: 5px;">I'm <strong style="color: var(--gold);">Glassy</strong> from EYC team..</div>
-            <div class="status-msg">Score is Correcting your answer..</div>
-            <div style="font-size: 0.7rem; color: #888; margin-top: 10px;">Wait for your mark..</div>
-        </div>
+        <i class="fas fa-compact-disc fa-spin" style="font-size: 3rem; color: var(--gold); margin-bottom: 20px;"></i>
+        <div id="sync-text" style="font-family: 'Cinzel'; letter-spacing: 2px; color: white; text-shadow: 0 0 10px var(--gold);">ESTABLISHING UPLINK...</div>
     </div>
 
     <div id="star-container"></div>
@@ -360,7 +301,6 @@
 
         function requestSubmit() {
             const frame = document.getElementById('contentFrame').contentWindow;
-            document.getElementById('display-student-name').innerText = userName;
             frame.postMessage({ type: 'REQUEST_MISSION_DATA' }, '*'); 
             document.getElementById('sync-overlay').style.display = 'flex';
         }
@@ -388,14 +328,9 @@
             .then(data => {
                 const syncText = document.getElementById('sync-text');
                 syncText.innerHTML = `
-                    <div class="fairy-loader"><i class="fas fa-star" style="color: #fff; text-shadow: 0 0 20px gold;"></i></div>
-                    <div style="color: var(--gold); font-size: 2.2rem; font-weight: 900; text-shadow: 0 0 20px var(--gold-glow); font-family: 'Orbitron';">
-                        ${data.grade}/${data.maxGrade}
-                    </div>
-                    <div style="font-size: 0.85rem; margin-top: 15px; color: #eee; font-family: 'Poppins'; line-height: 1.6; background: rgba(255,255,255,0.05); padding: 15px; border-radius: 12px; border: 1px solid var(--glass-border);">
-                        ${data.reason}
-                    </div>
-                    <div style="font-size: 0.65rem; margin-top: 20px; color: var(--gold); letter-spacing: 2px;">MISSION LOGGED SUCCESSFULLY</div>
+                    <div style="color: var(--gold); font-size: 2rem; font-weight: bold; text-shadow: 0 0 15px var(--gold-glow);">GRADE: ${data.grade}/${data.maxGrade}</div>
+                    <div style="font-size: 0.9rem; margin-top: 15px; color: #ccc; max-width: 300px;">${data.reason}</div>
+                    <div style="font-size: 0.7rem; margin-top: 10px; color: var(--gold); font-style: italic;">Uplink Complete. Redirecting...</div>
                 `;
                 setTimeout(() => window.location.href = 'MC.html', 4500);
             })
