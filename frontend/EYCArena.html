@@ -330,7 +330,7 @@
     </div>
 
     <script>
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyb6BmjeO9ARQdAa4w5kLh6uzL4dbPFDmCVHRaMpVmqMtMJfYTTbItWCO88Ed5BQuptxw/exec";
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx92BwkmEmsyaHQxj49wt8IFI-URvnOC7Tk-0_SjNUY-8xk3WykInF3MG0ofNtytBwixA/exec";
         let currentActivity, currentTask, userEmail, userName;
 
         window.onload = function() {
@@ -342,23 +342,16 @@
             userName = urlParams.get('name') || savedUser.name || "AGENT";
             currentActivity = urlParams.get('act') || "DX";
             currentTask = urlParams.get('task') || "1";
-            const userRank = urlParams.get('rank') || savedUser.rank || "--";
 
             document.getElementById('student-name').innerText = userName;
-            document.getElementById('student-meta').innerText = `RANK: #${userRank}`;
+            document.getElementById('student-meta').innerText = `TITLE: ${urlParams.get('title') || savedUser.title || 'RECRUIT'}`;
             document.getElementById('activity-title').innerText = currentActivity;
             document.getElementById('mission-sub').innerText = `MISSION ${currentTask.padStart(2, '0')}`;
             
             const avatar = urlParams.get('avatar') || savedUser.avatar || 'default.png';
             document.getElementById('student-img').src = avatar.startsWith('http') ? avatar : `assets/avatars/${avatar}`;
-            document.getElementById('activity-img').src = `AL/${currentActivity}.png`;
-            document.getElementById('contentFrame').src = `frontend/${currentActivity}.html?task=${currentTask}`;
-
-            fetch(`${SCRIPT_URL}?action=getMissionInfo&act=${currentActivity}&task=${currentTask}`)
-                .then(res => res.json())
-                .then(data => {
-                    if(data.maxGrade) document.getElementById('max-score').innerText = `${data.maxGrade} TOKENS`;
-                });
+            document.getElementById('activity-img').src = `assets/AL/${currentActivity}.png`;
+            document.getElementById('contentFrame').src = `assets/MIF/${currentActivity}.html?task=${currentTask}`;
         };
 
         function openGuide() {
