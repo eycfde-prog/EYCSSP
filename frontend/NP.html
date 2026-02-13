@@ -2,380 +2,177 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EYC Superstars Registration</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" href="npstyle.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Golden Ear | Voice Lab | EYC</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
     <style>
-        .sub-options { display: none; margin-top: 15px; text-align: left; }
-        .golden-ticket-area { display: none; margin-top: 10px; }
-        .ticket-input { width: 100%; padding: 10px; margin-bottom: 10px; border-radius: 10px; border: 1px solid #d4af37; background: rgba(0,0,0,0.5); color: white; }
+        :root { --neon-gold: #ffcc00; --neon-blue: #00f2ff; --glass: rgba(10, 10, 15, 0.95); }
+        
+        body { 
+            font-family: 'Rajdhani', sans-serif; background: transparent; color: white; 
+            margin: 0; padding: 10px; direction: ltr; overflow-x: hidden;
+        }
+
+        .ge-container { max-width: 100%; margin: 0 auto; text-align: center; }
+
+        .header-ge h1 { 
+            font-family: 'Orbitron'; color: var(--neon-gold); 
+            letter-spacing: 3px; font-size: 1.4rem; margin-bottom: 5px;
+        }
+
+        /* Avatar System */
+        .avatar-vault {
+            position: relative; width: 180px; height: 180px; margin: 0 auto 20px;
+            background: radial-gradient(circle, rgba(0, 242, 255, 0.1) 0%, transparent 70%);
+            border-radius: 50%; padding: 20px;
+        }
+
+        .avatar-part {
+            position: absolute; width: 100%; height: 100%; top: 0; left: 0;
+            object-fit: contain; transition: 0.3s ease;
+        }
+
+        /* Audio Controls */
+        .audio-module {
+            background: var(--glass); border: 1px solid var(--neon-gold);
+            padding: 15px; border-radius: 15px; margin-bottom: 20px;
+        }
+
+        audio { width: 100%; height: 35px; filter: invert(100%) hue-rotate(180deg) brightness(1.5); }
+
+        /* Selection Grid */
+        .actions-grid {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px;
+        }
+
+        .action-group {
+            background: rgba(255,255,255,0.05); padding: 10px; border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .action-group label {
+            display: block; font-family: 'Orbitron'; font-size: 10px; 
+            color: var(--neon-blue); margin-bottom: 8px;
+        }
+
+        select {
+            width: 100%; background: #000; color: white; border: 1px solid #333;
+            padding: 8px; font-family: 'Rajdhani'; font-size: 0.9rem; outline: none;
+        }
+
+        .status-bar {
+            font-family: 'Orbitron'; font-size: 11px; color: var(--neon-gold);
+            text-transform: uppercase; margin-top: 10px;
+        }
+
+        /* Mobile Adjustments */
+        @media (max-width: 480px) {
+            .header-ge h1 { font-size: 1.2rem; }
+            .avatar-vault { width: 140px; height: 140px; }
+            .actions-grid { grid-template-columns: 1fr; }
+        }
     </style>
 </head>
-<body onload="initStars(); initOptions(); updateAvatar();">
+<body>
 
-<canvas id="starCanvas"></canvas>
-<audio id="clickSound" src="https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3"></audio>
-<audio id="goldSound" src="https://assets.mixkit.co/active_storage/sfx/2019/2019-preview.mp3"></audio>
-
-<div class="container">
-    <div class="progress-container"><div class="progress-bar" id="pBar"></div></div>
-    <div class="loading-overlay" id="loader">DEPLOYING AGENT...</div>
-    
-    <div class="avatar-section" id="avatar-sidebar">
-        <div id="avatar-container">
-            <div class="img-loader" id="imgLoader"></div>
-            <img id="avatar-img" src="https://avataaars.io/?avatarStyle=Transparent" alt="Avatar">
-        </div>
-        <h3 id="display-name">EYC AGENT</h3>
+<div class="ge-container">
+    <div class="header-ge">
+        <h1 id="ge-title">GOLDEN EAR MISSION</h1>
     </div>
 
-    <div class="form-section">
-        <form id="registrationForm">
-            <div class="step active" id="step1">
-                <h2>01. Identity</h2>
-                <div class="input-group">
-                    <label>Full Name</label>
-                    <input type="text" id="name" placeholder="Enter Agent Name" required oninput="updateName()">
-                </div>
-                <button type="button" onclick="nextStep(2)">Proceed</button>
-            </div>
+    <div class="avatar-vault">
+        <img src="assets/avatar/base.png" class="avatar-part" id="part-base">
+        <img src="assets/avatar/head_normal.png" class="avatar-part" id="part-head">
+        <img src="assets/avatar/mouth_normal.png" class="avatar-part" id="part-mouth">
+        <img src="assets/avatar/hands_normal.png" class="avatar-part" id="part-hands">
+        <img src="assets/avatar/legs_normal.png" class="avatar-part" id="part-legs">
+    </div>
 
-            <div class="step" id="step2">
-                <h2>02. Contact & Age</h2>
-                <div class="input-group"><input type="email" id="email" placeholder="Email Address" required></div>
-                <div class="input-group"><input type="number" id="age" placeholder="Age" required></div>
-                <div class="btn-group">
-                    <button type="button" class="prev-btn" onclick="nextStep(1)">Back</button>
-                    <button type="button" onclick="nextStep(3)">Next</button>
-                </div>
-            </div>
+    <div class="audio-module">
+        <audio id="ge-audio" controls controlsList="nodownload">
+            <source src="" type="audio/mpeg">
+        </audio>
+        <div class="status-bar">Audio Feed Active</div>
+    </div>
 
-            <div class="step" id="step3">
-                <h2>03. Base Design</h2>
-                <div class="input-group">
-                    <label>Gender Base</label>
-                    <select id="gender" onchange="initOptions(); updateAvatar();">
-                        <option value="male">Male</option>
-                        <option value="female">Female</option>
-                    </select>
-                </div>
-                <div class="btn-group">
-                    <button type="button" class="prev-btn" onclick="nextStep(2)">Back</button>
-                    <button type="button" onclick="nextStep(4)">Customize</button>
-                </div>
-            </div>
-
-            <div class="step" id="step4">
-                <h2>04. Features</h2>
-                <div class="input-group">
-                    <label id="hairLabel">Hair Style</label>
-                    <select id="topType" onchange="checkHijab(); updateAvatar();"></select>
-                </div>
-                <div class="input-group">
-                    <label id="hairColorLabel">Color</label>
-                    <select id="hairColor" onchange="updateAvatar()"></select>
-                </div>
-                <div class="btn-group">
-                    <button type="button" class="prev-btn" onclick="nextStep(3)">Back</button>
-                    <button type="button" onclick="nextStep(5)">Next</button>
-                </div>
-            </div>
-
-            <div class="step" id="step5">
-                <h2>05. Face & Details</h2>
-                <div id="facial-hair-group" class="input-group">
-                    <label>Beard Style</label>
-                    <select id="facialHairType" onchange="updateAvatar()"></select>
-                </div>
-                <div class="input-group">
-                    <label>Accessories</label>
-                    <select id="accessoriesType" onchange="updateAvatar()">
-                        <option value="Blank">None</option>
-                        <option value="Kurt">Kurt</option>
-                        <option value="Prescription01">Classic</option>
-                        <option value="Prescription02">Modern</option>
-                        <option value="Round">Round</option>
-                        <option value="Sunglasses">Sunglasses</option>
-                        <option value="Wayfarers">Wayfarers</option>
-                    </select>
-                </div>
-                <div class="input-group">
-                    <label>Eye Expression</label>
-                    <select id="eyeType" onchange="updateAvatar()">
-                        <option value="Default">Normal</option>
-                        <option value="Happy">Happy</option>
-                        <option value="Wink">Wink 😉</option>
-                        <option value="Hearts">Love 😍</option>
-                        <option value="Surprised">Surprised 😮</option>
-                        <option value="Squint">Squint</option>
-                    </select>
-                </div>
-                <div class="input-group">
-    <label>Mouth Expression</label>
-    <select id="mouthType" onchange="updateAvatar()">
-        <option value="Default">Normal 😐</option>
-        <option value="Smile">Smile 😊</option>
-        <option value="Twinkle">Cheerful ✨</option>
-        <option value="Serious">Serious 🧐</option>
-        <option value="Tongue">Tongue 😋</option>
-        <option value="Grimace">Grimace 😬</option>
-        <option value="ScreamOpen">Shocked 😱</option>
-        <option value="Eating">Happy Eating 🍎</option>
-    </select>
-</div>
-                <div class="input-group">
-                    <label>Skin Complexion</label>
-                    <select id="skinColor" onchange="updateAvatar()">
-                        <option value="Tanned">Tanned</option>
-                        <option value="Yellow">Yellow</option>
-                        <option value="Pale">Pale</option>
-                        <option value="Light">Light</option>
-                        <option value="Brown">Brown</option>
-                    </select>
-                </div>
-                <div class="btn-group">
-                    <button type="button" class="prev-btn" onclick="nextStep(4)">Back</button>
-                    <button type="button" onclick="nextStep(6)">Outfits</button>
-                </div>
-            </div>
-
-            <div class="step" id="step6">
-                <h2>06. Wardrobe</h2>
-                <div class="input-group">
-                    <label>Outfit Style</label>
-                    <select id="clotheType" onchange="updateAvatar()">
-                        <option value="BlazerShirt">Blazer & Shirt</option>
-                        <option value="BlazerSweater">Blazer & Sweater</option>
-                        <option value="CollarSweater">Collar Sweater</option>
-                        <option value="GraphicShirt">Graphic T-Shirt</option>
-                        <option value="Hoodie">Hoodie</option>
-                    </select>
-                </div>
-                <div class="btn-group">
-                    <button type="button" class="prev-btn" onclick="nextStep(5)">Back</button>
-                    <button type="button" onclick="nextStep(7)">Next</button>
-                </div>
-            </div>
-
-            <div class="step" id="step7">
-                <h2>07. Mission Program</h2>
-                <div class="input-group">
-                    <label style="margin-bottom: 15px;">Select Your Path</label>
-                    <div style="display: flex; gap: 20px; justify-content: center;">
-                        <label class="check-label">
-                            <input type="checkbox" name="program" value="Season"> Season
-                        </label>
-                        <label class="check-label">
-                            <input type="checkbox" name="program" value="Royal" id="royalCheck" onchange="toggleRoyalOptions()"> Royal
-                        </label>
-                    </div>
-                </div>
-
-                <div id="royalSubOptions" class="sub-options">
-                    <label>Royal Type:</label>
-                    <select id="royalType" onchange="toggleTicketArea()" style="width:100%; padding:10px; border-radius:10px;">
-                        <option value="free">Free Access</option>
-                        <option value="paid">Paid (Golden Tickets)</option>
-                    </select>
-                    
-                    <div id="ticketArea" class="golden-ticket-area">
-                        <input type="text" id="ticket1" class="ticket-input" placeholder="Golden Ticket Code 1">
-                        <input type="text" id="ticket2" class="ticket-input" placeholder="Golden Ticket Code 2">
-                    </div>
-                </div>
-
-                <div class="btn-group" style="margin-top:20px;">
-                    <button type="button" class="prev-btn" onclick="nextStep(6)">Back</button>
-                    <button type="submit">Complete Mission</button>
-                </div>
-            </div>
-        </form>
-
-        <div id="success-card">
-            <h2>MISSION ACCOMPLISHED</h2>
-            <div class="card-inner">
-                <img id="card-avatar" src="" width="180">
-                <h3 id="card-name"></h3>
-                <div class="code-box">
-                    <span id="agent-code">----</span>
-                </div>
-            </div>
-<button onclick="window.location.href='MC.html'" class="final-btn">Enter Command Center</button>
+    <div class="actions-grid">
+        <div class="action-group">
+            <label>HEAD_STATE</label>
+            <select id="select-head" onchange="updateAvatar('head', this.value)">
+                <option value="normal">NORMAL</option>
+                <option value="confused">CONFUSED</option>
+                <option value="happy">HAPPY</option>
+                <option value="angry">ANGRY</option>
+            </select>
+        </div>
+        <div class="action-group">
+            <label>MOUTH_STATE</label>
+            <select id="select-mouth" onchange="updateAvatar('mouth', this.value)">
+                <option value="normal">NORMAL</option>
+                <option value="open">TALKING</option>
+                <option value="smile">SMILING</option>
+                <option value="sad">CLOSED</option>
+            </select>
+        </div>
+        <div class="action-group">
+            <label>HANDS_STATE</label>
+            <select id="select-hands" onchange="updateAvatar('hands', this.value)">
+                <option value="normal">IDLE</option>
+                <option value="up">WAVING</option>
+                <option value="down">RESTING</option>
+            </select>
+        </div>
+        <div class="action-group">
+            <label>LEGS_STATE</label>
+            <select id="select-legs" onchange="updateAvatar('legs', this.value)">
+                <option value="normal">STANDING</option>
+                <option value="run">RUNNING</option>
+                <option value="sit">SITTING</option>
+            </select>
         </div>
     </div>
 </div>
 
 <script>
-    const options = {
-        maleHair: ["ShortHairShortFlat", "ShortHairShortWaved", "NoHair", "ShortHairTheCaesar", "ShortHairDreads01"],
-        femaleHair: ["LongHairCurvy", "Hijab", "LongHairStraight", "LongHairBob", "LongHairNotTooLong", "LongHairCurly"],
-        maleHairColors: ["Black", "Brown", "BrownDark", "Blonde", "BlondeGolden", "Platinum"],
-        femaleHairColors: ["Black", "Brown", "BrownDark", "Blonde", "Platinum", "Red"],
-        hijabColors: ["Black", "White", "Blue01", "Blue02", "Red", "Heather", "PastelBlue", "PastelGreen", "Pink"],
-        facialHair: ["Blank", "BeardMedium", "BeardLight", "BeardMajestic", "MoustacheFancy", "MoustacheMagnum"],
-        eyes: ["Default", "Happy", "Surprised", "Wink", "Hearts", "Side", "Squint", "Close"]
-    };
+    const urlParams = new URLSearchParams(window.location.search);
+    const taskNum = urlParams.get('task') || "1";
 
-    function initStars() {
-        const canvas = document.getElementById('starCanvas');
-        const ctx = canvas.getContext('2d');
-        let w, h, stars = [];
-        function setSize() { w = canvas.width = window.innerWidth; h = canvas.height = window.innerHeight; }
-        window.onresize = setSize; setSize();
-        for(let i=0; i<80; i++) { stars.push({ x: Math.random() * w, y: Math.random() * h, size: Math.random() * 2, speed: Math.random() * 0.5 + 0.1 }); }
-        function draw() {
-            ctx.clearRect(0,0,w,h); ctx.fillStyle = "#d4af37";
-            stars.forEach(s => { ctx.beginPath(); ctx.arc(s.x, s.y, s.size, 0, Math.PI*2); ctx.fill(); s.y -= s.speed; if(s.y < 0) s.y = h; });
-            requestAnimationFrame(draw);
-        }
-        draw();
-    }
-
-    function playClick() { const snd = document.getElementById('clickSound'); snd.currentTime = 0; snd.play().catch(() => {}); }
-
-    function initOptions() {
-        const isFemale = document.getElementById('gender').value === 'female';
-        const topSel = document.getElementById('topType');
-        topSel.innerHTML = "";
-        const hairList = isFemale ? options.femaleHair : options.maleHair;
-        hairList.forEach(opt => topSel.add(new Option(opt, opt)));
-        const facialGroup = document.getElementById('facial-hair-group');
-        const facialSel = document.getElementById('facialHairType');
-        facialSel.innerHTML = "";
-        if (isFemale) { facialGroup.style.display = "none"; facialSel.add(new Option("Blank", "Blank")); }
-        else { facialGroup.style.display = "block"; options.facialHair.forEach(opt => facialSel.add(new Option(opt, opt))); }
-        checkHijab();
-    }
-
-    function checkHijab() {
-        const isFemale = document.getElementById('gender').value === 'female';
-        const isHijab = document.getElementById('topType').value === 'Hijab';
-        const colorSel = document.getElementById('hairColor');
-        const colorLabel = document.getElementById('hairColorLabel');
-        colorSel.innerHTML = "";
-        let colorList = isFemale && isHijab ? options.hijabColors : (isFemale ? options.femaleHairColors : options.maleHairColors);
-        colorLabel.innerText = isFemale && isHijab ? "Hijab Color" : "Hair Color";
-        colorList.forEach(opt => colorSel.add(new Option(opt, opt)));
-    }
-
-    function updateName() { document.getElementById('display-name').innerText = document.getElementById('name').value.toUpperCase() || "EYC AGENT"; }
-
-    function updateAvatar() {
-        const loader = document.getElementById('imgLoader');
-        const img = document.getElementById('avatar-img');
-        loader.style.display = 'block';
-        const top = document.getElementById('topType').value;
-        const skin = document.getElementById('skinColor').value;
-        const facial = document.getElementById('facialHairType').value;
-        const color = document.getElementById('hairColor').value;
-        const clothe = document.getElementById('clotheType').value;
-        const accessories = document.getElementById('accessoriesType').value;
-        const eye = document.getElementById('eyeType').value;
-        const colorParam = top === 'Hijab' ? `&hatColor=${color}` : `&hairColor=${color}`;
-        const url = `https://avataaars.io/?avatarStyle=Transparent&topType=${top}${colorParam}&accessoriesType=${accessories}&facialHairType=${facial}&clotheType=${clothe}&eyeType=${eye}&mouthType=Default&skinColor=${skin}`;
-        const tempImg = new Image();
-        tempImg.src = url;
-        tempImg.onload = () => { img.src = url; loader.style.display = 'none'; };
-    }
-
-    function nextStep(step) {
-        playClick();
-        if (step > 1) {
-            const prevStepEl = document.getElementById(`step${step-1}`);
-            const inputs = prevStepEl.querySelectorAll('input[required]');
-            let valid = true;
-            inputs.forEach(i => { if(!i.value) valid = false; });
-            if(!valid) { alert("Fill all fields, Agent!"); return; }
-        }
-        document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
-        document.getElementById('step' + step).classList.add('active');
-        document.getElementById('pBar').style.width = (step * 14.2) + "%";
-    }
-
-    // --- وظيفة حركة الفم الذكية ---
-    let mouthOpen = false;
-    function toggleMouth() {
-        const img = document.getElementById('avatar-img');
-        if (!img.src.includes('avataaars.io')) return;
+    function initGE() {
+        // Load Audio
+        const audio = document.getElementById('ge-audio');
+        audio.src = `assets/geaudio/ge${taskNum}.mp3`;
         
-        mouthOpen = !mouthOpen;
-        let currentUrl = new URL(img.src);
-        currentUrl.searchParams.set('mouthType', mouthOpen ? 'Twinkle' : 'Default');
-        img.src = currentUrl.toString();
+        document.getElementById('ge-title').innerText = `GOLDEN EAR: MISSION ${taskNum.padStart(2, '0')}`;
     }
 
-    document.getElementById('name').addEventListener('focus', () => {
-        const mouthInterval = setInterval(toggleMouth, 300);
-        document.getElementById('name').addEventListener('blur', () => clearInterval(mouthInterval), {once: true});
+    // تم تعديل هذه الوظيفة لتعمل مع الفم وبقية الأجزاء
+    function updateAvatar(part, state) {
+        const element = document.getElementById(`part-${part}`);
+        if (element) {
+            element.src = `assets/avatar/${part}_${state}.png`;
+        }
+    }
+
+    // Communication with Parent Arena
+    window.addEventListener('message', function(event) {
+        if (event.data.type === 'REQUEST_GE_DATA') {
+            const data = {
+                head: document.getElementById('select-head').value,
+                mouth: document.getElementById('select-mouth').value,
+                hands: document.getElementById('select-hands').value,
+                legs: document.getElementById('select-legs').value
+            };
+
+            window.parent.postMessage({ 
+                type: 'SUBMIT_X', 
+                activityCode: 'GE', 
+                answers: [data.head, data.mouth, data.hands, data.legs], 
+                missionNum: taskNum 
+            }, '*');
+        }
     });
 
-    // --- وظائف الـ Royal و الـ Tickets ---
-    function toggleRoyalOptions() {
-        const isRoyal = document.getElementById('royalCheck').checked;
-        document.getElementById('royalSubOptions').style.display = isRoyal ? 'block' : 'none';
-    }
-
-    function toggleTicketArea() {
-        const isPaid = document.getElementById('royalType').value === 'paid';
-        document.getElementById('ticketArea').style.display = isPaid ? 'block' : 'none';
-    }
-
-    document.getElementById('registrationForm').onsubmit = function(e) {
-        e.preventDefault();
-        playClick();
-        const programs = Array.from(document.querySelectorAll('input[name="program"]:checked')).map(cb => cb.value);
-        if (programs.length === 0) { alert("Please select at least one mission program, Agent!"); return; }
-
-        const loader = document.getElementById('loader');
-        loader.style.display = 'flex';
-        const generatedCode = "EYC-" + Math.floor(1000 + Math.random() * 9000);
-
-        const studentObj = {
-            action: "register",
-            name: document.getElementById('name').value,
-            email: document.getElementById('email').value,
-            age: document.getElementById('age').value,
-            programs: programs.join(", "),
-            avatar: document.getElementById('avatar-img').src,
-            studentCode: generatedCode
-        };
-
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzF8iNbomScVo8wcEf2_ry10tv_QaKNbdZXUbCQrkpqUf7YNKkOTHwGLju36LEkPrRSZg/exec"; 
-
-        fetch(SCRIPT_URL, {
-            method: "POST",
-            body: JSON.stringify(studentObj)
-        })
-        .then(response => response.text())
-        .then(result => {
-            loader.style.display = 'none';
-            if (result.includes("Error: Email already exists")) {
-                alert("ACCESS DENIED: This email is already registered in our database! 🚫");
-            } else if (result.includes("Success")) {
-                showFinalCard(generatedCode); 
-                localStorage.setItem('eyc_user_code', generatedCode);
-            } else {
-                alert("System Error: " + result);
-            }
-        })
-        .catch(err => {
-            loader.style.display = 'none';
-            alert("Transmission Failed: Check your connection, Agent! 📡");
-            console.error(err);
-        });
-    };
-
-    function showFinalCard(generatedCode) {
-        document.getElementById('registrationForm').style.display = 'none';
-        document.getElementById('avatar-sidebar').style.display = 'none';
-        document.getElementById('success-card').style.display = 'block';
-        document.getElementById('card-avatar').src = document.getElementById('avatar-img').src;
-        document.getElementById('card-name').innerText = document.getElementById('name').value;
-        document.getElementById('agent-code').innerText = generatedCode; 
-        document.getElementById('pBar').style.width = "100%";
-    }
+    window.onload = initGE;
 </script>
 </body>
 </html>
