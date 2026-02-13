@@ -112,7 +112,7 @@
             document.getElementById('activity-img').src = `assets/AL/${currentActivity}.png`;
 
             // 2. تحميل النشاط من مجلد frontend
-            document.getElementById('contentFrame').src = `frontend/${currentActivity}.html?task=${currentTask}`;
+            document.getElementById('contentFrame').src = `${currentActivity}.html?task=${currentTask}`;
         };
 
         async function startSubmission() {
