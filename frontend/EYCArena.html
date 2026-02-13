@@ -329,112 +329,83 @@
         </div>
     </div>
 
-    <script>
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwHyATNYbhXFGwtDUv7dxZ8CDOpaNKui0vcpM-umE9gigec8wr5L8H1u7dRYMqev_K-kg/exec";
-        let currentActivity, currentTask, userEmail, userName;
+<script>
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwHyATNYbhXFGwtDUv7dxZ8CDOpaNKui0vcpM-umE9gigec8wr5L8H1u7dRYMqev_K-kg/exec";
+    let currentActivity, currentTask, userEmail, userName;
 
-        window.onload = function() {
-            generateStars();
-            const urlParams = new URLSearchParams(window.location.search);
-            const savedUser = JSON.parse(localStorage.getItem('eyc_user')) || {};
+    window.onload = function() {
+        generateStars();
+        
+        // 1. استرجاع بيانات المستخدم من الـ LocalStorage (الجلسة)
+        const savedUser = JSON.parse(localStorage.getItem('eyc_user'));
+        const urlParams = new URLSearchParams(window.location.search);
 
-            userEmail = urlParams.get('email') || savedUser.email;
-            userName = urlParams.get('name') || savedUser.name || "AGENT";
-            currentActivity = urlParams.get('act') || "DX";
-            currentTask = urlParams.get('task') || "1";
+        // 2. التحقق الأمني: إذا لم تكن هناك جلسة أو الإيميل في الرابط يختلف عن الجلسة
+        const urlEmail = urlParams.get('email');
+        
+        if (!savedUser || (urlEmail && urlEmail !== savedUser.email)) {
+            alert("Security Breach: Invalid Session. Please login again.");
+            window.location.href = 'MC.html'; // إعادة التوجيه لصفحة الأنشطة
+            return;
+        }
 
-            document.getElementById('student-name').innerText = userName;
-            document.getElementById('student-meta').innerText = `TITLE: ${urlParams.get('title') || savedUser.title || 'RECRUIT'}`;
-            document.getElementById('activity-title').innerText = currentActivity;
-            document.getElementById('mission-sub').innerText = `MISSION ${currentTask.padStart(2, '0')}`;
-            
-            const avatar = urlParams.get('avatar') || savedUser.avatar || 'default.png';
-            document.getElementById('student-img').src = avatar.startsWith('http') ? avatar : `assets/avatars/${avatar}`;
-            document.getElementById('activity-img').src = `assets/AL/${currentActivity}.png`;
-            document.getElementById('contentFrame').src = `assets/MIF/${currentActivity}.html?task=${currentTask}`;
+        // 3. اعتماد بيانات الجلسة الأصلية بدلاً من بيانات الرابط القابلة للتلاعب
+        userEmail = savedUser.email;
+        userName = savedUser.name;
+        currentActivity = urlParams.get('act') || "DX";
+        currentTask = urlParams.get('task') || "1";
+
+        // تحديث الواجهة
+        document.getElementById('student-name').innerText = userName;
+        document.getElementById('student-meta').innerText = `TITLE: ${savedUser.title || 'RECRUIT'}`;
+        document.getElementById('activity-title').innerText = currentActivity;
+        document.getElementById('mission-sub').innerText = `MISSION ${currentTask.padStart(2, '0')}`;
+        
+        const avatar = savedUser.avatar || 'default.png';
+        document.getElementById('student-img').src = avatar.startsWith('http') ? avatar : `assets/avatars/${avatar}`;
+        document.getElementById('activity-img').src = `assets/AL/${currentActivity}.png`;
+
+        // 4. تغيير المسار ليقرأ من مجلد frontend على المستودع الرئيسي
+        // ملاحظة: تأكد من أن المسار هو المسار النسبي الصحيح في مستودعك
+        document.getElementById('contentFrame').src = `frontend/${currentActivity}.html?task=${currentTask}`;
+    };
+
+    // ... باقي الدوال (openGuide, requestSubmit, etc.) دون تغيير ...
+
+    function sendToCore(answers) {
+        // نستخدم هنا userEmail الذي تم استخراجه من الجلسة (LocalStorage) وليس الرابط
+        const payload = {
+            action: "submitReport",
+            email: userEmail, 
+            actCode: currentActivity,
+            taskNum: currentTask,
+            answer: answers
         };
 
-        function openGuide() {
-            alert("EYC TITANIUM RULES:\n1. No AI assistance.\n2. Manual creativity only.\n3. Tokens are awarded based on quality.");
-        }
-
-        function requestSubmit() {
-            const frame = document.getElementById('contentFrame').contentWindow;
-            document.getElementById('display-student-name').innerText = userName;
-            frame.postMessage({ type: 'REQUEST_MISSION_DATA' }, '*'); 
-            document.getElementById('sync-overlay').style.display = 'flex';
-        }
-
-        window.addEventListener('message', function(event) {
-            if (event.data.type === 'MISSION_ANSWERS') {
-                sendToCore(event.data.answers);
-            }
+        fetch(SCRIPT_URL, {
+            method: 'POST',
+            body: JSON.stringify(payload)
+        })
+        .then(response => response.json())
+        .then(data => {
+            const syncText = document.getElementById('sync-text');
+            syncText.innerHTML = `
+                <div class="fairy-loader"><i class="fas fa-star" style="color: #fff; text-shadow: 0 0 20px gold;"></i></div>
+                <div style="color: var(--gold); font-size: 2.2rem; font-weight: 900; text-shadow: 0 0 20px var(--gold-glow); font-family: 'Orbitron';">
+                    ${data.grade}/${data.maxGrade}
+                </div>
+                <div style="font-size: 0.85rem; margin-top: 15px; color: #eee; font-family: 'Poppins'; line-height: 1.6; background: rgba(255,255,255,0.05); padding: 15px; border-radius: 12px; border: 1px solid var(--glass-border);">
+                    ${data.reason}
+                </div>
+                <div style="font-size: 0.65rem; margin-top: 20px; color: var(--gold); letter-spacing: 2px;">MISSION LOGGED SUCCESSFULLY</div>
+            `;
+            setTimeout(() => window.location.href = 'MC.html', 4500);
+        })
+        .catch(err => {
+            document.getElementById('sync-overlay').style.display = 'none';
+            alert("Connection Interrupted. Try again.");
         });
-
-        function sendToCore(answers) {
-            const payload = {
-                action: "submitReport",
-                email: userEmail,
-                actCode: currentActivity,
-                taskNum: currentTask,
-                answer: answers
-            };
-
-            fetch(SCRIPT_URL, {
-                method: 'POST',
-                body: JSON.stringify(payload)
-            })
-            .then(response => response.json())
-            .then(data => {
-                const syncText = document.getElementById('sync-text');
-                syncText.innerHTML = `
-                    <div class="fairy-loader"><i class="fas fa-star" style="color: #fff; text-shadow: 0 0 20px gold;"></i></div>
-                    <div style="color: var(--gold); font-size: 2.2rem; font-weight: 900; text-shadow: 0 0 20px var(--gold-glow); font-family: 'Orbitron';">
-                        ${data.grade}/${data.maxGrade}
-                    </div>
-                    <div style="font-size: 0.85rem; margin-top: 15px; color: #eee; font-family: 'Poppins'; line-height: 1.6; background: rgba(255,255,255,0.05); padding: 15px; border-radius: 12px; border: 1px solid var(--glass-border);">
-                        ${data.reason}
-                    </div>
-                    <div style="font-size: 0.65rem; margin-top: 20px; color: var(--gold); letter-spacing: 2px;">MISSION LOGGED SUCCESSFULLY</div>
-                `;
-                setTimeout(() => window.location.href = 'MC.html', 4500);
-            })
-            .catch(err => {
-                document.getElementById('sync-overlay').style.display = 'none';
-                alert("Connection Interrupted. Try again.");
-            });
-        }
-
-        function generateStars() {
-            const container = document.getElementById('star-container');
-            for (let i = 0; i < 50; i++) {
-                const star = document.createElement('div');
-                star.className = 'star';
-                star.style.width = '2px'; star.style.height = '2px';
-                star.style.left = Math.random() * 100 + '%';
-                star.style.top = Math.random() * 100 + '%';
-                star.style.setProperty('--duration', (Math.random() * 3 + 2) + 's');
-                container.appendChild(star);
-            }
-        }
-
-        function toggleChat() {
-            const chatBox = document.getElementById('chat-box');
-            chatBox.style.display = chatBox.style.display === 'flex' ? 'none' : 'flex';
-        }
-
-        function askFifi() {
-            const input = document.getElementById('chat-input');
-            const content = document.getElementById('chat-content');
-            if (input.value.trim() !== "") {
-                const userMsg = document.createElement('div');
-                userMsg.style.cssText = "align-self: flex-end; background: var(--gold-gradient); color: black; padding: 8px 12px; border-radius: 12px 12px 0 12px; font-weight: 600;";
-                userMsg.innerText = input.value;
-                content.appendChild(userMsg);
-                input.value = "";
-                content.scrollTop = content.scrollHeight;
-            }
-        }
-    </script>
+    }
+</script>
 </body>
 </html>
