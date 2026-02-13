@@ -1,9 +1,9 @@
-# لإخفاء روابط التحميل وزر "Improve this page"
-show_downloads: false
-google_analytics: [] # اختياري
+theme: jekyll-theme-minimal
+title: EYC Grading System
+description: نظام تصحيح أنشطة اللغة الإنجليزية التلقائي
 
-# تخصيص القالب لإيقاف ميزات الموقع المفتوح
+# الأسطر البرمجية المسؤولة عن إخفاء رسالة "Improve this page" وروابط التحميل
+show_downloads: false
 github:
   is_project_page: false
   is_user_page: false
-  show_downloads: false
