@@ -4,11 +4,17 @@
       "answers": ["sun", "sea", "to", "no"],
       "points": 5
     }
-  },
+{
   "DX": {
-    "1": {
-      "model_text": "The quick brown fox jumps over the lazy dog",
-      "points": 10
-    }
+    "1": {"model_text": "digital|technology|learning|students|tablets|devices|libraries|information|handwriting|remember|practice", "points": 100},
+    "2": {"model_text": "travel|explorers|scientists|building|planets|galaxy|gravity|physical|training|universe|courage", "points": 100},
+    "3": {"model_text": "peaceful|mountains|forests|animals|oceans|planet|reducing|plastic|natural|generations", "points": 100},
+    "4": {"model_text": "machines|doctors|diseases|computers|translate|languages|ethics|creativity|valuable|robots", "points": 100},
+    "5": {"model_text": "letters|messages|efficient|instantly|billions|digital|network|privacy|personal|communication", "points": 100},
+    "6": {"model_text": "energy|natural|sunlight|electricity|turbines|modern|pollute|renewable|warming|environment", "points": 100},
+    "7": {"model_text": "fruits|vegetables|vitamins|healthy|sharp|stress|physical|exercise|habits|improvement", "points": 100},
+    "8": {"model_text": "strange|creatures|colorful|whales|marine|biologists|explore|species|magical|plastic", "points": 100},
+    "9": {"model_text": "amazing|structures|pyramids|engineers|complex|calendars|farmers|writing|tablets|empires", "points": 100},
+    "10": {"model_text": "journey|authors|clever|magic|mystery|vocabulary|mind|stronger|cultures|library|wisdom", "points": 100}
   }
 }
