@@ -150,7 +150,7 @@
     </div>
 
     <script>
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyZ1WPXthi_8NUKM_jb4QKQWog4IRIx8xnLWpMEOXR3ZlESoCwFjZCOTs8uI5tSQ08ioA/exec";
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxq7IIkvy43k5k8BmPe_20ZQRAbcsv9BlF2ZBS7ZdLr9HSN7woTy4U0HjB24PB_lJDDRw/exec";
         let currentUser = null;
         let isLoggedIn = false;
 
@@ -225,6 +225,7 @@
                         closeModal('loginModal');
                         renderHeader();
                         generateCards();
+                        refreshUserData();
                     }
                 })
                 .catch(err => alert("Connection Error!"));
@@ -256,7 +257,6 @@
                 node.onclick = () => {
                     if(!isLoggedIn) return openLogin();
                     
-                    // التحديث هنا: استخدام URLSearchParams لإرسال كل البيانات لصفحة Arena
                     const params = new URLSearchParams({
                         act: code,
                         task: i,
@@ -282,7 +282,46 @@
 
         function openLogin() { document.getElementById('loginModal').style.display = 'flex'; }
         function closeModal(id) { document.getElementById(id).style.display = 'none'; }
-        function handleLogout() { localStorage.removeItem('eyc_user'); location.reload(); }
+
+        function refreshUserData() {
+            if (!currentUser || !currentUser.email) return;
+            
+            fetch(`${SCRIPT_URL}?action=getProfile&email=${currentUser.email}`)
+                .then(res => res.json())
+                .then(res => {
+                    if(!res.error) {
+                        currentUser = {
+                            name: res.name, email: res.email, tokens: res.tokens,
+                            stars: res.stars, tickets: res.tickets, avatar: res.avatar,
+                            title: res.title, rank: res.rank
+                        };
+                        localStorage.setItem('eyc_user', JSON.stringify(currentUser));
+                        renderHeader();
+                    }
+                });
+        }
+
+        window.onload = () => {
+            createStars();
+            const saved = localStorage.getItem('eyc_user');
+            if(saved) {
+                currentUser = JSON.parse(saved);
+                isLoggedIn = true;
+                renderHeader();
+                generateCards();
+                refreshUserData();
+            } else {
+                renderHeader();
+                generateCards();
+            }
+        };
+
+        function handleLogout() {
+            if(confirm("Agent, are you sure you want to leave the Arena?")) {
+                localStorage.clear();
+                location.reload();
+            }
+        }
 
         function createStars() {
             const container = document.getElementById('star-container');
@@ -295,14 +334,7 @@
                 container.appendChild(star);
             }
         }
-
-        window.onload = () => {
-            createStars();
-            const saved = localStorage.getItem('eyc_user');
-            if(saved) { currentUser = JSON.parse(saved); isLoggedIn = true; }
-            renderHeader();
-            generateCards();
-        };
     </script>
 </body>
 </html>
+``` Would you like me to process any other segments or files?
