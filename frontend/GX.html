@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>GX | Grammar Extractor | Glassy Edition</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Poppins:wght@300;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --gold: #D4AF37;
+            --gold-glow: rgba(212, 175, 55, 0.3);
+            --glass: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(212, 175, 55, 0.2);
+            --error-red: #ff4444;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: transparent;
+            color: white;
+            margin: 0; padding: 15px;
+            direction: ltr; /* لضمان بقاء النصوص الإنجليزية يساراً */
+        }
+
+        body::-webkit-scrollbar { width: 4px; }
+        body::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 10px; }
+
+        .gx-container { max-width: 900px; margin: 0 auto; animation: fadeIn 0.8s ease; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .header-gx {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 20px; border-bottom: 1px solid var(--glass-border);
+            padding-bottom: 10px;
+        }
+
+        .header-gx h1 {
+            font-family: 'Orbitron'; font-size: 1rem;
+            color: var(--gold); letter-spacing: 3px; margin: 0;
+        }
+
+        .principle-tags { display: flex; gap: 8px; }
+        .tag {
+            font-family: 'Orbitron'; font-size: 8px; color: var(--gold);
+            border: 1px solid var(--glass-border); padding: 2px 6px; border-radius: 4px;
+        }
+
+        .passage-box {
+            background: var(--glass);
+            backdrop-filter: blur(15px);
+            border: 1px solid var(--glass-border);
+            padding: 25px; border-radius: 18px;
+            margin-bottom: 25px; line-height: 1.8;
+            font-size: 1.1rem; color: #eee;
+            position: relative; box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            text-align: left; /* محاذاة النص لليسار */
+        }
+
+        .passage-box::before {
+            content: "INTEL_SOURCE"; position: absolute; top: -10px; left: 20px;
+            background: #020205; padding: 0 12px; font-family: 'Orbitron';
+            font-size: 10px; color: var(--gold); border: 1px solid var(--glass-border);
+            border-radius: 5px;
+        }
+
+        .extractor-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 15px;
+        }
+
+        .extraction-card {
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            padding: 18px; border-radius: 15px;
+            border-bottom: 3px solid var(--gold);
+            transition: 0.4s ease;
+        }
+
+        .extraction-card:hover {
+            border-color: var(--gold);
+            box-shadow: 0 5px 15px var(--gold-glow);
+        }
+
+        .extraction-card.error-card { 
+            border-color: var(--error-red) !important; 
+            animation: shake 0.4s ease-in-out;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-5px); }
+            40%, 80% { transform: translateX(5px); }
+        }
+
+        .extraction-card label {
+            display: block; font-family: 'Orbitron'; font-size: 9px;
+            color: var(--gold); margin-bottom: 12px;
+            text-transform: uppercase; letter-spacing: 1px;
+        }
+
+        .extraction-input {
+            width: 100%; background: rgba(0,0,0,0.4);
+            border: 1px solid var(--glass-border); border-radius: 8px;
+            color: #fff; padding: 12px;
+            font-family: 'Poppins'; font-size: 0.9rem;
+            outline: none; box-sizing: border-box;
+            transition: 0.3s;
+            text-align: center;
+        }
+
+        .extraction-input:focus {
+            border-color: var(--gold);
+            background: rgba(212, 175, 55, 0.05);
+        }
+
+        .requirement-tag {
+            font-size: 9px; color: #666; margin-top: 8px; display: block;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+
+<div class="gx-container">
+    <div class="header-gx">
+        <h1 id="task-title">Grammar Extractor</h1>
+        <div class="principle-tags">
+            <span class="tag">CLR</span>
+            <span class="tag">AAI</span>
+        </div>
+    </div>
+
+    <div class="passage-box" id="passage-content">
+        Initializing Intel Extraction...
+    </div>
+
+    <div class="extractor-grid" id="extractor-fields">
+    </div>
+</div>
+
+<script>
+    const gxData = {
+        "1": {
+            passage: "The sun was shining brightly as the small birds flew over the green forest. Yesterday, they built a new nest because they were happy. If it rains tomorrow, they will stay inside.",
+            requirements: [
+                { label: "Extract 3 Verbs", hint: "e.g., built, stay..." },
+                { label: "Extract 2 Adjectives", hint: "e.g., small, green..." },
+                { label: "Extract 1 Past Simple sentence", hint: "Write the whole sentence" },
+                { label: "Extract 3 Nouns", hint: "e.g., birds, forest..." },
+                { label: "Extract 1 Future condition", hint: "If + will..." }
+            ]
+        },
+        "2": {
+            passage: "The smart engineer is working in the office. He fixed the old laptop yesterday and now he is buying a fast computer. While he was working, his phone rang.",
+            requirements: [
+                { label: "Extract 3 Verbs", hint: "working, fixed, buying" },
+                { label: "Extract 2 Adjectives", hint: "smart, fast" },
+                { label: "Extract 1 Past Simple sentence", hint: "The whole sentence" },
+                { label: "Extract 3 Nouns", hint: "engineer, office, phone" },
+                { label: "Extract 1 Past Continuous clause", hint: "was/were + ing" }
+            ]
+        },
+        "3": {
+            passage: "A famous chef is eating in the kitchen. She cooked a large meal for us because the spices smelled delicious. The chef has cooked many meals before.",
+            requirements: [
+                { label: "Extract 3 Verbs", hint: "eating, cooked, smelled" },
+                { label: "Extract 2 Adjectives", hint: "famous, delicious" },
+                { label: "Extract 1 Past Simple sentence", hint: "The whole sentence" },
+                { label: "Extract 3 Nouns", hint: "chef, kitchen, spices" },
+                { label: "Extract 1 Present Perfect", hint: "has/have + V3" }
+            ]
+        },
+        "4": {
+            passage: "The strong runner was running on the track. He won the gold medal last week because he had been training for months. He is the most athletic person I know.",
+            requirements: [
+                { label: "Extract 3 Verbs", hint: "running, won, training" },
+                { label: "Extract 2 Adjectives", hint: "strong, athletic" },
+                { label: "Extract 1 Past Simple sentence", hint: "The whole sentence" },
+                { label: "Extract 3 Nouns", hint: "runner, track, medal" },
+                { label: "Extract 1 Superlative", hint: "The + est" }
+            ]
+        },
+        "5": {
+            passage: "Many tourists are traveling to Egypt. They visited the Great Pyramids and saw ancient temples. If they have enough time, they will visit Luxor next week.",
+            requirements: [
+                { label: "Extract 3 Verbs", hint: "traveling, visited, saw" },
+                { label: "Extract 2 Adjectives", hint: "ancient, many" },
+                { label: "Extract 1 Past Simple sentence", hint: "The whole sentence" },
+                { label: "Extract 3 Nouns", hint: "tourists, pyramids, temples" },
+                { label: "Extract 1 Conditional", hint: "If + will" }
+            ]
+        }
+        // ... يمكنك إضافة من 6 لـ 10 بنفس الطريقة
+    };
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const taskNum = urlParams.get('task') || "1";
+
+    function loadExtractor() {
+        const data = gxData[taskNum] || gxData["1"];
+        document.getElementById('passage-content').innerText = data.passage;
+        document.getElementById('task-title').innerText = `Extractor: Task ${taskNum.padStart(2, '0')}`;
+        const grid = document.getElementById('extractor-fields');
+        grid.innerHTML = data.requirements.map((req, i) => `
+            <div class="extraction-card" id="card-${i}">
+                <label>DATA_FIELD_0${i+1}: ${req.label}</label>
+                <input type="text" class="extraction-input gx-input" id="extract-${i}" placeholder="Enter findings..." autocomplete="off">
+                <span class="requirement-tag">● ${req.hint}</span>
+            </div>
+        `).join('');
+    }
+
+window.addEventListener('message', function(event) {
+    if (event.data.type === 'MISSION_RESULT') {
+        // نستخدم المسميات اللي الأرينا بتبعتها فعلياً
+        const score = event.data.score || 0;
+        const total = event.data.total || 5;
+        
+        alert(`MISSION REPORT:\nScore: ${score} / ${total}`);
+    }
+});;
+
+    function collectAndSend() {
+        const inputs = document.querySelectorAll('.gx-input');
+        let answers = [];
+        let hasError = false;
+
+        inputs.forEach((input, i) => {
+            const val = input.value.trim();
+            const card = document.getElementById(`card-${i}`);
+            if(!val) {
+                hasError = true;
+                card.classList.add('error-card');
+                setTimeout(() => card.classList.remove('error-card'), 500);
+            } else {
+                card.classList.remove('error-card');
+                answers.push(val);
+            }
+        });
+
+        if(hasError) {
+            window.parent.postMessage({ type: 'MISSION_INCOMPLETE' }, '*');
+            return;
+        }
+
+        window.parent.postMessage({ 
+            type: 'MISSION_ANSWERS', 
+            activityCode: 'GX',
+            answers: answers.join('|'), 
+            missionNum: taskNum
+        }, '*');
+    }
+
+    window.onload = loadExtractor;
+</script>
+</body>
+</html>
+
+
+

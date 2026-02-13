@@ -1,0 +1,101 @@
+<script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const taskNum = urlParams.get('task') || "1";
+    const storageKey = `DX_Task_${taskNum}_Played`;
+
+    function initDictX() {
+        document.getElementById('task-title').innerText = `MISSION DX-${taskNum.padStart(2, '0')}`;
+        
+        // Joiner: ضبط المسارات بناءً على هيكلة المجلدات الجديدة
+        const slowPath = `assets/dxaudio/DX${taskNum}S.wav`;
+        const normalPath = `assets/dxaudio/DX${taskNum}.wav`;
+        
+        document.getElementById('slowSource').src = slowPath;
+        document.getElementById('normalSource').src = normalPath;
+        
+        const slowA = document.getElementById('slowAudio');
+        const normalA = document.getElementById('normalAudio');
+        
+        slowA.load();
+        normalA.load();
+        
+        slowA.playbackRate = 0.7; 
+        normalA.playbackRate = 1.0;
+
+        // التحقق من بروتوكول الوصول لمرة واحدة
+        if (localStorage.getItem(storageKey)) {
+            lockAudio(slowA);
+            lockAudio(normalA);
+        }
+    }
+
+    function disableAudio(el) {
+        el.onplay = null; 
+        localStorage.setItem(storageKey, "true");
+
+        el.ontimeupdate = function() {
+            if (el.seeking) {
+                el.currentTime = el.played.end(0);
+            }
+        };
+
+        el.onended = function() {
+            lockAudio(el);
+        };
+    }
+
+    function lockAudio(el) {
+        el.controls = false;
+        el.pause();
+        el.style.opacity = "0.1";
+        el.style.pointerEvents = "none";
+        if (!el.parentElement.querySelector('.expired-msg')) {
+            el.insertAdjacentHTML('afterend', '<p class="expired-msg">Access Terminated</p>');
+        }
+    }
+
+    function preview(input, imgId) {
+        const file = input.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const img = document.getElementById(imgId);
+                img.src = e.target.result;
+                img.style.display = "block";
+            };
+            reader.readAsDataURL(file);
+        }
+    }
+
+    // استقبال نداء SUBMIT من Arena الأم
+    window.addEventListener('message', function(event) {
+        if (event.data.type === 'REQUEST_MISSION_DATA') {
+            collectAndSubmit();
+        }
+    });
+
+    function collectAndSubmit() {
+        const p1 = document.getElementById('p1').src;
+        const p2 = document.getElementById('p2').src;
+        const p3 = document.getElementById('p3').src;
+        
+        let files = [];
+        if(p1.startsWith("data:image")) files.push(p1);
+        if(p2.startsWith("data:image")) files.push(p2);
+        if(p3.startsWith("data:image")) files.push(p3);
+
+        if (files.length === 0) {
+            // إبلاغ الصفحة الأم بعدم اكتمال البيانات
+            window.parent.postMessage({ type: 'MISSION_INCOMPLETE' }, '*');
+            return;
+        }
+
+        // إرسال الصور لصفحة المهام
+        window.parent.postMessage({ 
+            type: 'MISSION_ANSWERS', 
+            answers: files // ترسل كمصفوفة Base64
+        }, '*');
+    }
+
+    window.onload = initDictX;
+</script>

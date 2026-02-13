@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>GS | Grammar Scanner | Glassy Edition</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Poppins:wght@300;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --gold: #D4AF37;
+            --gold-glow: rgba(212, 175, 55, 0.3);
+            --error-red: #ff4444;
+            --glass: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(212, 175, 55, 0.2);
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: transparent;
+            color: white;
+            margin: 0;
+            padding: 15px;
+            direction: ltr;
+        }
+
+        body::-webkit-scrollbar { width: 4px; }
+        body::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 10px; }
+
+        .header-gs {
+            text-align: center;
+            margin-bottom: 25px;
+            border-bottom: 1px solid var(--glass-border);
+            padding-bottom: 15px;
+            position: relative;
+        }
+
+        .header-gs h1 {
+            font-family: 'Orbitron';
+            font-size: 1.1rem;
+            color: var(--gold);
+            letter-spacing: 3px;
+            margin: 0;
+            text-transform: uppercase;
+        }
+
+        .principle-tag {
+            position: absolute; top: 0; right: 0;
+            font-family: 'Orbitron'; font-size: 8px; color: var(--gold);
+            border: 1px solid var(--glass-border); padding: 2px 6px; border-radius: 4px;
+        }
+
+        .scanner-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            animation: fadeIn 0.8s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .sentence-card {
+            background: var(--glass);
+            backdrop-filter: blur(15px);
+            border: 1px solid var(--glass-border);
+            border-left: 3px solid var(--gold);
+            border-radius: 12px;
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 15px;
+            transition: 0.3s ease;
+        }
+
+        .sentence-card.error-card { 
+            border-color: var(--error-red) !important; 
+            animation: shake 0.4s ease-in-out;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-5px); }
+            40%, 80% { transform: translateX(5px); }
+        }
+
+        .sentence-text {
+            font-size: 1rem;
+            flex-grow: 1;
+            color: #eee;
+            font-weight: 300;
+        }
+
+        .correction-input {
+            width: 160px;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            color: var(--gold);
+            padding: 10px;
+            font-family: 'Orbitron';
+            font-size: 0.85rem;
+            outline: none;
+            transition: 0.3s;
+            text-align: center;
+        }
+
+        .correction-input:focus {
+            border-color: var(--gold);
+            box-shadow: 0 0 10px var(--gold-glow);
+        }
+
+        .id-tag {
+            font-family: 'Orbitron';
+            font-size: 8px;
+            color: #666;
+            min-width: 80px;
+        }
+
+        @media (max-width: 600px) {
+            .sentence-card { flex-direction: column; align-items: flex-start; gap: 10px; }
+            .correction-input { width: 100%; box-sizing: border-box; }
+            .id-tag { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header-gs">
+        <span class="principle-tag">ITS SYSTEM</span>
+        <h1 id="title-label">Grammar Scanner</h1>
+        <p style="font-size: 9px; color: #888; letter-spacing: 1px; margin-top: 5px;">PATCH THE LOGIC ERRORS</p>
+    </div>
+
+    <div id="scanner-screen" class="scanner-grid"></div>
+
+<script>
+const gsData = {
+    "1": ["He go to school every day.", "They has a big house.", "She don't like apples.", "We was playing football.", "I am learn English now."],
+    "2": ["She drink milk every morning.", "Birds flies in the sky.", "He never do his homework.", "They is waiting for you.", "I has two sisters."],
+    "3": ["I seen him yesterday.", "She can sings well.", "We was happy yesterday.", "He don't have much time.", "They has finished their work."],
+    "4": ["I am study English now.", "He go home very late.", "Cats likes to eat fish.", "You is my best friend.", "She have a new red car."],
+    "5": ["Does he works in this office?", "I didn't saw him at the party.", "We was at home all night.", "She cry every night.", "They has a very small dog."],
+    "6": ["I am more taller than you.", "She is the better student.", "He play football every Friday.", "We was late for the meeting.", "I doesn't know the answer."],
+    "7": ["Who are that man over there?", "She can't speaks English well.", "It are raining very hard.", "He have many pens in his bag.", "I is a student at this school."],
+    "8": ["They was eating their lunch.", "She don't smoke anymore.", "He go to work by bus.", "We has a test today.", "I am like pizza very much."],
+    "9": ["She beautiful girl in my class.", "He is more fast than his brother.", "They was sleeping when I came.", "I has a secret to tell you.", "You is very kind to me."],
+    "10": ["I am go to the club now.", "He have a terrible headache.", "She don't study for exams.", "We was dancing at the wedding.", "They has big bags to carry."]
+};
+
+const urlParams = new URLSearchParams(window.location.search);
+const taskNum = urlParams.get('task') || "1";
+
+function loadScanner() {
+    const sentences = gsData[taskNum] || gsData["1"];
+    const screen = document.getElementById('scanner-screen');
+    document.getElementById('title-label').innerText = `Scanner: Task ${taskNum.padStart(2, '0')}`;
+    
+    screen.innerHTML = sentences.map((s, i) => `
+        <div class="sentence-card" id="card-${i}">
+            <span class="id-tag">SCANNER_0${i+1}</span>
+            <div class="sentence-text">${s}</div>
+            <input type="text" class="correction-input alike-input" id="fix-${i}" placeholder="PATCH..." autocomplete="off">
+        </div>
+    `).join('');
+}
+
+window.addEventListener('message', function(event) {
+    if (event.data.type === 'REQUEST_MISSION_DATA') {
+        collectAndSend();
+    }
+});
+
+function collectAndSend() {
+    const inputs = document.querySelectorAll('.alike-input');
+    let answers = [];
+    let hasError = false;
+
+    inputs.forEach((input, i) => {
+        const val = input.value.trim();
+        const card = document.getElementById(`card-${i}`);
+        if(!val) {
+            hasError = true;
+            card.classList.add('error-card');
+            setTimeout(() => card.classList.remove('error-card'), 500);
+        } else {
+            card.classList.remove('error-card');
+            answers.push(val);
+        }
+    });
+
+    if(hasError) {
+        window.parent.postMessage({ type: 'MISSION_INCOMPLETE' }, '*');
+        return;
+    }
+
+// التعديل: استخدام الفاصلة العادية فقط بدون مسافات ليتوافق مع السكريبت
+window.parent.postMessage({ 
+    type: 'MISSION_ANSWERS', 
+    activityCode: 'GS',
+    answers: answers.join(','), // غيرنا ' | ' إلى ','
+    missionNum: taskNum
+}, '*');
+}
+
+window.onload = loadScanner;
+</script>
+</body>
+</html>

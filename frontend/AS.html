@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Alike Mission | Glassy Edition</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Poppins:wght@300;600&display=swap" rel="stylesheet">
+    <style>
+        :root { 
+            --gold: #D4AF37; 
+            --gold-glow: rgba(212, 175, 55, 0.4);
+            --glass: rgba(255, 255, 255, 0.03); 
+            --glass-border: rgba(212, 175, 55, 0.2);
+        }
+        
+        body { 
+            font-family: 'Poppins', sans-serif; 
+            background: transparent; 
+            color: white; 
+            margin: 0; 
+            padding: 15px; 
+            overflow-x: hidden;
+            direction: ltr; /* اللغة المطلوبة إنجليزية */
+        }
+
+        /* سكرول بار أنيق */
+        body::-webkit-scrollbar { width: 4px; }
+        body::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 10px; }
+
+        .mission-container { animation: slideUp 0.6s ease-out; }
+
+        @keyframes slideUp { 
+            from { opacity: 0; transform: translateY(30px); } 
+            to { opacity: 1; transform: translateY(0); } 
+        }
+
+        /* أيقونات المبادئ السرية */
+        .secret-principles {
+            display: flex; gap: 8px; justify-content: flex-end; margin-bottom: 15px;
+        }
+        .principle-tag {
+            font-family: 'Orbitron'; font-size: 8px; color: var(--gold);
+            border: 1px solid var(--glass-border); padding: 2px 6px; border-radius: 4px;
+            background: rgba(0,0,0,0.3); opacity: 0.7;
+        }
+
+        .alike-grid {
+            display: grid; grid-template-columns: 1fr; gap: 15px;
+            max-width: 800px; margin: 0 auto;
+        }
+
+        @media (min-width: 600px) {
+            .alike-grid { grid-template-columns: 1fr 1fr; }
+        }
+
+        .pair-card {
+            background: var(--glass); 
+            backdrop-filter: blur(15px);
+            border: 1px solid var(--glass-border); 
+            border-radius: 18px;
+            padding: 22px 15px 15px; 
+            position: relative;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        
+        .pair-card:hover { 
+            border-color: var(--gold); 
+            box-shadow: 0 5px 15px var(--gold-glow);
+            transform: translateY(-5px);
+        }
+
+        .case-tag {
+            position: absolute; top: -8px; left: 15px; 
+            background: var(--gold);
+            color: #000; 
+            font-family: 'Orbitron'; 
+            font-size: 9px; padding: 2px 12px; 
+            border-radius: 20px; font-weight: 900;
+        }
+
+        .input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 5px; }
+        
+        .word-box { display: flex; flex-direction: column; gap: 6px; }
+        
+        label { 
+            font-size: 11px; color: #888; font-weight: 600; 
+            text-transform: uppercase; letter-spacing: 1px;
+            margin-left: 5px; font-family: 'Orbitron';
+        }
+
+        input {
+            width: 100%; 
+            background: rgba(0,0,0,0.4); 
+            border: 1px solid var(--glass-border);
+            border-radius: 10px; 
+            padding: 10px; 
+            color: var(--gold); 
+            text-align: center;
+            font-family: 'Poppins'; font-size: 14px; 
+            outline: none; transition: 0.3s;
+        }
+
+        input:focus { 
+            border-color: var(--gold); 
+            background: rgba(212, 175, 55, 0.05);
+            box-shadow: inset 0 0 10px rgba(212, 175, 55, 0.1);
+        }
+
+        input.error { border-color: #ff4444 !important; animation: shake 0.3s; }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="secret-principles">
+        <span class="principle-tag">NLR</span>
+        <span class="principle-tag">ITS</span>
+        <span class="principle-tag">NCH</span>
+    </div>
+
+    <div id="mission-wrapper"></div>
+
+<script>
+    // تم حقن المهام العشر بواسطة Joiner
+    const missionsData = {
+        "1": [ {a:"شمس", b:"ابن"}, {a:"بحر", b:"يرى"}, {a:"إلى", b:"أيضاً"}, {a:"هنا", b:"يسمع"}, {a:"لا", b:"يعرف"} ],
+        "2": [ {a:"نفخ", b:"أزرق"}, {a:"دقيق", b:"زهرة"}, {a:"فارس", b:"ليل"}, {a:"يكتب", b:"يمين"}, {a:"كامل", b:"ثقب"} ],
+        "3": [ {a:"ينتظر", b:"وزن"}, {a:"كسر", b:"فرامل"}, {a:"أسبوع", b:"ضعيف"}, {a:"سنت", b:"أرسل"}, {a:"درجة سلم", b:"نظرة"} ],
+        "4": [ {a:"يشتري", b:"بواسطة"}, {a:"أرنب", b:"شعر"}, {a:"سمع", b:"قطيع"}, {a:"وريث", b:"هواء"}, {a:"فاز", b:"واحد"} ],
+        "5": [ {a:"يقابل", b:"لحم"}, {a:"طريق", b:"ركب"}, {a:"مشهد", b:"مرئي"}, {a:"لوح", b:"ملل"}, {a:"ذيل", b:"قصة"} ],
+        "6": [ {a:"كمثرى", b:"زوج"}, {a:"رئيسي", b:"عرف الأسد"}, {a:"قطعة", b:"سلام"}, {a:"ذكر", b:"بريد"}, {a:"فولاذ", b:"يسرق"} ],
+        "7": [ {a:"خادمة", b:"صنع"}, {a:"سهل/واضح", b:"طائرة"}, {a:"نفايات", b:"خصر"}, {a:"عزيزي", b:"غزال"}, {a:"خشب", b:"سوف"} ],
+        "8": [ {a:"توت", b:"يدفن"}, {a:"جذر", b:"طريق"}, {a:"إبحار", b:"تخفيض"}, {a:"إصبع قدم", b:"يسحب"}, {a:"يشفى", b:"كعب"} ],
+        "9": [ {a:"مسموح", b:"بصوت عال"}, {a:"يكون", b:"نحلة"}, {a:"قبو", b:"بائع"}, {a:"يموت", b:"صبغة"}, {a:"ضيف", b:"خمن"} ],
+        "10": [ {a:"صباح", b:"حداد"}, {a:"أنف", b:"يعرف (للمفرد)"}, {a:"باهت", b:"دلو"}, {a:"وردة", b:"صفوف"}, {a:"رمى", b:"خلال"} ]
+    };
+
+    function renderActiveMission() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const taskNum = urlParams.get('task') || "1"; 
+        const pairs = missionsData[taskNum] || missionsData["1"];
+        
+        const wrapper = document.getElementById('mission-wrapper');
+        wrapper.innerHTML = `
+            <div class="mission-container">
+                <div class="alike-grid">
+                    ${pairs.map((p, i) => `
+                        <div class="pair-card">
+                            <span class="case-tag">UNIT 0${i+1}</span>
+                            <div class="input-row">
+                                <div class="word-box">
+                                    <label>${p.a}</label>
+                                    <input type="text" class="alike-input" data-pair="${i}" data-word="a" placeholder="...">
+                                </div>
+                                <div class="word-box">
+                                    <label>${p.b}</label>
+                                    <input type="text" class="alike-input" data-pair="${i}" data-word="b" placeholder="...">
+                                </div>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        `;
+    }
+
+    // استجابة لطلب صفحة المهام الأم
+    window.addEventListener('message', function(event) {
+        if (event.data.type === 'REQUEST_MISSION_DATA') {
+            collectAndSend();
+        }
+    });
+
+    function collectAndSend() {
+        const inputs = document.querySelectorAll('.alike-input');
+        let answersArray = [];
+        let hasError = false;
+
+        inputs.forEach(input => {
+            const val = input.value.trim();
+            if(!val) {
+                hasError = true;
+                input.classList.add('error');
+            } else {
+                input.classList.remove('error');
+                answersArray.push(val.toLowerCase());
+            }
+        });
+
+        if(hasError) {
+            // تنبيه المستخدم داخل الإطار بوجود حقول فارغة
+            return; 
+        }
+
+        // إرسال البيانات مدمجة بفاصل لصفحة المهام
+        window.parent.postMessage({
+            type: 'MISSION_ANSWERS', 
+            answers: answersArray.join(', ')
+        }, '*');
+    }
+
+    window.onload = renderActiveMission;
+</script>
+</body>
+</html>

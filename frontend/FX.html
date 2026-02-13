@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Figurative X | Idiom Decoder | Glassy Edition</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Cairo:wght@400;700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        :root { 
+            --neon-blue: #00f2ff; 
+            --neon-purple: #bc13fe; 
+            --gold: #D4AF37;
+            --glass: rgba(255, 255, 255, 0.03); 
+            --glass-border: rgba(188, 19, 254, 0.2);
+        }
+
+        body { 
+            font-family: 'Rajdhani', sans-serif; 
+            background: transparent; 
+            color: white; 
+            margin: 0; padding: 15px; 
+            direction: ltr; /* اتجاه الصفحة العام لليسار */
+        }
+
+        .header-x {
+            text-align: center; 
+            margin-bottom: 30px; 
+            border-bottom: 1px solid var(--glass-border); 
+            padding-bottom: 15px;
+        }
+
+        .header-x h1 { 
+            font-family: 'Orbitron'; 
+            letter-spacing: 4px; 
+            color: var(--neon-blue);
+            margin: 0;
+        }
+
+        .dialog-card {
+            background: rgba(15, 15, 25, 0.8); 
+            border: 1px solid var(--glass-border);
+            border-radius: 25px; 
+            padding: 25px; 
+            margin-bottom: 30px;
+            backdrop-filter: blur(15px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.4);
+        }
+
+        /* تنسيق فقاعات المحادثة - كلها تبدأ من اليسار */
+        .chat-bubble { 
+            margin-bottom: 12px; 
+            padding: 12px 18px; 
+            border-radius: 15px; 
+            font-size: 1.1rem;
+            line-height: 1.4;
+            text-align: left; /* إجبار النص الإنجليزي على اليسار */
+            display: block;
+            width: fit-content;
+            max-width: 90%;
+        }
+
+        .speaker-a { 
+            background: rgba(0, 242, 255, 0.07); 
+            border-left: 3px solid var(--neon-blue); 
+            color: #d1faff;
+        }
+
+        .speaker-b { 
+            background: rgba(188, 19, 254, 0.07); 
+            border-left: 3px solid var(--neon-purple); 
+            color: #f5ebff;
+            margin-left: 20px; /* إزاحة بسيطة لتمييز الرد */
+        }
+
+        /* صندوق الإدخال العربي - في المنتصف */
+        .idiom-box {
+            background: rgba(212, 175, 55, 0.03); 
+            border: 1px dashed var(--gold);
+            padding: 20px; 
+            border-radius: 15px; 
+            margin-top: 20px; 
+            text-align: center; /* توسيط المحتوى */
+        }
+
+        .idiom-text { 
+            font-family: 'Orbitron'; 
+            color: var(--gold); 
+            font-size: 1rem; 
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .arabic-input {
+            width: 100%; 
+            max-width: 400px;
+            background: rgba(0,0,0,0.4); 
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            color: #fff;
+            font-family: 'Cairo', sans-serif; 
+            font-size: 1.1rem; 
+            text-align: center; /* توسيط الكتابة العربية */
+            padding: 12px; 
+            outline: none; 
+            direction: rtl; /* اتجاه الكتابة عربي */
+            transition: 0.3s;
+        }
+
+        .arabic-input:focus { border-color: var(--neon-blue); }
+
+        .unit-tag { font-family: 'Orbitron'; font-size: 9px; color: #555; letter-spacing: 2px; }
+    </style>
+</head>
+<body>
+
+    <div class="header-x">
+        <h1 id="x-title">FIGURATIVE-X</h1>
+        <p style="color: #666; font-size: 10px; font-family: 'Orbitron';">NEURAL IDIOM DECODER</p>
+    </div>
+
+    <div id="dialogs-container"></div>
+
+<script>
+    const figurativeData = {
+        "1": [
+            { a: "This project is huge. I don't know how to start.", b: "Don't worry, Mr.Ezz. Just take it one step at a time. Do you need a hand?", idiom: "Do you need a hand?", answers: ["هل تحتاج مساعدة", "محتاج مساعدة", "تحتاج مساعدة", "عايز مساعدة", "محتاج ايد مساعدة"] },
+            { a: "I've been studying for 5 hours straight!", b: "You look exhausted. Why don't you call it a day and sleep?", idiom: "Call it a day", answers: ["ينهي العمل اليوم", "يكتفي بهذا القدر اليوم", "كفاية كدة النهاردة", "يوقف شغل", "نكتفي كدة"] },
+            { a: "I failed the test again. I'm so depressed.", b: "Keep your chin up! You will do better next time for sure.", idiom: "Keep your chin up", answers: ["ارفع رأسك", "لا تحزن", "خليك متفائل", "خلي معنوياتك عالية", "متزعلش"] },
+            { a: "The concert starts in 5 minutes and we are still here!", b: "Shake a leg! We don't want to miss the opening song.", idiom: "Shake a leg", answers: ["اسرع", "عجل", "هز رجلك", "يلا بسرعة", "اتحرك بسرعة", "انجز"] },
+            { a: "Why are you so nervous about the presentation?", b: "I always get butterflies in my stomach before speaking in public.", idiom: "Butterflies in my stomach", answers: ["توتر", "اشعر بالتوتر", "قلق", "عندي مغص من التوتر", "رفرفة في معدتي"] }
+        ],
+        "2": [
+            { a: "Is Sarah still angry with me?", b: "Yes, so don't bring up the accident. Just let sleeping dogs lie.", idiom: "Let sleeping dogs lie", answers: ["تجنب المشاكل", "لا تنبش في الماضي", "سيب المشاافكل نايمة", "بلاش تفتح مواضيع قديمة", "ابعد عن المشاكل"] },
+            { a: "Did you hear that Mark is getting married?", b: "Really? Wow, that news came out of the blue!", idiom: "Out of the blue", answers: ["فجأة", "بدون سابق انذار", "من حيث لا ندري", "علي غفلة", "فجأة كدة"] },
+            { a: "I'm sorry I can't go to the party. I'm feeling under the weather.", b: "Oh, I'm sorry to hear that. Rest well and get better soon.", idiom: "Under the weather", answers: ["مريض", "تعبان", "حاسس اني مش تمام", "صحتك مش كويسة", "وعكة صحية"] },
+            { a: "Learning to drive seems so difficult.", b: "Don't worry, it's a piece of cake once you practice.", idiom: "A piece of cake", answers: ["سهل جدا", "تافه", "زي السكينة في الحلاوة", "بسيط جدا", "لعبة عيال"] },
+            { a: "I worked so hard on this painting.", b: "It's amazing! You really hit the nail on the head with these colors.", idiom: "Hit the nail on the head", answers: ["أصبت الهدف", "جبت الخلاصة", "جبت من الآخر", "قلت القول الفصل", "وصف دقيق"] }
+        ],
+        "3": [
+            { a: "Are you sure we should buy this expensive car?", b: "You're right. Let's sleep on it and decide tomorrow.", idiom: "Sleep on it", answers: ["نفكر في الموضوع", "نأجل القرار للصبح", "ناخد وقتنا في التفكير", "ننام ونفكر", "نقرر بكرة"] },
+            { a: "The exam was so long, but I finished it in 10 minutes.", b: "Are you pulling my leg? That's impossible!", idiom: "Pulling my leg", answers: ["تمزح معي", "تضحك علي", "بتشتغلني", "بتهزر معايا", "بتسرح بيا"] },
+            { a: "I wanted to tell her I love her, but I got cold feet.", b: "Don't be scared! You can do it next time.", idiom: "Got cold feet", answers: ["خفت", "ترددت", "رجلي سقعت", "تراجعت من الخوف", "جالي رعب"] },
+            { a: "How was the meeting with the new boss?", b: "It was great! We really saw eye to eye on the new strategy.", idiom: "Saw eye to eye", answers: ["اتفقنا", "وجهات نظرنا متطابقة", "كنا على نفس الخط", "متفقين تماما", "فهمنا بعض"] },
+            { a: "I can't believe he lied to me again.", b: "That's the last straw! I'm never talking to him again.", idiom: "The last straw", answers: ["القشة التي قصمت ظهر البعير", "آخر صبري", "خلاص كدة جابت اخرها", "القشة الاخيرة", "كفاية كدة"] }
+        ],
+        "4": [
+            { a: "Everything is going wrong today.", b: "Hang in there! Things will get better soon.", idiom: "Hang in there", answers: ["اصمد", "اصبر", "استمر", "خليك صامد", "متستسلمش"] },
+            { a: "We missed the bus by one second.", b: "Well, we are in the same boat. I missed it too.", idiom: "In the same boat", answers: ["في نفس الموقف", "في الهوا سوا", "في مركب واحدة", "حالنا واحد", "زي بعض"] },
+            { a: "Tell me the secret! Please!", b: "Okay, okay. I will spill the beans.", idiom: "Spill the beans", answers: ["يفشي السر", "يقول اللي عنده", "يبق البحصة", "يقول السر", "يفت الفتات"] },
+            { a: "I spent $5000 on this watch.", b: "Wow! That must have cost an arm and a leg!", idiom: "Cost an arm and a leg", answers: ["غالي جدا", "ثمنه باهظ", "كلفني الشيء الفلاني", "غالي نار", "كلفني ذراع ورجل"] },
+            { a: "I don't know the answer to this question.", b: "It's on the tip of my tongue, but I can't remember it!", idiom: "On the tip of my tongue", answers: ["على طرف لساني", "هفتكره حالا", "عارفه بس مش فاكره", "كلمة على لساني"] }
+        ],
+        "5": [
+            { a: "He is always talking about his new car.", b: "He is just blowing his own trumpet.", idiom: "Blowing his own trumpet", answers: ["يتفاخر", "بيتباهى بنفسه", "بيطبل لنفسه", "بيفشر", "بيحب المنظرة"] },
+            { a: "I'm so nervous about the audition.", b: "Go out there and break a leg!", idiom: "Break a leg", answers: ["بالتوفيق", "حظ سعيد", "اكسر رجل", "وريهم شطارتك", "أتمنى لك النجاح"] },
+            { a: "He didn't mean to hurt you.", b: "I know, but his words really cut me to the quick.", idiom: "Cut me to the quick", answers: ["جرحني بشدة", "جاءت على الجرح", "وجعني قوي", "آلمني", "أصابني في مقتل"] },
+            { a: "I'm trying to learn Chinese in two weeks.", b: "I think you've bitten off more than you can chew.", idiom: "Bitten off more than you can chew", answers: ["حملت نفسك فوق طاقتك", "اخذت خازوق", "طمعت في اكتر من طاقتك", "فتحت صدرك على الفاضي"] },
+            { a: "She is always happy and full of energy.", b: "Yes, she is definitely the life and soul of the party.", idiom: "Life and soul of the party", answers: ["روح المكان", "شخصية مرحة", "فاكهة القعدة", "محرك الحفلة", "شخص اجتماعي جدا"] }
+        ],
+        "6": [
+            { a: "I heard you're moving to Japan!", b: "Yes, I finally decided to take the plunge and start a new life.", idiom: "Take the plunge", answers: ["يتخذ خطوة جريئة", "يغامر", "ياخد الخطوة", "يتوكل على الله", "يرمي نفسه في التجربة"] },
+            { a: "Is the new software ready yet?", b: "We are still working out the kinks, but it should be ready by Monday.", idiom: "Working out the kinks", answers: ["حل المشاكل البسيطة", "تضبيط العيوب", "بنشيل العقبات", "تصفية المشاكل", "اللمسات الأخيرة"] },
+            { a: "I can't believe he forgot my birthday!", b: "Don't take it to heart. He’s just been very busy lately.", idiom: "Take it to heart", answers: ["تأخذه على محمل شخصي", "تزعل بجد", "تحط في قلبك", "تتأثر بزيادة", "تاخد على خاطرك"] },
+            { a: "He thinks he can finish the whole project in one hour.", b: "He is living in cloud cuckoo land!", idiom: "Cloud cuckoo land", answers: ["عالم الأوهام", "عايش في مية المخلل", "عايش في الخيال", "مش عايش معانا", "بيحلم"] },
+            { a: "Should we start the meeting now?", b: "Yes, let's get the show on the road.", idiom: "Get the show on the road", answers: ["نبدأ العمل", "نتحرك", "يلا بينا", "نبدأ المهمة", "نبدا الشغل"] }
+        ],
+        "7": [
+            { a: "I'm so stressed about the competition tomorrow.", b: "Just play it by ear and see how things go.", idiom: "Play it by ear", answers: ["يتصرف حسب الظروف", "يمشي مع التيار", "يسيبها بظروفها", "يقرر في وقتها", "يمشيها بالبركة"] },
+            { a: "Why is the boss so happy today?", b: "We are finally back in the black after a year of losses.", idiom: "In the black", answers: ["نحقق أرباح", "مفيش ديون", "الحسابات تمام", "بدأنا نكسب", "الوضع المالي كويس"] },
+            { a: "I've tried everything, but I still can't fix this computer.", b: "Maybe you should go back to the drawing board.", idiom: "Back to the drawing board", answers: ["نبدأ من الصفر", "نرجع لنقطة البداية", "نعيد التفكير من الأول", "نبدأ من جديد"] },
+            { a: "Did you tell him about the surprise party?", b: "No, I'm keeping it under wraps until Friday.", idiom: "Under wraps", answers: ["سري", "طي الكتمان", "مستخبى", "محدش يعرفه", "في السر"] },
+            { a: "He is always late for work.", b: "That’s right, he really needs to pull his socks up.", idiom: "Pull your socks up", answers: ["يشد حيله", "يحسن أداؤه", "ينضبط", "يركز في شغله", "يفوق لنفسه"] }
+        ],
+        "8": [
+            { a: "I think I can win this race easily.", b: "Don't count your chickens before they hatch!", idiom: "Don't count your chickens before they hatch", answers: ["لا تسبق الأحداث", "لا تفرح قبل الأوان", "متبنيش قصور في الهواء", "متضمنش قبل ما تخلص"] },
+            { a: "Is he a good person?", b: "Well, he's a bit strange, but he has a heart of gold.", idiom: "Heart of gold", answers: ["قلبه أبيض", "قلب ذهب", "إنسان طيب جدا", "نيته صافية"] },
+            { a: "I don't like my job, but I need the money.", b: "I guess you'll just have to grin and bear it.", idiom: "Grin and bear it", answers: ["يتحمل بصبر", "يصبر ويسكت", "يبلعها ويمشي", "يستحمل على مضض"] },
+            { a: "The new phone is so expensive!", b: "I know, it's just a flash in the pan. The price will drop soon.", idiom: "Flash in the pan", answers: ["نجاح مؤقت", "هوجة وهتعدي", "حاجة عارضة", "شعلة وهتطفي", "موضة مؤقتة"] },
+            { a: "Why are you looking so unhappy?", b: "I’ve had a long day and I’m feeling a bit down in the dumps.", idiom: "Down in the dumps", answers: ["مكتئب", "حزين", "نفسيته تعبانة", "موده وحش", "مهموم"] }
+        ],
+        "9": [
+            { a: "He said he would help us, but he never showed up.", b: "He is always full of hot air.", idiom: "Full of hot air", answers: ["كلام في الهواء", "فشار", "بياع كلام", "كلامه كتير وفعله قليل", "هبّاد"] },
+            { a: "How do you stay so calm during exams?", b: "I just try to keep a cool head.", idiom: "Keep a cool head", answers: ["يحافظ على هدوئه", "يخلي أعصابة باردة", "يفكر بهدوء", "ميتوترش"] },
+            { a: "I can't decide which car to buy.", b: "Just follow your gut and choose the one you like.", idiom: "Follow your gut", answers: ["اتبع إحساسك", "اسمع كلام قلبك", "امشي ورا حدسك", "خليك مع احساسك"] },
+            { a: "Are we still going to the cinema?", b: "No, let's take a rain check. I'm too tired.", idiom: "Take a rain check", answers: ["نأجلها لوقت تاني", "مرة تانية", "نخليها وقت تاني", "بلاش المرة دي"] },
+            { a: "He finally told her he was sorry.", b: "Good! That really helped to break the ice.", idiom: "Break the ice", answers: ["يذيب الجليد", "يكسر الحاجز", "يفك التوتر", "يفتح كلام"] }
+        ],
+        "10": [
+            { a: "I forgot to bring my wallet.", b: "That’s okay. It happened once in a blue moon.", idiom: "Once in a blue moon", answers: ["نادراً جداً", "فين وفين", "كل فين وفين", "في السنة مرة", "نادر لما يحصل"] },
+            { a: "She’s very upset about her lost dog.", b: "I know, she’s been crying her eyes out all night.", idiom: "Crying her eyes out", answers: ["تبكي بشدة", "تقطع قلبها من العياط", "بتعيط بحرقة", "عينيها ورمت من العياط"] },
+            { a: "Do you think he will tell the truth?", b: "I doubt it. He’s always been a bit of a dark horse.", idiom: "Dark horse", answers: ["شخص غامض", "مخادع", "مخبي كتير", "شخص غير متوقع"] },
+            { a: "I’m going to tell the boss I’m quitting.", b: "Wait! Don't burn your bridges. You might need this job later.", idiom: "Burn your bridges", answers: ["يقطع خط الرجعة", "يخسر كل حاجة", "يهدم الجسور", "يقفل الأبواب وراه"] },
+            { a: "He is so rich, but he lives in a small house.", b: "Yes, he's very down to earth.", idiom: "Down to earth", answers: ["متواضع", "واقعي", "ابن بلد", "غير متكبر", "عملي"] }
+        ]
+    };
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const taskNum = urlParams.get('task') || "1";
+
+    function loadFigurative() {
+        const dialogs = figurativeData[taskNum] || figurativeData["1"];
+        const container = document.getElementById('dialogs-container');
+        
+        container.innerHTML = dialogs.map((d, i) => `
+            <div class="dialog-card">
+                <span class="unit-tag">ENCRYPTED DIALOGUE #${i+1}</span>
+                <div class="chat-bubble speaker-a"><b>A:</b> ${d.a}</div>
+                <div class="chat-bubble speaker-b"><b>B:</b> ${d.b}</div>
+                
+                <div class="idiom-box">
+                    <span class="idiom-text">"${d.idiom}"</span>
+                    <input type="text" class="arabic-input" id="ans-${i}" placeholder="اكتب المعنى العربي هنا...">
+                </div>
+            </div>
+        `).join('');
+        document.getElementById('x-title').innerText = `FIGURATIVE-X: TASK ${taskNum.padStart(2, '0')}`;
+    }
+
+    window.addEventListener('message', function(event) {
+        if (event.data.type === 'REQUEST_MISSION_DATA') {
+            collectAndSubmit();
+        }
+    });
+
+    function collectAndSubmit() {
+        const userAnswers = [];
+        let missing = false;
+
+        for(let i=0; i<5; i++) {
+            const el = document.getElementById(`ans-${i}`);
+            const val = el.value.trim();
+            if(!val) {
+                missing = true;
+                el.style.borderColor = "#ff4444";
+            } else {
+                el.style.borderColor = "rgba(255,255,255,0.1)";
+                userAnswers.push(val);
+            }
+        }
+
+        if(missing) {
+            window.parent.postMessage({ type: 'MISSION_INCOMPLETE' }, '*');
+            return;
+        }
+
+        window.parent.postMessage({ 
+            type: 'MISSION_ANSWERS', 
+            activityCode: 'FX',
+            answers: userAnswers.join(' | '), 
+            missionNum: taskNum 
+        }, '*');
+    }
+
+    window.onload = loadFigurative;
+</script>
+</body>
+</html>
