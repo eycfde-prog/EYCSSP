@@ -7,7 +7,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Orbitron:wght@400;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        /* التنسيقات ثابتة للحفاظ على جمالية الواجهة */
+        /* [التنسيقات ثابتة كما هي لضمان المظهر الاحترافي] */
         :root { --gold: #D4AF37; --gold-glow: rgba(212, 175, 55, 0.6); --gold-gradient: linear-gradient(135deg, #bf953f, #fcf6ba, #b38728); --bg-deep: #020205; --glass: rgba(255, 255, 255, 0.03); --glass-border: rgba(212, 175, 55, 0.3); --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
         body { background: var(--bg-deep); color: white; height: 100vh; display: flex; flex-direction: column; overflow: hidden; position: relative; }
@@ -23,18 +23,21 @@
         .glass-iframe-wrapper { width: 100%; height: 100%; max-width: 1100px; background: rgba(0, 0, 0, 0.2); backdrop-filter: blur(5px); border: 1px solid var(--glass-border); border-radius: 15px; overflow: hidden; }
         iframe { width: 100%; height: 100%; border: none; }
         footer { padding: 10px 15px 15px; display: flex; justify-content: space-between; align-items: center; gap: 10px; max-width: 1000px; margin: 0 auto; width: 100%; }
-        .btn { padding: 10px; border-radius: 10px; border: none; font-weight: 700; cursor: pointer; font-size: 0.7rem; font-family: 'Cinzel'; display: flex; align-items: center; gap: 6px; }
+        .btn { padding: 10px; border-radius: 10px; border: none; font-weight: 700; cursor: pointer; transition: var(--transition); font-size: 0.7rem; font-family: 'Cinzel'; display: flex; align-items: center; justify-content: center; gap: 6px; }
         .btn-submit { flex: 2; background: var(--gold-gradient); color: #000; }
         .btn-side { flex: 1; background: rgba(255,255,255,0.05); color: var(--gold); border: 1px solid var(--glass-border); }
-        #sync-overlay { position: fixed; inset: 0; background: rgba(2, 2, 5, 0.95); z-index: 2000; display: none; flex-direction: column; justify-content: center; align-items: center; backdrop-filter: blur(15px); }
+        #sync-overlay { position: fixed; inset: 0; background: radial-gradient(circle at center, rgba(10, 10, 15, 0.98), #020205); z-index: 2000; display: none; flex-direction: column; justify-content: center; align-items: center; text-align: center; backdrop-filter: blur(15px); }
+        .fairy-loader i { font-size: 3.5rem; color: var(--gold); animation: fairyFloat 2s infinite ease-in-out; }
+        @keyframes fairyFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
     </style>
 </head>
 <body>
 
     <div id="sync-overlay">
-        <div id="sync-text" style="text-align: center;">
-            <div style="color: var(--gold); font-family: 'Cinzel'; font-size: 1.2rem;">Checking Mission...</div>
-            <div id="loader-icon" style="margin: 20px;"><i class="fas fa-spinner fa-spin fa-2x" style="color: var(--gold);"></i></div>
+        <div class="fairy-loader"><i class="fas fa-wand-magic-sparkles"></i></div>
+        <div id="sync-text">
+            <div style="color: var(--gold); font-weight: 700;">Hello <span id="display-student-name">...</span>! ✨</div>
+            <div style="color: #aaa; font-size: 0.8rem;">Processing your submission...</div>
         </div>
     </div>
 
@@ -43,18 +46,21 @@
     <header>
         <div class="battle-header">
             <div class="info-box">
-                <img id="student-img" class="student-photo" src="" alt="Student">
+                <img id="student-img" class="student-photo" src="" alt="S">
                 <div style="display: flex; flex-direction: column;">
                     <span class="name" id="student-name">LOADING...</span>
-                    <span id="student-meta" style="font-size: 0.5rem; color: #888; font-family: 'Orbitron';">RANK --</span>
+                    <span id="student-meta" style="font-size: 0.5rem; color: #888;">RANK --</span>
                 </div>
+            </div>
+            <div style="text-align: center;">
+                <div style="font-family: 'Cinzel'; color: var(--gold); font-weight: 900;">VS</div>
             </div>
             <div class="info-box">
                 <div style="display: flex; flex-direction: column; text-align: right;">
                     <span class="name" id="activity-title">ACTIVITY</span>
-                    <span id="mission-sub" style="font-size: 0.5rem; color: var(--gold); font-family: 'Orbitron';">M-01</span>
+                    <span id="mission-sub" style="font-size: 0.5rem; color: var(--gold);">MISSION --</span>
                 </div>
-                <img id="activity-img" class="activity-logo" src="" alt="Logo">
+                <img id="activity-img" class="activity-logo" src="" alt="L">
             </div>
         </div>
     </header>
@@ -66,9 +72,9 @@
     </main>
 
     <footer>
-        <button class="btn btn-side" onclick="alert('Follow instructions carefully!')">RULES</button>
-        <button id="submitBtn" class="btn btn-submit" onclick="requestSubmit()"><i class="fas fa-shield-alt"></i> SUBMIT REPORT</button>
-        <button class="btn btn-side" onclick="window.location.href='MC.html'">EXIT</button>
+        <button class="btn btn-side" onclick="alert('Stay Focused!')"><i class="fas fa-scroll"></i> RULES</button>
+        <button id="submitBtn" class="btn btn-submit" onclick="requestSubmit()"><i class="fas fa-shield-alt"></i> SUBMIT MISSION</button>
+        <button class="btn btn-side" onclick="window.location.href='MC.html'"><i class="fas fa-door-open"></i> EXIT</button>
     </footer>
 
     <script>
@@ -80,45 +86,51 @@
             const urlParams = new URLSearchParams(window.location.search);
             const savedUser = JSON.parse(localStorage.getItem('eyc_user')) || {};
 
-            // جلب البيانات من الرابط
+            // 1. جلب البيانات من الـ URL
             userEmail = urlParams.get('email');
             userName = urlParams.get('name') || savedUser.name || "AGENT";
-            currentActivity = urlParams.get('act'); // مثلاً: AS
+            currentActivity = urlParams.get('act'); // هنا كود النشاط مثل AS
             currentTask = urlParams.get('task') || "1";
 
-            // 1. التأكد من الهوية (Security Check)
+            // 2. التحقق الأمني (منع التلاعب بالإيميل)
             if (!savedUser.email || userEmail !== savedUser.email) {
-                alert("Security Error: Identity mismatch. Please log in again.");
+                alert("Security Alert: Session Mismatch. Please login again.");
                 window.location.href = 'MC.html';
                 return;
             }
 
-            // 2. تحديث واجهة المستخدم
+            // 3. تحديث واجهة المستخدم بالبيانات الموثقة
             document.getElementById('student-name').innerText = userName;
+            document.getElementById('student-meta').innerText = `TITLE: ${savedUser.title || 'RECRUIT'}`;
             document.getElementById('activity-title').innerText = currentActivity;
             document.getElementById('mission-sub').innerText = `MISSION ${currentTask.padStart(2, '0')}`;
-            document.getElementById('student-img').src = savedUser.avatar ? `assets/avatars/${savedUser.avatar}` : 'assets/avatars/default.png';
+            
+            const avatar = savedUser.avatar || 'default.png';
+            document.getElementById('student-img').src = avatar.startsWith('http') ? avatar : `assets/avatars/${avatar}`;
             document.getElementById('activity-img').src = `assets/AL/${currentActivity}.png`;
 
-            // 3. تحميل صفحة النشاط الصحيحة من مجلد frontend
-            // لو الـ act هو AS، سيقوم بفتح frontend/AS.html?task=1
+            // 4. تحميل صفحة النشاط الصحيحة من مجلد frontend
+            // المسار الجديد: frontend/AS.html?task=1
             if (currentActivity) {
-                const iframePath = `frontend/${currentActivity}.html?task=${currentTask}`;
-                document.getElementById('contentFrame').src = iframePath;
-                console.log("Iframe redirected to:", iframePath);
+                const targetPath = `frontend/${currentActivity}.html?task=${currentTask}`;
+                document.getElementById('contentFrame').src = targetPath;
+                console.log("Arena is loading mission from:", targetPath);
             } else {
-                alert("Error: Activity Code Missing!");
+                alert("Error: No activity code provided.");
             }
         };
 
+        // وظيفة طلب البيانات من الـ Iframe (ملف النشاط)
         function requestSubmit() {
-            // إرسال رسالة لملف النشاط (مثل AS.html) ليقوم بجمع الإجابات
             const frame = document.getElementById('contentFrame').contentWindow;
+            document.getElementById('display-student-name').innerText = userName;
+            
+            // نرسل رسالة لملف النشاط (مثل AS.html) ليقوم بجمع الإجابات
             frame.postMessage({ type: 'REQUEST_MISSION_DATA' }, '*'); 
             document.getElementById('sync-overlay').style.display = 'flex';
         }
 
-        // الاستماع لرد ملف النشاط بالإجابات
+        // الاستماع للإجابات القادمة من الـ Iframe
         window.addEventListener('message', function(event) {
             if (event.data.type === 'MISSION_ANSWERS') {
                 sendToCore(event.data.answers);
@@ -138,24 +150,24 @@
                 method: 'POST',
                 body: JSON.stringify(payload)
             })
-            .then(res => res.json())
+            .then(response => response.json())
             .then(data => {
                 const syncText = document.getElementById('sync-text');
                 syncText.innerHTML = `
-                    <div style="color: var(--gold); font-size: 2rem; font-family: 'Orbitron';">${data.grade}/${data.maxGrade}</div>
-                    <div style="margin-top:15px; color:#ccc; font-size:0.8rem;">${data.reason}</div>
+                    <div style="color: var(--gold); font-size: 2rem; font-weight: 900;">${data.grade}/${data.maxGrade}</div>
+                    <div style="font-size: 0.8rem; color: #eee; margin-top: 10px;">${data.reason}</div>
                 `;
                 setTimeout(() => window.location.href = 'MC.html', 5000);
             })
             .catch(err => {
                 document.getElementById('sync-overlay').style.display = 'none';
-                alert("Connection lost. Please try again.");
+                alert("Submit Failed. Please check connection.");
             });
         }
 
         function generateStars() {
             const container = document.getElementById('star-container');
-            for (let i = 0; i < 50; i++) {
+            for (let i = 0; i < 30; i++) {
                 const star = document.createElement('div');
                 star.className = 'star';
                 star.style.cssText = `width:2px; height:2px; left:${Math.random()*100}%; top:${Math.random()*100}%; --duration:${Math.random()*3+2}s`;
