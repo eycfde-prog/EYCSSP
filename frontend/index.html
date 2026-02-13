@@ -6,7 +6,147 @@
     <title>EYC Superstars | Elite Command Center</title>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Orbitron:wght@400;700;900&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" href="style.css">
+    
+    <style>
+        :root {
+            --gold: #D4AF37;
+            --gold-gradient: linear-gradient(135deg, #bf953f, #fcf6ba, #b38728);
+            --bg-deep: #050508;
+            --gold-glow: rgba(212, 175, 55, 0.4);
+            --glass-border: rgba(212, 175, 55, 0.2);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+        body { background: var(--bg-deep); color: white; min-height: 100vh; overflow-x: hidden; }
+
+        /* Background Effects */
+        #letter-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; opacity: 0.4; }
+        .bg-glow {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle at 50% 50%, rgba(212, 175, 55, 0.08) 0%, transparent 70%);
+            z-index: -1;
+        }
+
+        nav {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 0 5%; height: 80px; position: sticky; top: 0; z-index: 1000;
+            background: rgba(5, 5, 8, 0.9); backdrop-filter: blur(15px);
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .logo-text { font-family: 'Orbitron'; color: var(--gold); font-weight: 900; letter-spacing: 2px; }
+
+        /* Hero Section */
+        .hero { text-align: center; padding: 50px 20px 20px; }
+        
+        .main-logo {
+            width: 110px; margin-bottom: 20px;
+            filter: drop-shadow(0 0 20px var(--gold-glow));
+        }
+
+        .hero h1 {
+            font-family: 'Cinzel', serif; font-size: clamp(2.5rem, 8vw, 4.5rem);
+            background: var(--gold-gradient);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            line-height: 1; letter-spacing: 3px; margin-bottom: 10px;
+        }
+
+        /* Mission Control - The Core */
+        .mission-control {
+            display: flex; flex-direction: column; align-items: center;
+            padding-bottom: 80px;
+        }
+
+        .core-container {
+            position: relative; width: 340px; height: 340px;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; transform-style: preserve-3d;
+        }
+
+        /* الحلقات الـ Crystal */
+        .core-ring {
+            position: absolute; border-radius: 50%;
+            border: 1px solid var(--glass-border);
+            box-shadow: inset 0 0 15px rgba(212, 175, 55, 0.1);
+        }
+
+        .ring-outer {
+            width: 300px; height: 300px;
+            border-style: double; border-width: 3px;
+            animation: rotateRight 25s linear infinite;
+        }
+
+        .ring-inner {
+            width: 240px; height: 240px;
+            border-style: dashed; border-width: 2px;
+            opacity: 0.6;
+            animation: rotateLeft 18s linear infinite;
+        }
+
+        @keyframes rotateRight { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        @keyframes rotateLeft { from { transform: rotate(360deg); } to { transform: rotate(0deg); } }
+
+        /* الزر الرئيسي */
+        .main-core-btn {
+            width: 170px; height: 170px;
+            background: radial-gradient(circle, rgba(20, 20, 25, 0.9) 0%, #050508 100%);
+            border: 2px solid var(--gold);
+            border-radius: 50%;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            color: var(--gold); font-family: 'Orbitron'; font-weight: 900;
+            box-shadow: 0 0 50px rgba(212, 175, 55, 0.3), inset 0 0 20px var(--gold-glow);
+            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 10;
+        }
+
+        .core-container:hover .main-core-btn {
+            transform: scale(1.1) rotate(5deg);
+            box-shadow: 0 0 70px var(--gold-glow);
+            color: #fff;
+        }
+
+        /* Button Stack */
+        .btn-stack {
+            display: flex; flex-direction: column;
+            gap: 15px; width: 100%; max-width: 300px; padding: 0 20px;
+        }
+
+        .nav-btn {
+            width: 100%; padding: 15px; border-radius: 15px;
+            background: rgba(255, 255, 255, 0.03); color: #fff;
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(10px);
+            cursor: pointer; transition: 0.3s; font-family: 'Orbitron'; 
+            text-decoration: none; text-align: center; font-size: 0.85rem;
+            font-weight: 700; letter-spacing: 3px;
+            text-transform: uppercase;
+        }
+
+        .nav-btn:hover { 
+            background: var(--gold-gradient);
+            color: #000;
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(212, 175, 55, 0.3);
+            border-color: transparent;
+        }
+
+        #lightning-flash {
+            position: fixed; inset: 0; background: #fff; z-index: 9999;
+            opacity: 0; pointer-events: none;
+        }
+        @keyframes flashEffect {
+            0% { opacity: 0; } 10% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 0; }
+        }
+
+        footer { padding: 40px; text-align: center; border-top: 1px solid var(--glass-border); }
+
+        /* Stars */
+        .star {
+            position: absolute; width: 4px; height: 4px;
+            background: var(--gold); border-radius: 50%;
+            box-shadow: 0 0 10px var(--gold); pointer-events: none;
+        }
+    </style>
 </head>
 <body>
 
@@ -48,6 +188,127 @@
         </div>
     </footer>
 
-    <script src="script.js"></script>
+    <script>
+        const activities = {
+            season: [
+                { name: "Golden Ear", icon: "fa-ear-listen", code: "GES" },
+                { name: "Alike", icon: "fa-clone", code: "AS" },
+                { name: "Seeds", icon: "fa-seedling", code: "SS" },
+                { name: "Grammar", icon: "fa-spell-check", code: "GS" },
+                { name: "Label", icon: "fa-tag", code: "LS" },
+                { name: "Vivid", icon: "fa-eye", code: "VS" }
+            ],
+            royal: [
+                { name: "Golden EarX", icon: "fa-ear-deaf", code: "GEX" },
+                { name: "AlikeX", icon: "fa-object-group", code: "AX" },
+                { name: "SeedsX", icon: "fa-tree", code: "SX" },
+                { name: "GrammarX", icon: "fa-pen-fancy", code: "GX" },
+                { name: "LabelX", icon: "fa-tags", code: "LX" },
+                { name: "VividX", icon: "fa-wand-magic-sparkles", code: "VX" },
+                { name: "FigurativeX", icon: "fa-mask", code: "FX" },
+                { name: "DictationX", icon: "fa-microphone-lines", code: "DX" },
+                { name: "Sing Sang SungX", icon: "fa-music", code: "SSSX" },
+                { name: "ElmagazineX", icon: "fa-book-open", code: "ELX" }
+            ]
+        };
+
+        function openTasks(name, activityCode) {
+            document.getElementById('mTitle').innerText = name;
+            const tGrid = document.getElementById('tGrid'); tGrid.innerHTML = '';
+            
+            const currentType = document.querySelector('.tab-btn.active').innerText;
+            const tokenValue = (currentType === 'ROYAL') ? 10 : 5;
+
+            for (let i = 1; i <= 10; i++) {
+                const node = document.createElement('div');
+                node.className = `task-node`;
+                node.innerHTML = i;
+                node.onclick = () => {
+                    if(!isLoggedIn) return alert("Login to submit scores!");
+                    
+                    const params = new URLSearchParams({
+                        email: currentUser.email,
+                        name: currentUser.name,
+                        rank: currentUser.rank,   
+                        title: currentUser.title, 
+                        image: currentUser.image, 
+                        activity: activityCode,
+                        activityName: name,
+                        taskNum: i,
+                        tokens: tokenValue
+                    });
+                    window.location.href = `EYCArena.html?${params.toString()}`;
+                };
+                tGrid.appendChild(node);
+            }
+            document.getElementById('taskModal').style.display = 'flex';
+        }
+
+        function createStars() {
+            const orbit = document.getElementById('starOrbit');
+            const count = 15;
+            for (let i = 0; i < count; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                const angle = (i / count) * Math.PI * 2;
+                const radius = 140 + Math.random() * 30;
+                const speed = 0.005 + Math.random() * 0.01;
+                let currentAngle = angle;
+                
+                function moveStar() {
+                    currentAngle += speed;
+                    const x = Math.cos(currentAngle) * radius + 170;
+                    const y = Math.sin(currentAngle) * radius + 170;
+                    star.style.left = x + 'px';
+                    star.style.top = y + 'px';
+                    star.style.opacity = Math.sin(currentAngle * 3) * 0.5 + 0.5;
+                    requestAnimationFrame(moveStar);
+                }
+                orbit.appendChild(star);
+                moveStar();
+            }
+        }
+        createStars();
+
+        function startMission() {
+            const flash = document.getElementById('lightning-flash');
+            flash.style.animation = "flashEffect 0.6s ease-out forwards";
+            if (window.navigator.vibrate) window.navigator.vibrate([80, 40, 80]);
+            setTimeout(() => { window.location.href = "MC.html"; }, 500);
+        }
+
+        const canvas = document.getElementById('letter-canvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+        function initCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+
+        class LetterParticle {
+            constructor() { this.init(); }
+            init() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.char = ["E", "Y", "C"][Math.floor(Math.random()*3)];
+                this.fontSize = Math.random() * 15 + 10;
+                this.speed = Math.random() * 0.5 + 0.2;
+                this.opacity = Math.random() * 0.3;
+            }
+            update() {
+                this.y -= this.speed;
+                if (this.y < -20) this.y = canvas.height + 20;
+                ctx.fillStyle = `rgba(212, 175, 55, ${this.opacity})`;
+                ctx.font = `900 ${this.fontSize}px Orbitron`;
+                ctx.fillText(this.char, this.x, this.y);
+            }
+        }
+
+        function createParticles() { particles = Array.from({length: 40}, () => new LetterParticle()); }
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach(p => p.update());
+            requestAnimationFrame(animate);
+        }
+        window.addEventListener('resize', () => { initCanvas(); createParticles(); });
+        initCanvas(); createParticles(); animate();
+    </script>
 </body>
 </html>
