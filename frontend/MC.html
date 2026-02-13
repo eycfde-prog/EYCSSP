@@ -204,33 +204,33 @@
             }
         }
 
-        function handleLogin() {
-            const email = document.getElementById('loginEmail').value;
-            const code = document.getElementById('loginCode').value;
-            if (!email || !code) return alert("Enter credentials, Agent!");
+function handleLogin() {
+    const email = document.getElementById('loginEmail').value;
+    const code = document.getElementById('loginCode').value;
+    if (!email || !code) return alert("Enter credentials, Agent!");
 
-            fetch(`${SCRIPT_URL}?action=getProfile&email=${email}`)
-                .then(res => res.json())
-                .then(res => {
-                    if(res.error) {
-                        alert("User not found!");
-                    } else {
-                        currentUser = {
-                            name: res.name, email: email, tokens: res.tokens,
-                            stars: res.stars, tickets: res.tickets, avatar: res.avatar,
-                            title: res.title, rank: res.rank || "N/A"
-                        };
-                        isLoggedIn = true;
-                        localStorage.setItem('eyc_user', JSON.stringify(currentUser));
-                        closeModal('loginModal');
-                        renderHeader();
-                        generateCards();
-                        refreshUserData();
-                    }
-                })
-                .catch(err => alert("Connection Error!"));
-        }
-
+    // إضافة الكود (code) إلى الرابط المرسل
+    fetch(`${SCRIPT_URL}?action=getProfile&email=${email}&code=${code}`)
+        .then(res => res.json())
+        .then(res => {
+            if(res.error) {
+                alert(res.message); // سيظهر "Invalid Access Code!" أو "User not found"
+            } else {
+                currentUser = {
+                    name: res.name, email: email, tokens: res.tokens,
+                    stars: res.stars, tickets: res.tickets, avatar: res.avatar,
+                    title: res.title, rank: res.rank || "N/A"
+                };
+                isLoggedIn = true;
+                localStorage.setItem('eyc_user', JSON.stringify(currentUser));
+                closeModal('loginModal');
+                renderHeader();
+                generateCards();
+                refreshUserData();
+            }
+        })
+        .catch(err => alert("Connection Error!"));
+}
         function generateCards() {
             const grid = document.getElementById('cardsGrid'); grid.innerHTML = '';
             const type = document.querySelector('.tab-btn.active').innerText.toLowerCase();
