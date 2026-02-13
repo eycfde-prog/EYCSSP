@@ -112,7 +112,7 @@
             // 4. تحميل صفحة النشاط الصحيحة من مجلد frontend
             // المسار الجديد: frontend/AS.html?task=1
             if (currentActivity) {
-                const targetPath = `frontend/${currentActivity}.html?task=${currentTask}`;
+                const targetPath = `${currentActivity}.html?task=${currentTask}`;
                 document.getElementById('contentFrame').src = targetPath;
                 console.log("Arena is loading mission from:", targetPath);
             } else {
