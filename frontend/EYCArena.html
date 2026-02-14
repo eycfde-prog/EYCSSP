@@ -88,33 +88,41 @@
 
         let currentActivity, currentTask, userEmail, userName;
 
-        window.onload = function() {
-            generateStars();
-            const urlParams = new URLSearchParams(window.location.search);
-            const savedUser = JSON.parse(localStorage.getItem('eyc_user')) || {};
+ window.onload = function() {
+    generateStars();
+    const urlParams = new URLSearchParams(window.location.search);
+    const savedUser = JSON.parse(localStorage.getItem('eyc_user')) || {};
 
-            userEmail = urlParams.get('email');
-            userName = urlParams.get('name') || savedUser.name || "AGENT";
-            currentActivity = urlParams.get('act'); 
-            currentTask = urlParams.get('task') || "1";
+    userEmail = urlParams.get('email');
+    userName = urlParams.get('name') || savedUser.name || "AGENT";
+    currentActivity = urlParams.get('act'); 
+    currentTask = urlParams.get('task') || "1";
 
-            // 1. التحقق من تسجيل الدخول
-            if (!savedUser.email || userEmail !== savedUser.email) {
-                alert("Security Alert: Unauthorized Access.");
-                window.location.href = 'index.html'; // أو صفحة تسجيل الدخول
-                return;
-            }
+    // 1. التحقق الأمني
+    if (!savedUser.email || userEmail !== savedUser.email) {
+        alert("Security Alert: Unauthorized Access.");
+        window.location.href = 'index.html'; 
+        return;
+    }
 
-            document.getElementById('student-name').innerText = userName;
-            document.getElementById('activity-title').innerText = currentActivity;
-            document.getElementById('mission-sub').innerText = `MISSION ${currentTask.padStart(2, '0')}`;
-            document.getElementById('student-img').src = savedUser.avatar || 'assets/avatars/default.png';
-            document.getElementById('activity-img').src = `assets/AL/${currentActivity}.png`;
+    // 2. تحديث النصوص
+    document.getElementById('student-name').innerText = userName;
+    document.getElementById('activity-title').innerText = currentActivity;
+    document.getElementById('mission-sub').innerText = `MISSION ${currentTask.padStart(2, '0')}`;
 
-            // 2. تحميل النشاط من مجلد frontend
-            document.getElementById('contentFrame').src = `${currentActivity}.html?task=${currentTask}`;
-        };
+    // 3. تحميل الصور من نفس المجلد
+    // صورة النشاط: (مثلاً لو النشاط AS، هيحمل AS.png من نفس المجلد)
+    document.getElementById('activity-img').src = `${currentActivity}.png`;
+    
+    // صورة الطالب: (لو رابط خارجي أو مسار أصول)
+    const avatarUrl = savedUser.avatar || 'assets/avatars/default.png';
+    document.getElementById('student-img').src = avatarUrl;
 
+    // 4. تحميل محتوى النشاط (Iframe) من نفس المجلد
+    if (currentActivity) {
+        document.getElementById('contentFrame').src = `${currentActivity}.html?task=${currentTask}`;
+    }
+};
         async function startSubmission() {
             document.getElementById('sync-overlay').style.display = 'flex';
             document.getElementById('display-student-name').innerText = userName;
