@@ -119,7 +119,7 @@
 
 <script>
     // تأكد أن هذا الرابط هو الرابط النهائي بعد عمل New Deployment
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzaJf-9AWhziYPA9TKmi-0DsmpXdMD2AMntReqvuarbTwb0xHhjPS8iTCBEjzlld-W-1g/exec";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwjcK8hf-IEivMizBLy8iXt0qydtcxDHOsoZ6zACM6WE1gzy4ya4yuUD1td3jxt5EUYrQ/exec";
     const DRIVE_DX = "https://drive.google.com/drive/folders/1f5xKkjHOC9C-DjEKdjhYvbxAWfEId8zz?usp=drive_link";
     const DRIVE_ELX = "https://drive.google.com/drive/folders/1wdpDSwpmZN_HYbfUhUcH-PlmRsBPB73-?usp=drive_link";
 
@@ -198,44 +198,37 @@
     }
 
 function sendToAiGrader(answers) {
-// استبدل السطر الموجود في دالة sendToAiGrader بهذا المنطق
-let separator = (currentActivity === "FX" || currentActivity === "LX") ? "|" : ", ";
-const answerString = Array.isArray(answers) ? answers.join(separator) : answers;
+    // Gear Fix: توحيد الفواصل وإزالة المسافات الزائدة من كل إجابة
+    let separator = (currentActivity === "FX" || currentActivity === "LX") ? "|" : ",";
+    const cleanedAnswers = Array.isArray(answers) ? answers.map(a => String(a).trim()).join(separator) : String(answers).trim();
 
     const payload = {
         action: "submitReport",
         email: userEmail,
         actCode: currentActivity,
         taskNum: currentTask,
-        answer: answerString
+        answer: cleanedAnswers
     };
 
-    // إرسال البيانات كـ Content-Type: text/plain لتجنب مشاكل الـ CORS
     fetch(SCRIPT_URL, {
         method: 'POST',
+        mode: 'no-cors', // لضمان تجاوز قيود المتصفح عند الإرسال لجوجل
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload) 
     })
-    .then(res => res.json())
-    .then(data => {
+    // ملحوظة: عند استخدام no-cors لن تستطيع قراءة الـ JSON الراجع مباشرة
+    // يفضل توجيه الطالب لصفحة نجاح أو استخدام "Redirect" في السكربت
+    .then(() => {
         document.getElementById('loader-content').style.display = 'none';
         const resultDiv = document.getElementById('result-display');
         resultDiv.style.display = 'block';
-
-        if (data.error) {
-            resultDiv.innerHTML = `
-                <div style="font-size: 1.2rem; color: #ff4444; font-family: 'Orbitron';">MISSION BLOCKED</div>
-                <p style="margin: 15px 0; color: #ddd;">${data.reason}</p>
-                <button class="btn btn-side" style="width:100%" onclick="window.location.href='MC.html'">RETURN TO BASE</button>
-            `;
-        } else {
-            // عرض الدرجة الحقيقية الراجعة من السكريبت المطوّر
-            resultDiv.innerHTML = `
-                <div style="font-size: 2.5rem; color: var(--gold); font-family: 'Orbitron';">${data.grade}/${data.maxGrade}</div>
-                <p style="margin: 15px 0; color: #ddd;">${data.reason}</p>
-                <button class="btn btn-submit" style="width:100%" onclick="window.location.href='MC.html'">COMPLETE MISSION</button>
-            `;
-        }
-    })
+        resultDiv.innerHTML = `
+            <div style="font-size: 1.5rem; color: var(--gold); font-family: 'Orbitron';">MISSION SUBMITTED</div>
+            <p style="margin: 15px 0; color: #ddd;">HQ is analyzing your data. Check your profile for the final grade!</p>
+            <button class="btn btn-submit" style="width:100%" onclick="window.location.href='MC.html'">RETURN TO BASE</button>
+        `;
+    });
+}
     .catch(err => {
         console.error("Connection Error:", err);
         document.getElementById('status-msg').innerText = "HQ Connection Failed!";
