@@ -163,38 +163,24 @@ document.getElementById('student-title').innerText = savedUser.title || "Elite A
     }
 };
 async function startSubmission() {
-    const overlay = document.getElementById('sync-overlay');
-    const statusMsg = document.getElementById('status-msg');
-    
-    overlay.style.display = 'flex';
+    document.getElementById('sync-overlay').style.display = 'flex';
+    document.getElementById('loader-content').style.display = 'block';
+    document.getElementById('result-display').style.display = 'none';
     document.getElementById('display-student-name').innerText = userName;
-    statusMsg.innerText = "Security Check: Verifying mission history...";
+    document.getElementById('status-msg').innerText = "Verifying mission status...";
 
-    try {
-        // فحص التكرار عبر doGet
-        const checkUrl = `${SCRIPT_URL}?action=checkMission&email=${userEmail}&act=${currentActivity}&task=${currentTask}`;
-        const response = await fetch(checkUrl);
-        const checkData = await response.json();
-
-        if (checkData.completed) {
-            statusMsg.innerHTML = `<span style="color:#ff4444">Access Denied: Mission already completed!</span>`;
-            setTimeout(() => { overlay.style.display = 'none'; }, 3000);
-            return;
-        }
-
-        // لو لم يحلها من قبل، نطلب البيانات من الـ Iframe
-        statusMsg.innerText = "Gathering mission data...";
-        const frame = document.getElementById('contentFrame').contentWindow;
-        frame.postMessage({ type: 'REQUEST_MISSION_DATA' }, '*');
-
-    } catch (e) {
-        statusMsg.innerText = "Error connecting to HQ.";
-        setTimeout(() => { overlay.style.display = 'none'; }, 2000);
-    }
+    // نرسل طلب فحص التكرار للسكريبت قبل البدء
+    // ملاحظة: السكريبت سيتعامل مع هذا عبر doGet أو POST، 
+    // ولكن الأفضل أن نترك الفحص داخل عملية الـ submitReport لتقليل الطلبات.
+    
+    // اطلب البيانات من الـ Iframe مباشرة
+    const frame = document.getElementById('contentFrame').contentWindow;
+    frame.postMessage({ type: 'REQUEST_MISSION_DATA' }, '*');
+    document.getElementById('status-msg').innerText = "Gathering your answers...";
 }
 
 function sendToAiGrader(answers) {
-    document.getElementById('status-msg').innerText = "AI System is evaluating your performance...";
+    document.getElementById('status-msg').innerText = "AI is grading your mission... Please wait.";
     
     const payload = {
         action: "submitReport",
@@ -206,27 +192,35 @@ function sendToAiGrader(answers) {
 
     fetch(SCRIPT_URL, {
         method: 'POST',
+        mode: 'no-cors', // اختيارياً حسب إعدادات السيرفر، لكن يفضل تركه افتراضياً
         body: JSON.stringify(payload)
     })
     .then(res => res.json())
     .then(data => {
-        if (data.error) throw new Error(data.reason);
-
         document.getElementById('loader-content').style.display = 'none';
         const resultDiv = document.getElementById('result-display');
         resultDiv.style.display = 'block';
-        
-        // عرض النتيجة النهائية مع التعليق (Feedback)
-        resultDiv.innerHTML = `
-            <div style="font-family:'Orbitron'; color:var(--gold); font-size:1rem; margin-bottom:10px;">MISSION EVALUATED</div>
-            <div style="font-size: 3rem; font-weight: 900; color: white; text-shadow: 0 0 20px var(--gold-glow);">${data.grade} <span style="font-size:1rem; color:#888;">/ ${data.maxGrade}</span></div>
-            <div style="margin: 20px 0; color: #aaa; font-style: italic; font-size: 0.9rem;">"${data.reason}"</div>
-            <div style="color:var(--gold); font-size:0.7rem; margin-bottom:20px;">Your total score has been updated in your profile.</div>
-            <button class="btn btn-submit" style="width:100%" onclick="window.location.href='MC.html'">RETURN TO COMMAND CENTER</button>
-        `;
+
+        // إذا كان هناك خطأ (مثل التكرار)
+        if (data.error) {
+            resultDiv.innerHTML = `
+                <div style="font-size: 1.2rem; color: #ff4444; font-family: 'Orbitron'; margin-bottom:10px;">MISSION BLOCKED</div>
+                <div style="margin: 15px 0; color: #ddd; font-size: 0.85rem;">${data.reason}</div>
+                <button class="btn btn-side" style="width:100%" onclick="window.location.href='MC.html'">RETURN TO BASE</button>
+            `;
+        } else {
+            // نجاح التصحيح
+            resultDiv.innerHTML = `
+                <div style="font-size: 2.5rem; font-weight: 900; color: var(--gold); font-family: 'Orbitron';">${data.grade}/${data.maxGrade}</div>
+                <div style="margin: 15px 0; color: #ddd; font-size: 0.85rem; line-height: 1.5;">${data.reason}</div>
+                <div style="color: var(--gold); font-size: 0.7rem; margin-bottom: 15px;">Wallet updated in Sheet1! ✅</div>
+                <button class="btn btn-submit" style="width:100%" onclick="window.location.href='MC.html'">BACK TO MISSIONS</button>
+            `;
+        }
     })
     .catch(err => {
-        alert("System Overload: " + err.message);
+        console.error(err);
+        alert("Grading service unavailable. Make sure you deployed the script as 'Anyone'.");
         document.getElementById('sync-overlay').style.display = 'none';
     });
 }
