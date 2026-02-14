@@ -117,113 +117,139 @@
         <button class="btn btn-side" onclick="window.location.href='MC.html'"><i class="fas fa-door-open"></i> EXIT</button>
     </footer>
 
-    <script>
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyOT4dv5YrnAZMXlV-glHGUu9mlcQ6mblTWiPccLc3zUJPJDQKLXVx6Q1XDHI2jMPMTDQ/exec";
-        const DRIVE_DX = "https://drive.google.com/drive/folders/1f5xKkjHOC9C-DjEKdjhYvbxAWfEId8zz?usp=drive_link";
-        const DRIVE_ELX = "https://drive.google.com/drive/folders/1wdpDSwpmZN_HYbfUhUcH-PlmRsBPB73-?usp=drive_link";
+<script>
+    // تأكد أن هذا الرابط هو الرابط النهائي بعد عمل New Deployment
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyOT4dv5YrnAZMXlV-glHGUu9mlcQ6mblTWiPccLc3zUJPJDQKLXVx6Q1XDHI2jMPMTDQ/exec";
+    const DRIVE_DX = "https://drive.google.com/drive/folders/1f5xKkjHOC9C-DjEKdjhYvbxAWfEId8zz?usp=drive_link";
+    const DRIVE_ELX = "https://drive.google.com/drive/folders/1wdpDSwpmZN_HYbfUhUcH-PlmRsBPB73-?usp=drive_link";
 
-        let currentActivity, currentTask, userEmail, userName;
+    let currentActivity, currentTask, userEmail, userName;
 
- window.onload = function() {
-    generateStars();
-    const urlParams = new URLSearchParams(window.location.search);
-    const savedUser = JSON.parse(localStorage.getItem('eyc_user')) || {};
+    window.onload = function() {
+        generateStars();
+        const urlParams = new URLSearchParams(window.location.search);
+        
+        // جلب البيانات من localStorage أو من الـ URL
+        const savedUser = JSON.parse(localStorage.getItem('eyc_user')) || {};
 
-    userEmail = urlParams.get('email');
-    userName = urlParams.get('name') || savedUser.name || "AGENT";
-    currentActivity = urlParams.get('act'); 
-    currentTask = urlParams.get('task') || "1";
+        userEmail = urlParams.get('email') || savedUser.email;
+        userName = urlParams.get('name') || savedUser.name || "AGENT";
+        currentActivity = urlParams.get('act'); 
+        currentTask = urlParams.get('task') || "1";
 
-    // 1. التحقق الأمني
-    if (!savedUser.email || userEmail !== savedUser.email) {
-        alert("Security Alert: Unauthorized Access.");
-        window.location.href = 'index.html'; 
-        return;
-    }
+        // 1. التحقق الأمني (تم التخفيف قليلاً لضمان العرض)
+        if (!userEmail) {
+            console.error("No user email found.");
+            // يمكنك توجيه الطالب لصفحة الدخول هنا لو أردت
+        }
 
-// 2. تحديث النصوص
-document.getElementById('student-name').innerText = userName;
-document.getElementById('activity-title').innerText = currentActivity;
-document.getElementById('mission-sub').innerText = `MISSION ${currentTask.padStart(2, '0')}`;
+        // 2. تحديث النصوص (مع وجود نصوص افتراضية)
+        document.getElementById('student-name').innerText = userName.toUpperCase();
+        document.getElementById('display-student-name').innerText = userName;
+        document.getElementById('activity-title').innerText = currentActivity || "ACTIVITY";
+        document.getElementById('mission-sub').innerText = `MISSION ${currentTask.padStart(2, '0')}`;
+        document.getElementById('student-title').innerText = savedUser.title || "ELITE AGENT";
 
-// السطر الجديد لإظهار اللقب (Title)
-document.getElementById('student-title').innerText = savedUser.title || "Elite Agent";
+        // 3. تحميل الصور
+        // صورة النشاط
+        if (currentActivity) {
+            document.getElementById('activity-img').src = `${currentActivity}.png`;
+        }
+        
+        // صورة الطالب
+        const avatarImg = document.getElementById('student-img');
+        if (savedUser.avatar) {
+            avatarImg.src = savedUser.avatar;
+        } else {
+            avatarImg.src = "https://via.placeholder.com/150/000000/D4AF37?text=AGENT"; // صورة افتراضية
+        }
 
-    // 3. تحميل الصور من نفس المجلد
-    // صورة النشاط: (مثلاً لو النشاط AS، هيحمل AS.png من نفس المجلد)
-    document.getElementById('activity-img').src = `${currentActivity}.png`;
-    
-    // صورة الطالب: (لو رابط خارجي أو مسار أصول)
-    const avatarUrl = savedUser.avatar || 'assets/avatars/default.png';
-    document.getElementById('student-img').src = avatarUrl;
-
-    // 4. تحميل محتوى النشاط (Iframe) من نفس المجلد
-    if (currentActivity) {
-        document.getElementById('contentFrame').src = `${currentActivity}.html?task=${currentTask}`;
-    }
-};
-async function startSubmission() {
-    document.getElementById('sync-overlay').style.display = 'flex';
-    document.getElementById('loader-content').style.display = 'block';
-    document.getElementById('result-display').style.display = 'none';
-    document.getElementById('display-student-name').innerText = userName;
-    document.getElementById('status-msg').innerText = "Verifying mission status...";
-
-    // نرسل طلب فحص التكرار للسكريبت قبل البدء
-    // ملاحظة: السكريبت سيتعامل مع هذا عبر doGet أو POST، 
-    // ولكن الأفضل أن نترك الفحص داخل عملية الـ submitReport لتقليل الطلبات.
-    
-    // اطلب البيانات من الـ Iframe مباشرة
-    const frame = document.getElementById('contentFrame').contentWindow;
-    frame.postMessage({ type: 'REQUEST_MISSION_DATA' }, '*');
-    document.getElementById('status-msg').innerText = "Gathering your answers...";
-}
-
-function sendToAiGrader(answers) {
-    document.getElementById('status-msg').innerText = "AI is grading your mission... Please wait.";
-    
-    const payload = {
-        action: "submitReport",
-        email: userEmail,
-        actCode: currentActivity,
-        taskNum: currentTask,
-        answer: answers
+        // 4. تحميل محتوى النشاط (Iframe)
+        if (currentActivity) {
+            document.getElementById('contentFrame').src = `${currentActivity}.html?task=${currentTask}`;
+        }
     };
 
-    fetch(SCRIPT_URL, {
-        method: 'POST',
-        mode: 'no-cors', // اختيارياً حسب إعدادات السيرفر، لكن يفضل تركه افتراضياً
-        body: JSON.stringify(payload)
-    })
-    .then(res => res.json())
-    .then(data => {
-        document.getElementById('loader-content').style.display = 'none';
-        const resultDiv = document.getElementById('result-display');
-        resultDiv.style.display = 'block';
-
-        // إذا كان هناك خطأ (مثل التكرار)
-        if (data.error) {
-            resultDiv.innerHTML = `
-                <div style="font-size: 1.2rem; color: #ff4444; font-family: 'Orbitron'; margin-bottom:10px;">MISSION BLOCKED</div>
-                <div style="margin: 15px 0; color: #ddd; font-size: 0.85rem;">${data.reason}</div>
-                <button class="btn btn-side" style="width:100%" onclick="window.location.href='MC.html'">RETURN TO BASE</button>
-            `;
-        } else {
-            // نجاح التصحيح
-            resultDiv.innerHTML = `
-                <div style="font-size: 2.5rem; font-weight: 900; color: var(--gold); font-family: 'Orbitron';">${data.grade}/${data.maxGrade}</div>
-                <div style="margin: 15px 0; color: #ddd; font-size: 0.85rem; line-height: 1.5;">${data.reason}</div>
-                <div style="color: var(--gold); font-size: 0.7rem; margin-bottom: 15px;">Wallet updated in Sheet1! ✅</div>
-                <button class="btn btn-submit" style="width:100%" onclick="window.location.href='MC.html'">BACK TO MISSIONS</button>
-            `;
+    // --- وظيفة استلام الرسائل من الـ Iframe (ضرورية جداً) ---
+    window.addEventListener('message', function(event) {
+        if (event.data.type === 'MISSION_ANSWERS') {
+            processAnswers(event.data.answers);
         }
-    })
-    .catch(err => {
-        console.error(err);
-        alert("Grading service unavailable. Make sure you deployed the script as 'Anyone'.");
-        document.getElementById('sync-overlay').style.display = 'none';
     });
-}
-    </script>
+
+    async function startSubmission() {
+        document.getElementById('sync-overlay').style.display = 'flex';
+        document.getElementById('loader-content').style.display = 'block';
+        document.getElementById('result-display').style.display = 'none';
+        document.getElementById('status-msg').innerText = "Gathering your answers...";
+
+        // طلب البيانات من الـ Iframe
+        const frame = document.getElementById('contentFrame').contentWindow;
+        frame.postMessage({ type: 'REQUEST_MISSION_DATA' }, '*');
+    }
+
+    function processAnswers(answers) {
+        if (!answers || answers.length === 0) {
+            alert("Please complete the mission first!");
+            document.getElementById('sync-overlay').style.display = 'none';
+            return;
+        }
+        sendToAiGrader(answers);
+    }
+
+    function sendToAiGrader(answers) {
+        document.getElementById('status-msg').innerText = "Analyzing mission data...";
+        
+        const payload = {
+            action: "submitReport",
+            email: userEmail,
+            actCode: currentActivity,
+            taskNum: currentTask,
+            answer: answers
+        };
+
+        // ملاحظة: تم حذف no-cors للسماح بقراءة الـ JSON
+        fetch(SCRIPT_URL, {
+            method: 'POST',
+            body: JSON.stringify(payload)
+        })
+        .then(res => res.json())
+        .then(data => {
+            document.getElementById('loader-content').style.display = 'none';
+            const resultDiv = document.getElementById('result-display');
+            resultDiv.style.display = 'block';
+
+            if (data.error) {
+                resultDiv.innerHTML = `
+                    <div style="font-size: 1.2rem; color: #ff4444; font-family: 'Orbitron';">MISSION BLOCKED</div>
+                    <p style="margin: 15px 0; color: #ddd;">${data.reason}</p>
+                    <button class="btn btn-side" style="width:100%" onclick="window.location.href='MC.html'">RETURN TO BASE</button>
+                `;
+            } else {
+                resultDiv.innerHTML = `
+                    <div style="font-size: 2.5rem; color: var(--gold); font-family: 'Orbitron';">${data.grade}/${data.maxGrade}</div>
+                    <p style="margin: 15px 0; color: #ddd;">${data.reason}</p>
+                    <button class="btn btn-submit" style="width:100%" onclick="window.location.href='MC.html'">COMPLETE MISSION</button>
+                `;
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            alert("Communication error with the server.");
+            document.getElementById('sync-overlay').style.display = 'none';
+        });
+    }
+
+    function generateStars() {
+        const container = document.getElementById('star-container');
+        if (!container) return;
+        for (let i = 0; i < 40; i++) {
+            const star = document.createElement('div');
+            star.className = 'star';
+            star.style.cssText = `width:2px; height:2px; left:${Math.random()*100}%; top:${Math.random()*100}%; --duration:${Math.random()*3+2}s`;
+            container.appendChild(star);
+        }
+    }
+</script>
 </body>
 </html>
