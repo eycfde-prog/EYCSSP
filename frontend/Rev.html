@@ -101,7 +101,7 @@
     </button>
 
     <script>
-        const scriptURL = 'https://script.google.com/macros/s/AKfycbzSsImDObxsSYYx5PD2M3dUSq36h51w_SZqJ5mKG_dpzFHsMUxsjedEfLEkIBOe4IV4kA/exec'; // حط الرابط بتاعك هنا
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbxfMaHu2NKjJJZ0PJYfLF0QkGDt7bcg_y6P_QiaoETsc5W3EEFvxYPGLoSogzzH9kxFeQ/exec'; // حط الرابط بتاعك هنا
 
         function openModal(id) { document.getElementById(id).style.display = 'flex'; }
         function closeModal(id) { document.getElementById(id).style.display = 'none'; }
@@ -156,43 +156,41 @@
             }
         }
 
-        async function submitReview() {
-            const email = document.getElementById('userEmail').value;
-            const text = document.getElementById('userText').value;
-            if(!email || !text) return alert("البيانات ناقصة يا بطل!");
+async function submitReview() {
+    const email = document.getElementById('userEmail').value;
+    const text = document.getElementById('userText').value;
+    if(!email || !text) return alert("البيانات ناقصة يا بطل!");
 
-            const btn = document.getElementById('sendBtn');
-            btn.disabled = true;
-            btn.innerText = "جاري الإرسال...";
+    const btn = document.getElementById('sendBtn');
+    btn.disabled = true;
+    btn.innerText = "جاري الإرسال...";
 
-            try {
-                await fetch(scriptURL, {
-                    method: 'POST',
-                    body: JSON.stringify({ action: "addReview", email: email, text: text })
-                });
-                location.reload();
-            } catch (e) {
-                alert("فشل الإرسال.");
-                btn.disabled = false;
-            }
-        }
+    // تحويل البيانات لـ FormData لتجنب مشاكل الـ CORS في Apps Script
+    const formData = new URLSearchParams();
+    formData.append('action', 'addReview');
+    formData.append('email', email);
+    formData.append('text', text);
 
-        async function likeComment(btn, id) {
-            let likedItems = JSON.parse(localStorage.getItem('eyc_liked_reviews') || '[]');
-            if (likedItems.includes(id)) return;
-
-            btn.classList.add('liked');
-            let countSpan = btn.querySelector('span');
-            countSpan.innerText = parseInt(countSpan.innerText) + 1;
-
-            likedItems.push(id);
-            localStorage.setItem('eyc_liked_reviews', JSON.stringify(likedItems));
-
-            fetch(scriptURL, {
-                method: 'POST',
-                body: JSON.stringify({ action: "likeReview", id: id })
-            });
-        }
+    try {
+        // إرسال كـ POST بالطريقة المتوافقة مع Apps Script
+        await fetch(scriptURL, {
+            method: 'POST',
+            mode: 'no-cors', // مهم جداً عند الإرسال لـ Google Script
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: formData.toString()
+        });
+        
+        // بما أن no-cors لا تعيد استجابة، ننتظر ثانية ثم نحدث الصفحة
+        setTimeout(() => {
+            location.reload();
+        }, 1000);
+        
+    } catch (e) {
+        alert("حدث خطأ في الاتصال.");
+        btn.disabled = false;
+        btn.innerText = "تثبيت رأيي 📌";
+    }
+}
     </script>
 </body>
 </html>
