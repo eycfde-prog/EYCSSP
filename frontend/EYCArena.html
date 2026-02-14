@@ -53,7 +53,7 @@
                 <img id="student-img" class="student-photo" src="" alt="S">
                 <div style="display: flex; flex-direction: column;">
                     <span class="name" id="student-name">LOADING...</span>
-                    <span id="student-meta" style="font-size: 0.5rem; color: #888;">RANK --</span>
+<span id="student-title" style="font-size: 0.5rem; color: #888; text-transform: uppercase;">LOADING...</span>
                 </div>
             </div>
             <div style="text-align: center;">
@@ -105,10 +105,13 @@
         return;
     }
 
-    // 2. تحديث النصوص
-    document.getElementById('student-name').innerText = userName;
-    document.getElementById('activity-title').innerText = currentActivity;
-    document.getElementById('mission-sub').innerText = `MISSION ${currentTask.padStart(2, '0')}`;
+// 2. تحديث النصوص
+document.getElementById('student-name').innerText = userName;
+document.getElementById('activity-title').innerText = currentActivity;
+document.getElementById('mission-sub').innerText = `MISSION ${currentTask.padStart(2, '0')}`;
+
+// السطر الجديد لإظهار اللقب (Title)
+document.getElementById('student-title').innerText = savedUser.title || "Elite Agent";
 
     // 3. تحميل الصور من نفس المجلد
     // صورة النشاط: (مثلاً لو النشاط AS، هيحمل AS.png من نفس المجلد)
