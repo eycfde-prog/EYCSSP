@@ -30,6 +30,58 @@
         .fairy-loader i { font-size: 3.5rem; color: var(--gold); animation: fairyFloat 2s infinite ease-in-out; text-shadow: 0 0 20px var(--gold); }
         @keyframes fairyFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
         .result-card { background: rgba(255,255,255,0.05); padding: 20px; border-radius: 15px; border: 1px solid var(--gold); max-width: 400px; }
+    /* Media Queries for Mobile responsiveness */
+@media (max-width: 600px) {
+    /* 1. تقليل حجم الخطوط والمساحات في الهيدر */
+    .battle-header {
+        gap: 5px;
+    }
+    .info-box {
+        padding: 2px 6px;
+        gap: 5px;
+    }
+    .student-photo, .activity-logo {
+        width: 28px;
+        height: 28px;
+    }
+    .name {
+        font-size: 0.55rem; /* تصغير اسم الطالب */
+    }
+    header div[style*="letter-spacing"] {
+        font-size: 0.7rem; /* تصغير كلمة ARENA */
+        letter-spacing: 1px !important;
+    }
+
+    /* 2. ضبط الفوتر ليناسب العرض الصغير */
+    footer {
+        padding: 10px 5px;
+        gap: 5px;
+    }
+    .btn {
+        padding: 8px 5px;
+        font-size: 0.6rem; /* تصغير نصوص الأزرار */
+        gap: 4px;
+    }
+    .btn i {
+        font-size: 0.7rem;
+    }
+    
+    /* 3. التأكد من أن الـ iframe يأخذ أكبر مساحة ممكنة */
+    .arena-container {
+        padding: 5px;
+    }
+}
+
+/* ضبط خاص للهواتف الصغيرة جداً (مثل iPhone SE) */
+@media (max-width: 380px) {
+    .name, #student-title, #mission-sub {
+        display: none; /* إخفاء النصوص الجانبية لإبقاء الصور فقط إذا كان الموبايل صغير جداً */
+    }
+    .info-box {
+        border: none;
+        background: transparent;
+    }
+}
     </style>
 </head>
 <body>
