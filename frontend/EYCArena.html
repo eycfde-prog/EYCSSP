@@ -198,10 +198,9 @@
     }
 
 function sendToAiGrader(answers) {
-    document.getElementById('status-msg').innerText = "Analyzing mission data...";
-    
-    // تحويل المصفوفة إلى نص مفصول بفواصل كما يتوقع السكريبت المطوّر
-    const answerString = Array.isArray(answers) ? answers.join(', ') : answers;
+// استبدل السطر الموجود في دالة sendToAiGrader بهذا المنطق
+let separator = (currentActivity === "FX" || currentActivity === "LX") ? "|" : ", ";
+const answerString = Array.isArray(answers) ? answers.join(separator) : answers;
 
     const payload = {
         action: "submitReport",
