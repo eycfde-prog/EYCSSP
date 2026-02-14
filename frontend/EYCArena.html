@@ -6,82 +6,66 @@
     <title>EYC Arena | Titanium Mode</title>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Orbitron:wght@400;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <style>
+<style>
         /* التنسيقات ثابتة لضمان استقرار الواجهة */
         :root { --gold: #D4AF37; --gold-glow: rgba(212, 175, 55, 0.6); --gold-gradient: linear-gradient(135deg, #bf953f, #fcf6ba, #b38728); --bg-deep: #020205; --glass: rgba(255, 255, 255, 0.03); --glass-border: rgba(212, 175, 55, 0.3); --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
-        body { background: var(--bg-deep); color: white; height: 100vh; display: flex; flex-direction: column; overflow: hidden; position: relative; }
+        
+        /* تعديل الـ body لضمان عدم اختفاء العناصر */
+        body { 
+            background: var(--bg-deep); 
+            color: white; 
+            height: 100vh; 
+            height: 100dvh; /* لدعم متصفحات الموبايل الحديثة */
+            display: flex; 
+            flex-direction: column; 
+            overflow: hidden; 
+            position: relative; 
+        }
+
         #star-container { position: fixed; inset: 0; z-index: -2; background: radial-gradient(ellipse at bottom, #1B2735 0%, #090A0F 100%); }
         .star { position: absolute; background: white; border-radius: 50%; opacity: 0.5; animation: twinkle var(--duration) infinite ease-in-out; }
         @keyframes twinkle { 0%, 100% { opacity: 0.3; transform: scale(1); } 50% { opacity: 1; transform: scale(1.2); } }
-        header { padding: 8px 15px; background: rgba(5, 5, 8, 0.7); backdrop-filter: blur(15px); border-bottom: 1px solid var(--glass-border); z-index: 10; }
+        
+        header { padding: 8px 15px; background: rgba(5, 5, 8, 0.7); backdrop-filter: blur(15px); border-bottom: 1px solid var(--glass-border); z-index: 10; flex-shrink: 0; }
         .battle-header { display: flex; justify-content: space-between; align-items: center; max-width: 1000px; margin: 0 auto; width: 100%; }
         .info-box { display: flex; align-items: center; gap: 8px; background: var(--glass); padding: 4px 10px; border-radius: 10px; border: 1px solid var(--glass-border); }
         .student-photo, .activity-logo { width: 34px; height: 34px; border-radius: 6px; border: 1px solid var(--gold); object-fit: cover; }
         .name { font-family: 'Cinzel', serif; font-size: 0.7rem; color: var(--gold); font-weight: 700; }
-        .arena-container { flex: 1; padding: 8px; display: flex; justify-content: center; align-items: center; overflow: hidden; }
+        
+        /* تعديل هنا لضمان مرونة الـ iframe */
+        .arena-container { flex: 1; padding: 10px; display: flex; justify-content: center; align-items: center; min-height: 0; }
         .glass-iframe-wrapper { width: 100%; height: 100%; max-width: 1100px; background: rgba(0, 0, 0, 0.2); backdrop-filter: blur(5px); border: 1px solid var(--glass-border); border-radius: 15px; overflow: hidden; }
         iframe { width: 100%; height: 100%; border: none; }
-        footer { padding: 10px 15px 15px; display: flex; justify-content: space-between; align-items: center; gap: 10px; max-width: 1000px; margin: 0 auto; width: 100%; }
+        
+        footer { padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; gap: 10px; max-width: 1000px; margin: 0 auto; width: 100%; flex-shrink: 0; }
         .btn { padding: 10px; border-radius: 10px; border: none; font-weight: 700; cursor: pointer; transition: var(--transition); font-size: 0.7rem; font-family: 'Cinzel'; display: flex; align-items: center; justify-content: center; gap: 6px; }
         .btn-submit { flex: 2; background: var(--gold-gradient); color: #000; box-shadow: 0 0 15px var(--gold-glow); }
         .btn-side { flex: 1; background: rgba(255,255,255,0.05); color: var(--gold); border: 1px solid var(--glass-border); }
+        
         #sync-overlay { position: fixed; inset: 0; background: radial-gradient(circle at center, rgba(10, 10, 15, 0.98), #020205); z-index: 2000; display: none; flex-direction: column; justify-content: center; align-items: center; text-align: center; backdrop-filter: blur(15px); padding: 20px;}
         .fairy-loader i { font-size: 3.5rem; color: var(--gold); animation: fairyFloat 2s infinite ease-in-out; text-shadow: 0 0 20px var(--gold); }
         @keyframes fairyFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
         .result-card { background: rgba(255,255,255,0.05); padding: 20px; border-radius: 15px; border: 1px solid var(--gold); max-width: 400px; }
-    /* Media Queries for Mobile responsiveness */
-@media (max-width: 600px) {
-    /* 1. تقليل حجم الخطوط والمساحات في الهيدر */
-    .battle-header {
-        gap: 5px;
-    }
-    .info-box {
-        padding: 2px 6px;
-        gap: 5px;
-    }
-    .student-photo, .activity-logo {
-        width: 28px;
-        height: 28px;
-    }
-    .name {
-        font-size: 0.55rem; /* تصغير اسم الطالب */
-    }
-    header div[style*="letter-spacing"] {
-        font-size: 0.7rem; /* تصغير كلمة ARENA */
-        letter-spacing: 1px !important;
+
+    /* Media Queries لضبط الموبايل */
+    @media (max-width: 600px) {
+        /* تصغير الهيدر */
+        header { padding: 5px 10px; }
+        .student-photo, .activity-logo { width: 28px; height: 28px; }
+        .name { font-size: 0.5rem; }
+        
+        /* تقليص مساحة الفوتر لترك مساحة للـ iframe */
+        footer { padding: 5px 10px 15px; gap: 5px; }
+        .btn { padding: 12px 5px; font-size: 0.55rem; } /* زيادة الطول قليلاً لتسهيل اللمس وتقليل العرض */
+        
+        .arena-container { padding: 5px; }
     }
 
-    /* 2. ضبط الفوتر ليناسب العرض الصغير */
-    footer {
-        padding: 10px 5px;
-        gap: 5px;
+    @media (max-width: 380px) {
+        .info-box span { display: none; } /* إخفاء النصوص في الهواتف الصغيرة جداً */
+        .info-box { border: none; background: transparent; }
     }
-    .btn {
-        padding: 8px 5px;
-        font-size: 0.6rem; /* تصغير نصوص الأزرار */
-        gap: 4px;
-    }
-    .btn i {
-        font-size: 0.7rem;
-    }
-    
-    /* 3. التأكد من أن الـ iframe يأخذ أكبر مساحة ممكنة */
-    .arena-container {
-        padding: 5px;
-    }
-}
-
-/* ضبط خاص للهواتف الصغيرة جداً (مثل iPhone SE) */
-@media (max-width: 380px) {
-    .name, #student-title, #mission-sub {
-        display: none; /* إخفاء النصوص الجانبية لإبقاء الصور فقط إذا كان الموبايل صغير جداً */
-    }
-    .info-box {
-        border: none;
-        background: transparent;
-    }
-}
     </style>
 </head>
 <body>
