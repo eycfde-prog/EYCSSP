@@ -48,6 +48,40 @@
 
         /* Toggle Switch */
         .theme-switch { position: fixed; top: 20px; left: 20px; z-index: 100; display: flex; align-items: center; gap: 10px; background: rgba(255,255,255,0.05); padding: 8px 15px; border-radius: 50px; border: 1px solid rgba(212, 175, 55, 0.2); }
+    /* تأثير اللمعة المتحركة */
+@keyframes shine {
+    0% { left: -100%; }
+    20% { left: 100%; }
+    100% { left: 100%; }
+}
+
+.sticky-note {
+    overflow: hidden; /* ضروري لعمل اللمعة داخل الورقة فقط */
+}
+
+.sticky-note::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 50%;
+    height: 100%;
+    background: linear-gradient(
+        to right, 
+        transparent, 
+        rgba(255, 255, 255, 0.4), 
+        transparent
+    );
+    transform: skewX(-25deg);
+    animation: shine 4s infinite; /* اللمعة تظهر كل 4 ثواني */
+}
+
+/* ألوان مختلفة لكل ورقة (سيتم توزيعها بواسطة الـ JS تلقائياً) */
+.note-yellow { background: #fff176 !important; }
+.note-blue   { background: #81d4fa !important; }
+.note-pink   { background: #f48fb1 !important; }
+.note-green  { background: #a5d6a7 !important; }
+.note-purple { background: #d1c4e9 !important; }
     </style>
 </head>
 <body class="pb-20" onload="loadReviews()">
@@ -101,7 +135,7 @@
     </button>
 
     <script>
-        const scriptURL = 'https://script.google.com/macros/s/AKfycbzKQjwq8outn7jXVIcsFUNTyfQ_9pqdEhYkQkKeeHHiJFCQM0zIneXdus4-DqrtTxIodg/exec'; // حط الرابط بتاعك هنا
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbxI0wBI7Hd2_aNS4ul4Cde8gBySYhWNPBQ7QkAxg3VAutejhjVaM8n14gqQABsxb1kR-Q/exec'; // حط الرابط بتاعك هنا
 
         function openModal(id) { document.getElementById(id).style.display = 'flex'; }
         function closeModal(id) { document.getElementById(id).style.display = 'none'; }
