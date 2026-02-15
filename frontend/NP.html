@@ -2,22 +2,233 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>EYC Superstars Registration</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" href="npstyle.css">
     <style>
-        .sub-options { display: none; margin-top: 15px; text-align: left; }
+        :root {
+            --gold: #d4af37;
+            --dark-bg: #0a0a0a;
+            --glass: rgba(255, 255, 255, 0.05);
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Poppins', sans-serif;
+            background: var(--dark-bg);
+            color: white;
+            overflow-x: hidden;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        #starCanvas {
+            position: fixed;
+            top: 0; left: 0;
+            z-index: -1;
+        }
+
+        /* Container & Layout */
+        .container { 
+            display: flex; 
+            flex-wrap: wrap; 
+            justify-content: center; 
+            align-items: flex-start; 
+            gap: 20px; 
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Sidebar & Avatar */
+        .avatar-section {
+            flex: 1;
+            min-width: 280px;
+            max-width: 300px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center; 
+            position: sticky;
+            top: 20px;
+        }
+
+        #avatar-container {
+            position: relative;
+            width: 220px;   
+            height: 220px;  
+            background: radial-gradient(circle, rgba(212, 175, 55, 0.1) 0%, rgba(0, 0, 0, 0.4) 100%);
+            border-radius: 50%;
+            border: 3px solid var(--gold);
+            box-shadow: 0 0 30px rgba(212, 175, 55, 0.3), inset 0 0 20px rgba(212, 175, 55, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden; 
+            margin: 0 auto;
+        }
+
+        #avatar-img { 
+            width: 100%; 
+            height: auto;
+            display: block;
+            transform: translateY(10px); 
+        }
+
+        .img-loader {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1;
+            border: 3px solid rgba(212,175,55,0.3);
+            border-radius: 50%;
+            border-top: 3px solid var(--gold);
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            display: none;
+        }
+        @keyframes spin { 0% { transform: translate(-50%, -50%) rotate(0deg); } 100% { transform: translate(-50%, -50%) rotate(360deg); } }
+
+        #display-name {
+            margin-top: 20px;
+            color: var(--gold);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            font-size: 1.2rem;
+        }
+
+        /* Form Section */
+        .form-section {
+            flex: 2;
+            min-width: 320px;
+            max-width: 600px;
+            background: var(--glass);
+            padding: 40px;
+            border-radius: 30px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .step { display: none; }
+        .step.active { display: block; animation: fadeIn 0.5s ease; }
+
+        .input-group { margin-bottom: 25px; text-align: left; }
+        label { display: block; margin-bottom: 10px; color: var(--gold); font-weight: 600; }
+
+        input, select {
+            width: 100%;
+            padding: 15px;
+            background: rgba(0,0,0,0.5);
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            border-radius: 12px;
+            color: white;
+            font-size: 1rem;
+            box-sizing: border-box;
+            transition: 0.3s;
+        }
+
+        input:focus, select:focus { outline: none; border-color: var(--gold); box-shadow: 0 0 10px rgba(212,175,55,0.2); }
+
+        button {
+            background: var(--gold);
+            color: black;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+            width: 100%;
+            font-size: 1rem;
+        }
+
+        button:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(212, 175, 55, 0.4); }
+
+        .btn-group { display: flex; gap: 15px; }
+        .prev-btn { background: rgba(255,255,255,0.1); color: white; }
+
+        /* Sub-options & Tickets */
+        .sub-options { 
+            display: none; margin-top: 15px; text-align: left;
+            padding: 15px;
+            background: rgba(212, 175, 55, 0.05);
+            border-radius: 15px;
+            border: 1px dashed var(--gold);
+        }
         .golden-ticket-area { display: none; margin-top: 10px; }
-        .ticket-input { width: 100%; padding: 10px; margin-bottom: 10px; border-radius: 10px; border: 1px solid #d4af37; background: rgba(0,0,0,0.5); color: white; }
+        .ticket-input { width: 100%; padding: 10px; margin-bottom: 10px; border-radius: 10px; border: 1px solid #d4af37; background: rgba(0,0,0,0.5); color: white; text-align: center; }
+
+        /* Progress Bar */
+        .progress-container {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 6px;
+            background: rgba(255,255,255,0.05);
+            z-index: 2000;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: var(--gold);
+            width: 14.2%;
+            transition: 0.5s ease;
+            box-shadow: 0 0 10px var(--gold);
+        }
+
+        /* Success Card */
+        #success-card { display: none; text-align: center; }
+        .card-inner { background: rgba(255,255,255,0.05); padding: 20px; border-radius: 20px; border: 1px solid var(--gold); }
+        .code-box { background: #000; padding: 10px; border-radius: 10px; font-size: 1.5rem; font-weight: bold; color: var(--gold); margin-top: 15px; }
+        .final-btn { margin-top: 20px; }
+
+        /* Utils */
+        .loading-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9);
+            display: none; align-items: center; justify-content: center;
+            z-index: 3000; color: var(--gold); letter-spacing: 5px; font-weight: bold;
+        }
+
+        .check-label { display: flex; align-items: center; gap: 8px; cursor: pointer; }
+        .check-label input { width: 20px; height: 20px; }
+
+        /* --- Responsive Fixes --- */
+        @media (max-width: 768px) {
+            .container { padding: 10px; gap: 10px; }
+            .avatar-section { 
+                width: 100% !important; 
+                max-width: 100%;
+                order: -1; 
+                margin-bottom: 10px;
+                position: relative;
+                top: 0;
+            }
+            #avatar-container { width: 150px; height: 150px; }
+            #display-name { font-size: 1rem; margin-top: 10px; }
+            .form-section { 
+                width: 100% !important; 
+                padding: 20px 15px; 
+                border-radius: 20px;
+                min-width: auto;
+            }
+            h2 { font-size: 1.2rem; margin-bottom: 15px; }
+            .input-group { margin-bottom: 15px; }
+            button { padding: 12px; }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
     </style>
 </head>
 <body onload="initStars(); initOptions(); updateAvatar();">
 
 <canvas id="starCanvas"></canvas>
 <audio id="clickSound" src="https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3"></audio>
-<audio id="goldSound" src="https://assets.mixkit.co/active_storage/sfx/2019/2019-preview.mp3"></audio>
 
 <div class="container">
     <div class="progress-container"><div class="progress-bar" id="pBar"></div></div>
@@ -113,18 +324,18 @@
                     </select>
                 </div>
                 <div class="input-group">
-    <label>Mouth Expression</label>
-    <select id="mouthType" onchange="updateAvatar()">
-        <option value="Default">Normal 😐</option>
-        <option value="Smile">Smile 😊</option>
-        <option value="Twinkle">Cheerful ✨</option>
-        <option value="Serious">Serious 🧐</option>
-        <option value="Tongue">Tongue 😋</option>
-        <option value="Grimace">Grimace 😬</option>
-        <option value="ScreamOpen">Shocked 😱</option>
-        <option value="Eating">Happy Eating 🍎</option>
-    </select>
-</div>
+                    <label>Mouth Expression</label>
+                    <select id="mouthType" onchange="updateAvatar()">
+                        <option value="Default">Normal 😐</option>
+                        <option value="Smile">Smile 😊</option>
+                        <option value="Twinkle">Cheerful ✨</option>
+                        <option value="Serious">Serious 🧐</option>
+                        <option value="Tongue">Tongue 😋</option>
+                        <option value="Grimace">Grimace 😬</option>
+                        <option value="ScreamOpen">Shocked 😱</option>
+                        <option value="Eating">Happy Eating 🍎</option>
+                    </select>
+                </div>
                 <div class="input-group">
                     <label>Skin Complexion</label>
                     <select id="skinColor" onchange="updateAvatar()">
@@ -164,28 +375,21 @@
                 <div class="input-group">
                     <label style="margin-bottom: 15px;">Select Your Path</label>
                     <div style="display: flex; gap: 20px; justify-content: center;">
-                        <label class="check-label">
-                            <input type="checkbox" name="program" value="Season"> Season
-                        </label>
-                        <label class="check-label">
-                            <input type="checkbox" name="program" value="Royal" id="royalCheck" onchange="toggleRoyalOptions()"> Royal
-                        </label>
+                        <label class="check-label"><input type="checkbox" name="program" value="Season"> Season</label>
+                        <label class="check-label"><input type="checkbox" name="program" value="Royal" id="royalCheck" onchange="toggleRoyalOptions()"> Royal</label>
                     </div>
                 </div>
-
                 <div id="royalSubOptions" class="sub-options">
                     <label>Royal Type:</label>
-                    <select id="royalType" onchange="toggleTicketArea()" style="width:100%; padding:10px; border-radius:10px;">
+                    <select id="royalType" onchange="toggleTicketArea()">
                         <option value="free">Free Access</option>
                         <option value="paid">Paid (Golden Tickets)</option>
                     </select>
-                    
                     <div id="ticketArea" class="golden-ticket-area">
                         <input type="text" id="ticket1" class="ticket-input" placeholder="Golden Ticket Code 1">
                         <input type="text" id="ticket2" class="ticket-input" placeholder="Golden Ticket Code 2">
                     </div>
                 </div>
-
                 <div class="btn-group" style="margin-top:20px;">
                     <button type="button" class="prev-btn" onclick="nextStep(6)">Back</button>
                     <button type="submit">Complete Mission</button>
@@ -198,11 +402,9 @@
             <div class="card-inner">
                 <img id="card-avatar" src="" width="180">
                 <h3 id="card-name"></h3>
-                <div class="code-box">
-                    <span id="agent-code">----</span>
-                </div>
+                <div class="code-box"><span id="agent-code">----</span></div>
             </div>
-<button onclick="window.location.href='MC.html'" class="final-btn">Enter Command Center</button>
+            <button onclick="window.location.href='MC.html'" class="final-btn">Enter Command Center</button>
         </div>
     </div>
 </div>
@@ -262,10 +464,11 @@
 
     function updateName() { document.getElementById('display-name').innerText = document.getElementById('name').value.toUpperCase() || "EYC AGENT"; }
 
-    function updateAvatar() {
+    function updateAvatar(forcedMouth = null) {
         const loader = document.getElementById('imgLoader');
         const img = document.getElementById('avatar-img');
         loader.style.display = 'block';
+        
         const top = document.getElementById('topType').value;
         const skin = document.getElementById('skinColor').value;
         const facial = document.getElementById('facialHairType').value;
@@ -273,8 +476,11 @@
         const clothe = document.getElementById('clotheType').value;
         const accessories = document.getElementById('accessoriesType').value;
         const eye = document.getElementById('eyeType').value;
+        const mouth = forcedMouth || document.getElementById('mouthType').value; // يحترم اختيار الطالب إلا لو فيه حركة كلام
+        
         const colorParam = top === 'Hijab' ? `&hatColor=${color}` : `&hairColor=${color}`;
-        const url = `https://avataaars.io/?avatarStyle=Transparent&topType=${top}${colorParam}&accessoriesType=${accessories}&facialHairType=${facial}&clotheType=${clothe}&eyeType=${eye}&mouthType=Default&skinColor=${skin}`;
+        const url = `https://avataaars.io/?avatarStyle=Transparent&topType=${top}${colorParam}&accessoriesType=${accessories}&facialHairType=${facial}&clotheType=${clothe}&eyeType=${eye}&mouthType=${mouth}&skinColor=${skin}`;
+        
         const tempImg = new Image();
         tempImg.src = url;
         tempImg.onload = () => { img.src = url; loader.style.display = 'none'; };
@@ -292,26 +498,29 @@
         document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
         document.getElementById('step' + step).classList.add('active');
         document.getElementById('pBar').style.width = (step * 14.2) + "%";
+        window.scrollTo({top: 0, behavior: 'smooth'});
     }
 
-    // --- وظيفة حركة الفم الذكية ---
+    // --- نظام الفم الذكي والمعدل ---
     let mouthOpen = false;
+    let mouthInterval = null;
+
     function toggleMouth() {
-        const img = document.getElementById('avatar-img');
-        if (!img.src.includes('avataaars.io')) return;
-        
         mouthOpen = !mouthOpen;
-        let currentUrl = new URL(img.src);
-        currentUrl.searchParams.set('mouthType', mouthOpen ? 'Twinkle' : 'Default');
-        img.src = currentUrl.toString();
+        // نمرر حركات الفم للتبديل فقط أثناء الكلام
+        updateAvatar(mouthOpen ? 'Twinkle' : 'Default');
     }
 
     document.getElementById('name').addEventListener('focus', () => {
-        const mouthInterval = setInterval(toggleMouth, 300);
-        document.getElementById('name').addEventListener('blur', () => clearInterval(mouthInterval), {once: true});
+        if(mouthInterval) clearInterval(mouthInterval);
+        mouthInterval = setInterval(toggleMouth, 300);
     });
 
-    // --- وظائف الـ Royal و الـ Tickets ---
+    document.getElementById('name').addEventListener('blur', () => {
+        if(mouthInterval) clearInterval(mouthInterval);
+        updateAvatar(); // يرجع لشكل الفم اللي الطالب اختاره
+    });
+
     function toggleRoyalOptions() {
         const isRoyal = document.getElementById('royalCheck').checked;
         document.getElementById('royalSubOptions').style.display = isRoyal ? 'block' : 'none';
@@ -363,7 +572,6 @@
         .catch(err => {
             loader.style.display = 'none';
             alert("Transmission Failed: Check your connection, Agent! 📡");
-            console.error(err);
         });
     };
 
