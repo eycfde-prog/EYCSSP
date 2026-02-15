@@ -80,7 +80,7 @@
     </footer>
 
 <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwmsXyyjdIDYNRliLAhd5EDURBU3FG_IxA2ZY4tKdQPH3fBUyu8DXbz0zL9WWIji23bQw/exec"; 
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbysdu3Pe2MDOHygs0IXxFa2oocIdwffxRueQMOZUNWCYPjHHcDtEpmj_e20hF_3SYbbyA/exec"; 
 
     let currentActivity, currentTask, userEmail, userName;
 
@@ -193,39 +193,57 @@
         sendToAiGrader(answers);
     }
 
-    async function sendToAiGrader(answers) {
-        let separator = (currentActivity === "FX" || currentActivity === "LX") ? "|" : ",";
-        const cleanedAnswers = Array.isArray(answers) ? answers.map(a => String(a).trim()).join(separator) : String(answers).trim();
+async function sendToAiGrader(answers) {
+    let separator = (currentActivity === "FX" || currentActivity === "LX") ? "|" : ",";
+    const cleanedAnswers = Array.isArray(answers) ? answers.map(a => String(a).trim()).join(separator) : String(answers).trim();
 
-        const payload = {
-            action: "submitReport",
-            email: userEmail,
-            actCode: currentActivity,
-            taskNum: currentTask,
-            answer: cleanedAnswers
-        };
+    const payload = {
+        action: "submitReport",
+        email: userEmail,
+        actCode: currentActivity,
+        taskNum: currentTask,
+        answer: cleanedAnswers
+    };
 
-        document.getElementById('sync-overlay').style.display = 'flex';
+    document.getElementById('sync-overlay').style.display = 'flex';
+    document.getElementById('status-msg').innerText = "Transmitting data to HQ...";
 
-        try {
-            await fetch(SCRIPT_URL, {
-                method: 'POST',
-                mode: 'no-cors',
-                headers: { 'Content-Type': 'text/plain' },
-                body: JSON.stringify(payload)
-            });
+    try {
+        // نستخدم fetch مع إرسال البيانات كـ Text لتجنب مشاكل الـ CORS في POST
+        const response = await fetch(SCRIPT_URL, {
+            method: 'POST',
+            body: JSON.stringify(payload)
+        });
 
-            document.getElementById('status-msg').innerText = "Data Transmitted! Verifying Grade...";
+        const result = await response.json(); // ننتظر النتيجة الحقيقية من السيرفر (محرك التصحيح)
+
+        if (result.success) {
+            document.getElementById('status-msg').innerText = "Mission Evaluated! Showing Results...";
             
-            setTimeout(async () => {
-                await checkMissionStatus();
-            }, 2500);
-
-        } catch (error) {
-            console.error("Gear Debug Info:", error);
-            alert("Transmition Error! Please check your connection.");
+            // تحديث واجهة النتيجة فوراً بدون انتظار إعادة التحميل
+            const resultDiv = document.getElementById('result-display');
+            document.getElementById('loader-content').style.display = 'none';
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = `
+                <div style="font-size: 1.2rem; color: var(--gold); font-family: 'Orbitron';">MISSION SECURED</div>
+                <div style="font-size: 2.5rem; margin: 10px 0; color: white;">${result.grade}/${result.maxGrade}</div>
+                <p style="color: #4CAF50; font-size: 0.8rem; margin-bottom: 15px;">${result.feedback || result.reason}</p>
+                <button class="btn btn-submit" style="width:100%" onclick="window.location.href='MC.html'">RETURN TO BASE</button>
+            `;
+            
+            // تعطيل زر الإرسال لمنع التكرار
+            document.getElementById('submitBtn').disabled = true;
+            document.getElementById('submitBtn').style.opacity = "0.5";
+        } else {
+            throw new Error(result.reason || "Evaluation failed");
         }
+
+    } catch (error) {
+        console.error("Gear Debug Info:", error);
+        alert("⚠️ Connection Error: Could not reach HQ. Your progress is safe, try again in a moment.");
+        document.getElementById('sync-overlay').style.display = 'none';
     }
+}
 </script>
 </body>
 </html>
