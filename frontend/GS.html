@@ -162,11 +162,26 @@ function loadScanner() {
         <div class="sentence-card" id="card-${i}">
             <span class="id-tag">SCANNER_0${i+1}</span>
             <div class="sentence-text">${s}</div>
-            <input type="text" class="correction-input alike-input" id="fix-${i}" placeholder="PATCH..." autocomplete="off">
+            <input type="text" 
+                   class="correction-input alike-input" 
+                   id="fix-${i}" 
+                   placeholder="PATCH..." 
+                   onkeydown="preventSpaces(event)" 
+                   autocomplete="off">
         </div>
     `).join('');
 }
 
+// دالة Gear لمنع المسافات وإجبار الطالب على كلمة واحدة
+function preventSpaces(e) {
+    if (e.key === " " || e.keyCode === 32) {
+        e.preventDefault();
+        // تأثير هز خفيف للتنبيه
+        e.target.style.borderColor = "var(--error-red)";
+        setTimeout(() => e.target.style.borderColor = "var(--glass-border)", 300);
+        return false;
+    }
+}
 window.addEventListener('message', function(event) {
     if (event.data.type === 'REQUEST_MISSION_DATA') {
         collectAndSend();
