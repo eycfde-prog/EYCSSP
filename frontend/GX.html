@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>GX | Grammar Extractor | Glassy Edition</title>
+    <title>GX | Grammar Extractor | Gear Edition</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Poppins:wght@300;500&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -19,7 +19,7 @@
             background: transparent;
             color: white;
             margin: 0; padding: 15px;
-            direction: ltr; /* لضمان بقاء النصوص الإنجليزية يساراً */
+            direction: ltr;
         }
 
         body::-webkit-scrollbar { width: 4px; }
@@ -57,7 +57,7 @@
             margin-bottom: 25px; line-height: 1.8;
             font-size: 1.1rem; color: #eee;
             position: relative; box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-            text-align: left; /* محاذاة النص لليسار */
+            text-align: left;
         }
 
         .passage-box::before {
@@ -78,11 +78,6 @@
             padding: 18px; border-radius: 15px;
             border-bottom: 3px solid var(--gold);
             transition: 0.4s ease;
-        }
-
-        .extraction-card:hover {
-            border-color: var(--gold);
-            box-shadow: 0 5px 15px var(--gold-glow);
         }
 
         .extraction-card.error-card { 
@@ -112,11 +107,6 @@
             text-align: center;
         }
 
-        .extraction-input:focus {
-            border-color: var(--gold);
-            background: rgba(212, 175, 55, 0.05);
-        }
-
         .requirement-tag {
             font-size: 9px; color: #666; margin-top: 8px; display: block;
             font-style: italic;
@@ -138,8 +128,7 @@
         Initializing Intel Extraction...
     </div>
 
-    <div class="extractor-grid" id="extractor-fields">
-    </div>
+    <div class="extractor-grid" id="extractor-fields"></div>
 </div>
 
 <script>
@@ -194,7 +183,6 @@
                 { label: "Extract 1 Conditional", hint: "If + will" }
             ]
         }
-        // ... يمكنك إضافة من 6 لـ 10 بنفس الطريقة
     };
 
     const urlParams = new URLSearchParams(window.location.search);
@@ -214,15 +202,18 @@
         `).join('');
     }
 
-window.addEventListener('message', function(event) {
-    if (event.data.type === 'MISSION_RESULT') {
-        // نستخدم المسميات اللي الأرينا بتبعتها فعلياً
-        const score = event.data.score || 0;
-        const total = event.data.total || 5;
+    // --- Gear Fix: الاستماع لطلب البيانات من الأرينا ---
+    window.addEventListener('message', function(event) {
+        if (event.data.type === 'REQUEST_MISSION_DATA') {
+            collectAndSend();
+        }
         
-        alert(`MISSION REPORT:\nScore: ${score} / ${total}`);
-    }
-});;
+        if (event.data.type === 'MISSION_RESULT') {
+            const score = event.data.score || 0;
+            const total = event.data.total || 5;
+            alert(`MISSION REPORT:\nScore: ${score} / ${total}`);
+        }
+    });
 
     function collectAndSend() {
         const inputs = document.querySelectorAll('.gx-input');
@@ -243,10 +234,12 @@ window.addEventListener('message', function(event) {
         });
 
         if(hasError) {
+            // إرسال تنبيه للأرينا أن المهمة غير مكتملة
             window.parent.postMessage({ type: 'MISSION_INCOMPLETE' }, '*');
             return;
         }
 
+        // إرسال الإجابات بنجاح
         window.parent.postMessage({ 
             type: 'MISSION_ANSWERS', 
             activityCode: 'GX',
@@ -259,6 +252,3 @@ window.addEventListener('message', function(event) {
 </script>
 </body>
 </html>
-
-
-
