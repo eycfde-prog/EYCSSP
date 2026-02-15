@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Seeds X | Creative Flow | Glassy Edition</title>
+    <title>Seeds X | Gear Optimized Edition</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
     <style>
         :root { 
@@ -18,131 +18,112 @@
             background: transparent; 
             color: white; 
             margin: 0; 
-            padding: 20px; 
+            padding: 15px; 
             direction: ltr;
-            overflow-x: hidden;
+            padding-bottom: 100px; /* مساحة للعداد العائم */
         }
-
-        ::-webkit-scrollbar { width: 4px; }
-        ::-webkit-scrollbar-thumb { background: var(--neon-purple); border-radius: 10px; }
 
         .mission-header {
             text-align: center; 
-            margin-bottom: 25px;
+            margin-bottom: 20px;
             border: 1px solid rgba(188, 19, 254, 0.2);
             background: linear-gradient(to right, transparent, rgba(188, 19, 254, 0.1), transparent);
-            padding: 15px;
-            border-radius: 15px;
+            padding: 10px;
+            border-radius: 12px;
         }
+
+        .mission-header h1 { font-family: 'Orbitron'; font-size: 0.9rem; color: var(--neon-purple); margin:0; }
 
         .sentences-grid {
             display: grid; 
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); 
-            gap: 15px; 
-            margin-bottom: 30px;
+            grid-template-columns: 1fr; /* عمود واحد للموبايل لسهولة القراءة */
+            gap: 10px; 
+            margin-bottom: 20px;
         }
 
         .sentence-card {
             background: var(--glass-bg); 
             border: 1px solid rgba(255,255,255,0.05);
-            padding: 15px; 
-            border-radius: 12px; 
-            font-size: 0.9rem;
-            border-left: 4px solid var(--neon-blue); 
-            position: relative;
-            transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            padding: 12px; 
+            border-radius: 10px; 
+            font-size: 0.85rem;
+            border-left: 3px solid var(--neon-blue); 
             backdrop-filter: blur(10px);
-            animation: slideIn 0.5s ease-out backwards;
         }
 
-        .sentence-card:hover {
-            transform: translateX(5px);
-            border-color: var(--neon-blue);
-            box-shadow: 0 0 20px rgba(0, 242, 255, 0.15);
-        }
-
-        .sentence-card.glitch-seed {
-            border-left-color: var(--glitch-red);
-            background: rgba(255, 0, 60, 0.05);
-            box-shadow: 0 0 15px rgba(255, 0, 60, 0.1);
-        }
+        .sentence-card.glitch-seed { border-left-color: var(--glitch-red); background: rgba(255, 0, 60, 0.05); }
 
         .sentence-card span { 
             font-family: 'Orbitron'; 
             color: var(--neon-purple); 
-            font-size: 9px; 
+            font-size: 8px; 
             display: block; 
-            margin-bottom: 8px;
-            letter-spacing: 2px;
-            opacity: 0.8;
-        }
-
-        .writing-zone {
-            background: var(--glass-bg); 
-            border-radius: 20px; 
-            padding: 25px;
-            border: 1px solid rgba(188, 19, 254, 0.25);
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-            position: relative;
+            margin-bottom: 5px;
+            letter-spacing: 1px;
         }
 
         textarea {
             width: 100%; 
-            height: 320px; 
-            background: rgba(0,0,0,0.3); 
-            border: 1px solid rgba(255,255,255,0.05);
+            height: 350px; 
+            background: rgba(0,0,0,0.5); 
+            border: 1px solid rgba(188, 19, 254, 0.3);
             color: #e0e0e0; 
             font-family: 'Rajdhani'; 
-            font-size: 1.15rem;
-            line-height: 1.7; 
+            font-size: 1.1rem;
+            line-height: 1.6; 
             outline: none; 
             resize: none; 
             box-sizing: border-box;
             border-radius: 15px;
-            padding: 20px;
+            padding: 18px;
             transition: 0.3s;
         }
 
-        textarea:focus {
-            border-color: var(--neon-purple);
-            background: rgba(188, 19, 254, 0.02);
-        }
+        textarea:focus { border-color: var(--neon-blue); }
 
-        .footer-info {
-            display: flex; 
-            justify-content: space-between; 
+        /* العداد العائم (Floating Circle) */
+        .floating-counter {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 65px;
+            height: 65px;
+            background: var(--glass-bg);
+            border: 2px solid var(--neon-blue);
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
             align-items: center;
-            margin-top: 20px; 
-            font-family: 'Orbitron'; 
-            font-size: 10px; 
-            color: var(--neon-blue);
-            letter-spacing: 1px;
+            justify-content: center;
+            box-shadow: 0 0 20px rgba(0, 242, 255, 0.3);
+            z-index: 9999;
+            pointer-events: none;
+            transition: 0.3s;
         }
 
-        .glow-count { 
-            font-size: 16px;
+        .floating-counter .num {
+            font-family: 'Orbitron';
+            font-size: 1rem;
             font-weight: bold;
-            margin-left: 8px;
-            transition: 0.4s;
+            color: var(--neon-blue);
         }
 
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateX(-20px); }
-            to { opacity: 1; transform: translateX(0); }
+        .floating-counter .label {
+            font-size: 0.5rem;
+            color: #888;
+            text-transform: uppercase;
         }
 
-        .btn-submit {
-            width: 100%; margin-top: 20px;
-            background: transparent; border: 2px solid var(--neon-purple);
-            color: var(--neon-purple); padding: 15px;
-            font-family: 'Orbitron'; border-radius: 50px;
-            cursor: pointer; transition: 0.3s; letter-spacing: 2px;
+        .floating-counter.ready {
+            border-color: #00ff88;
+            box-shadow: 0 0 25px rgba(0, 255, 136, 0.5);
         }
+        
+        .floating-counter.ready .num { color: #00ff88; }
 
-        .btn-submit:hover {
-            background: var(--neon-purple); color: white;
-            box-shadow: 0 0 20px var(--neon-purple);
-        }
+        /* إخفاء زر الإرسال الداخلي */
+        .btn-submit { display: none; }
+
     </style>
 </head>
 <body>
@@ -155,13 +136,12 @@
 
     <div class="writing-zone">
         <textarea id="storyInput" placeholder="Integrate all protocols into your narrative matrix... (150+ words required)" oninput="updateCount()"></textarea>
-        <div class="footer-info">
-            <span>OBJECTIVE: 150+ WORDS SYNC</span>
-            <span>INTEGRITY: <span id="wordCount" class="glow-count">0</span></span>
-        </div>
     </div>
 
-    <button class="btn-submit" onclick="submitMission()">INITIALIZE TRANSMISSION</button>
+    <div class="floating-counter" id="counter-circle">
+        <span class="num" id="count-num">0</span>
+        <span class="label">Words</span>
+    </div>
 
 <script>
     const seedsXData = {
@@ -184,7 +164,7 @@
         const sentences = seedsXData[taskNum] || seedsXData["1"];
         const area = document.getElementById('sentences-area');
         area.innerHTML = sentences.map((s, i) => `
-            <div class="sentence-card ${i === 5 ? 'glitch-seed' : ''}" style="animation-delay: ${i * 0.1}s">
+            <div class="sentence-card ${i === 5 ? 'glitch-seed' : ''}">
                 <span>PROTOCOL_0${i+1}</span>
                 ${s}
             </div>
@@ -195,15 +175,16 @@
     function updateCount() {
         const text = document.getElementById('storyInput').value.trim();
         const count = text ? text.split(/\s+/).length : 0;
-        const display = document.getElementById('wordCount');
-        display.innerText = count;
+        
+        const countNum = document.getElementById('count-num');
+        const circle = document.getElementById('counter-circle');
+        
+        countNum.innerText = count;
         
         if(count >= 150) {
-            display.style.color = "#00ff88";
-            display.style.textShadow = "0 0 15px #00ff88";
+            circle.classList.add('ready');
         } else {
-            display.style.color = "var(--neon-blue)";
-            display.style.textShadow = "none";
+            circle.classList.remove('ready');
         }
     }
 
@@ -212,13 +193,13 @@
         const count = story ? story.split(/\s+/).length : 0;
 
         if(count < 150) {
-            alert("❌ TRANSMISSION ERROR: Story depth insufficient (Min 150 words).");
+            alert("❌ HQ: Depth insufficient. Minimum 150 words required.");
             return;
         }
 
         window.parent.postMessage({ 
             type: 'MISSION_ANSWERS', 
-            activityCode: 'SSX',
+            activityCode: 'SX',
             answers: story, 
             missionNum: taskNum 
         }, '*');
