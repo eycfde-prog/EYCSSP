@@ -81,7 +81,7 @@
 
 <script>
     // استخدم رابط السكربت الخاص بك هنا
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzLI2wXQy2h5CNOoMYdd8T-K4bFFLpe-r2AsX1aGqS6Ieg9251mXgLK9FWC0KeELhWqUA/exec"; 
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby_Ul6y_9Z-cjYEnaHFdfI5JbnAPlPtWadXjtw5208y_OAoZWkSNU5xgVBX9PHXpAvdGA/exec"; 
 
     let currentActivity, currentTask, userEmail, userName;
 
@@ -199,24 +199,32 @@ async function sendToAiGrader(answers) {
     };
 
     try {
+        // تم إزالة no-cors وإضافة Header النص العادي لضمان التوافق
         const response = await fetch(SCRIPT_URL, {
             method: 'POST',
-            mode: 'no-cors', // لضمان الإرسال حتى لو كانت هناك قيود CORS
-            headers: { 'Content-Type': 'text/plain' }, 
-            body: JSON.stringify(payload)
+            body: JSON.stringify(payload) 
         });
 
-        // ملاحظة: مع no-cors لن تتمكن من قراءة الرد JSON مباشرة
-        // الحل الأفضل هو استخدام Redirect أو تحسين doPost كما سأوضح بالأسفل
-        
-        // كحل بديل ومستقر جداً للهواة والمحترفين:
-        setTimeout(async () => {
-            // نقوم بعمل checkStatus بعد ثواني للتأكد من وصول البيانات وإظهار النتيجة
-            await checkMissionStatus(); 
-        }, 2000);
+        const result = await response.json();
 
+        if (result.success) {
+            document.getElementById('loader-content').style.display = 'none';
+            const resultDiv = document.getElementById('result-display');
+            resultDiv.style.display = 'block';
+            
+            resultDiv.innerHTML = `
+                <div style="font-size: 1.2rem; color: var(--gold); font-family: 'Orbitron';">MISSION EVALUATED</div>
+                <div style="font-size: 2.5rem; margin: 10px 0; color: white;">${result.grade}/${result.maxGrade}</div>
+                <p style="color: #4CAF50; font-size: 0.8rem; margin-bottom: 15px;">${result.feedback}</p>
+                <button class="btn btn-submit" style="width:100%" onclick="window.location.href='MC.html'">RETURN TO BASE</button>
+            `;
+        } else {
+            throw new Error(result.message);
+        }
     } catch (error) {
         console.error("Gear Debug Info:", error);
+        alert("Transmission Failed! Please check your connection or HQ status.");
+        document.getElementById('sync-overlay').style.display = 'none';
     }
 }
 </script>
