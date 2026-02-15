@@ -81,7 +81,7 @@
 
 <script>
     // استخدم رابط السكربت الخاص بك هنا
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxtl4iIdCYZ9jL2EtQ6NZ-BCViUQnmAtGXyjnv0-sc3QInAILqI8Ngsv_0g5ELNzqHV4g/exec"; 
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwimiA5bO7CTpfSxbOZsqi8uyxq0MEoYYPzvZFEHEAURZaVM3TJcKVl6-vKjTInUoopcg/exec"; 
 
     let currentActivity, currentTask, userEmail, userName;
 
@@ -202,10 +202,14 @@ function processAnswers(answers) {
         };
 
         try {
-            const response = await fetch(SCRIPT_URL, {
-                method: 'POST',
-                body: JSON.stringify(payload)
-            });
+const response = await fetch(SCRIPT_URL, {
+    method: 'POST',
+    mode: 'no-cors', // جرب إضافة هذا إذا استمر الخطأ، لكن الأفضل هو التعديل أدناه
+    body: JSON.stringify(payload),
+    headers: {
+        'Content-Type': 'text/plain;charset=utf-8', // نستخدم text/plain لتجنب مشاكل الـ CORS
+    },
+});
             const result = await response.json();
 
             if(result.success) {
