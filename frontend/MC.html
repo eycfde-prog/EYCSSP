@@ -145,12 +145,13 @@
             <input type="email" id="loginEmail" style="width:100%; padding:14px; margin:8px 0; border-radius:12px; background:rgba(255,255,255,0.05); border:1px solid #333; color:#fff; text-align:center;" placeholder="Email Address">
             <input type="password" id="loginCode" style="width:100%; padding:14px; margin:8px 0; border-radius:12px; background:rgba(255,255,255,0.05); border:1px solid #333; color:#fff; text-align:center;" placeholder="Access Code">
             <button class="btn-gold-solid" style="width:100%; margin-top:20px;" onclick="handleLogin()">ENTER ARENA</button>
+            <p onclick="forgotCode()" style="color:var(--gold); font-size:0.7rem; cursor:pointer; margin-top:15px; text-decoration:underline;">FORGOT ACCESS CODE?</p>
             <button class="btn-gold-outline" style="width:100%; margin-top:10px; border:none;" onclick="closeModal('loginModal')">BACK</button>
         </div>
     </div>
 
     <script>
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyZXehJe3qPRs2pNdMcBe9ZZxWVttD8OAZ4FwcLnEU_vs4_A9Chzh_jil9Kc4qSC16Lag/exec";
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxc8UDS38CVw8dZ9NnPl2Oa8y-dCk1yTsVOwoWr4yPzuBsdMt3PTqhKwRIvHn3vWWw33A/exec";
         let currentUser = null;
         let isLoggedIn = false;
 
@@ -190,10 +191,14 @@
                             <div class="avatar-main" style="background-image: url('${currentUser.avatar || 'https://via.placeholder.com/150'}')"></div>
                         </div>
                         <h1 class="student-name">${currentUser.name}</h1>
-                        <div class="rank-badge">🏆 RANK #${currentUser.rank}</div>
-                        <div style="display:flex; gap:20px; margin-top:15px; justify-content:center;">
+                        <div style="display:flex; gap:10px; align-items:center; justify-content:center;">
+                            <div class="rank-badge">🏆 RANK #${currentUser.rank}</div>
+                            <i class="fas fa-sync-alt nav-icon" style="font-size:1rem; margin-top:5px;" onclick="refreshUserData()" title="Refresh Stats"></i>
+                        </div>
+                        <div style="display:flex; gap:20px; margin-top:15px; justify-content:center; font-family:'Orbitron'; font-size:0.9rem;">
                             <div>🪙 <span style="color:var(--gold)">${currentUser.tokens || 0}</span></div>
                             <div>⭐ <span style="color:var(--gold)">${currentUser.stars || 0}</span></div>
+                            <div>🎟️ <span style="color:#FFD700; text-shadow: 0 0 10px #FFD700;">${currentUser.goldTickets || 0}</span></div>
                         </div>
                         <p style="font-size:0.7rem; color:#888; margin-top:10px; letter-spacing:2px;">${currentUser.title}</p>
                     </div>`;
@@ -204,33 +209,45 @@
             }
         }
 
-function handleLogin() {
-    const email = document.getElementById('loginEmail').value;
-    const code = document.getElementById('loginCode').value;
-    if (!email || !code) return alert("Enter credentials, Agent!");
+        function handleLogin() {
+            const email = document.getElementById('loginEmail').value;
+            const code = document.getElementById('loginCode').value;
+            if (!email || !code) return alert("Enter credentials, Agent!");
 
-    // إضافة الكود (code) إلى الرابط المرسل
-    fetch(`${SCRIPT_URL}?action=getProfile&email=${email}&code=${code}`)
-        .then(res => res.json())
-        .then(res => {
-            if(res.error) {
-                alert(res.message); // سيظهر "Invalid Access Code!" أو "User not found"
-            } else {
-                currentUser = {
-                    name: res.name, email: email, tokens: res.tokens,
-                    stars: res.stars, tickets: res.tickets, avatar: res.avatar,
-                    title: res.title, rank: res.rank || "N/A"
-                };
-                isLoggedIn = true;
-                localStorage.setItem('eyc_user', JSON.stringify(currentUser));
-                closeModal('loginModal');
-                renderHeader();
-                generateCards();
-                refreshUserData();
+            fetch(`${SCRIPT_URL}?action=getProfile&email=${email}&code=${code}`)
+                .then(res => res.json())
+                .then(res => {
+                    if(res.error) {
+                        alert(res.message);
+                    } else {
+                        currentUser = {
+                            name: res.name, email: email, tokens: res.tokens,
+                            stars: res.stars, goldTickets: res.goldTickets || 0, avatar: res.avatar,
+                            title: res.title, rank: res.rank || "N/A"
+                        };
+                        isLoggedIn = true;
+                        localStorage.setItem('eyc_user', JSON.stringify(currentUser));
+                        closeModal('loginModal');
+                        renderHeader();
+                        generateCards();
+                        refreshUserData();
+                    }
+                })
+                .catch(err => alert("Connection Error!"));
+        }
+
+        function forgotCode() {
+            const email = document.getElementById('loginEmail').value;
+            if(!email) return alert("Please enter your email address first!");
+            
+            if(confirm("Send access code to your email?")) {
+                fetch(`${SCRIPT_URL}?action=forgotCode&email=${email}`)
+                .then(res => res.json())
+                .then(res => alert(res.message))
+                .catch(() => alert("Error connecting to HQ!"));
             }
-        })
-        .catch(err => alert("Connection Error!"));
-}
+        }
+
         function generateCards() {
             const grid = document.getElementById('cardsGrid'); grid.innerHTML = '';
             const type = document.querySelector('.tab-btn.active').innerText.toLowerCase();
@@ -292,7 +309,7 @@ function handleLogin() {
                     if(!res.error) {
                         currentUser = {
                             name: res.name, email: res.email, tokens: res.tokens,
-                            stars: res.stars, tickets: res.tickets, avatar: res.avatar,
+                            stars: res.stars, goldTickets: res.goldTickets || 0, avatar: res.avatar,
                             title: res.title, rank: res.rank
                         };
                         localStorage.setItem('eyc_user', JSON.stringify(currentUser));
