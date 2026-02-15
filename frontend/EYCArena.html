@@ -188,9 +188,7 @@ function processAnswers(answers) {
 
 async function sendToAiGrader(answers) {
     let separator = (currentActivity === "FX" || currentActivity === "LX") ? "|" : ",";
-    const cleanedAnswers = Array.isArray(answers) ? 
-        answers.map(a => String(a).trim()).join(separator) : 
-        String(answers).trim();
+    const cleanedAnswers = Array.isArray(answers) ? answers.map(a => String(a).trim()).join(separator) : String(answers).trim();
 
     const payload = {
         action: "submitReport",
@@ -203,33 +201,30 @@ async function sendToAiGrader(answers) {
     try {
         const response = await fetch(SCRIPT_URL, {
             method: 'POST',
-            // تم إزالة no-cors للسماح بقراءة النتيجة
-            body: JSON.stringify(payload),
-            headers: {
-                // استخدام text/plain هو الخدعة السحرية لتجاوز الـ CORS في GAS
-                'Content-Type': 'text/plain;charset=utf-8', 
-            },
+            mode: 'cors', // نستخدم cors بشكل صريح
+            // السر هنا: إرسال النص بصيغة plain لجعل المتصفح يعتبره طلباً آمناً تلقائياً
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' }, 
+            body: JSON.stringify(payload)
         });
-        
-        const result = await response.json(); // الآن ستعمل بنجاح
 
-        if(result.success) {
-            document.getElementById('loader-content').style.display = 'none';
-            const resultDiv = document.getElementById('result-display');
-            resultDiv.style.display = 'block';
-            
-            resultDiv.innerHTML = `
-                <div style="font-size: 1.2rem; color: var(--gold); font-family: 'Orbitron';">MISSION EVALUATED</div>
-                <div style="font-size: 2.5rem; margin: 10px 0;">${result.grade}/${result.maxGrade}</div>
-                <p style="color: #4CAF50; font-size: 0.8rem; margin-bottom: 15px;">${result.feedback || 'Excellent work, Agent!'}</p>
-                <button class="btn btn-submit" style="width:100%" onclick="window.location.href='MC.html'">RETURN TO BASE</button>
-            `;
-        } else {
-            throw new Error(result.message);
-        }
+        // البرمجة الدفاعية: التحقق من نجاح الرد قبل تحويله لـ JSON
+        if (!response.ok) throw new Error(`HTTP Error: ${response.status}`);
+
+        const result = await response.json();
+
+        document.getElementById('loader-content').style.display = 'none';
+        const resultDiv = document.getElementById('result-display');
+        resultDiv.style.display = 'block';
+        
+        resultDiv.innerHTML = `
+            <div style="font-size: 1.2rem; color: var(--gold); font-family: 'Orbitron';">MISSION EVALUATED</div>
+            <div style="font-size: 2.5rem; margin: 10px 0;">${result.grade}/${result.maxGrade}</div>
+            <p style="color: #4CAF50; font-size: 0.8rem; margin-bottom: 15px;">${result.feedback || 'Excellent work, Agent!'}</p>
+            <button class="btn btn-submit" style="width:100%" onclick="window.location.href='MC.html'">RETURN TO BASE</button>
+        `;
     } catch (error) {
-        console.error("Submission Error:", error);
-        alert("HQ Connection Error: " + error.message);
+        console.error("Gear Debug Info:", error);
+        alert("🚨 HQ CONNECTION LOST: \n1. Check Internet \n2. Ensure Script is Deployed as 'Anyone'");
         document.getElementById('sync-overlay').style.display = 'none';
     }
 }
