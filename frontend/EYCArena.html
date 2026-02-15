@@ -118,119 +118,78 @@
     </footer>
 
 <script>
-    // تأكد أن هذا الرابط هو الرابط النهائي بعد عمل New Deployment
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxyrJaQYrcJEGWncEzkRz2DcqiaQPnOjK3MtzPJR537ugNucC-NhqkUnXf55WijAfjGHw/exec";
-    const DRIVE_DX = "https://drive.google.com/drive/folders/1f5xKkjHOC9C-DjEKdjhYvbxAWfEId8zz?usp=drive_link";
-    const DRIVE_ELX = "https://drive.google.com/drive/folders/1wdpDSwpmZN_HYbfUhUcH-PlmRsBPB73-?usp=drive_link";
+    const SCRIPT_URL = "رابط_السكربت_الخاص_بك"; 
 
     let currentActivity, currentTask, userEmail, userName;
 
-    window.onload = function() {
+    window.onload = async function() {
         generateStars();
         const urlParams = new URLSearchParams(window.location.search);
-        
-        // جلب البيانات من localStorage أو من الـ URL
-        const savedUser = JSON.parse(localStorage.getItem('eyc_user')) || {};
+        const savedUser = JSON.parse(localStorage.getItem('eyc_user'));
 
-        userEmail = urlParams.get('email') || savedUser.email;
-        userName = urlParams.get('name') || savedUser.name || "AGENT";
+        // جلب البيانات مع تأكيد الأولوية للـ URL لضمان الدقة
+        userEmail = urlParams.get('email') || (savedUser ? savedUser.email : null);
+        userName = urlParams.get('name') || (savedUser ? savedUser.name : "AGENT");
         currentActivity = urlParams.get('act'); 
-        currentTask = urlParams.get('task') || "1";
+        currentTask = urlParams.get('task');
 
-        // 1. التحقق الأمني (تم التخفيف قليلاً لضمان العرض)
-        if (!userEmail) {
-            console.error("No user email found.");
-            // يمكنك توجيه الطالب لصفحة الدخول هنا لو أردت
+        // الحماية: إذا لم يسجل دخول، ارجع لصفحة اللوج إن
+        if (!userEmail || !currentActivity) {
+            alert("Security Protocol: Please login first!");
+            window.location.href = 'MC.html'; // استبدلها باسم صفحة اللوج إن عندك
+            return;
         }
 
-        // 2. تحديث النصوص (مع وجود نصوص افتراضية)
+        // تحديث الواجهة بالبيانات المتاحة
         document.getElementById('student-name').innerText = userName.toUpperCase();
         document.getElementById('display-student-name').innerText = userName;
-        document.getElementById('activity-title').innerText = currentActivity || "ACTIVITY";
+        document.getElementById('activity-title').innerText = currentActivity;
         document.getElementById('mission-sub').innerText = `MISSION ${currentTask.padStart(2, '0')}`;
-        document.getElementById('student-title').innerText = savedUser.title || "ELITE AGENT";
+        document.getElementById('student-title').innerText = urlParams.get('title') || (savedUser ? savedUser.title : "ELITE AGENT");
+        document.getElementById('student-img').src = urlParams.get('avatar') || (savedUser ? savedUser.avatar : "default-avatar.png");
+        document.getElementById('activity-img').src = `assets/AL${currentActivity}.png`;
 
-        // 3. تحميل الصور
-        // صورة النشاط
-        if (currentActivity) {
-            document.getElementById('activity-img').src = `assets/AL${currentActivity}.png`;
-        }
-        
-        // صورة الطالب
-        const avatarImg = document.getElementById('student-img');
-        if (savedUser.avatar) {
-            avatarImg.src = savedUser.avatar;
-        } else {
-            avatarImg.src = "https://via.placeholder.com/150/000000/D4AF37?text=AGENT"; // صورة افتراضية
-        }
-
-        // 4. تحميل محتوى النشاط (Iframe)
-        if (currentActivity) {
-            document.getElementById('contentFrame').src = `${currentActivity}.html?task=${currentTask}`;
-        }
+        // التحقق من حالة المهمة في السيرفر
+        checkMissionStatus();
     };
 
-    // --- وظيفة استلام الرسائل من الـ Iframe (ضرورية جداً) ---
-    window.addEventListener('message', function(event) {
-        if (event.data.type === 'MISSION_ANSWERS') {
-            processAnswers(event.data.answers);
+    async function checkMissionStatus() {
+        try {
+            const response = await fetch(`${SCRIPT_URL}?action=checkStatus&email=${userEmail}&act=${currentActivity}&task=${currentTask}`);
+            const data = await response.json();
+            
+            if (data.done) {
+                // إذا كانت المهمة منتهية، اظهر كلمة DONE وامنع التكرار
+                document.getElementById('glass-wrapper').innerHTML = `
+                    <div style="display:flex; flex-direction:column; justify-content:center; align-items:center; height:100%; color:#4CAF50; font-family:'Orbitron';">
+                        <i class="fas fa-check-circle" style="font-size:5rem; margin-bottom:20px;"></i>
+                        <h1 style="font-size:3rem; letter-spacing:10px;">MISSION DONE</h1>
+                        <p style="color:#aaa; margin-top:10px;">You have already secured these tokens, Agent.</p>
+                    </div>`;
+                document.getElementById('submitBtn').disabled = true;
+                document.getElementById('submitBtn').style.opacity = "0.5";
+            } else {
+                // إذا لم تكن منتهية، حمل النشاط
+                document.getElementById('contentFrame').src = `${currentActivity}.html?task=${currentTask}`;
+            }
+        } catch (e) {
+            console.error("Status Check Failed");
+            document.getElementById('contentFrame').src = `${currentActivity}.html?task=${currentTask}`;
         }
-    });
-
-    async function startSubmission() {
-        document.getElementById('sync-overlay').style.display = 'flex';
-        document.getElementById('loader-content').style.display = 'block';
-        document.getElementById('result-display').style.display = 'none';
-        document.getElementById('status-msg').innerText = "Gathering your answers...";
-
-        // طلب البيانات من الـ Iframe
-        const frame = document.getElementById('contentFrame').contentWindow;
-        frame.postMessage({ type: 'REQUEST_MISSION_DATA' }, '*');
     }
 
+    // تعديل زر السبمت لمنع الإجابات الفاضية
     function processAnswers(answers) {
-        if (!answers || answers.length === 0) {
-            alert("Please complete the mission first!");
+        // التحقق من وجود إجابات حقيقية
+        const hasContent = Array.isArray(answers) ? answers.some(a => a && String(a).trim() !== "") : (answers && String(answers).trim() !== "");
+        
+        if (!hasContent) {
+            alert("⚠️ HQ: Empty missions will not be accepted. Provide data!");
             document.getElementById('sync-overlay').style.display = 'none';
             return;
         }
         sendToAiGrader(answers);
     }
-
-function sendToAiGrader(answers) {
-    let separator = (currentActivity === "FX" || currentActivity === "LX") ? "|" : ",";
-    const cleanedAnswers = Array.isArray(answers) ? answers.map(a => String(a).trim()).join(separator) : String(answers).trim();
-
-    const payload = {
-        action: "submitReport",
-        email: userEmail,
-        actCode: currentActivity,
-        taskNum: currentTask,
-        answer: cleanedAnswers
-    };
-
-    fetch(SCRIPT_URL, {
-        method: 'POST',
-        mode: 'no-cors', 
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload) 
-    })
-    .then(() => {
-        document.getElementById('loader-content').style.display = 'none';
-        const resultDiv = document.getElementById('result-display');
-        resultDiv.style.display = 'block';
-        resultDiv.innerHTML = `
-            <div style="font-size: 1.5rem; color: var(--gold); font-family: 'Orbitron';">MISSION SUBMITTED</div>
-            <p style="margin: 15px 0; color: #ddd;">HQ is analyzing your data. Check your profile for the final grade!</p>
-            <button class="btn btn-submit" style="width:100%" onclick="window.location.href='MC.html'">RETURN TO BASE</button>
-        `;
-    })
-    .catch(err => {
-        console.error("Connection Error:", err);
-        document.getElementById('status-msg').innerText = "HQ Connection Failed!";
-        setTimeout(() => { document.getElementById('sync-overlay').style.display = 'none'; }, 2000);
-    });
-}
 </script>
 </body>
 </html>
