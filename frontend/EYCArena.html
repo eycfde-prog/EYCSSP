@@ -166,16 +166,68 @@
         }
     });
 
-    function processAnswers(answers) {
-        const hasContent = Array.isArray(answers) ? answers.some(a => a && String(a).trim() !== "") : (answers && String(answers).trim() !== "");
+function processAnswers(answers) {
+        const hasContent = Array.isArray(answers) ? 
+            answers.some(a => a && String(a).trim() !== "") : 
+            (answers && String(answers).trim() !== "");
         
         if (!hasContent) {
             alert("⚠️ HQ: Empty missions will not be accepted!");
             return;
         }
         
+        // إظهار واجهة التحميل
         document.getElementById('sync-overlay').style.display = 'flex';
-        // استدعاء دالة الإرسال للسيرفر هنا (sendToAiGrader)
+        document.getElementById('loader-content').style.display = 'flex';
+        document.getElementById('result-display').style.display = 'none';
+        document.getElementById('status-msg').innerText = "Transmitting data to HQ...";
+        
+        // البدء في الإرسال الفعلي
+        sendToAiGrader(answers);
+    }
+
+    async function sendToAiGrader(answers) {
+        // تحديد الفاصل بناءً على نوع النشاط
+        let separator = (currentActivity === "FX" || currentActivity === "LX") ? "|" : ",";
+        const cleanedAnswers = Array.isArray(answers) ? 
+            answers.map(a => String(a).trim()).join(separator) : 
+            String(answers).trim();
+
+        const payload = {
+            action: "submitReport",
+            email: userEmail,
+            actCode: currentActivity,
+            taskNum: currentTask,
+            answer: cleanedAnswers
+        };
+
+        try {
+            const response = await fetch(SCRIPT_URL, {
+                method: 'POST',
+                body: JSON.stringify(payload)
+            });
+            const result = await response.json();
+
+            if(result.success) {
+                // إخفاء الـ Loader وإظهار النتيجة
+                document.getElementById('loader-content').style.display = 'none';
+                const resultDiv = document.getElementById('result-display');
+                resultDiv.style.display = 'block';
+                
+                resultDiv.innerHTML = `
+                    <div style="font-size: 1.2rem; color: var(--gold); font-family: 'Orbitron';">MISSION EVALUATED</div>
+                    <div style="font-size: 2.5rem; margin: 10px 0;">${result.grade}/${result.maxGrade}</div>
+                    <p style="color: #4CAF50; font-size: 0.9rem; margin-bottom: 15px;">${result.feedback || 'Excellent work, Agent!'}</p>
+                    <button class="btn btn-submit" style="width:100%" onclick="window.location.href='MC.html'">RETURN TO BASE</button>
+                `;
+            } else {
+                throw new Error(result.message);
+            }
+        } catch (error) {
+            console.error("Submission Error:", error);
+            alert("Connection Lost! Data was not saved. Error: " + error.message);
+            document.getElementById('sync-overlay').style.display = 'none';
+        }
     }
 </script>
 </body>
