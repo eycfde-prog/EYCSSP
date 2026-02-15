@@ -198,7 +198,6 @@
     }
 
 function sendToAiGrader(answers) {
-    // Gear Fix: توحيد الفواصل وإزالة المسافات الزائدة من كل إجابة
     let separator = (currentActivity === "FX" || currentActivity === "LX") ? "|" : ",";
     const cleanedAnswers = Array.isArray(answers) ? answers.map(a => String(a).trim()).join(separator) : String(answers).trim();
 
@@ -212,12 +211,10 @@ function sendToAiGrader(answers) {
 
     fetch(SCRIPT_URL, {
         method: 'POST',
-        mode: 'no-cors', // لضمان تجاوز قيود المتصفح عند الإرسال لجوجل
+        mode: 'no-cors', 
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload) 
     })
-    // ملحوظة: عند استخدام no-cors لن تستطيع قراءة الـ JSON الراجع مباشرة
-    // يفضل توجيه الطالب لصفحة نجاح أو استخدام "Redirect" في السكربت
     .then(() => {
         document.getElementById('loader-content').style.display = 'none';
         const resultDiv = document.getElementById('result-display');
@@ -227,8 +224,7 @@ function sendToAiGrader(answers) {
             <p style="margin: 15px 0; color: #ddd;">HQ is analyzing your data. Check your profile for the final grade!</p>
             <button class="btn btn-submit" style="width:100%" onclick="window.location.href='MC.html'">RETURN TO BASE</button>
         `;
-    });
-}
+    })
     .catch(err => {
         console.error("Connection Error:", err);
         document.getElementById('status-msg').innerText = "HQ Connection Failed!";
