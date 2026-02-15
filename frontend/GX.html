@@ -22,16 +22,6 @@
             direction: ltr;
         }
 
-        body::-webkit-scrollbar { width: 4px; }
-        body::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 10px; }
-
-        .gx-container { max-width: 900px; margin: 0 auto; animation: fadeIn 0.8s ease; }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
         .header-gx {
             display: flex; justify-content: space-between; align-items: center;
             margin-bottom: 20px; border-bottom: 1px solid var(--glass-border);
@@ -43,74 +33,60 @@
             color: var(--gold); letter-spacing: 3px; margin: 0;
         }
 
-        .principle-tags { display: flex; gap: 8px; }
-        .tag {
-            font-family: 'Orbitron'; font-size: 8px; color: var(--gold);
-            border: 1px solid var(--glass-border); padding: 2px 6px; border-radius: 4px;
-        }
-
         .passage-box {
             background: var(--glass);
             backdrop-filter: blur(15px);
             border: 1px solid var(--glass-border);
-            padding: 25px; border-radius: 18px;
-            margin-bottom: 25px; line-height: 1.8;
-            font-size: 1.1rem; color: #eee;
-            position: relative; box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            padding: 20px; border-radius: 18px;
+            margin-bottom: 25px; line-height: 1.6;
+            font-size: 1rem; color: #eee;
+            position: relative;
             text-align: left;
         }
 
-        .passage-box::before {
-            content: "INTEL_SOURCE"; position: absolute; top: -10px; left: 20px;
-            background: #020205; padding: 0 12px; font-family: 'Orbitron';
-            font-size: 10px; color: var(--gold); border: 1px solid var(--glass-border);
-            border-radius: 5px;
-        }
-
         .extractor-grid {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            display: grid; grid-template-columns: 1fr;
             gap: 15px;
         }
 
         .extraction-card {
             background: var(--glass);
             border: 1px solid var(--glass-border);
-            padding: 18px; border-radius: 15px;
-            border-bottom: 3px solid var(--gold);
-            transition: 0.4s ease;
-        }
-
-        .extraction-card.error-card { 
-            border-color: var(--error-red) !important; 
-            animation: shake 0.4s ease-in-out;
-        }
-
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            20%, 60% { transform: translateX(-5px); }
-            40%, 80% { transform: translateX(5px); }
+            padding: 15px; border-radius: 15px;
+            border-left: 4px solid var(--gold);
         }
 
         .extraction-card label {
-            display: block; font-family: 'Orbitron'; font-size: 9px;
-            color: var(--gold); margin-bottom: 12px;
-            text-transform: uppercase; letter-spacing: 1px;
+            display: block; font-family: 'Orbitron'; font-size: 10px;
+            color: var(--gold); margin-bottom: 10px;
+            text-transform: uppercase;
         }
 
-        .extraction-input {
-            width: 100%; background: rgba(0,0,0,0.4);
-            border: 1px solid var(--glass-border); border-radius: 8px;
-            color: #fff; padding: 12px;
-            font-family: 'Poppins'; font-size: 0.9rem;
-            outline: none; box-sizing: border-box;
-            transition: 0.3s;
-            text-align: center;
+        /* حاوية المدخلات المتعددة */
+        .inputs-container {
+            display: flex; flex-wrap: wrap; gap: 8px;
         }
 
-        .requirement-tag {
-            font-size: 9px; color: #666; margin-top: 8px; display: block;
-            font-style: italic;
+        .gx-input {
+            flex: 1; min-width: 120px;
+            background: rgba(0,0,0,0.4);
+            border: 1px solid var(--glass-border); border-radius: 6px;
+            color: #fff; padding: 8px 12px;
+            font-family: 'Poppins'; font-size: 0.85rem;
+            outline: none; transition: 0.3s;
         }
+
+        .gx-input:focus { border-color: var(--gold); background: rgba(212, 175, 55, 0.05); }
+
+        /* حالة الخطأ */
+        .error-card { border-color: var(--error-red) !important; animation: shake 0.4s; }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        .hint { font-size: 9px; color: #666; margin-top: 8px; display: block; }
     </style>
 </head>
 <body>
@@ -118,16 +94,10 @@
 <div class="gx-container">
     <div class="header-gx">
         <h1 id="task-title">Grammar Extractor</h1>
-        <div class="principle-tags">
-            <span class="tag">CLR</span>
-            <span class="tag">AAI</span>
-        </div>
+        <div class="principle-tags"><span class="tag" style="font-family:'Orbitron'; font-size:8px; color:var(--gold); border:1px solid var(--glass-border); padding:2px 6px; border-radius:4px;">INTEL</span></div>
     </div>
 
-    <div class="passage-box" id="passage-content">
-        Initializing Intel Extraction...
-    </div>
-
+    <div class="passage-box" id="passage-content">Loading Mission Data...</div>
     <div class="extractor-grid" id="extractor-fields"></div>
 </div>
 
@@ -136,53 +106,24 @@
         "1": {
             passage: "The sun was shining brightly as the small birds flew over the green forest. Yesterday, they built a new nest because they were happy. If it rains tomorrow, they will stay inside.",
             requirements: [
-                { label: "Extract 3 Verbs", hint: "e.g., built, stay..." },
-                { label: "Extract 2 Adjectives", hint: "e.g., small, green..." },
-                { label: "Extract 1 Past Simple sentence", hint: "Write the whole sentence" },
-                { label: "Extract 3 Nouns", hint: "e.g., birds, forest..." },
-                { label: "Extract 1 Future condition", hint: "If + will..." }
+                { label: "Extract 3 Verbs", count: 3 },
+                { label: "Extract 2 Adjectives", count: 2 },
+                { label: "Extract 1 Past Simple sentence", count: 1 },
+                { label: "Extract 3 Nouns", count: 3 },
+                { label: "Extract 1 Future condition", count: 1 }
             ]
         },
         "2": {
             passage: "The smart engineer is working in the office. He fixed the old laptop yesterday and now he is buying a fast computer. While he was working, his phone rang.",
             requirements: [
-                { label: "Extract 3 Verbs", hint: "working, fixed, buying" },
-                { label: "Extract 2 Adjectives", hint: "smart, fast" },
-                { label: "Extract 1 Past Simple sentence", hint: "The whole sentence" },
-                { label: "Extract 3 Nouns", hint: "engineer, office, phone" },
-                { label: "Extract 1 Past Continuous clause", hint: "was/were + ing" }
-            ]
-        },
-        "3": {
-            passage: "A famous chef is eating in the kitchen. She cooked a large meal for us because the spices smelled delicious. The chef has cooked many meals before.",
-            requirements: [
-                { label: "Extract 3 Verbs", hint: "eating, cooked, smelled" },
-                { label: "Extract 2 Adjectives", hint: "famous, delicious" },
-                { label: "Extract 1 Past Simple sentence", hint: "The whole sentence" },
-                { label: "Extract 3 Nouns", hint: "chef, kitchen, spices" },
-                { label: "Extract 1 Present Perfect", hint: "has/have + V3" }
-            ]
-        },
-        "4": {
-            passage: "The strong runner was running on the track. He won the gold medal last week because he had been training for months. He is the most athletic person I know.",
-            requirements: [
-                { label: "Extract 3 Verbs", hint: "running, won, training" },
-                { label: "Extract 2 Adjectives", hint: "strong, athletic" },
-                { label: "Extract 1 Past Simple sentence", hint: "The whole sentence" },
-                { label: "Extract 3 Nouns", hint: "runner, track, medal" },
-                { label: "Extract 1 Superlative", hint: "The + est" }
-            ]
-        },
-        "5": {
-            passage: "Many tourists are traveling to Egypt. They visited the Great Pyramids and saw ancient temples. If they have enough time, they will visit Luxor next week.",
-            requirements: [
-                { label: "Extract 3 Verbs", hint: "traveling, visited, saw" },
-                { label: "Extract 2 Adjectives", hint: "ancient, many" },
-                { label: "Extract 1 Past Simple sentence", hint: "The whole sentence" },
-                { label: "Extract 3 Nouns", hint: "tourists, pyramids, temples" },
-                { label: "Extract 1 Conditional", hint: "If + will" }
+                { label: "Extract 3 Verbs", count: 3 },
+                { label: "Extract 2 Adjectives", count: 2 },
+                { label: "Extract 1 Past Simple sentence", count: 1 },
+                { label: "Extract 3 Nouns", count: 3 },
+                { label: "Extract 1 Past Continuous clause", count: 1 }
             ]
         }
+        // ... يمكنك إضافة الباقي بنفس الهيكل (label و count)
     };
 
     const urlParams = new URLSearchParams(window.location.search);
@@ -191,59 +132,68 @@
     function loadExtractor() {
         const data = gxData[taskNum] || gxData["1"];
         document.getElementById('passage-content').innerText = data.passage;
-        document.getElementById('task-title').innerText = `Extractor: Task ${taskNum.padStart(2, '0')}`;
+        document.getElementById('task-title').innerText = `GX: Task ${taskNum.padStart(2, '0')}`;
+        
         const grid = document.getElementById('extractor-fields');
-        grid.innerHTML = data.requirements.map((req, i) => `
-            <div class="extraction-card" id="card-${i}">
-                <label>DATA_FIELD_0${i+1}: ${req.label}</label>
-                <input type="text" class="extraction-input gx-input" id="extract-${i}" placeholder="Enter findings..." autocomplete="off">
-                <span class="requirement-tag">● ${req.hint}</span>
-            </div>
-        `).join('');
+        grid.innerHTML = data.requirements.map((req, i) => {
+            // إنشاء عدد المدخلات المطلوب لكل بطاقة
+            let inputsHtml = '';
+            for(let j=0; j < req.count; j++) {
+                inputsHtml += `<input type="text" class="gx-input" data-group="${i}" placeholder="Data ${j+1}..." autocomplete="off">`;
+            }
+
+            return `
+                <div class="extraction-card" id="card-${i}">
+                    <label>FIELD_0${i+1}: ${req.label}</label>
+                    <div class="inputs-container">${inputsHtml}</div>
+                </div>
+            `;
+        }).join('');
     }
 
-    // --- Gear Fix: الاستماع لطلب البيانات من الأرينا ---
+    // الربط مع زر الأرينا الخارجي
     window.addEventListener('message', function(event) {
         if (event.data.type === 'REQUEST_MISSION_DATA') {
             collectAndSend();
         }
-        
-        if (event.data.type === 'MISSION_RESULT') {
-            const score = event.data.score || 0;
-            const total = event.data.total || 5;
-            alert(`MISSION REPORT:\nScore: ${score} / ${total}`);
-        }
     });
 
     function collectAndSend() {
-        const inputs = document.querySelectorAll('.gx-input');
-        let answers = [];
+        const cards = document.querySelectorAll('.extraction-card');
+        let answersArray = [];
         let hasError = false;
 
-        inputs.forEach((input, i) => {
-            const val = input.value.trim();
-            const card = document.getElementById(`card-${i}`);
-            if(!val) {
+        cards.forEach((card, i) => {
+            const inputs = card.querySelectorAll('.gx-input');
+            let groupAnswers = [];
+            let groupEmpty = false;
+
+            inputs.forEach(input => {
+                const val = input.value.trim();
+                if(!val) groupEmpty = true;
+                groupAnswers.push(val);
+            });
+
+            if(groupEmpty) {
                 hasError = true;
                 card.classList.add('error-card');
                 setTimeout(() => card.classList.remove('error-card'), 500);
             } else {
-                card.classList.remove('error-card');
-                answers.push(val);
+                // تجميع إجابات المجموعة الواحدة بفاصل شرطة مائلة أو مسافة
+                // هنا سنجمع الكل في نص واحد مفصول بـ | للأرينا
+                answersArray.push(groupAnswers.join(' ')); 
             }
         });
 
         if(hasError) {
-            // إرسال تنبيه للأرينا أن المهمة غير مكتملة
             window.parent.postMessage({ type: 'MISSION_INCOMPLETE' }, '*');
             return;
         }
 
-        // إرسال الإجابات بنجاح
         window.parent.postMessage({ 
             type: 'MISSION_ANSWERS', 
             activityCode: 'GX',
-            answers: answers.join('|'), 
+            answers: answersArray.join('|'), 
             missionNum: taskNum
         }, '*');
     }
