@@ -80,12 +80,10 @@
     </footer>
 
 <script>
-    // استخدم رابط السكربت الخاص بك هنا
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxetS9Xp7UX4YZ7mI3yyz9-9k95GP-dQcuz-okMCwTfbJ1mahcPjsxvO_LvtxNy_LrL9A/exec"; 
 
     let currentActivity, currentTask, userEmail, userName;
 
-    // دالة النجوم البسيطة لمنع الخطأ
     function createStars() {
         const container = document.getElementById('star-container');
         for (let i = 0; i < 50; i++) {
@@ -114,54 +112,59 @@
             return;
         }
 
-        // تحديث البيانات في الهيدر
         document.getElementById('student-name').innerText = userName.toUpperCase();
         document.getElementById('display-student-name').innerText = userName;
         document.getElementById('activity-title').innerText = currentActivity;
         document.getElementById('mission-sub').innerText = `MISSION ${currentTask.padStart(2, '0')}`;
         document.getElementById('student-title').innerText = urlParams.get('title') || savedUser.title || "ELITE AGENT";
         
-        // جلب الصورة مع فك التشفير (Decode) للرابط لضمان عمله
         let avatarUrl = urlParams.get('avatar') || savedUser.avatar || "https://via.placeholder.com/150/000000/D4AF37?text=AGENT";
         document.getElementById('student-img').src = decodeURIComponent(avatarUrl);
         document.getElementById('activity-img').src = `assets/AL${currentActivity}.png`;
 
-        // التحقق من حالة المهمة
         checkMissionStatus();
     };
 
-async function checkMissionStatus() {
-    try {
-        // نرسل طلب GET للتحقق من الحالة وجلب الدرجة
-        const response = await fetch(`${SCRIPT_URL}?action=checkStatus&email=${userEmail}&act=${currentActivity}&task=${currentTask}`);
-        const data = await response.json();
-        
-        if (data.done) {
-            const resultDiv = document.getElementById('result-display');
-            const loaderContent = document.getElementById('loader-content');
+    async function checkMissionStatus() {
+        try {
+            const response = await fetch(`${SCRIPT_URL}?action=checkStatus&email=${userEmail}&act=${currentActivity}&task=${currentTask}`);
+            const data = await response.json();
             
-            if(loaderContent) loaderContent.style.display = 'none';
-            if(resultDiv) {
+            if (data.done) {
+                const resultDiv = document.getElementById('result-display');
+                const loaderContent = document.getElementById('loader-content');
+                
                 document.getElementById('sync-overlay').style.display = 'flex';
-                resultDiv.style.display = 'block';
-                resultDiv.innerHTML = `
-                    <div style="font-size: 1.2rem; color: var(--gold); font-family: 'Orbitron';">MISSION SECURED</div>
-                    <div style="font-size: 2.5rem; margin: 10px 0; color: white;">${data.grade || '--'}/${data.maxGrade || '--'}</div>
-                    <p style="color: #4CAF50; font-size: 0.8rem; margin-bottom: 15px;">Target Neutralized successfully.</p>
-                    <button class="btn btn-submit" style="width:100%" onclick="window.location.href='MC.html'">RETURN TO BASE</button>
-                `;
+                if(loaderContent) loaderContent.style.display = 'none';
+                if(resultDiv) {
+                    resultDiv.style.display = 'block';
+                    resultDiv.innerHTML = `
+                        <div style="font-size: 1.2rem; color: var(--gold); font-family: 'Orbitron';">MISSION SECURED</div>
+                        <div style="font-size: 2.5rem; margin: 10px 0; color: white;">${data.grade || '--'}/${data.maxGrade || '--'}</div>
+                        <p style="color: #4CAF50; font-size: 0.8rem; margin-bottom: 15px;">Target Neutralized successfully.</p>
+                        <button class="btn btn-submit" style="width:100%" onclick="window.location.href='MC.html'">RETURN TO BASE</button>
+                    `;
+                }
+                
+                document.getElementById('glass-iframe-wrapper').innerHTML = `
+                    <div style="display:flex; flex-direction:column; justify-content:center; align-items:center; height:100%; color:#4CAF50; font-family:'Orbitron'; text-align:center;">
+                        <i class="fas fa-check-circle" style="font-size:4rem; margin-bottom:20px;"></i>
+                        <h1>MISSION DONE</h1>
+                    </div>`;
+                document.getElementById('submitBtn').disabled = true;
+                document.getElementById('submitBtn').style.opacity = "0.5";
+            } else {
+                document.getElementById('sync-overlay').style.display = 'none';
+                document.getElementById('contentFrame').src = `${currentActivity}.html?task=${currentTask}`;
             }
-            
-            // تحديث واجهة الـ Iframe الرئيسية أيضاً
-            document.getElementById('glass-iframe-wrapper').innerHTML = `<div style="text-align:center; padding:50px; color:#4CAF50;"><i class="fas fa-check-circle" style="font-size:4rem;"></i><h1>MISSION DONE</h1></div>`;
-            document.getElementById('submitBtn').disabled = true;
+        } catch (e) {
+            console.error("Sync Error:", e);
+            document.getElementById('sync-overlay').style.display = 'none';
+            document.getElementById('contentFrame').src = `${currentActivity}.html?task=${currentTask}`;
         }
-    } catch (e) {
-        console.error("Sync Error:", e);
     }
-}
+
     function startSubmission() {
-        // طلب البيانات من الـ Iframe
         const frame = document.getElementById('contentFrame').contentWindow;
         frame.postMessage({ type: 'REQUEST_MISSION_DATA' }, '*');
     }
@@ -172,7 +175,7 @@ async function checkMissionStatus() {
         }
     });
 
-function processAnswers(answers) {
+    function processAnswers(answers) {
         const hasContent = Array.isArray(answers) ? 
             answers.some(a => a && String(a).trim() !== "") : 
             (answers && String(answers).trim() !== "");
@@ -182,52 +185,47 @@ function processAnswers(answers) {
             return;
         }
         
-        // إظهار واجهة التحميل
         document.getElementById('sync-overlay').style.display = 'flex';
         document.getElementById('loader-content').style.display = 'flex';
         document.getElementById('result-display').style.display = 'none';
         document.getElementById('status-msg').innerText = "Transmitting data to HQ...";
         
-        // البدء في الإرسال الفعلي
         sendToAiGrader(answers);
     }
 
-async function sendToAiGrader(answers) {
-    let separator = (currentActivity === "FX" || currentActivity === "LX") ? "|" : ",";
-    const cleanedAnswers = Array.isArray(answers) ? answers.map(a => String(a).trim()).join(separator) : String(answers).trim();
+    async function sendToAiGrader(answers) {
+        let separator = (currentActivity === "FX" || currentActivity === "LX") ? "|" : ",";
+        const cleanedAnswers = Array.isArray(answers) ? answers.map(a => String(a).trim()).join(separator) : String(answers).trim();
 
-    const payload = {
-        action: "submitReport",
-        email: userEmail,
-        actCode: currentActivity,
-        taskNum: currentTask,
-        answer: cleanedAnswers
-    };
+        const payload = {
+            action: "submitReport",
+            email: userEmail,
+            actCode: currentActivity,
+            taskNum: currentTask,
+            answer: cleanedAnswers
+        };
 
-    // إظهار اللودر
-    document.getElementById('sync-overlay').style.display = 'flex';
+        document.getElementById('sync-overlay').style.display = 'flex';
 
-    try {
-        // نستخدم fetch مع تحديد method و body نصي فقط
-        await fetch(SCRIPT_URL, {
-            method: 'POST',
-            mode: 'no-cors', // نستخدم no-cors هنا للإرسال فقط
-            headers: { 'Content-Type': 'text/plain' },
-            body: JSON.stringify(payload)
-        });
+        try {
+            await fetch(SCRIPT_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'text/plain' },
+                body: JSON.stringify(payload)
+            });
 
-        // بما أن no-cors لا تسمح بقراءة الرد، سننتظر ثانيتين ثم نحدث الحالة
-        document.getElementById('status-msg').innerText = "Data Transmitted! Verifying Grade...";
-        
-        setTimeout(async () => {
-            await checkMissionStatus(); // هذه الدالة ستقوم بجلب النتيجة وتحديث الواجهة
-        }, 2500);
+            document.getElementById('status-msg').innerText = "Data Transmitted! Verifying Grade...";
+            
+            setTimeout(async () => {
+                await checkMissionStatus();
+            }, 2500);
 
-    } catch (error) {
-        console.error("Gear Debug Info:", error);
-        alert("Transmition Error! Please check your connection.");
+        } catch (error) {
+            console.error("Gear Debug Info:", error);
+            alert("Transmition Error! Please check your connection.");
+        }
     }
-}
 </script>
 </body>
 </html>
