@@ -3,94 +3,87 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Golden Ear X | Audio Summarization | Glassy Edition</title>
+    <title>Golden Ear X | Audio Summarization | Titanium Edition</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
     <style>
         :root {
             --neon-purple: #bc13fe;
             --neon-blue: #00f2ff;
-            --glass-deep: rgba(10, 10, 20, 0.9);
-            --border-purple: rgba(188, 19, 254, 0.3);
+            --glass-deep: rgba(10, 10, 20, 0.92);
+            --border-purple: rgba(188, 19, 254, 0.4);
         }
 
         body { 
             font-family: 'Rajdhani', sans-serif; 
             background: transparent; 
-            color: white; 
-            margin: 0; padding: 15px; 
+            color: #e0e0e0; 
+            margin: 0; padding: 20px; 
             direction: ltr;
         }
 
         .audio-x-panel {
             background: var(--glass-deep); 
-            border: 2px solid var(--border-purple);
-            border-radius: 25px; 
-            padding: 25px; 
+            border: 1px solid var(--border-purple);
+            border-radius: 20px; 
+            padding: 30px; 
             text-align: center;
-            box-shadow: 0 0 40px rgba(188, 19, 254, 0.15); 
-            margin-bottom: 30px;
+            box-shadow: 0 0 30px rgba(188, 19, 254, 0.2); 
+            margin-bottom: 35px;
             position: relative;
             overflow: hidden;
             backdrop-filter: blur(20px);
         }
 
-        .audio-x-panel::before {
-            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 2px;
-            background: linear-gradient(90deg, transparent, var(--neon-purple), transparent);
-            animation: scanning 3s linear infinite;
+        /* تأثير المسح الضوئي */
+        .audio-x-panel::after {
+            content: ''; position: absolute; top: -100%; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(to bottom, transparent, rgba(188, 19, 254, 0.1), transparent);
+            animation: scan 4s linear infinite;
         }
 
-        @keyframes scanning { 0% { top: 0; } 100% { top: 100%; } }
+        @keyframes scan { 0% { top: -100%; } 100% { top: 100%; } }
 
         .audio-x-panel h1 { 
             font-family: 'Orbitron'; 
             color: var(--neon-purple); 
-            font-size: 1.2rem; 
-            letter-spacing: 4px; 
+            font-size: 1.1rem; 
+            letter-spacing: 5px; 
             margin: 0 0 20px 0;
-            text-shadow: 0 0 10px rgba(188, 19, 254, 0.5);
+            text-transform: uppercase;
         }
 
         audio { 
             width: 100%; 
-            height: 40px;
-            filter: invert(1) hue-rotate(250deg) brightness(1.2); 
-            opacity: 0.8;
-            transition: 0.3s;
+            height: 35px;
+            filter: invert(1) hue-rotate(260deg) brightness(1.1); 
+            opacity: 0.85;
         }
-        audio:hover { opacity: 1; }
 
-        .summary-zone { display: flex; flex-direction: column; gap: 15px; }
+        .summary-zone { display: flex; flex-direction: column; gap: 20px; }
 
         .sentence-box {
-            background: rgba(255, 255, 255, 0.02); 
-            border: 1px solid rgba(188, 19, 254, 0.1);
-            border-radius: 15px; 
-            padding: 15px 20px; 
+            background: rgba(255, 255, 255, 0.03); 
+            border: 1px solid rgba(188, 19, 254, 0.15);
+            border-radius: 12px; 
+            padding: 20px 25px; 
             position: relative;
-            transition: 0.4s;
-            animation: slideIn 0.5s ease-out backwards;
+            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
-        @keyframes slideIn { from { opacity: 0; transform: translateX(-20px); } to { opacity: 1; transform: translateX(0); } }
-
-        .sentence-box:nth-child(2) { animation-delay: 0.2s; }
-        .sentence-box:nth-child(3) { animation-delay: 0.4s; }
-
         .sentence-box:focus-within {
-            background: rgba(188, 19, 254, 0.05);
-            border-color: var(--neon-purple);
-            box-shadow: 0 5px 15px rgba(188, 19, 254, 0.1);
+            background: rgba(188, 19, 254, 0.08);
+            border-color: var(--neon-blue);
+            transform: scale(1.02);
         }
 
         .sentence-box label {
             display: block; 
             font-family: 'Orbitron'; 
             color: var(--neon-blue);
-            font-size: 10px; 
-            margin-bottom: 8px; 
+            font-size: 9px; 
+            margin-bottom: 10px; 
             letter-spacing: 2px;
-            opacity: 0.7;
+            text-transform: uppercase;
         }
 
         .x-input-field {
@@ -100,34 +93,29 @@
             border-bottom: 1px solid rgba(255,255,255,0.1); 
             color: #fff;
             font-family: 'Rajdhani'; 
-            font-size: 1.15rem;
-            padding: 8px 0; 
-            outline: none; 
-            transition: 0.3s;
-        }
-
-        .x-input-field:focus { 
-            border-bottom-color: var(--neon-blue);
+            font-size: 1.1rem;
+            padding: 10px 0; 
+            outline: none;
         }
 
         .line-marker {
             position: absolute; left: 0; top: 50%; transform: translateY(-50%);
-            width: 3px; height: 60%; 
+            width: 4px; height: 50%; 
             background: var(--neon-purple);
-            border-radius: 0 5px 5px 0;
             box-shadow: 0 0 10px var(--neon-purple);
+            animation: pulseHeight 2s infinite ease-in-out;
         }
 
-        @keyframes pulseMarker {
-            0%, 100% { opacity: 1; height: 60%; }
-            50% { opacity: 0.5; height: 80%; }
+        @keyframes pulseHeight {
+            0%, 100% { height: 40%; opacity: 0.6; }
+            50% { height: 70%; opacity: 1; }
         }
     </style>
 </head>
 <body>
 
     <div class="audio-x-panel">
-        <h1 id="x-title">GE-X: MISSION 01</h1>
+        <h1 id="x-title">GE-X: ANALYZING AUDIO</h1>
         <audio id="xAudio" controls>
             <source id="xSource" src="" type="audio/wav">
         </audio>
@@ -136,20 +124,20 @@
     <div class="summary-zone">
         <div class="sentence-box">
             <div class="line-marker"></div>
-            <label>SUMMARIZATION LINE 01</label>
-            <input type="text" id="sent-1" class="x-input-field" placeholder="Enter the first key point...">
+            <label>Neural Link - Key Point 01</label>
+            <input type="text" id="sent-1" class="x-input-field" placeholder="Decoding first insight...">
         </div>
 
         <div class="sentence-box">
             <div class="line-marker"></div>
-            <label>SUMMARIZATION LINE 02</label>
-            <input type="text" id="sent-2" class="x-input-field" placeholder="Enter the second key point...">
+            <label>Neural Link - Key Point 02</label>
+            <input type="text" id="sent-2" class="x-input-field" placeholder="Capturing second observation...">
         </div>
 
         <div class="sentence-box">
             <div class="line-marker"></div>
-            <label>SUMMARIZATION LINE 03</label>
-            <input type="text" id="sent-3" class="x-input-field" placeholder="Enter the final summary line...">
+            <label>Final Summation - Conclusion</label>
+            <input type="text" id="sent-3" class="x-input-field" placeholder="Synthesizing final thought...">
         </div>
     </div>
 
@@ -157,20 +145,17 @@
     const urlParams = new URLSearchParams(window.location.search);
     const taskNum = urlParams.get('task') || "1";
 
-function initGEX() {
-    const audio = document.getElementById('xAudio');
-    const source = document.getElementById('xSource');
-    
-    // المسار الذي يخرج من مجلد MIF ثم يدخل لمجلد الصوتيات الجديد
-// بما أنها في المجلد الرئيسي، ندخل مباشرة لمجلد assets
-const audioPath = `../../assets/gexaudio/GEX${taskNum}.wav`;
+    function initGEX() {
+        const audio = document.getElementById('xAudio');
+        const source = document.getElementById('xSource');
+        
+        const audioPath = `../../assets/gexaudio/GEX${taskNum}.wav`;
         source.src = audioPath;
         audio.load();
 
-    document.getElementById('x-title').innerText = `GE-X: MISSION ${taskNum.padStart(2, '0')}`;
-}
+        document.getElementById('x-title').innerText = `GE-X: MISSION ${taskNum.padStart(2, '0')}`;
+    }
 
-    // استماع لطلب صفحة المهام (Arena)
     window.addEventListener('message', function(event) {
         if (event.data.type === 'REQUEST_MISSION_DATA') {
             collectAndSend();
@@ -184,17 +169,18 @@ const audioPath = `../../assets/gexaudio/GEX${taskNum}.wav`;
 
         if (!s1 || !s2 || !s3) {
             document.querySelectorAll('.x-input-field').forEach(input => {
-                if(!input.value) input.style.borderBottomColor = '#ff4444';
+                if(!input.value) input.parentElement.style.borderColor = '#ff4444';
+                else input.parentElement.style.borderColor = 'rgba(188, 19, 254, 0.15)';
             });
             window.parent.postMessage({ type: 'MISSION_INCOMPLETE' }, '*');
             return; 
         }
 
-        const finalAnswers = `${s1}, ${s2}, ${s3}`;
-
         window.parent.postMessage({ 
             type: 'MISSION_ANSWERS', 
-            answers: finalAnswers
+            activityCode: 'GEX',
+            answers: `${s1} | ${s2} | ${s3}`,
+            missionNum: taskNum
         }, '*');
     }
 
