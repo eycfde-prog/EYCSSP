@@ -3,128 +3,127 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Seeds Mission | Gear Optimized</title>
+    <title>Story Seeds | Creative Writing | Jessy Edition</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
     <style>
         :root {
             --neon-blue: #00f2ff;
             --neon-purple: #bc13fe;
             --odd-red: #ff003c;
-            --glass-bg: rgba(15, 15, 25, 0.9);
+            --glass-deep: rgba(10, 10, 20, 0.95);
             --border-glow: rgba(188, 19, 254, 0.3);
         }
 
         body {
             font-family: 'Rajdhani', sans-serif;
             background: transparent;
-            color: white;
+            color: #fff;
             margin: 0; padding: 15px;
             direction: ltr;
-            padding-bottom: 100px; /* مساحة للعداد العائم */
+            padding-bottom: 80px;
         }
 
-        /* تنسيق الهيدر والكلمات */
         .header-box {
-            text-align: center; margin-bottom: 15px;
-            padding: 10px; border-radius: 12px;
+            text-align: center; margin-bottom: 20px;
+            padding: 15px; border-radius: 15px;
             border: 1px solid var(--border-glow);
-            background: linear-gradient(135deg, rgba(188, 19, 254, 0.1), transparent);
+            background: rgba(188, 19, 254, 0.05);
+            backdrop-filter: blur(10px);
         }
 
-        .header-box h1 { font-family: 'Orbitron'; font-size: 0.9rem; color: var(--neon-purple); letter-spacing: 3px; }
+        .header-box h1 { 
+            font-family: 'Orbitron'; font-size: 1rem; 
+            color: var(--neon-purple); letter-spacing: 4px; margin: 0;
+            text-transform: uppercase;
+        }
 
         .words-grid {
             display: grid; 
             grid-template-columns: repeat(3, 1fr);
-            gap: 8px; margin-bottom: 15px;
+            gap: 10px; margin-bottom: 20px;
         }
 
         .word-card {
-            background: rgba(0, 0, 0, 0.4);
+            background: rgba(0, 0, 0, 0.5);
             border: 1px solid rgba(0, 242, 255, 0.2);
-            padding: 8px 2px; text-align: center;
-            font-family: 'Orbitron'; font-size: 0.65rem;
-            color: var(--neon-blue); border-radius: 8px;
-            backdrop-filter: blur(5px); position: relative;
+            padding: 10px 5px; text-align: center;
+            font-family: 'Orbitron'; font-size: 0.7rem;
+            color: var(--neon-blue); border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
         }
 
-        .word-card.odd { border-color: var(--odd-red); color: var(--odd-red); }
-        .word-card.odd::before {
-            content: 'ODD'; position: absolute; top: -5px; left: 50%;
+        .word-card.odd { 
+            border-color: var(--odd-red); 
+            color: var(--odd-red);
+            background: rgba(255, 0, 60, 0.05);
+            position: relative;
+        }
+        
+        .word-card.odd::after {
+            content: 'CORRUPTED SEED'; position: absolute; bottom: -8px; left: 50%;
             transform: translateX(-50%); background: var(--odd-red);
-            color: white; padding: 1px 4px; border-radius: 3px; font-size: 6px;
+            color: white; padding: 1px 5px; border-radius: 3px; font-size: 5px;
+            white-space: nowrap;
         }
 
-        /* منطقة الكتابة */
         .story-zone { position: relative; }
 
         textarea {
-            width: 100%; height: 320px;
-            background: rgba(0,0,0,0.6);
-            border: 1px solid rgba(188, 19, 254, 0.3); 
-            color: #eee; padding: 15px; font-size: 1rem;
+            width: 100%; height: 350px;
+            background: var(--glass-deep);
+            border: 1px solid var(--border-glow); 
+            color: #e0e0e0; padding: 20px; font-size: 1.1rem;
             font-family: 'Rajdhani'; resize: none; outline: none; 
-            box-sizing: border-box; border-radius: 15px;
-            line-height: 1.5; transition: 0.3s;
+            box-sizing: border-box; border-radius: 20px;
+            line-height: 1.6; transition: 0.4s;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
         }
 
-        textarea:focus { border-color: var(--neon-blue); }
+        textarea:focus { 
+            border-color: var(--neon-blue);
+            box-shadow: inset 0 0 20px rgba(0, 242, 255, 0.05), 0 0 15px rgba(0, 242, 255, 0.1);
+        }
 
-        /* العداد العائم (Floating Circle) */
+        /* العداد العائم المطور */
         .floating-counter {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            width: 65px;
-            height: 65px;
-            background: var(--glass-bg);
+            position: fixed; bottom: 25px; right: 25px;
+            width: 70px; height: 70px;
+            background: var(--glass-deep);
             border: 2px solid var(--neon-blue);
             border-radius: 50%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 0 20px rgba(0, 242, 255, 0.3);
-            z-index: 9999;
-            pointer-events: none; /* لا يعيق اللمس */
-            transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            box-shadow: 0 0 20px rgba(0, 242, 255, 0.2);
+            z-index: 1000; transition: 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
         }
 
         .floating-counter .num {
-            font-family: 'Orbitron';
-            font-size: 1.1rem;
-            font-weight: bold;
+            font-family: 'Orbitron'; font-size: 1.2rem;
             color: var(--neon-blue);
         }
 
-        .floating-counter .label {
-            font-size: 0.5rem;
-            color: #888;
-            text-transform: uppercase;
-        }
+        .floating-counter .label { font-size: 0.6rem; color: #666; text-transform: uppercase; }
 
         .floating-counter.ready {
             border-color: #00ff88;
-            box-shadow: 0 0 25px rgba(0, 255, 136, 0.5);
+            background: rgba(0, 255, 136, 0.05);
+            box-shadow: 0 0 30px rgba(0, 255, 136, 0.4);
+            transform: scale(1.1);
         }
         
         .floating-counter.ready .num { color: #00ff88; }
-
-        /* إخفاء زر السبمت الداخلي كما طلبت */
-        #submit-btn { display: none; }
-
     </style>
 </head>
 <body>
 
     <div class="header-box">
-        <h1 id="mission-title">MISSION: STORY SEEDS 01</h1>
+        <h1 id="mission-title">STORY SEEDS: DECODING...</h1>
     </div>
 
     <div class="words-grid" id="words-container"></div>
 
     <div class="story-zone">
-        <textarea id="story-input" oninput="updateCount()" placeholder="Begin your orbital log... Use all 6 data seeds (words) above."></textarea>
+        <textarea id="story-input" oninput="updateCount()" placeholder="Initiate writing sequence... Use all 6 data seeds. Target: 120+ words."></textarea>
     </div>
 
     <div class="floating-counter" id="counter-circle">
@@ -151,7 +150,7 @@
 
     function loadSeeds() {
         const words = seedGroups[task] || seedGroups["1"];
-        document.getElementById('mission-title').innerText = `STORY SEEDS ${task.padStart(2, '0')}`;
+        document.getElementById('mission-title').innerText = `STORY SEEDS | MISSION ${task.padStart(2, '0')}`;
         const container = document.getElementById('words-container');
         container.innerHTML = words.map((w, i) => `
             <div class="word-card ${i === 5 ? 'odd' : ''}">${w}</div>
@@ -160,42 +159,32 @@
 
     function updateCount() {
         const text = document.getElementById('story-input').value.trim();
-        const words = text ? text.split(/\s+/).length : 0;
+        const words = text ? text.split(/\s+/).filter(w => w.length > 0).length : 0;
         
-        const countNum = document.getElementById('count-num');
+        document.getElementById('count-num').innerText = words;
         const circle = document.getElementById('counter-circle');
         
-        countNum.innerText = words;
-        
-        // تغيير لون العداد عند بلوغ الهدف (120 كلمة)
-        if(words >= 120) {
-            circle.classList.add('ready');
-        } else {
-            circle.classList.remove('ready');
-        }
-    }
-
-    // الدالة التي يتم استدعاؤها من صفحة الأرينا الخارجية
-    function submitStory() {
-        const text = document.getElementById('story-input').value.trim();
-        const wordCount = text ? text.split(/\s+/).length : 0;
-
-        if (wordCount < 120) {
-            alert("❌ HQ: Story too short! Minimum 120 words required.");
-            return;
-        }
-
-        window.parent.postMessage({
-            type: 'MISSION_ANSWERS',
-            activityCode: 'SS',
-            answers: text, 
-            missionNum: task
-        }, '*');
+        if(words >= 120) circle.classList.add('ready');
+        else circle.classList.remove('ready');
     }
 
     window.addEventListener('message', function(event) {
         if (event.data.type === 'REQUEST_MISSION_DATA') {
-            submitStory();
+            const text = document.getElementById('story-input').value.trim();
+            const wordCount = text ? text.split(/\s+/).filter(w => w.length > 0).length : 0;
+
+            if (wordCount < 120) {
+                // إرسال تنبيه للأب بأن المهمة لم تكتمل
+                window.parent.postMessage({ type: 'MISSION_INCOMPLETE', message: "Minimum 120 words required." }, '*');
+                return;
+            }
+
+            window.parent.postMessage({
+                type: 'MISSION_ANSWERS',
+                activityCode: 'SS',
+                answers: text, 
+                missionNum: task
+            }, '*');
         }
     });
 
