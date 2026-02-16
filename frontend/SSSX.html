@@ -3,112 +3,102 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SSSX | Super Star Translation | Glassy</title>
+    <title>SSSX | Super Star Translation | Jessy Edition</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@500;700&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root {
             --star-gold: #ffcc00;
             --neon-pink: #ff007f;
-            --glass-bg: rgba(15, 10, 25, 0.85);
-            --border-glow: rgba(255, 204, 0, 0.3);
+            --glass-deep: rgba(10, 5, 20, 0.95);
+            --border-glow: rgba(255, 204, 0, 0.25);
         }
 
         body {
             font-family: 'Rajdhani', sans-serif;
-            background: transparent;
-            color: white; margin: 0; padding: 15px; direction: ltr;
-            overflow-x: hidden;
+            background: transparent; color: white; 
+            margin: 0; padding: 15px; direction: ltr;
         }
 
-        .sssx-container { max-width: 850px; margin: 0 auto; }
+        .sssx-container { max-width: 800px; margin: 0 auto; }
 
         .header-sssx {
-            text-align: center; margin-bottom: 30px;
-            padding: 15px; border-radius: 20px;
-            background: linear-gradient(90deg, transparent, rgba(255, 204, 0, 0.1), transparent);
+            text-align: center; margin-bottom: 25px;
+            padding: 20px; border-radius: 20px;
+            background: rgba(255, 204, 0, 0.03);
             border: 1px solid var(--border-glow);
+            backdrop-filter: blur(10px);
         }
 
         .header-sssx h1 {
             font-family: 'Orbitron'; color: var(--star-gold);
-            letter-spacing: 6px; margin: 0; font-size: 1.2rem;
-            text-shadow: 0 0 20px rgba(255, 204, 0, 0.5);
+            letter-spacing: 5px; margin: 0; font-size: 1.1rem;
+            text-shadow: 0 0 15px rgba(255, 204, 0, 0.4);
         }
 
         .lyrics-source {
-            background: var(--glass-bg);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 30px; border-radius: 20px;
-            margin-bottom: 35px; line-height: 1.8;
-            font-family: 'Amiri', serif; font-size: 1.5rem;
+            background: var(--glass-deep);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 35px 25px; border-radius: 25px;
+            margin-bottom: 30px; line-height: 1.9;
+            font-family: 'Amiri', serif; font-size: 1.6rem;
             text-align: right; color: #fff;
             position: relative;
-            box-shadow: 0 15px 40px rgba(0,0,0,0.4);
-            border-right: 6px solid var(--neon-pink);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+            border-right: 5px solid var(--neon-pink);
         }
 
         .lyrics-source::before {
-            content: 'ARABIC LYRICS'; position: absolute; top: 10px; left: 15px;
+            content: 'SOURCE MATERIAL'; position: absolute; top: 12px; left: 20px;
             font-family: 'Orbitron'; font-size: 8px; color: var(--neon-pink);
-            letter-spacing: 2px; opacity: 0.6;
+            letter-spacing: 3px; opacity: 0.7;
         }
 
         .translation-zone {
-            background: rgba(0, 0, 0, 0.4); border-radius: 20px;
-            padding: 25px; border: 1px solid rgba(255,204,0,0.15);
-            backdrop-filter: blur(10px);
-            position: relative;
+            background: rgba(255, 255, 255, 0.02); border-radius: 25px;
+            padding: 25px; border: 1px solid rgba(255,204,0,0.1);
+            backdrop-filter: blur(15px); position: relative;
         }
 
         .translation-zone label {
             display: block; font-family: 'Orbitron'; color: var(--star-gold);
-            font-size: 10px; margin-bottom: 15px; letter-spacing: 2px;
-            text-transform: uppercase;
+            font-size: 9px; margin-bottom: 15px; letter-spacing: 2px;
         }
 
         textarea {
-            width: 100%; height: 240px; background: transparent; border: none;
-            color: #f0f0f0; font-family: 'Rajdhani'; font-size: 1.25rem;
+            width: 100%; height: 260px; background: transparent; border: none;
+            color: #e0e0e0; font-family: 'Rajdhani'; font-size: 1.3rem;
             line-height: 1.6; outline: none; resize: none; box-sizing: border-box;
             border-left: 3px solid var(--star-gold); padding-left: 20px;
-            transition: 0.3s;
+            transition: 0.4s;
         }
 
-        textarea:focus {
-            background: rgba(255, 204, 0, 0.02);
-            border-left-width: 6px;
-        }
+        textarea:focus { border-left-width: 8px; background: rgba(255, 204, 0, 0.01); }
 
         .rules-bar {
-            display: flex; justify-content: space-between; flex-wrap: wrap;
-            margin-top: 25px; font-family: 'Orbitron'; font-size: 8px;
-            gap: 10px;
+            display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap;
         }
 
-        .rule-item { 
-            border: 1px solid rgba(255,255,255,0.1); padding: 5px 12px; 
-            border-radius: 50px; color: #666; transition: 0.4s;
-        }
-        
-        .rule-active { 
-            color: var(--star-gold); border-color: var(--star-gold); 
-            box-shadow: 0 0 10px rgba(255, 204, 0, 0.2);
+        .rule-tag {
+            font-family: 'Orbitron'; font-size: 7px; padding: 4px 10px;
+            border-radius: 4px; border: 1px solid rgba(255,255,255,0.1);
+            color: #888; letter-spacing: 1px;
         }
 
-        .ssb-badge {
+        .rule-tag.active { color: var(--star-gold); border-color: var(--star-gold); }
+
+        #ssb-nomination {
             display: none; margin-top: 30px; 
-            background: linear-gradient(45deg, #000, #111);
+            background: linear-gradient(45deg, #000, #1a1a1a);
             border: 2px solid var(--star-gold);
-            color: var(--star-gold); font-family: 'Orbitron'; font-weight: bold;
-            padding: 20px; border-radius: 15px; text-align: center;
-            letter-spacing: 2px;
-            box-shadow: 0 0 30px rgba(255, 204, 0, 0.3);
-            animation: starPulse 2s infinite;
+            color: var(--star-gold); font-family: 'Orbitron';
+            padding: 25px; border-radius: 20px; text-align: center;
+            box-shadow: 0 0 40px rgba(255, 204, 0, 0.3);
+            animation: glowPulse 2s infinite;
         }
 
-        @keyframes starPulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.02); box-shadow: 0 0 40px var(--star-gold); }
+        @keyframes glowPulse {
+            0%, 100% { box-shadow: 0 0 20px rgba(255, 204, 0, 0.2); }
+            50% { box-shadow: 0 0 50px rgba(255, 204, 0, 0.5); transform: translateY(-2px); }
         }
     </style>
 </head>
@@ -116,27 +106,27 @@
 
 <div class="sssx-container">
     <div class="header-sssx">
-        <h1 id="mission-title">SSSX: SUPER STAR TRANSLATION</h1>
+        <h1 id="mission-title">SSSX: LYRICAL INTERPRETATION</h1>
     </div>
 
     <div class="lyrics-source">
-        <div id="lyrics-content">LOADING TRANSMISSION...</div>
+        <div id="lyrics-content">SYNCING WITH SOURCE...</div>
     </div>
 
     <div class="translation-zone">
-        <label>Poetic Interpretation (English)</label>
-        <textarea id="xlateInput" placeholder="Capture the soul and melody..."></textarea>
+        <label>Poetic Reconstruction (English)</label>
+        <textarea id="xlateInput" placeholder="Decode the emotion, reconstruct the soul..."></textarea>
         
         <div class="rules-bar">
-            <span class="rule-item rule-active">NON-LITERAL</span>
-            <span class="rule-item rule-active">POETIC_FLOW</span>
-            <span class="rule-item rule-active">EMOTIONAL_DEPTH</span>
-            <span class="rule-item">SSS_ELIGIBLE</span>
+            <div class="rule-tag active">DYNAMIC_TRANSLATION</div>
+            <div class="rule-tag active">METAPHOR_RETAIN</div>
+            <div class="rule-tag active">VOCAL_RHYTHM</div>
         </div>
     </div>
 
-    <div id="ssb-nomination" class="ssb-badge">
-        ✨ SSS STATUS ACHIEVED: ELITE TRANSLATION ✨
+    <div id="ssb-nomination">
+        ✨ SUPER STAR STATUS DETECTED ✨<br>
+        <span style="font-size: 10px; opacity: 0.8; margin-top: 10px; display: block;">ELITE LEVEL INTERPRETATION ACHIEVED</span>
     </div>
 </div>
 
@@ -151,7 +141,7 @@ const songData = {
     "7": { lyrics: "الحلوة دي قامت تعجن في الفجرية.. والديك بيدن: كوكو كوكو<br>يلا بنا على باب الله يا صنايعية.. يجعل صباحك صباح الخير يا اسطى عطية<br>طلعت يا محلا نورها.. شمس الشموسة" },
     "8": { lyrics: "البنت قالت فستانى منشور على الشط التانى<br>خدنى المراكبى و عدانى و رجعت فى القمره الليله<br>ياللى صافحتك بغوايش عايش و لا لغيرك عايش<br>قلبى و لا البحر الطايش عينى و لا الجمرة الليله" },
     "9": { lyrics: "أهو ده اللي صار وادي اللي كان.. مالكش حق تلوم عليّ<br>تلوم عليّ إزاي يا سيدنا.. وكل شبر في أرضنا نطق وقال يا أهلنا<br>مصر يا أم العجايب.. شعبك أصيل والخصم عايب" },
-    "10": { lyrics: "يا حبيباً زرت يومـاً أيكـه.. طائر الشـوق أغنـي ألمـي<br>لك إبطـاء المـذل المنعـم.. وتجنـي القـادر المحتكـم<br>أعطني حريتي أطلـق يديّ.. إنني أعطيت ما استبقيت شيَّ" }
+    "10": { lyrics: "أعطني حريتي أطلق يديّ.. إنني أعطيت ما استبقيت شيَّ<br>آه من قيدك أدمى معصمي.. لم أبقهِ وما أبقى عليَّ<br>ما احتفاظي بعهودٍ لم تصنها.. وإلامَ الأسر والدنيا لديَّ" }
 };
 
 const urlParams = new URLSearchParams(window.location.search);
@@ -160,28 +150,22 @@ const taskNum = urlParams.get('task') || "1";
 function initSSSX() {
     const song = songData[taskNum] || songData["1"];
     document.getElementById('lyrics-content').innerHTML = song.lyrics;
-    document.getElementById('mission-title').innerText = `SSSX: MISSION ${taskNum.padStart(2, '0')}`;
-}
-
-function submitTranslation() {
-    const translation = document.getElementById('xlateInput').value.trim();
-    
-    if(!translation) {
-        alert("❌ SYSTEM: Translation data required for analysis.");
-        return;
-    }
-
-    window.parent.postMessage({ 
-        type: 'MISSION_ANSWERS', 
-        activityCode: 'SSSX', 
-        answers: translation, 
-        missionNum: taskNum 
-    }, '*');
+    document.getElementById('mission-title').innerText = `SSSX | MISSION ${taskNum.padStart(2, '0')}`;
 }
 
 window.addEventListener('message', function(event) {
     if (event.data.type === 'REQUEST_MISSION_DATA') {
-        submitTranslation();
+        const translation = document.getElementById('xlateInput').value.trim();
+        if(!translation) {
+            window.parent.postMessage({ type: 'MISSION_INCOMPLETE', message: "Interpretation required." }, '*');
+            return;
+        }
+        window.parent.postMessage({ 
+            type: 'MISSION_ANSWERS', 
+            activityCode: 'SSSX', 
+            answers: translation, 
+            missionNum: taskNum 
+        }, '*');
     }
     if (event.data.type === 'SHOW_SSB') {
         const badge = document.getElementById('ssb-nomination');
