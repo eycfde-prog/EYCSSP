@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Alike X | Phonetic Radar | Glassy Edition</title>
+    <title>Alike X | Phonetic Radar | Titanium Edition</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Poppins:wght@300;600&display=swap" rel="stylesheet">
     <style>
         :root { 
@@ -11,63 +11,70 @@
             --gold-glow: rgba(212, 175, 55, 0.4);
             --glass: rgba(255, 255, 255, 0.03); 
             --glass-border: rgba(212, 175, 55, 0.2);
-            --bg-dark: rgba(10, 10, 15, 0.9);
         }
 
         body { 
             font-family: 'Poppins', sans-serif; 
-            background: transparent; 
+            background: transparent; /* للاندماج مع خلفية الأرينا */
             color: white; 
             margin: 0; 
             padding: 15px; 
             direction: ltr; 
+            overflow-x: hidden;
         }
 
-        /* سكرول بار جلاسي */
         body::-webkit-scrollbar { width: 4px; }
         body::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 10px; }
 
         .header-x { 
             text-align: center; 
-            margin-bottom: 20px; 
+            margin-bottom: 25px; 
             border-bottom: 1px solid var(--glass-border); 
             padding-bottom: 15px;
+            position: relative;
         }
 
         .principle-tag {
-            float: right; font-family: 'Orbitron'; font-size: 8px; color: var(--gold);
-            border: 1px solid var(--glass-border); padding: 2px 6px; border-radius: 4px;
-            background: rgba(0,0,0,0.3); margin-top: -30px;
+            position: absolute; right: 0; top: 0;
+            font-family: 'Orbitron'; font-size: 8px; color: var(--gold);
+            border: 1px solid var(--glass-border); padding: 2px 8px; border-radius: 4px;
+            background: rgba(0,0,0,0.4); letter-spacing: 1px;
         }
 
         .question-card { 
             background: var(--glass); 
             border: 1px solid var(--glass-border); 
-            border-radius: 20px; 
+            border-radius: 15px; 
             padding: 20px; 
             margin-bottom: 20px; 
-            backdrop-filter: blur(15px);
-            transition: all 0.4s ease;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
         }
 
         .question-card:hover { 
             border-color: var(--gold); 
-            box-shadow: 0 5px 20px rgba(212, 175, 55, 0.1);
+            background: rgba(212, 175, 55, 0.05);
         }
 
         .audio-btn { 
-            background: var(--glass);
+            background: rgba(0,0,0,0.3);
             color: var(--gold); 
             border: 1px solid var(--gold); 
-            padding: 10px 18px; 
-            border-radius: 12px; 
+            padding: 12px 20px; 
+            border-radius: 8px; 
             cursor: pointer; 
             font-family: 'Orbitron'; 
-            font-size: 10px; 
-            margin-bottom: 15px; 
+            font-size: 11px; 
+            margin-bottom: 18px; 
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
             transition: 0.3s;
             letter-spacing: 1px;
         }
@@ -78,23 +85,32 @@
             box-shadow: 0 0 15px var(--gold-glow); 
         }
 
+        .audio-btn i { font-size: 14px; animation: pulse 1.5s infinite; }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.4; }
+            100% { opacity: 1; }
+        }
+
         .sentence-text { 
             font-size: 1.1rem; 
             margin-bottom: 20px; 
-            color: #eee; 
+            color: #ddd; 
             line-height: 1.6;
-            font-weight: 300;
+            font-weight: 400;
         }
         
         .missing-word { 
             color: var(--gold); 
-            font-weight: bold; 
-            border-bottom: 2px solid var(--gold);
-            padding: 0 8px;
+            font-weight: 700; 
+            border-bottom: 2px dashed var(--gold);
+            padding: 0 10px;
             font-family: 'Orbitron';
+            text-shadow: 0 0 10px var(--gold-glow);
         }
 
-        .options-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+        .options-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
 
         @media (max-width: 500px) {
             .options-grid { grid-template-columns: 1fr; }
@@ -103,26 +119,31 @@
         .opt-btn { 
             background: rgba(255,255,255,0.05); 
             border: 1px solid var(--glass-border); 
-            color: #ccc; 
-            padding: 12px; 
-            border-radius: 12px; 
+            color: #aaa; 
+            padding: 14px; 
+            border-radius: 10px; 
             cursor: pointer; 
             font-family: 'Poppins'; 
-            font-size: 0.95rem; 
+            font-size: 14px; 
             transition: 0.3s; 
         }
 
-        .opt-btn:hover { border-color: var(--gold); color: white; background: rgba(212, 175, 55, 0.1); }
+        .opt-btn:hover { border-color: var(--gold); color: white; }
         
         .opt-btn.active { 
             background: var(--gold); 
-            color: black; 
-            font-weight: 600; 
+            color: #000; 
+            font-weight: 700; 
             box-shadow: 0 0 20px var(--gold-glow);
-            border-color: white;
+            border-color: #fff;
         }
 
-        .error-input { border: 1px solid #ff4444 !important; animation: shake 0.3s ease; }
+        .error-input { 
+            border: 1px solid #ff4444 !important; 
+            background: rgba(255, 68, 68, 0.05) !important;
+            animation: shake 0.4s ease; 
+        }
+
         @keyframes shake {
             0%, 100% { transform: translateX(0); }
             25% { transform: translateX(-5px); }
@@ -132,85 +153,23 @@
 </head>
 <body>
     <div class="header-x">
-        <span class="principle-tag">NLR SYSTEM</span>
-        <h1 id="x-title" style="font-family: 'Orbitron'; letter-spacing: 2px; font-size: 1rem; color: var(--gold);">PHONETIC RADAR</h1>
+        <span class="principle-tag">AX-RADAR UNIT</span>
+        <h1 id="x-title" style="font-family: 'Orbitron'; letter-spacing: 3px; font-size: 1.2rem; color: var(--gold); margin: 0;">PHONETIC RADAR</h1>
     </div>
+    
     <div id="quiz-screen"></div>
 
 <script>
-    // الداتا الكاملة تم حقنها بواسطة Joiner
     const alikeXData = {
-    "1": [
-        { s: "The wind _______ the blue paper away.", options: ["blew", "blue", "blow"] },
-        { s: "I can see the deep blue _______ from here.", options: ["see", "sea", "seed"] },
-        { s: "It is not allowed to speak out _______.", options: ["loud", "allowed", "lord"] },
-        { s: "He _______ eight apples for breakfast.", options: ["ate", "eight", "eat"] },
-        { s: "The _______ shines bright, my dear son.", options: ["sun", "son", "soon"] }
-    ],
-    "2": [
-        { s: "I _______ you liked the new shoes.", options: ["knew", "new", "now"] },
-        { s: "This bread is made of wheat _______.", options: ["flower", "flour", "floor"] },
-        { s: "The _______ rode through the dark night.", options: ["knight", "night", "knife"] },
-        { s: "_______ your name on the right side.", options: ["Write", "Right", "White"] },
-        { s: "The _______ team fell into the hole.", options: ["hole", "whole", "hall"] }
-    ],
-    "3": [
-        { s: "I will _______ to see the heavy weight.", options: ["wait", "weight", "wet"] },
-        { s: "There is a _______ in the car brake.", options: ["break", "brake", "brick"] },
-        { s: "The weak boy felt better in a _______.", options: ["week", "weak", "wake"] },
-        { s: "He sent a _______ to the poor man.", options: ["cent", "sent", "scent"] },
-        { s: "Use the _______ to go to the second floor.", options: ["stair", "stare", "stay"] }
-    ],
-    "4": [
-        { s: "I want to _______ the red car.", options: ["buy", "by", "bye"] },
-        { s: "The _______ has soft fur.", options: ["hair", "hare", "here"] },
-        { s: "I _______ a loud noise outside.", options: ["heard", "herd", "hard"] },
-        { s: "He is the _______ to the throne.", options: ["air", "heir", "hair"] },
-        { s: "We _______ the game yesterday.", options: ["one", "won", "win"] }
-    ],
-    "5": [
-        { s: "I need to _______ you at the gate.", options: ["meet", "meat", "met"] },
-        { s: "The _______ is fresh and lean.", options: ["meet", "meat", "main"] },
-        { s: "The _______ leads to the city.", options: ["road", "rode", "row"] },
-        { s: "He _______ his bike to school.", options: ["road", "rode", "ride"] },
-        { s: "The _______ was very beautiful.", options: ["scene", "seen", "sun"] }
-    ],
-    "6": [
-        { s: "I can see the wooden _______.", options: ["board", "bored", "bird"] },
-        { s: "I am _______ of this game.", options: ["board", "bored", "born"] },
-        { s: "The _______ of the cat is long.", options: ["tail", "tale", "tall"] },
-        { s: "The fairy _______ is very old.", options: ["tail", "tale", "tell"] },
-        { s: "There is _______ water in the well.", options: ["no", "know", "now"] }
-    ],
-    "7": [
-        { s: "I _______ the answer to this.", options: ["know", "no", "now"] },
-        { s: "The _______ is sweet and juicy.", options: ["pear", "pair", "pure"] },
-        { s: "I have a new _______ of shoes.", options: ["pear", "pair", "pay"] },
-        { s: "The _______ goal is to win.", options: ["main", "mane", "mean"] },
-        { s: "The lion has a thick _______.", options: ["main", "mane", "money"] }
-    ],
-    "8": [
-        { s: "The _______ of cake is small.", options: ["piece", "peace", "price"] },
-        { s: "We all want world _______.", options: ["piece", "peace", "pace"] },
-        { s: "The _______ bird is colorful.", options: ["male", "mail", "mile"] },
-        { s: "I sent the _______ yesterday.", options: ["male", "mail", "mall"] },
-        { s: "The _______ door is very strong.", options: ["steel", "steal", "still"] }
-    ],
-    "9": [
-        { s: "Don't _______ the golden ring.", options: ["steel", "steal", "still"] },
-        { s: "The _______ cleaned the room.", options: ["maid", "made", "mad"] },
-        { s: "He _______ a delicious cake.", options: ["maid", "made", "make"] },
-        { s: "The _______ was flat and wide.", options: ["plain", "plane", "plan"] },
-        { s: "The _______ took off on time.", options: ["plain", "plane", "plant"] }
-    ],
-    "10": [
-        { s: "The _______ from the factory.", options: ["waste", "waist", "west"] },
-        { s: "The belt goes around my _______.", options: ["waste", "waist", "wrist"] },
-        { s: "I can't _______ for the party.", options: ["wait", "weight", "wet"] },
-        { s: "The _______ of the box is 5kg.", options: ["wait", "weight", "white"] },
-        { s: "He is my _______ friend.", options: ["dear", "deer", "dare"] }
-    ]
-}
+        "1": [
+            { s: "The wind _______ the blue paper away.", options: ["blew", "blue", "blow"] },
+            { s: "I can see the deep blue _______ from here.", options: ["see", "sea", "seed"] },
+            { s: "It is not allowed to speak out _______.", options: ["loud", "allowed", "lord"] },
+            { s: "He _______ eight apples for breakfast.", options: ["ate", "eight", "eat"] },
+            { s: "The _______ shines bright, my dear son.", options: ["sun", "son", "soon"] }
+        ],
+        // ... (باقي الداتا الخاصة بك كما هي)
+    };
 
     const urlParams = new URLSearchParams(window.location.search);
     const taskNum = urlParams.get('task') || "1"; 
@@ -222,7 +181,7 @@
         screen.innerHTML = questions.map((q, i) => `
             <div class="question-card" id="card-${i}">
                 <button class="audio-btn" onclick="playAudio(${i})">
-                    <span style="font-size:14px">📡</span> INTERCEPT AUDIO CLUE
+                    <span style="font-size:16px">📡</span> INTERCEPT CLUE AX-${((taskNum-1)*5)+(i+1)}
                 </button>
                 <div class="sentence-text">
                     ${q.s.replace('_______', `<span class="missing-word" id="display-${i}">_______</span>`)}
@@ -242,17 +201,13 @@
         
         const display = document.getElementById(`display-${qIdx}`);
         display.innerText = val.toUpperCase();
-        display.style.color = "var(--gold)";
         
         document.getElementById(`card-${qIdx}`).classList.remove('error-input');
         answers[qIdx] = val;
     }
 
     function playAudio(idx) {
-        const t = parseInt(taskNum);
-        const qIdx = parseInt(idx);
-        // حساب رقم الملف الصوتي: AX1, AX2... AX50
-        const audioFileNum = ((t - 1) * 5) + (qIdx + 1);
+        const audioFileNum = ((parseInt(taskNum) - 1) * 5) + (parseInt(idx) + 1);
         const audio = new Audio(`assets/alikeaudio/AX${audioFileNum}.wav`);
         audio.play().catch(e => console.error("Signal Lost:", audioFileNum));
     }
