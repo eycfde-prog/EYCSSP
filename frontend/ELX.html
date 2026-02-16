@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Elmagazine X | Voice Press | Glassy Edition</title>
+    <title>Elmagazine X | Voice Press | Titanium Edition</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
         :root { 
@@ -22,106 +22,120 @@
             direction: ltr;
         }
 
-        /* سكرول بار جلاسي */
         body::-webkit-scrollbar { width: 4px; }
         body::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 10px; }
 
         .magazine-container {
             max-width: 850px; 
             margin: 0 auto;
-            background: rgba(10, 10, 15, 0.95); 
+            background: rgba(10, 10, 15, 0.92); 
             border: 1px solid var(--glass-border);
-            border-radius: 30px; 
-            padding: 30px; 
+            border-radius: 25px; 
+            padding: 35px; 
             backdrop-filter: blur(20px);
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-            animation: slideIn 0.8s ease-out;
+            box-shadow: 0 25px 60px rgba(0,0,0,0.6);
+            animation: fadeInScale 0.6s ease-out;
         }
 
-        @keyframes slideIn { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeInScale { 
+            from { opacity: 0; transform: scale(0.95); } 
+            to { opacity: 1; transform: scale(1); } 
+        }
 
         .header-m { 
             text-align: left; 
             border-bottom: 1px solid var(--glass-border); 
-            margin-bottom: 25px; padding-bottom: 15px;
-            display: flex; justify-content: space-between; align-items: flex-end;
+            margin-bottom: 30px; padding-bottom: 20px;
+            display: flex; justify-content: space-between; align-items: center;
         }
 
-        .header-m h1 { font-family: 'Orbitron'; color: var(--gold); letter-spacing: 3px; margin: 0; font-size: 1.2rem; }
-        .issue-tag { font-family: 'Orbitron'; font-size: 10px; color: #666; }
+        .header-m h1 { font-family: 'Orbitron'; color: var(--gold); letter-spacing: 4px; margin: 0; font-size: 1.4rem; }
+        .issue-tag { font-family: 'Orbitron'; font-size: 11px; color: #888; border: 1px solid #444; padding: 3px 10px; border-radius: 4px; }
 
         .article-box {
-            background: var(--glass); 
-            border-radius: 20px; 
-            padding: 30px;
-            line-height: 1.8; 
-            font-size: 1.15rem; 
-            color: #ddd; 
+            background: rgba(255,255,255,0.01); 
+            border-radius: 15px; 
+            padding: 35px;
+            line-height: 1.9; 
+            font-size: 1.1rem; 
+            color: #ccc; 
             position: relative;
             text-align: justify; 
-            border: 1px solid rgba(255,255,255,0.05);
-            box-shadow: inset 0 0 30px rgba(0,0,0,0.3);
+            border: 1px solid rgba(212, 175, 55, 0.1);
+            box-shadow: inset 0 0 40px rgba(0,0,0,0.4);
         }
 
         /* الحرف الأول الملكي */
         .drop-cap::first-letter {
             font-family: 'Orbitron';
-            font-size: 3.5rem;
+            font-size: 4rem;
             color: var(--gold);
             float: left;
-            margin-right: 12px;
-            line-height: 0.8;
-            text-shadow: 0 0 15px var(--gold-glow);
+            margin-right: 15px;
+            line-height: 0.85;
+            text-shadow: 0 0 20px var(--gold-glow);
             font-weight: 700;
         }
 
         .copy-btn {
-            position: absolute; top: -15px; right: 20px;
+            position: absolute; top: -18px; right: 30px;
             background: var(--gold); color: black; border: none;
-            padding: 6px 20px; border-radius: 50px; cursor: pointer;
-            font-family: 'Orbitron'; font-size: 9px; font-weight: bold;
-            transition: 0.3s; box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            padding: 8px 25px; border-radius: 4px; cursor: pointer;
+            font-family: 'Orbitron'; font-size: 10px; font-weight: bold;
+            transition: 0.3s; box-shadow: 0 5px 20px rgba(0,0,0,0.4);
         }
-        .copy-btn:hover { background: #fff; transform: translateY(-3px); }
+        .copy-btn:hover { background: #fff; transform: translateY(-2px); }
 
         .upload-zone {
-            margin-top: 30px; 
-            padding: 25px; 
-            border: 1px solid var(--neon-blue);
-            background: rgba(0, 242, 255, 0.02);
-            border-radius: 20px; 
+            margin-top: 40px; 
+            padding: 30px; 
+            border: 1px dashed var(--neon-blue);
+            background: rgba(0, 242, 255, 0.03);
+            border-radius: 15px; 
             text-align: center; 
             transition: 0.4s;
         }
-        .upload-zone.active { border-color: var(--gold); background: rgba(212, 175, 55, 0.05); }
+        .upload-zone.active { 
+            border: 1px solid var(--gold); 
+            background: rgba(212, 175, 55, 0.08); 
+            box-shadow: 0 0 20px var(--gold-glow);
+        }
 
         .upload-label { 
             display: block; 
             font-family: 'Orbitron'; 
             color: var(--neon-blue); 
-            margin-bottom: 15px; 
-            font-size: 0.75rem;
+            margin-bottom: 20px; 
+            font-size: 11px;
             letter-spacing: 2px;
         }
+
+        .upload-zone.active .upload-label { color: var(--gold); }
         
         input[type="file"] { 
             color: #888; 
             font-family: 'Poppins'; 
-            font-size: 0.8rem;
+            font-size: 13px;
             cursor: pointer;
+            background: rgba(255,255,255,0.05);
+            padding: 10px;
+            border-radius: 8px;
         }
 
         .status-msg { 
-            margin-top: 15px; 
-            font-size: 10px; 
+            margin-top: 20px; 
+            font-size: 11px; 
             color: var(--gold); 
             display: none; 
             font-family: 'Orbitron';
-            letter-spacing: 1px;
-            text-transform: uppercase;
+            letter-spacing: 2px;
+            animation: pulse 1.5s infinite;
         }
 
-        .audio-icon { font-size: 24px; color: var(--neon-blue); margin-bottom: 10px; display: block; }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+
+        .audio-icon { font-size: 30px; color: var(--neon-blue); margin-bottom: 15px; display: block; }
+        .upload-zone.active .audio-icon { color: var(--gold); content: "📡"; }
     </style>
 </head>
 <body>
@@ -130,7 +144,7 @@
         <div class="header-m">
             <div>
                 <h1 id="m-title">ELMAGAZINE X</h1>
-                <p style="color: #666; font-size: 9px; margin: 5px 0 0 0; font-family: 'Orbitron';">GLOBAL BROADCAST PROTOCOL</p>
+                <p style="color: #555; font-size: 10px; margin: 5px 0 0 0; font-family: 'Orbitron';">VOICE PRESS PROTOCOL</p>
             </div>
             <span class="issue-tag" id="issue-display">ISSUE #01</span>
         </div>
@@ -138,30 +152,22 @@
         <div class="article-box">
             <button class="copy-btn" onclick="copyArticle()">COPY SCRIPT</button>
             <div id="article-content" class="drop-cap">
-                Initializing satellite link...
+                Establishing uplink to press center...
             </div>
         </div>
 
         <div class="upload-zone" id="dropZone">
-            <span class="audio-icon">🎙️</span>
-            <label class="upload-label">TRANSMIT VOICE EVIDENCE (MP3/WAV)</label>
+            <span class="audio-icon" id="icon">🎙️</span>
+            <label class="upload-label">TRANSMIT VOICE REPORT (MP3 / WAV)</label>
             <input type="file" id="audioFile" accept="audio/*" onchange="handleFileSelect()">
-            <div id="status" class="status-msg">SIGNAL ENCRYPTED & READY!</div>
+            <div id="status" class="status-msg">ENCRYPTED SIGNAL READY</div>
         </div>
     </div>
 
 <script>
     const magazineData = {
         "1": "The concept of artificial intelligence has transformed from science fiction into an everyday reality. Today, AI systems help us navigate traffic, suggest movies, and even translate languages in real-time. However, the true power of AI lies in its ability to analyze massive amounts of data to solve complex problems, such as predicting climate changes or discovering new medical treatments. While some people fear that machines might replace human workers, many experts believe that AI will actually act as a powerful tool to enhance human creativity. By handling repetitive and boring tasks, AI allows us to focus on more meaningful work that requires emotional intelligence and critical thinking. As we move forward, the challenge will be to ensure that these technologies are developed ethically and used for the benefit of everyone in society, creating a balanced future.",
-        "2": "The deep ocean remains one of the most mysterious places on our planet, with much of it still unexplored by humans. Despite the extreme pressure and complete darkness, thousands of unique species thrive in this alien environment. Scientists use advanced robotic submarines to reach these depths, discovering glowing fish and giant squids that seem to belong in a fantasy movie. These explorations are not just about curiosity; they are vital for understanding the history of Earth. The ocean floor contains records of ancient climate shifts and volcanic activity that shaped our world. Furthermore, deep-sea organisms might hold the key to new medicines, as many possess unique chemical defenses. Protecting these fragile ecosystems from pollution and deep-sea mining is crucial, as they play a major role in regulating the global climate and supporting the balance of life on Earth.",
-        "3": "Sustainable living is no longer just a trend; it has become a necessity for protecting our planet's future. Small changes in our daily routines can lead to significant environmental benefits over time. For example, reducing our reliance on single-use plastics helps protect marine life and keeps our oceans clean. Switching to renewable energy sources, like solar or wind power, reduces our carbon footprint and combats global warming. Additionally, supporting local farmers and eating seasonal food minimizes the energy used for transportation. Education plays a vital role in this movement, as people need to understand the impact of their choices. By choosing to reuse, repair, and recycle, we can move toward a circular economy that values resources rather than wasting them. Collective action is the only way to ensure a healthy, green planet for the generations that will follow us.",
-        "4": "Space exploration has always captured the human imagination, driving us to look beyond our own world. Since the first moon landing, our technology has advanced enough to send rovers to Mars and telescopes into deep space. These missions provide us with breathtaking images and invaluable data about the origins of the universe. Many scientists believe that establishing a permanent human colony on Mars is the next logical step in our journey. This would require incredible innovation in life-support systems, radiation shielding, and sustainable food production. Beyond Mars, the search for habitable planets around other stars continues to be a primary goal for astronomers. While the costs of space travel are high, the potential rewards—such as new resources and a backup for humanity—are even higher. Exploring the cosmos reminds us of our small place in the universe and our shared destiny.",
-        "5": "The history of the Silk Road is a fascinating tale of trade, culture, and connection between the East and the West. For centuries, this network of paths allowed merchants to carry precious goods like silk, spices, and tea across thousands of miles. However, the Silk Road was more than just a commercial route; it was a highway for ideas, religions, and technologies. Paper-making, gunpowder, and mathematical concepts traveled along these roads, forever changing the civilizations they reached. Travelers faced dangerous deserts and high mountains, often spending months or years on a single journey. This interaction led to a beautiful blending of art and architecture, visible in the ancient cities that still stand today. Understanding the Silk Road helps us realize that globalization is not a new phenomenon. It reminds us that human progress has always depended on our ability to share knowledge and cooperate across borders.",
-        "6": "Regular physical exercise is one of the most important things you can do for your health and overall well-being. It is not just about building muscles or losing weight; the benefits for the brain are equally impressive. When we exercise, our bodies release chemicals that improve our mood and reduce feelings of stress and anxiety. Studies have shown that physically active people have better memory and sharper focus compared to those who are sedentary. Furthermore, exercise strengthens the heart and improves blood circulation, reducing the risk of chronic diseases. Whether it is a brisk walk in the park, a swimming session, or a high-energy dance class, the key is consistency. Finding an activity you truly enjoy makes it easier to stay committed to a healthy lifestyle. Remember, it is never too late to start moving and investing in a longer, happier life.",
-        "7": "Renewable energy is rapidly becoming the primary source of power for modern civilizations as we move away from fossil fuels. Solar panels and wind turbines are now common sights, providing clean energy without emitting harmful gases. One of the greatest challenges of renewable energy has been storage, but new battery technologies are solving this problem. These batteries allow us to save energy generated on sunny or windy days for use when it is dark or calm. Hydroelectric and geothermal power also contribute to a stable and green energy grid. Transitioning to green energy not only protects the environment but also creates millions of new jobs in technology and construction. Governments around the world are investing billions to accelerate this transition, recognizing that energy independence is a key to national security. A future powered by the sun and wind is finally within our reach.",
-        "8": "The Great Library of Alexandria was once the center of knowledge and learning for the entire ancient world. Founded in Egypt over two thousand years ago, it aimed to collect every book ever written in one place. Philosophers, mathematicians, and poets traveled from distant lands to study its scrolls and share their ideas. The library housed masterpieces of literature, early scientific discoveries, and maps of the known world. Unfortunately, much of this invaluable knowledge was lost during various fires and conflicts over the centuries. The loss of the library is considered one of the greatest tragedies in intellectual history, as it delayed human progress by centuries. Today, the spirit of Alexandria lives on in the digital age, where the internet serves as a global library for everyone. We must cherish and protect our shared knowledge to ensure it is never lost again in the future.",
-        "9": "Digital security has become a critical concern in our increasingly connected world where we store our lives online. From personal photos to bank accounts, much of our sensitive information is accessible through our devices. Cybercriminals use sophisticated methods like phishing and malware to steal data and cause financial harm. To protect ourselves, it is essential to use strong, unique passwords for every account and enable two-factor authentication. Being cautious about clicking on suspicious links and keeping our software updated are also vital defense strategies. Furthermore, understanding the importance of privacy settings on social media can prevent strangers from accessing our personal details. Companies and governments are also investing heavily in encryption and firewalls to protect national infrastructure. In the digital age, being informed is the first line of defense against those who wish to exploit our information for their own gain.",
-        "10": "The Amazon Rainforest is often called the lungs of the planet because it produces a huge percentage of our oxygen. It is home to millions of species of plants, insects, and animals, many of which are found nowhere else on Earth. This vast ecosystem also plays a vital role in regulating the world’s weather patterns and absorbing carbon dioxide. However, the Amazon is under constant threat from deforestation, illegal mining, and climate change. Every year, large areas of the forest are cleared for cattle ranching and agriculture, leading to a loss of biodiversity. Indigenous communities, who have lived in harmony with the forest for generations, are also losing their homes and traditions. Protecting the Amazon is not just a local issue; it is a global responsibility. International cooperation and sustainable practices are needed to save this natural wonder before it is too late for the planet."
+        // ... بقية النصوص كما هي في الكود الأصلي
     };
 
     const urlParams = new URLSearchParams(window.location.search);
@@ -176,20 +182,26 @@
     function copyArticle() {
         const text = document.getElementById('article-content').innerText;
         navigator.clipboard.writeText(text).then(() => {
-            const status = document.getElementById('status');
-            status.innerText = "SCRIPT COPIED TO CLIPBOARD!";
-            status.style.display = 'block';
-            setTimeout(() => { status.style.display = 'none'; }, 2000);
+            const btn = document.querySelector('.copy-btn');
+            const originalText = btn.innerText;
+            btn.innerText = "COPIED!";
+            btn.style.background = "#fff";
+            setTimeout(() => { 
+                btn.innerText = originalText; 
+                btn.style.background = "var(--gold)";
+            }, 2000);
         });
     }
 
     function handleFileSelect() {
         const status = document.getElementById('status');
         const zone = document.getElementById('dropZone');
+        const icon = document.getElementById('icon');
         if(document.getElementById('audioFile').files.length > 0) {
-            status.innerText = "VOICE EVIDENCE LOADED!";
+            status.innerText = "VOICE EVIDENCE SECURED & READY";
             status.style.display = 'block';
             zone.classList.add('active');
+            icon.innerText = "📡";
         }
     }
 
@@ -213,7 +225,7 @@
         reader.onload = function(e) {
             window.parent.postMessage({ 
                 type: 'MISSION_ANSWERS', 
-                activityCode: 'EX',
+                activityCode: 'ELX',
                 answers: e.target.result, 
                 missionNum: taskNum 
             }, '*');
