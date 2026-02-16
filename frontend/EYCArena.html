@@ -7,39 +7,155 @@
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Orbitron:wght@400;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root { --gold: #D4AF37; --gold-glow: rgba(212, 175, 55, 0.6); --gold-gradient: linear-gradient(135deg, #bf953f, #fcf6ba, #b38728); --bg-deep: #020205; --glass: rgba(255, 255, 255, 0.03); --glass-border: rgba(212, 175, 55, 0.3); --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        :root { 
+            --gold: #D4AF37; 
+            --gold-glow: rgba(212, 175, 55, 0.6); 
+            --gold-gradient: linear-gradient(135deg, #bf953f, #fcf6ba, #b38728); 
+            --bg-deep: #020205; 
+            --glass: rgba(255, 255, 255, 0.03); 
+            --glass-border: rgba(212, 175, 55, 0.3); 
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+        }
+
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
-        body { background: var(--bg-deep); color: white; height: 100vh; height: 100dvh; display: flex; flex-direction: column; overflow: hidden; position: relative; }
+
+        body { 
+            background: var(--bg-deep); 
+            color: white; 
+            height: 100vh; 
+            height: 100dvh; 
+            display: flex; 
+            flex-direction: column; 
+            overflow: hidden; 
+            position: relative; 
+        }
+
+        /* خلفية النجوم المتحركة */
         #star-container { position: fixed; inset: 0; z-index: -2; background: radial-gradient(ellipse at bottom, #1B2735 0%, #090A0F 100%); }
-        .star { position: absolute; background: white; border-radius: 50%; opacity: 0.5; }
-        header { padding: 8px 15px; background: rgba(5, 5, 8, 0.7); backdrop-filter: blur(15px); border-bottom: 1px solid var(--glass-border); z-index: 10; flex-shrink: 0; }
-        .battle-header { display: flex; justify-content: space-between; align-items: center; max-width: 1000px; margin: 0 auto; width: 100%; }
-        .info-box { display: flex; align-items: center; gap: 8px; background: var(--glass); padding: 4px 10px; border-radius: 10px; border: 1px solid var(--glass-border); }
-        .student-photo, .activity-logo { width: 34px; height: 34px; border-radius: 6px; border: 1px solid var(--gold); object-fit: cover; }
-        .name { font-family: 'Cinzel', serif; font-size: 0.7rem; color: var(--gold); font-weight: 700; }
-        .arena-container { flex: 1; padding: 10px; display: flex; justify-content: center; align-items: center; min-height: 0; }
-        .glass-iframe-wrapper { width: 100%; height: 100%; max-width: 1100px; background: rgba(0, 0, 0, 0.2); backdrop-filter: blur(5px); border: 1px solid var(--glass-border); border-radius: 15px; overflow: hidden; }
-        iframe { width: 100%; height: 100%; border: none; }
-        footer { padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; gap: 10px; max-width: 1000px; margin: 0 auto; width: 100%; flex-shrink: 0; }
-        .btn { padding: 10px; border-radius: 10px; border: none; font-weight: 700; cursor: pointer; transition: var(--transition); font-size: 0.7rem; font-family: 'Cinzel'; display: flex; align-items: center; justify-content: center; gap: 6px; }
-        .btn-submit { flex: 2; background: var(--gold-gradient); color: #000; box-shadow: 0 0 15px var(--gold-glow); }
-        .btn-side { flex: 1; background: rgba(255,255,255,0.05); color: var(--gold); border: 1px solid var(--glass-border); }
-        #sync-overlay { position: fixed; inset: 0; background: radial-gradient(circle at center, rgba(10, 10, 15, 0.98), #020205); z-index: 2000; display: none; flex-direction: column; justify-content: center; align-items: center; text-align: center; backdrop-filter: blur(15px); padding: 20px;}
-        .fairy-loader i { font-size: 3.5rem; color: var(--gold); animation: fairyFloat 2s infinite ease-in-out; text-shadow: 0 0 20px var(--gold); }
-        @keyframes fairyFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
-        .result-card { background: rgba(255,255,255,0.05); padding: 20px; border-radius: 15px; border: 1px solid var(--gold); max-width: 400px; }
+        .star { position: absolute; background: white; border-radius: 50%; opacity: 0.5; animation: blink 3s infinite; }
+        @keyframes blink { 0%, 100% { opacity: 0.3; } 50% { opacity: 0.8; } }
+
+        header { 
+            padding: 10px 15px; 
+            background: rgba(5, 5, 8, 0.85); 
+            backdrop-filter: blur(15px); 
+            border-bottom: 2px solid var(--gold);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+            z-index: 10; 
+        }
+
+        .battle-header { display: flex; justify-content: space-between; align-items: center; max-width: 1200px; margin: 0 auto; width: 100%; }
+
+        /* شريط الطاقة (Power Bar) */
+        .power-bar-container {
+            width: 100px;
+            height: 6px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            margin-top: 4px;
+            overflow: hidden;
+            border: 1px solid rgba(212, 175, 55, 0.3);
+        }
+        .power-fill {
+            width: 100%;
+            height: 100%;
+            background: var(--gold-gradient);
+            box-shadow: 0 0 10px var(--gold);
+            animation: powerPulse 2s infinite;
+        }
+        @keyframes powerPulse { 0% { opacity: 0.6; } 50% { opacity: 1; } 100% { opacity: 0.6; } }
+
+        .info-box { display: flex; align-items: center; gap: 10px; background: var(--glass); padding: 5px 12px; border-radius: 12px; border: 1px solid var(--glass-border); }
+        .student-photo { width: 40px; height: 40px; border-radius: 50%; border: 2px solid var(--gold); object-fit: cover; box-shadow: 0 0 10px var(--gold-glow); }
+        .name { font-family: 'Cinzel', serif; font-size: 0.85rem; color: var(--gold); font-weight: 900; letter-spacing: 1px; }
+        .title-text { font-family: 'Orbitron', sans-serif; font-size: 0.55rem; color: #aaa; }
+
+        /* Arena Viewport & Effects */
+        .arena-container { flex: 1; padding: 15px; display: flex; justify-content: center; align-items: center; min-height: 0; position: relative; }
+        
+        .glass-iframe-wrapper { 
+            width: 100%; height: 100%; max-width: 1100px; 
+            background: #000; 
+            border: 1px solid var(--glass-border); 
+            border-radius: 10px; 
+            overflow: hidden; 
+            position: relative;
+            box-shadow: inset 0 0 80px rgba(0,0,0,0.9), 0 0 30px rgba(212, 175, 55, 0.1);
+        }
+
+        /* Scanlines Effect */
+        .glass-iframe-wrapper::before {
+            content: " ";
+            position: absolute; inset: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%), 
+                        linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
+            background-size: 100% 4px, 3px 100%;
+            z-index: 2; pointer-events: none;
+        }
+
+        /* Corner Brackets */
+        .corner { position: absolute; width: 25px; height: 25px; border: 3px solid var(--gold); z-index: 3; pointer-events: none; }
+        .tl { top: 10px; left: 10px; border-right: 0; border-bottom: 0; }
+        .tr { top: 10px; right: 10px; border-left: 0; border-bottom: 0; }
+        .bl { bottom: 10px; left: 10px; border-right: 0; border-top: 0; }
+        .br { bottom: 10px; right: 10px; border-left: 0; border-top: 0; }
+
+        iframe { width: 100%; height: 100%; border: none; z-index: 1; }
+
+        /* Footer & Buttons */
+        footer { padding: 15px; display: flex; justify-content: center; gap: 15px; max-width: 1000px; margin: 0 auto; width: 100%; }
+        
+        .btn { 
+            padding: 12px 25px; border-radius: 8px; border: none; font-weight: 700; cursor: pointer; 
+            transition: var(--transition); font-size: 0.8rem; font-family: 'Cinzel'; 
+            display: flex; align-items: center; gap: 8px; position: relative; overflow: hidden;
+        }
+
+        .btn-submit { 
+            flex: 2; background: var(--gold-gradient); color: #000; 
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.4); 
+        }
+        .btn-submit:hover { 
+            box-shadow: 0 0 30px var(--gold); transform: translateY(-2px); 
+        }
+
+        .btn-side { 
+            flex: 1; background: rgba(255,255,255,0.05); color: var(--gold); 
+            border: 1px solid var(--glass-border); 
+        }
+        .btn-side:hover { background: rgba(212, 175, 55, 0.1); border-color: var(--gold); }
+
+        /* Sync Overlay & Terminal Logs */
+        #sync-overlay { 
+            position: fixed; inset: 0; background: rgba(2, 2, 5, 0.98); 
+            z-index: 2000; display: none; flex-direction: column; 
+            justify-content: center; align-items: center; backdrop-filter: blur(15px); 
+        }
+
+        .terminal-container {
+            width: 80%; max-width: 500px; height: 150px;
+            background: rgba(0,0,0,0.5); border: 1px solid var(--glass-border);
+            border-radius: 5px; padding: 10px; font-family: 'Courier New', monospace;
+            font-size: 0.7rem; color: var(--gold); overflow: hidden; margin-top: 20px;
+        }
+
+        .fairy-loader i { font-size: 3rem; color: var(--gold); animation: float 2s infinite; text-shadow: 0 0 20px var(--gold); }
+        @keyframes float { 0%, 100% { transform: translateY(0) scale(1); } 50% { transform: translateY(-15px) scale(1.1); } }
+
+        @media (max-width: 600px) {
+            .battle-header { flex-direction: column; gap: 10px; }
+            .power-bar-container { width: 60px; }
+        }
     </style>
 </head>
 <body>
 
+    <audio id="clickSound" src="https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3"></audio>
+
     <div id="sync-overlay">
-        <div id="loader-content">
-            <div class="fairy-loader"><i class="fas fa-wand-magic-sparkles"></i></div>
-            <div id="sync-text">
-                <div style="color: var(--gold); font-weight: 700; font-size: 1.2rem;">Hello <span id="display-student-name">...</span>! ✨</div>
-                <div id="status-msg" style="color: #aaa; font-size: 0.8rem; margin-top: 10px;">Verifying session...</div>
-            </div>
-        </div>
+        <div class="fairy-loader"><i class="fas fa-atom"></i></div>
+        <div style="color: var(--gold); font-family: 'Orbitron'; margin-top: 15px; letter-spacing: 2px;">SECURE CONNECTION...</div>
+        <div class="terminal-container" id="terminal-logs"></div>
         <div id="result-display" style="display: none;" class="result-card"></div>
     </div>
 
@@ -49,201 +165,171 @@
         <div class="battle-header">
             <div class="info-box">
                 <img id="student-img" class="student-photo" src="" alt="S">
-                <div style="display: flex; flex-direction: column;">
-                    <span class="name" id="student-name">LOADING...</span>
-                    <span id="student-title" style="font-size: 0.5rem; color: #888; text-transform: uppercase;">LOADING...</span>
+                <div>
+                    <div class="name" id="student-name">AGENT NAME</div>
+                    <div class="title-text" id="student-title">ELITE AGENT</div>
+                    <div class="power-bar-container"><div class="power-fill"></div></div>
                 </div>
             </div>
-            <div style="text-align: center;">
-                <div style="font-family: 'Cinzel'; color: var(--gold); font-weight: 900; letter-spacing: 2px;">ARENA</div>
+            
+            <div style="font-family: 'Orbitron'; color: var(--gold); text-align: center;">
+                <div style="font-size: 0.6rem; opacity: 0.7;">BATTLEFIELD STATION</div>
+                <div style="font-weight: 900; letter-spacing: 4px; font-size: 1.2rem;">ARENA</div>
             </div>
+
             <div class="info-box">
-                <div style="display: flex; flex-direction: column; text-align: right;">
-                    <span class="name" id="activity-title">ACTIVITY</span>
-                    <span id="mission-sub" style="font-size: 0.5rem; color: var(--gold);">MISSION --</span>
+                <div style="text-align: right;">
+                    <div class="name" id="activity-title">MISSION</div>
+                    <div id="mission-sub" style="font-size: 0.6rem; color: var(--gold); font-family: 'Orbitron';">PHASE 01</div>
                 </div>
-                <img id="activity-img" class="activity-logo" src="" alt="L">
+                <img id="activity-img" style="width: 35px; height: 35px; border-radius: 5px;" src="" alt="L">
             </div>
         </div>
     </header>
 
     <main class="arena-container">
-        <div class="glass-iframe-wrapper" id="glass-iframe-wrapper">
-            <iframe id="contentFrame" allow="autoplay"></iframe>
+        <div class="glass-iframe-wrapper">
+            <div class="corner tl"></div><div class="corner tr"></div>
+            <div class="corner bl"></div><div class="corner br"></div>
+            <iframe id="contentFrame" src="about:blank" allow="autoplay"></iframe>
         </div>
     </main>
 
     <footer>
-        <button class="btn btn-side" onclick="alert('Rules: Be Honest, Be Creative!')"><i class="fas fa-scroll"></i> RULES</button>
-        <button id="submitBtn" class="btn btn-submit" onclick="startSubmission()"><i class="fas fa-shield-alt"></i> SUBMIT MISSION</button>
-        <button class="btn btn-side" onclick="window.location.href='MC.html'"><i class="fas fa-door-open"></i> EXIT</button>
+        <button class="btn btn-side" onclick="playEffect(); alert('Mission Rules: Innovation, Integrity, Impact.')">
+            <i class="fas fa-file-invoice"></i> RULES
+        </button>
+        <button id="submitBtn" class="btn btn-submit" onclick="playEffect(); startSubmission()">
+            <i class="fas fa-bolt"></i> TRANSMIT DATA
+        </button>
+        <button class="btn btn-side" onclick="playEffect(); window.location.href='MC.html'">
+            <i class="fas fa-power-off"></i> EXIT
+        </button>
     </footer>
 
 <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxHYyjTsl3YmWUQOaQ6Zm7dhCkPGFmaVgnmRxErFbKks4lOj3fq0RmYZ2dDSksa_vNDug/exec"; 
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxHYyjTsl3YmWUQOaQ6Zm7dhCkPGFmaVgnmRxErFbKks4lOj3fq0RmYZ2dDSksa_vNDug/exec";
 
-    let currentActivity, currentTask, userEmail, userName;
+    // تفعيل الأصوات
+    function playEffect() {
+        const audio = document.getElementById('clickSound');
+        audio.currentTime = 0;
+        audio.play().catch(e => {});
+    }
 
+    // إنشاء النجوم
     function createStars() {
         const container = document.getElementById('star-container');
-        for (let i = 0; i < 50; i++) {
+        for (let i = 0; i < 60; i++) {
             const star = document.createElement('div');
             star.className = 'star';
-            star.style.width = star.style.height = Math.random() * 3 + 'px';
+            star.style.width = star.style.height = Math.random() * 2 + 'px';
             star.style.top = Math.random() * 100 + '%';
             star.style.left = Math.random() * 100 + '%';
+            star.style.animationDelay = Math.random() * 5 + 's';
             container.appendChild(star);
         }
     }
+
+    // نظام الـ Terminal Logs الوهمي
+    function addLog(text) {
+        const term = document.getElementById('terminal-logs');
+        const line = document.createElement('div');
+        line.textContent = `> ${text}`;
+        term.appendChild(line);
+        term.scrollTop = term.scrollHeight;
+    }
+
+    const mockLogs = [
+        "Initializing neural link...",
+        "Bypassing firewall filters...",
+        "Establishing handshake with HQ...",
+        "Uploading encrypted mission payload...",
+        "AI Evaluator online...",
+        "Analyzing response patterns...",
+        "Finalizing report metadata..."
+    ];
 
     window.onload = async function() {
         createStars();
         const urlParams = new URLSearchParams(window.location.search);
         const savedUser = JSON.parse(localStorage.getItem('eyc_user')) || {};
 
-        userEmail = urlParams.get('email') || savedUser.email;
-        userName = urlParams.get('name') || savedUser.name || "AGENT";
-        currentActivity = urlParams.get('act'); 
-        currentTask = urlParams.get('task') || "1";
+        const userEmail = urlParams.get('email') || savedUser.email;
+        const userName = urlParams.get('name') || savedUser.name || "AGENT";
+        const currentActivity = urlParams.get('act');
+        const currentTask = urlParams.get('task') || "1";
 
         if (!userEmail || !currentActivity) {
-            alert("Security Protocol: Please login first!");
             window.location.href = 'MC.html';
             return;
         }
 
         document.getElementById('student-name').innerText = userName.toUpperCase();
-        document.getElementById('display-student-name').innerText = userName;
         document.getElementById('activity-title').innerText = currentActivity;
-        document.getElementById('mission-sub').innerText = `MISSION ${currentTask.padStart(2, '0')}`;
+        document.getElementById('mission-sub').innerText = `PHASE ${currentTask.padStart(2, '0')}`;
         document.getElementById('student-title').innerText = urlParams.get('title') || savedUser.title || "ELITE AGENT";
+        document.getElementById('student-img').src = decodeURIComponent(urlParams.get('avatar') || savedUser.avatar || "");
         
-        let avatarUrl = urlParams.get('avatar') || savedUser.avatar || "https://via.placeholder.com/150/000000/D4AF37?text=AGENT";
-        document.getElementById('student-img').src = decodeURIComponent(avatarUrl);
-        document.getElementById('activity-img').src = `assets/AL${currentActivity}.png`;
-
-        checkMissionStatus();
+        // تحميل المحتوى في الـ Iframe
+        document.getElementById('contentFrame').src = `${currentActivity}.html?task=${currentTask}`;
     };
 
-    async function checkMissionStatus() {
-        try {
-            const response = await fetch(`${SCRIPT_URL}?action=checkStatus&email=${userEmail}&act=${currentActivity}&task=${currentTask}`);
-            const data = await response.json();
-            
-            if (data.done) {
-                const resultDiv = document.getElementById('result-display');
-                const loaderContent = document.getElementById('loader-content');
-                
-                document.getElementById('sync-overlay').style.display = 'flex';
-                if(loaderContent) loaderContent.style.display = 'none';
-                if(resultDiv) {
-                    resultDiv.style.display = 'block';
-                    resultDiv.innerHTML = `
-                        <div style="font-size: 1.2rem; color: var(--gold); font-family: 'Orbitron';">MISSION SECURED</div>
-                        <div style="font-size: 2.5rem; margin: 10px 0; color: white;">${data.grade || '--'}/${data.maxGrade || '--'}</div>
-                        <p style="color: #4CAF50; font-size: 0.8rem; margin-bottom: 15px;">Target Neutralized successfully.</p>
-                        <button class="btn btn-submit" style="width:100%" onclick="window.location.href='MC.html'">RETURN TO BASE</button>
-                    `;
-                }
-                
-                document.getElementById('glass-iframe-wrapper').innerHTML = `
-                    <div style="display:flex; flex-direction:column; justify-content:center; align-items:center; height:100%; color:#4CAF50; font-family:'Orbitron'; text-align:center;">
-                        <i class="fas fa-check-circle" style="font-size:4rem; margin-bottom:20px;"></i>
-                        <h1>MISSION DONE</h1>
-                    </div>`;
-                document.getElementById('submitBtn').disabled = true;
-                document.getElementById('submitBtn').style.opacity = "0.5";
-            } else {
-                document.getElementById('sync-overlay').style.display = 'none';
-                document.getElementById('contentFrame').src = `${currentActivity}.html?task=${currentTask}`;
-            }
-        } catch (e) {
-            console.error("Sync Error:", e);
-            document.getElementById('sync-overlay').style.display = 'none';
-            document.getElementById('contentFrame').src = `${currentActivity}.html?task=${currentTask}`;
-        }
-    }
-
     function startSubmission() {
+        const overlay = document.getElementById('sync-overlay');
+        overlay.style.display = 'flex';
+        
+        let i = 0;
+        const logInterval = setInterval(() => {
+            if(i < mockLogs.length) {
+                addLog(mockLogs[i]);
+                i++;
+            } else {
+                clearInterval(logInterval);
+            }
+        }, 600);
+
         const frame = document.getElementById('contentFrame').contentWindow;
         frame.postMessage({ type: 'REQUEST_MISSION_DATA' }, '*');
     }
 
     window.addEventListener('message', function(event) {
         if (event.data.type === 'MISSION_ANSWERS') {
-            processAnswers(event.data.answers);
+            sendToAiGrader(event.data.answers);
         }
     });
 
-    function processAnswers(answers) {
-        const hasContent = Array.isArray(answers) ? 
-            answers.some(a => a && String(a).trim() !== "") : 
-            (answers && String(answers).trim() !== "");
+    async function sendToAiGrader(answers) {
+        const urlParams = new URLSearchParams(window.location.search);
+        const userEmail = urlParams.get('email') || JSON.parse(localStorage.getItem('eyc_user')).email;
         
-        if (!hasContent) {
-            alert("⚠️ HQ: Empty missions will not be accepted!");
-            return;
-        }
-        
-        document.getElementById('sync-overlay').style.display = 'flex';
-        document.getElementById('loader-content').style.display = 'flex';
-        document.getElementById('result-display').style.display = 'none';
-        document.getElementById('status-msg').innerText = "Transmitting data to HQ...";
-        
-        sendToAiGrader(answers);
-    }
+        const payload = {
+            action: "submitReport",
+            email: userEmail,
+            actCode: urlParams.get('act'),
+            taskNum: urlParams.get('task') || "1",
+            answer: Array.isArray(answers) ? answers.join(",") : answers
+        };
 
-async function sendToAiGrader(answers) {
-    let separator = (currentActivity === "FX" || currentActivity === "LX") ? "|" : ",";
-    const cleanedAnswers = Array.isArray(answers) ? answers.map(a => String(a).trim()).join(separator) : String(answers).trim();
-
-    const payload = {
-        action: "submitReport",
-        email: userEmail,
-        actCode: currentActivity,
-        taskNum: currentTask,
-        answer: cleanedAnswers
-    };
-
-    document.getElementById('sync-overlay').style.display = 'flex';
-    document.getElementById('status-msg').innerText = "Transmitting data to HQ...";
-
-    try {
-        // نستخدم fetch مع إرسال البيانات كـ Text لتجنب مشاكل الـ CORS في POST
-        const response = await fetch(SCRIPT_URL, {
-            method: 'POST',
-            body: JSON.stringify(payload)
-        });
-
-        const result = await response.json(); // ننتظر النتيجة الحقيقية من السيرفر (محرك التصحيح)
-
-        if (result.success) {
-            document.getElementById('status-msg').innerText = "Mission Evaluated! Showing Results...";
+        try {
+            const response = await fetch(SCRIPT_URL, {
+                method: 'POST',
+                body: JSON.stringify(payload)
+            });
+            const result = await response.json();
             
-            // تحديث واجهة النتيجة فوراً بدون انتظار إعادة التحميل
-            const resultDiv = document.getElementById('result-display');
-            document.getElementById('loader-content').style.display = 'none';
-            resultDiv.style.display = 'block';
-            resultDiv.innerHTML = `
-                <div style="font-size: 1.2rem; color: var(--gold); font-family: 'Orbitron';">MISSION SECURED</div>
-                <div style="font-size: 2.5rem; margin: 10px 0; color: white;">${result.grade}/${result.maxGrade}</div>
-                <p style="color: #4CAF50; font-size: 0.8rem; margin-bottom: 15px;">${result.feedback || result.reason}</p>
-                <button class="btn btn-submit" style="width:100%" onclick="window.location.href='MC.html'">RETURN TO BASE</button>
-            `;
-            
-            // تعطيل زر الإرسال لمنع التكرار
-            document.getElementById('submitBtn').disabled = true;
-            document.getElementById('submitBtn').style.opacity = "0.5";
-        } else {
-            throw new Error(result.reason || "Evaluation failed");
+            if(result.success) {
+                addLog("TRANSMISSION COMPLETE.");
+                setTimeout(() => {
+                    alert(`Mission Evaluated! Grade: ${result.grade}/${result.maxGrade}`);
+                    window.location.href = 'MC.html';
+                }, 1000);
+            }
+        } catch (e) {
+            addLog("ERROR: CONNECTION TIMEOUT.");
+            setTimeout(() => document.getElementById('sync-overlay').style.display = 'none', 2000);
         }
-
-    } catch (error) {
-        console.error("Gear Debug Info:", error);
-        alert("⚠️ Connection Error: Could not reach HQ. Your progress is safe, try again in a moment.");
-        document.getElementById('sync-overlay').style.display = 'none';
     }
-}
 </script>
 </body>
 </html>
