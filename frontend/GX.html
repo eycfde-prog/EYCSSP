@@ -3,21 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>GX | Grammar Extractor | Gear Edition</title>
+    <title>GX | Word Extractor | Titanium Edition</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Poppins:wght@300;500&display=swap" rel="stylesheet">
     <style>
         :root {
             --gold: #D4AF37;
-            --gold-glow: rgba(212, 175, 55, 0.3);
-            --glass: rgba(255, 255, 255, 0.03);
-            --glass-border: rgba(212, 175, 55, 0.2);
+            --gold-glow: rgba(212, 175, 55, 0.4);
+            --glass: rgba(10, 10, 15, 0.9);
+            --glass-border: rgba(212, 175, 55, 0.25);
             --error-red: #ff4444;
         }
 
         body {
             font-family: 'Poppins', sans-serif;
             background: transparent;
-            color: white;
+            color: #fff;
             margin: 0; padding: 15px;
             direction: ltr;
         }
@@ -25,68 +25,68 @@
         .header-gx {
             display: flex; justify-content: space-between; align-items: center;
             margin-bottom: 20px; border-bottom: 1px solid var(--glass-border);
-            padding-bottom: 10px;
+            padding-bottom: 15px;
         }
 
         .header-gx h1 {
-            font-family: 'Orbitron'; font-size: 1rem;
-            color: var(--gold); letter-spacing: 3px; margin: 0;
+            font-family: 'Orbitron'; font-size: 1.1rem;
+            color: var(--gold); letter-spacing: 4px; margin: 0;
+            text-transform: uppercase;
         }
 
         .passage-box {
             background: var(--glass);
-            backdrop-filter: blur(15px);
+            backdrop-filter: blur(20px);
             border: 1px solid var(--glass-border);
-            padding: 20px; border-radius: 18px;
-            margin-bottom: 25px; line-height: 1.6;
-            font-size: 1rem; color: #eee;
-            position: relative;
-            text-align: left;
+            padding: 22px; border-radius: 20px;
+            margin-bottom: 25px; line-height: 1.7;
+            font-size: 1.05rem; color: #f0f0f0;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            border-left: 5px solid var(--gold);
         }
 
         .extractor-grid {
-            display: grid; grid-template-columns: 1fr;
-            gap: 15px;
+            display: grid; grid-template-columns: 1fr; gap: 18px;
         }
 
         .extraction-card {
-            background: var(--glass);
+            background: rgba(255,255,255,0.03);
             border: 1px solid var(--glass-border);
-            padding: 15px; border-radius: 15px;
-            border-left: 4px solid var(--gold);
+            padding: 18px; border-radius: 15px;
+            transition: 0.3s;
         }
 
         .extraction-card label {
             display: block; font-family: 'Orbitron'; font-size: 10px;
-            color: var(--gold); margin-bottom: 10px;
-            text-transform: uppercase;
+            color: var(--gold); margin-bottom: 12px;
+            letter-spacing: 2px;
         }
 
-        /* حاوية المدخلات المتعددة */
         .inputs-container {
-            display: flex; flex-wrap: wrap; gap: 8px;
+            display: flex; flex-wrap: wrap; gap: 10px;
         }
 
         .gx-input {
-            flex: 1; min-width: 120px;
-            background: rgba(0,0,0,0.4);
-            border: 1px solid var(--glass-border); border-radius: 6px;
-            color: #fff; padding: 8px 12px;
-            font-family: 'Poppins'; font-size: 0.85rem;
+            flex: 1; min-width: 100px;
+            background: rgba(0,0,0,0.5);
+            border: 1px solid rgba(255,255,255,0.1); border-radius: 8px;
+            color: #fff; padding: 10px 14px;
+            font-family: 'Poppins'; font-size: 0.9rem;
             outline: none; transition: 0.3s;
         }
 
-        .gx-input:focus { border-color: var(--gold); background: rgba(212, 175, 55, 0.05); }
+        .gx-input:focus { 
+            border-color: var(--gold); 
+            background: rgba(212, 175, 55, 0.05);
+            box-shadow: 0 0 10px var(--gold-glow);
+        }
 
-        /* حالة الخطأ */
         .error-card { border-color: var(--error-red) !important; animation: shake 0.4s; }
         @keyframes shake {
             0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-5px); }
-            75% { transform: translateX(5px); }
+            25% { transform: translateX(-6px); }
+            75% { transform: translateX(6px); }
         }
-
-        .hint { font-size: 9px; color: #666; margin-top: 8px; display: block; }
     </style>
 </head>
 <body>
@@ -94,7 +94,7 @@
 <div class="gx-container">
     <div class="header-gx">
         <h1 id="task-title">Grammar Extractor</h1>
-        <div class="principle-tags"><span class="tag" style="font-family:'Orbitron'; font-size:8px; color:var(--gold); border:1px solid var(--glass-border); padding:2px 6px; border-radius:4px;">INTEL</span></div>
+        <div class="principle-tags"><span style="font-family:'Orbitron'; font-size:8px; color:var(--gold); border:1px solid var(--glass-border); padding:2px 6px; border-radius:4px;">LEXICAL ANALYSIS</span></div>
     </div>
 
     <div class="passage-box" id="passage-content">Loading Mission Data...</div>
@@ -104,132 +104,120 @@
 <script>
 const gxData = {
     "1": {
-        passage: "The sun was shining brightly as the small birds flew over the green forest. Yesterday, they built a new nest because they were happy. If it rains tomorrow, they will stay inside.",
+        passage: "The sun was shining brightly as the small birds flew over the green forest. Yesterday, they built a new nest because they were happy.",
         requirements: [
             { label: "Extract 3 Verbs", count: 3 },
-            { label: "Extract 2 Adjectives", count: 2 },
-            { label: "Extract 1 Past Simple sentence", count: 1 },
-            { label: "Extract 3 Nouns", count: 3 },
-            { label: "Extract 1 Future condition", count: 1 }
+            { label: "Extract 3 Adjectives", count: 3 },
+            { label: "Extract 2 Nouns", count: 2 },
+            { label: "Extract 1 Adverb", count: 1 }
         ]
     },
     "2": {
-        passage: "The smart engineer is working in the office. He fixed the old laptop yesterday and now he is buying a fast computer. While he was working, his phone rang.",
+        passage: "The smart engineer is working quietly in the office. He fixed the old laptop yesterday and now he is buying a fast computer.",
         requirements: [
-            { label: "Extract 3 Verbs", count: 3 },
-            { label: "Extract 2 Adjectives", count: 2 },
-            { label: "Extract 1 Past Simple sentence", count: 1 },
             { label: "Extract 3 Nouns", count: 3 },
-            { label: "Extract 1 Past Continuous clause", count: 1 }
+            { label: "Extract 2 Adjectives", count: 2 },
+            { label: "Extract 2 Verbs (Past)", count: 2 },
+            { label: "Extract 1 Adverb", count: 1 }
         ]
     },
     "3": {
-        passage: "A famous chef is cooking in the kitchen. She prepared a large meal because the spices smelled delicious. The chef has cooked many meals before.",
+        passage: "A famous chef is cooking in the large kitchen. She prepared a delicious meal because the spices smelled great. The chef is very happy.",
         requirements: [
-            { label: "Extract 3 Verbs", count: 3 },
-            { label: "Extract 2 Adjectives", count: 2 },
-            { label: "Extract 1 Past Simple sentence", count: 1 },
-            { label: "Extract 3 Nouns", count: 3 },
-            { label: "Extract 1 Present Perfect", count: 1 }
+            { label: "Extract 2 Verbs", count: 2 },
+            { label: "Extract 3 Adjectives", count: 3 },
+            { label: "Extract 2 Nouns", count: 2 },
+            { label: "Extract 1 Pronoun", count: 1 }
         ]
     },
     "4": {
-        passage: "The strong runner was running on the track. He won the gold medal last week because he had been training for months. He is the most athletic person I know.",
+        passage: "The strong runner was running quickly on the track. He won the gold medal last week because he had been training hard for months.",
         requirements: [
-            { label: "Extract 3 Verbs", count: 3 },
+            { label: "Extract 2 Adverbs", count: 2 },
             { label: "Extract 2 Adjectives", count: 2 },
-            { label: "Extract 1 Past Simple sentence", count: 1 },
-            { label: "Extract 3 Nouns", count: 3 },
-            { label: "Extract 1 Superlative", count: 1 }
+            { label: "Extract 2 Verbs", count: 2 },
+            { label: "Extract 2 Nouns", count: 2 }
         ]
     },
     "5": {
-        passage: "Many tourists are traveling to Egypt. They visited the Great Pyramids and saw ancient temples. If they have enough time, they will visit Luxor next week.",
+        passage: "Many tourists are traveling to Egypt. They visited the Great Pyramids and saw ancient temples. They will visit Luxor soon.",
         requirements: [
-            { label: "Extract 3 Verbs", count: 3 },
+            { label: "Extract 3 Proper Nouns", count: 3 },
+            { label: "Extract 2 Past Verbs", count: 2 },
             { label: "Extract 2 Adjectives", count: 2 },
-            { label: "Extract 1 Past Simple sentence", count: 1 },
-            { label: "Extract 3 Nouns", count: 3 },
-            { label: "Extract 1 Conditional", count: 1 }
+            { label: "Extract 1 Future Verb", count: 1 }
         ]
     },
     "6": {
-        passage: "The young student was reading a useful book in the quiet library. He wrote a long story yesterday to improve his skills. He is better than before.",
+        passage: "The young student was reading a useful book in the library. He wrote a long story yesterday to improve his skills.",
         requirements: [
-            { label: "Extract 3 Verbs", count: 3 },
             { label: "Extract 2 Adjectives", count: 2 },
-            { label: "Extract 1 Past Simple sentence", count: 1 },
+            { label: "Extract 2 Verbs", count: 2 },
             { label: "Extract 3 Nouns", count: 3 },
-            { label: "Extract 1 Comparative", count: 1 }
+            { label: "Extract 1 Adverb", count: 1 }
         ]
     },
     "7": {
-        passage: "The brave swimmer dove into the deep ocean. The water was very cold but she felt excited. She has been swimming since morning.",
+        passage: "The brave swimmer dove into the deep ocean. The water was very cold but she felt excited. She swims daily.",
         requirements: [
-            { label: "Extract 3 Verbs", count: 3 },
-            { label: "Extract 2 Adjectives", count: 2 },
-            { label: "Extract 1 Past Simple sentence", count: 1 },
-            { label: "Extract 3 Nouns", count: 3 },
-            { label: "Extract 1 Present Perfect Continuous", count: 1 }
+            { label: "Extract 3 Adjectives", count: 3 },
+            { label: "Extract 2 Verbs", count: 2 },
+            { label: "Extract 2 Nouns", count: 2 },
+            { label: "Extract 1 Adverb", count: 1 }
         ]
     },
     "8": {
-        passage: "The loud dog was barking at the cat. The scared cat hid behind the wooden fence. It was a very strange situation.",
+        passage: "The loud dog was barking at the small cat. The scared cat hid behind the wooden fence. It was a strange day.",
         requirements: [
-            { label: "Extract 3 Verbs", count: 3 },
-            { label: "Extract 2 Adjectives", count: 2 },
-            { label: "Extract 1 Past Simple sentence", count: 1 },
-            { label: "Extract 3 Nouns", count: 3 },
-            { label: "Extract 1 Past Continuous", count: 1 }
+            { label: "Extract 3 Adjectives", count: 3 },
+            { label: "Extract 2 Verbs", count: 2 },
+            { label: "Extract 2 Nouns", count: 2 },
+            { label: "Extract 1 Preposition", count: 1 }
         ]
     },
     "9": {
-        passage: "The creative artist used many colorful paints. She was painting a beautiful picture when the phone rang. She is an amazing person.",
+        passage: "The creative artist used many colorful paints. She was painting a beautiful picture when the phone rang loudly.",
         requirements: [
-            { label: "Extract 3 Verbs", count: 3 },
             { label: "Extract 2 Adjectives", count: 2 },
-            { label: "Extract 1 Past Simple sentence", count: 1 },
-            { label: "Extract 3 Nouns", count: 3 },
-            { label: "Extract 1 Past Continuous", count: 1 }
+            { label: "Extract 2 Nouns", count: 2 },
+            { label: "Extract 2 Verbs", count: 2 },
+            { label: "Extract 1 Adverb", count: 1 }
         ]
     },
     "10": {
-        passage: "The heavy rain fell on the empty streets. People were staying at home because it was freezing. They had finished their dinner before the power went out.",
+        passage: "The heavy rain fell on the empty streets. People were staying at home because it was freezing cold outside.",
         requirements: [
-            { label: "Extract 3 Verbs", count: 3 },
             { label: "Extract 2 Adjectives", count: 2 },
-            { label: "Extract 1 Past Simple sentence", count: 1 },
-            { label: "Extract 3 Nouns", count: 3 },
-            { label: "Extract 1 Past Perfect", count: 1 }
+            { label: "Extract 2 Verbs", count: 2 },
+            { label: "Extract 2 Nouns", count: 2 },
+            { label: "Extract 2 Adverbs", count: 2 }
         ]
     }
 };
+
     const urlParams = new URLSearchParams(window.location.search);
     const taskNum = urlParams.get('task') || "1";
 
     function loadExtractor() {
         const data = gxData[taskNum] || gxData["1"];
         document.getElementById('passage-content').innerText = data.passage;
-        document.getElementById('task-title').innerText = `GX: Task ${taskNum.padStart(2, '0')}`;
+        document.getElementById('task-title').innerText = `GX: SCAN ${taskNum.padStart(2, '0')}`;
         
         const grid = document.getElementById('extractor-fields');
         grid.innerHTML = data.requirements.map((req, i) => {
-            // إنشاء عدد المدخلات المطلوب لكل بطاقة
             let inputsHtml = '';
             for(let j=0; j < req.count; j++) {
-                inputsHtml += `<input type="text" class="gx-input" data-group="${i}" placeholder="Data ${j+1}..." autocomplete="off">`;
+                inputsHtml += `<input type="text" class="gx-input" data-group="${i}" placeholder="Word ${j+1}..." autocomplete="off">`;
             }
-
             return `
                 <div class="extraction-card" id="card-${i}">
-                    <label>FIELD_0${i+1}: ${req.label}</label>
+                    <label>DATA_CORE_0${i+1}: ${req.label}</label>
                     <div class="inputs-container">${inputsHtml}</div>
                 </div>
             `;
         }).join('');
     }
 
-    // الربط مع زر الأرينا الخارجي
     window.addEventListener('message', function(event) {
         if (event.data.type === 'REQUEST_MISSION_DATA') {
             collectAndSend();
@@ -241,7 +229,7 @@ const gxData = {
         let answersArray = [];
         let hasError = false;
 
-        cards.forEach((card, i) => {
+        cards.forEach((card) => {
             const inputs = card.querySelectorAll('.gx-input');
             let groupAnswers = [];
             let groupEmpty = false;
@@ -257,8 +245,6 @@ const gxData = {
                 card.classList.add('error-card');
                 setTimeout(() => card.classList.remove('error-card'), 500);
             } else {
-                // تجميع إجابات المجموعة الواحدة بفاصل شرطة مائلة أو مسافة
-                // هنا سنجمع الكل في نص واحد مفصول بـ | للأرينا
                 answersArray.push(groupAnswers.join(' ')); 
             }
         });
@@ -280,5 +266,3 @@ const gxData = {
 </script>
 </body>
 </html>
-
-
