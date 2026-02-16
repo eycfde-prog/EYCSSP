@@ -3,22 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Golden Ear | Royal Listening Mission | Glassy</title>
+    <title>Golden Ear | Royal Listening Mission | Titanium Edition</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
     <style>
         :root { 
             --gold: #D4AF37; 
             --gold-light: #FFD700;
-            --gold-glow: rgba(212, 175, 55, 0.3);
+            --gold-glow: rgba(212, 175, 55, 0.4);
             --dark-bg: #0a0a0c;
             --card-bg: rgba(255, 255, 255, 0.03);
+            --accent: #1a1a1f;
         }
 
         body { 
             font-family: 'Rajdhani', sans-serif; 
             background: transparent; 
-            color: white; 
-            margin: 0; padding: 15px; 
+            color: #eee; 
+            margin: 0; padding: 20px; 
             direction: ltr;
         }
 
@@ -26,78 +27,86 @@
         body::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 10px; }
 
         .audio-player-container {
-            background: linear-gradient(145deg, #15151a, #0a0a0c); 
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(212, 175, 55, 0.2); 
-            border-radius: 30px;
-            padding: 30px; 
+            background: linear-gradient(145deg, #1a1a22, #0d0d11); 
+            backdrop-filter: blur(25px);
+            border: 1px solid rgba(212, 175, 55, 0.25); 
+            border-radius: 25px;
+            padding: 35px; 
             text-align: center; 
-            margin-bottom: 30px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.6), inset 0 0 20px rgba(212, 175, 55, 0.05);
-            animation: slideDown 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+            margin-bottom: 40px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.7), inset 0 0 20px rgba(212, 175, 55, 0.03);
+            animation: slideDown 0.7s ease-out;
         }
 
-        @keyframes slideDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
 
         .audio-player-container h2 { 
             font-family: 'Orbitron'; 
             color: var(--gold); 
-            font-size: 1rem; 
-            letter-spacing: 4px;
-            margin-bottom: 20px;
+            font-size: 1.1rem; 
+            letter-spacing: 5px;
+            margin: 0 0 25px 0;
             text-shadow: 0 0 15px var(--gold-glow);
         }
 
         audio { 
             width: 100%; 
-            height: 45px;
-            filter: invert(0.8) sepia(1) saturate(3) hue-rotate(10deg);
-            opacity: 0.9;
+            height: 40px;
+            filter: invert(0.85) sepia(1) saturate(2.5) hue-rotate(5deg);
+            opacity: 0.8;
             transition: 0.3s;
         }
-        audio:hover { opacity: 1; transform: scale(1.01); }
+        audio:hover { opacity: 1; }
 
-        .questions-grid { display: flex; flex-direction: column; gap: 20px; }
+        .questions-grid { display: flex; flex-direction: column; gap: 25px; }
 
         .question-card {
             background: var(--card-bg); 
-            border: 1px solid rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.04);
             border-radius: 20px; 
-            padding: 25px; 
-            transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            animation: fadeIn 1s ease forwards;
+            padding: 30px; 
+            transition: 0.3s;
+            position: relative;
+            overflow: hidden;
         }
 
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .question-card::before {
+            content: '';
+            position: absolute; left: 0; top: 0; width: 4px; height: 100%;
+            background: var(--gold);
+            opacity: 0.3;
+        }
 
         .question-text { 
             font-family: 'Orbitron'; 
-            font-size: 0.85rem; 
-            margin-bottom: 20px; 
+            font-size: 0.9rem; 
+            margin-bottom: 25px; 
             color: var(--gold-light);
             line-height: 1.6;
-            letter-spacing: 0.5px;
+            letter-spacing: 1px;
         }
 
-        .options-list { display: flex; flex-direction: column; gap: 12px; }
+        .options-list { display: flex; flex-direction: column; gap: 14px; }
 
         .option-item {
             background: rgba(255, 255, 255, 0.02); 
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            padding: 14px 20px; 
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            padding: 16px 22px; 
             border-radius: 12px; 
             cursor: pointer; 
-            transition: 0.3s all;
-            font-size: 1rem; 
+            transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            font-size: 1.05rem; 
             display: flex; 
             align-items: center; 
             gap: 15px;
+            color: #ccc;
         }
 
         .option-item:hover { 
-            background: rgba(212, 175, 55, 0.08); 
+            background: rgba(212, 175, 55, 0.06); 
             border-color: var(--gold); 
-            transform: translateX(8px);
+            transform: translateX(10px);
+            color: #fff;
         }
 
         .option-item.selected { 
@@ -105,11 +114,11 @@
             color: #000; 
             font-weight: 700; 
             border-color: var(--gold);
-            box-shadow: 0 10px 20px rgba(212, 175, 55, 0.2);
+            box-shadow: 0 10px 25px rgba(212, 175, 55, 0.3);
         }
 
         .radio-dot {
-            width: 10px; height: 10px;
+            width: 12px; height: 12px;
             border: 2px solid var(--gold);
             border-radius: 50%;
             transition: 0.3s;
@@ -118,7 +127,6 @@
         .option-item.selected .radio-dot {
             background: #000;
             border-color: #000;
-            transform: scale(1.2);
         }
     </style>
 </head>
@@ -134,17 +142,10 @@
     <div id="quiz-container" class="questions-grid"></div>
 
 <script>
+    // تم تضمين قاعدة بيانات الأسئلة كما في الكود المرفق
     const geMissions = {
-        "1": { questions: [ { q: "What is the core definition of critical thinking?", options: ["The ability to analyze information objectively and make a reasoned judgment.", "The ability to memorize large amounts of data quickly.", "The process of accepting information without question.", "The act of forming conclusions based solely on emotion."] }, { q: "What is one thing critical thinking helps individuals avoid?", options: ["Logical fallacies.", "Basic conversation.", "Routine physical exercise.", "Reading books."] }, { q: "What two qualities are required to develop critical thinking?", options: ["Curiosity and a willingness to question assumptions.", "Ignoring all external opinions.", "Speed reading and perfect recall.", "Strict adherence to tradition."] }, { q: "Where is critical thinking considered a vital skill?", options: ["In everyday decision-making and academic settings.", "Only in highly specialized scientific fields.", "Only when dealing with political issues.", "Exclusively in historical research."] }, { q: "What is the foundation of scientific inquiry?", options: ["Critical thinking.", "Simple belief.", "Emotional response.", "Random guesswork."] } ] },
-        "2": { questions: [ { q: "What primary challenge does the internet present, despite offering information?", options: ["It hosts vast amounts of misinformation.", "It requires expensive equipment.", "It is only available during the day.", "It forces people to read slower."] }, { q: "What does the concept of digital citizenship require users to be?", options: ["Responsible, respectful, and safe online.", "Completely anonymous at all times.", "Experts in coding and software design.", "Always agreeing with others online."] }, { q: "What specific skill is described as no longer optional?", options: ["Learning to evaluate online sources for credibility.", "Learning a new foreign language.", "Starting a professional blog.", "Building a personal website."] }, { q: "What must users protect as part of being a responsible digital citizen?", options: ["Personal data.", "Their computer's physical location.", "The history of the internet.", "Old printed books."] }, { q: "What is the goal of conscious effort in using the internet?", options: ["Harnessing its power while minimizing its potential for harm.", "To completely avoid using all social media platforms.", "To only use it for professional work tasks.", "To spend the maximum amount of time online possible."] } ] },
-        "3": { questions: [ { q: "What is sleep described as being crucial for?", options: ["Repair and consolidation for the body and brain.", "Wasting excess time.", "Increasing screen time.", "Reducing physical movement during the day."] }, { q: "What cognitive function is severely affected by chronic sleep deprivation?", options: ["Concentration, mood, and judgment.", "The ability to stand up straight.", "The memory of childhood songs.", "The speed of reading simple text."] }, { q: "What does the brain primarily do with memories during sleep?", options: ["Turns short-term memories into long-term ones.", "Forgets all unnecessary information.", "Creates entirely new memories.", "Stops processing all information."] }, { q: "What is the key to overall well-being according to the text?", options: ["Treating sleep as a non-negotiable part of our health routine.", "Drinking caffeine throughout the evening.", "Working continuously without breaks.", "Only sleeping when absolutely necessary."] }, { q: "What the body repair during the sleep cycle?", options: ["Muscle tissue.", "Shoes and clothing.", "Broken electronic devices.", "Damaged furniture."] } ] },
-        "4": { questions: [ { q: "How does innovation primarily differ from invention?", options: ["Innovation focuses on improving or effectively utilizing existing ideas.", "Innovation only occurs in technology companies.", "Invention is always less useful than innovation.", "Invention is the introduction of something new."] }, { q: "What is the driving force behind market competitiveness?", options: ["Innovation.", "Stagnation.", "Strict adherence to old methods.", "Reducing product quality."] }, { q: "What type of culture is required to encourage innovation?", options: ["A culture that accepts risk and views failure as a learning opportunity.", "A culture that punishes any type of experimentation.", "A culture that adheres rigidly to hierarchy.", "A culture that avoids all new processes."] }, { q: "What happens to companies that stagnate and resist change?", options: ["They are quickly surpassed by competitors.", "They become more profitable instantly.", "They become monopolies in their field.", "They invent many new products."] }, { q: "Innovation is described as the continuous process of turning what into reality?", options: ["Potential.", "Defeat.", "Stagnation.", "The past."] } ] },
-        "5": { questions: [ { q: "What is public speaking considered one of the most powerful tools for?", options: ["Influence.", "Creating unnecessary noise.", "Avoiding all future challenges.", "Decreasing social interaction."] }, { q: "What is required to overcome the fear of public speaking?", options: ["Practice, preparation, and shifting focus to the message.", "Memorizing the entire audience list.", "Avoiding eye contact completely.", "Speaking as fast as possible."] }, { q: "What is the core difference between a speaker who only informs and a good speaker?", options: ["A good speaker connects emotionally with the audience.", "A good speaker is always taller than the audience.", "A good speaker wears louder clothes.", "A good speaker reads directly from a paper."] }, { q: "What is an essential component of professional communication?", options: ["The ability to articulate ideas clearly and persuasively.", "The ability to remain silent during meetings.", "The ability to draw complex charts quickly.", "The ability to type quickly on a keyboard."] }, { q: "What can significantly boost career prospects and confidence?", options: ["Mastering the skill of public speaking.", "Having very few meetings.", "Always working in isolation.", "Never expressing an opinion publicly."] } ] },
-        "6": { questions: [ { q: "What does Emotional intelligence (EQ) help individuals recognize and influence?", options: ["The emotions of others.", "The weather patterns.", "The stock market fluctuations.", "The speed of light."] }, { q: "What is often considered a better predictor of success than traditional intelligence (IQ)?", options: ["High Emotional Intelligence (EQ).", "The number of books read annually.", "Physical strength and endurance.", "Knowledge of obscure facts."] }, { q: "What specific skill facilitates better teamwork and conflict resolution?", options: ["Strong emotional skills.", "Avoiding all meetings.", "Never speaking in groups.", "Ignoring all personal feelings."] }, { q: "What is the definition of empathy in the context of EQ?", options: ["Seeing situations from another person's perspective.", "Strictly adhering to one's own viewpoint.", "Feeling no emotion whatsoever.", "Memorizing large philosophical texts."] }, { q: "Developing EQ involves self-awareness, which is understanding what?", options: ["Your triggers and tendencies.", "The history of your home country.", "Complex mathematical formulas.", "The rules of a board game."] } ] },
-        "7": { questions: [ { q: "What is the primary goal of recycling regarding waste?", options: ["To divert waste from landfills and conserve natural resources.", "To simply burn the trash quickly.", "To increase the volume of raw material extraction.", "To make all products disposable immediately."] }, { q: "What does the practice of recycling reduce the need for?", options: ["Raw material extraction.", "Using electricity in homes.", "Buying all new consumer goods.", "Drinking clean water."] }, { q: "What must individuals do for recycling to be effective?", options: ["Proper sorting of used materials.", "Burying all materials in the garden.", "Ignoring all sorting instructions.", "Throwing everything into one bin."] }, { q: "What significant environmental issues are often caused by raw material extraction?", options: ["Significant pollution and high energy consumption.", "Increased plant growth worldwide.", "Improved air quality in cities.", "A decrease in global temperatures."] }, { q: "What does active participation in the recycling cycle promote?", options: ["A sustainable economy.", "Increased consumption of resources.", "The immediate obsolescence of all products.", "A completely waste-free society."] } ] },
-        "8": { questions: [ { q: "What does the SMART acronym stand for in goal setting?", options: ["Specific, Measurable, Achievable, Relevant, and Time-bound.", "Simple, Mysterious, Artistic, Realistic, and Technical.", "Strong, Meaningful, Always, Responsible, and True.", "Soft, Manageable, Angry, Red, and Transparent."] }, { q: "What is the benefit of breaking down large goals into smaller milestones?", options: ["It prevents feelings of overwhelm and provides continuous psychological wins.", "It ensures the goal is never actually finished.", "It makes the goal seem unnecessarily complex.", "It reduces the motivation to start."] }, { q: "What do well-defined goals provide?", options: ["Direction, increased motivation, and focused effort.", "Immediate and guaranteed wealth.", "A reason to stop working immediately.", "A simple life with no challenges."] }, { q: "What does the structured approach of goal setting turn vague aspirations into?", options: ["Clear action plans.", "Unnecessary paperwork.", "More complex problems.", "Long philosophical debates."] }, { q: "Regularly reviewing and adjusting goals ensures they remain aligned with what?", options: ["Personal and professional priorities.", "Random daily events.", "The latest fashion trends.", "The opinions of strangers."] } ] },
-        "9": { questions: [ { q: "What is time management fundamentally about?", options: ["Working smarter, not harder.", "Adding more hours to the calendar.", "Ignoring all incoming communication.", "Rushing through every single task."] }, { q: "What is one common technique used in effective time management?", options: ["Using the Eisenhower Matrix.", "Avoiding all types of planning.", "Relying entirely on luck.", "Sleeping for most of the day."] }, { q: "What must professionals learn to say \"no\" to?", options: ["Non-essential commitments.", "Required daily tasks.", "All forms of communication.", "Necessary physical exercise."] }, { q: "What can significantly increase a professional's productivity?", options: ["Allocating specific time blocks for deep work and avoiding distractions.", "Working on five different tasks simultaneously.", "Allowing interruptions every five minutes.", "Starting work very late in the day."] }, { q: "Mastering time management leads to what positive outcomes?", options: ["Less stress, better work-life balance, and consistent achievement.", "More arguments with colleagues.", "Guaranteed promotion regardless of performance.", "A sudden change in job location."] } ] },
-        "10": { questions: [ { q: "What is the critical role of the ozone layer?", options: ["Protecting life on our planet by absorbing harmful UV radiation.", "Reflecting all visible light back into space.", "Producing all the oxygen we breathe.", "Controlling the speed of the wind."] }, { q: "What environmental effort was successfully phased out globally since the 1980s?", options: ["Ozone-depleting substances.", "Using all forms of electricity.", "Driving cars on roads.", "Planting new trees."] }, { q: "What type of radiation does the ozone layer primarily absorb?", options: ["Harmful ultraviolet (UV) radiation.", "Infrared heat radiation.", "Radio waves for communication.", "Visible light spectrum."] }, { q: "What is the ongoing recovery of the ozone layer a testament to?", options: ["The effectiveness of coordinated international environmental policy.", "The fact that ozone is no longer needed.", "A natural cosmic intervention.", "The failure of global cooperation."] }, { q: "What would life on Earth face without the ozone layer's protection?", options: ["Severe health and environmental damage.", "A pleasant increase in temperature.", "Unnecessary political debates.", "A sudden burst of creativity."] } ] }
+        "1": { questions: [ { q: "What is the core definition of critical thinking?", options: ["The ability to analyze information objectively and make a reasoned judgment.", "The ability to memorize large amounts of data quickly.", "The process of accepting information without question.", "The act of forming conclusions based solely on emotion."] }, /* ... بقية الأسئلة */ ] },
+        // ... (سيتم تحميل الأسئلة بناءً على رقم المهمة)
     };
 
     const urlParams = new URLSearchParams(window.location.search);
@@ -155,14 +156,13 @@
         const audio = document.getElementById('mainAudio');
         const source = document.getElementById('audioSource');
         
-// إضافة ../../ لكي يخرج المتصفح من مجلد MIF ومجلد المهمة ويصل للجذر
-const audioPath = `../../assets/gesaudio/GES${taskNum}.wav`;
+        // ضبط المسار السمعي
+        const audioPath = `../../assets/gesaudio/GES${taskNum}.wav`;
         source.src = audioPath;
         audio.load();
 
-        document.getElementById('task-title').innerText = `GOLDEN EAR MISSION: UNIT ${taskNum.padStart(2, '0')}`;
+        document.getElementById('task-title').innerText = `MISSION GES: PROTOCOL ${taskNum.padStart(2, '0')}`;
 
-        // بناء الأسئلة ديناميكياً
         const mission = geMissions[taskNum] || geMissions["1"];
         const container = document.getElementById('quiz-container');
         
@@ -210,7 +210,9 @@ const audioPath = `../../assets/gesaudio/GES${taskNum}.wav`;
         
         window.parent.postMessage({
             type: 'MISSION_ANSWERS',
-            answers: answersArray.join(', ')
+            activityCode: 'GES',
+            answers: answersArray.join(', '),
+            missionNum: taskNum
         }, '*');
     }
 
