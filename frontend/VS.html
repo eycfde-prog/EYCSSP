@@ -3,179 +3,110 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Vivid | Picture Description | Glassy Edition</title>
+    <title>Vivid | Narrative Analysis | Jessy Edition</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
     <style>
         :root { 
             --vivid-blue: #00d4ff; 
-            --glass-bg: rgba(10, 15, 25, 0.9); 
-            --border-glow: rgba(0, 212, 255, 0.3);
-            --scan-line: rgba(0, 212, 255, 0.1);
-            --gold-border: #d4af37;
+            --glass-bg: rgba(5, 10, 20, 0.95); 
+            --border-glow: rgba(0, 212, 255, 0.25);
+            --scan-line: rgba(0, 212, 255, 0.15);
+            --gold-trim: #d4af37;
         }
 
         body { 
             font-family: 'Rajdhani', sans-serif; 
-            background: transparent; 
-            color: white; 
-            margin: 0; 
-            padding: 20px; 
-            direction: ltr;
+            background: transparent; color: white; 
+            margin: 0; padding: 20px; direction: ltr;
         }
 
         .vivid-container {
-            max-width: 850px; 
-            margin: 0 auto; 
-            animation: emerge 0.8s ease-out;
+            max-width: 850px; margin: 0 auto; 
+            animation: slideUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
         }
 
-        @keyframes emerge { 
-            from { opacity: 0; transform: translateY(10px); } 
+        @keyframes slideUp { 
+            from { opacity: 0; transform: translateY(30px); } 
             to { opacity: 1; transform: translateY(0); } 
         }
 
-        .header-vivid {
-            text-align: center;
-            margin-bottom: 25px;
-        }
+        .header-vivid { text-align: center; margin-bottom: 30px; }
 
         .header-vivid h1 { 
-            font-family: 'Orbitron'; 
-            color: var(--vivid-blue); 
-            letter-spacing: 6px; 
-            margin: 0; 
-            font-size: 1.3rem;
-            text-shadow: 0 0 15px rgba(0, 212, 255, 0.5);
-        }
-
-        .mission-image {
-            width: 100%;
-            max-width: 1000px;
-            height: auto;
-            border-radius: 15px;
-            border: 1px solid var(--gold-border);
-            display: block;
-            margin: 0 auto;
+            font-family: 'Orbitron'; color: var(--vivid-blue); 
+            letter-spacing: 5px; margin: 0; font-size: 1.2rem;
+            text-shadow: 0 0 20px rgba(0, 212, 255, 0.4);
+            text-transform: uppercase;
         }
 
         .image-frame {
-            background: #000; 
-            border: 1px solid var(--border-glow);
-            padding: 10px; 
-            border-radius: 20px; 
-            margin-bottom: 30px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.7);
-            position: relative;
-            overflow: hidden;
-            min-height: 250px;
+            background: #000; border: 1px solid var(--border-glow);
+            padding: 12px; border-radius: 20px; margin-bottom: 30px;
+            box-shadow: 0 25px 60px rgba(0,0,0,0.8);
+            position: relative; overflow: hidden;
+            display: flex; align-items: center; justify-content: center;
+            min-height: 300px;
         }
 
-        .image-frame::before {
-            content: "";
-            position: absolute;
-            top: -100%; left: 0; width: 100%; height: 100%;
+        /* شعاع المسح الضوئي */
+        .image-frame::after {
+            content: ""; position: absolute;
+            top: -100%; left: 0; width: 100%; height: 20%;
             background: linear-gradient(to bottom, transparent, var(--scan-line), transparent);
-            animation: scan 3s linear infinite;
-            z-index: 2;
-            pointer-events: none;
+            animation: radar 4s linear infinite;
+            z-index: 5; pointer-events: none;
         }
 
-        @keyframes scan {
+        @keyframes radar {
             0% { top: -100%; }
-            100% { top: 100%; }
+            100% { top: 200%; }
         }
 
         #target-image {
-            width: 100%; 
-            max-height: 450px; 
-            object-fit: contain;
-            border-radius: 12px; 
-            display: block;
-            filter: contrast(1.05);
-            transition: 0.5s ease;
+            max-width: 100%; max-height: 500px; 
+            border-radius: 12px; transition: 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            filter: saturate(1.1) brightness(0.9);
         }
 
         .image-frame:hover #target-image {
-            transform: scale(1.02);
-            filter: contrast(1.1) brightness(1.05);
+            transform: scale(1.03); filter: saturate(1.2) brightness(1.1);
         }
 
         .description-zone {
-            background: var(--glass-bg); 
-            border-radius: 20px;
-            padding: 25px; 
-            border: 1px solid rgba(255,255,255,0.05);
-            backdrop-filter: blur(15px);
+            background: var(--glass-bg); border-radius: 25px;
+            padding: 30px; border: 1px solid rgba(255,255,255,0.08);
+            backdrop-filter: blur(20px); box-shadow: 0 10px 30px rgba(0,0,0,0.3);
         }
 
         .description-zone label {
-            display: block; 
-            font-family: 'Orbitron'; 
-            color: var(--vivid-blue);
-            font-size: 9px; 
-            margin-bottom: 15px; 
-            letter-spacing: 2px; 
+            display: block; font-family: 'Orbitron'; color: var(--vivid-blue);
+            font-size: 10px; margin-bottom: 18px; letter-spacing: 3px;
         }
 
         textarea {
-            width: 100%; 
-            height: 180px; 
-            background: rgba(0,0,0,0.3); 
-            border: none;
-            color: #eee; 
-            font-family: 'Rajdhani'; 
-            font-size: 1.2rem;
-            line-height: 1.6; 
-            outline: none; 
-            resize: none; 
-            box-sizing: border-box;
-            border-left: 3px solid var(--vivid-blue); 
-            padding: 12px 20px;
-            border-radius: 0 15px 15px 0;
-            transition: 0.3s;
+            width: 100%; height: 200px; background: rgba(0,0,0,0.4); 
+            border: 1px solid rgba(255,255,255,0.05);
+            color: #f0f0f0; font-family: 'Rajdhani'; font-size: 1.25rem;
+            line-height: 1.7; outline: none; resize: none; box-sizing: border-box;
+            border-left: 4px solid var(--vivid-blue); padding: 15px 25px;
+            border-radius: 0 18px 18px 0; transition: 0.3s;
         }
 
         textarea:focus {
-            background: rgba(0, 212, 255, 0.03);
-            border-left-width: 6px;
+            background: rgba(0, 212, 255, 0.05);
+            border-left-width: 10px; border-color: rgba(0, 212, 255, 0.3);
         }
 
         .footer-tools {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 15px;
-            padding-top: 15px;
-            border-top: 1px solid rgba(255,255,255,0.05);
-        }
-
-        .hint-text {
-            font-size: 10px; 
-            color: #666; 
-            letter-spacing: 0.5px;
+            display: flex; justify-content: space-between;
+            align-items: center; margin-top: 20px;
+            padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.05);
         }
 
         .word-counter {
-            font-family: 'Orbitron';
-            font-size: 10px;
-            color: var(--vivid-blue);
-            background: rgba(0, 212, 255, 0.1);
-            padding: 4px 12px;
-            border-radius: 50px;
-        }
-
-        .btn-submit {
-            width: 100%; margin-top: 20px;
-            background: transparent; border: 1px solid var(--vivid-blue);
-            color: var(--vivid-blue); padding: 14px;
-            font-family: 'Orbitron'; border-radius: 50px;
-            cursor: pointer; transition: 0.3s; letter-spacing: 2px;
-            font-size: 11px; font-weight: bold;
-        }
-
-        .btn-submit:hover {
-            background: var(--vivid-blue); color: black;
-            box-shadow: 0 0 20px var(--vivid-blue);
+            font-family: 'Orbitron'; font-size: 10px;
+            color: var(--vivid-blue); background: rgba(0, 212, 255, 0.1);
+            padding: 6px 16px; border-radius: 50px; border: 1px solid var(--border-glow);
         }
     </style>
 </head>
@@ -183,24 +114,23 @@
 
     <div class="vivid-container">
         <div class="header-vivid">
-            <h1 id="v-title">VIVID: MISSION ANALYSIS</h1>
-            <p style="color: #666; font-size: 11px; margin: 8px 0; letter-spacing: 1px;">SYSTEM STATUS: ANALYZING VISUAL DATA...</p>
+            <h1 id="v-title">VIVID: VISUAL DECODING</h1>
+            <p style="color: #555; font-size: 10px; margin: 10px 0; letter-spacing: 2px;">SCANNING ARCHIVE FOR MISSION DATA...</p>
         </div>
 
         <div class="image-frame">
-            <img id="target-image" src="" alt="Visual Target" class="mission-image">
+            <img id="target-image" src="" alt="Target Analysis">
         </div>
 
         <div class="description-zone">
-            <label>NARRATIVE ENCODING:</label>
-            <textarea id="descInput" placeholder="Describe textures, lighting, and cinematic atmosphere..." oninput="updateWordCount()"></textarea>
+            <label>NARRATIVE SEQUENCE INPUT:</label>
+            <textarea id="descInput" placeholder="Analyze lighting, textures, and atmospheric depth..." oninput="updateWordCount()"></textarea>
             
             <div class="footer-tools">
-                <div class="hint-text">Translate visual elements into narrative power.</div>
+                <div style="font-size: 10px; color: #666; font-style: italic;">"Every pixel holds a story."</div>
                 <div class="word-counter">DATA_POINTS: <span id="wCount">0</span></div>
             </div>
         </div>
-
     </div>
 
 <script>
@@ -212,12 +142,13 @@
 
     function initVivid() {
         const imgElement = document.getElementById('target-image');
+        // مسار الصورة في مستودعك
         const rawUrl = `https://raw.githubusercontent.com/${GITHUB_USER}/${REPO_NAME}/main/assets/vspics/VS${taskNum}.png`;
         
         imgElement.src = rawUrl;
         
         imgElement.onerror = function() {
-            this.src = "https://placehold.co/800x450/050505/00d4ff?text=IMAGE+NOT+FOUND";
+            this.src = "https://via.placeholder.com/800x450/050505/00d4ff?text=SIGNAL+LOST:+IMAGE+NOT+FOUND";
         };
         
         document.getElementById('v-title').innerText = `VIVID: MISSION ${taskNum.padStart(2, '0')}`;
@@ -225,25 +156,24 @@
 
     function updateWordCount() {
         const text = document.getElementById('descInput').value.trim();
-        const words = text ? text.split(/\s+/).length : 0;
+        const words = text ? text.split(/\s+/).filter(w => w.length > 0).length : 0;
         document.getElementById('wCount').innerText = words;
     }
 
-    // --- التعديل الجوهري هنا ---
     window.addEventListener('message', function(event) {
         if (event.data.type === 'REQUEST_MISSION_DATA') {
             const description = document.getElementById('descInput').value.trim();
             
             if(!description) {
-                // بدلاً من alert، نرسل تنبيه بسيط للأم
-                document.getElementById('descInput').style.borderColor = "red";
+                document.getElementById('descInput').style.borderColor = "#ff4444";
                 return; 
             }
 
-            // نرسل الإجابة فقط، الصفحة الأم هي من ستتولى الباقي كما في نشاط Alike
             window.parent.postMessage({ 
                 type: 'MISSION_ANSWERS', 
-                answers: description 
+                activityCode: 'VS',
+                answers: description,
+                missionNum: taskNum
             }, '*');
         }
     });
