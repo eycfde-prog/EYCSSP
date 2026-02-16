@@ -4,21 +4,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>EYC Arena | Titanium Mode</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Orbitron:wght@400;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Orbitron:wght@400;500;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root { 
             --gold: #D4AF37; 
-            --gold-glow: rgba(212, 175, 55, 0.6); 
+            --gold-glow: rgba(212, 175, 55, 0.5); 
             --gold-gradient: linear-gradient(135deg, #bf953f, #fcf6ba, #b38728); 
             --bg-deep: #020205; 
-            --glass: rgba(255, 255, 255, 0.03); 
-            --glass-border: rgba(212, 175, 55, 0.3); 
-            --transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+            --glass: rgba(255, 255, 255, 0.02); 
+            --glass-border: rgba(212, 175, 55, 0.2); 
+            --transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; -webkit-tap-highlight-color: transparent; }
-        
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
         body { 
             background: var(--bg-deep); 
             color: white; 
@@ -26,165 +26,184 @@
             display: flex; 
             flex-direction: column; 
             overflow: hidden; 
-            position: relative; 
+            position: relative;
+            font-family: 'Poppins', sans-serif;
         }
 
-        /* Star Background & Overlay Effects */
-        #star-container { position: fixed; inset: 0; z-index: -2; background: radial-gradient(circle at 50% 50%, #111827 0%, #020205 100%); }
-        .star { position: absolute; background: white; border-radius: 50%; opacity: 0.4; }
-        
-        /* Scanning Lines Effect */
-        body::before {
-            content: "";
-            position: fixed; inset: 0;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.2) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
-            background-size: 100% 3px, 3px 100%;
-            z-index: 100; pointer-events: none; opacity: 0.3;
-        }
+        /* Star Background Animation */
+        #star-container { position: fixed; inset: 0; z-index: -2; background: radial-gradient(circle at center, #0a0c14 0%, #020205 100%); }
+        .star { position: absolute; background: white; border-radius: 50%; opacity: 0.3; animation: twinkle 3s infinite; }
+        @keyframes twinkle { 0%, 100% { opacity: 0.3; } 50% { opacity: 0.8; } }
 
+        /* Tactical Header */
         header { 
             padding: 12px 20px; 
-            background: rgba(5, 5, 8, 0.85); 
-            backdrop-filter: blur(20px); 
-            border-bottom: 2px solid var(--glass-border); 
+            background: linear-gradient(to bottom, rgba(0,0,0,0.9), transparent);
+            border-bottom: 1px solid var(--glass-border); 
             z-index: 10; 
         }
-
         .battle-header { display: flex; justify-content: space-between; align-items: center; max-width: 1200px; margin: 0 auto; width: 100%; }
-
+        
         .info-box { 
             display: flex; 
             align-items: center; 
             gap: 12px; 
-            background: rgba(212, 175, 55, 0.05); 
-            padding: 6px 14px; 
+            background: var(--glass); 
+            padding: 6px 12px; 
             border-radius: 12px; 
             border: 1px solid var(--glass-border);
-            box-shadow: inset 0 0 10px rgba(212, 175, 55, 0.1);
-        }
-
-        .student-photo, .activity-logo { 
-            width: 42px; height: 42px; 
-            border-radius: 8px; 
-            border: 2px solid var(--gold); 
-            object-fit: cover; 
-            box-shadow: 0 0 10px var(--gold-glow);
-        }
-
-        .name { font-family: 'Cinzel', serif; font-size: 0.85rem; color: var(--gold); font-weight: 900; letter-spacing: 1px; }
-        .rank-bar { width: 60px; height: 4px; background: #222; border-radius: 2px; margin-top: 4px; overflow: hidden; border: 0.5px solid var(--glass-border); }
-        .rank-progress { width: 75%; height: 100%; background: var(--gold-gradient); box-shadow: 0 0 5px var(--gold); }
-
-        /* Arena Viewport Style */
-        .arena-container { flex: 1; padding: 15px; display: flex; justify-content: center; align-items: center; position: relative; }
-        
-        .glass-iframe-wrapper { 
-            width: 100%; height: 100%; 
-            max-width: 1100px; 
-            background: #000; 
-            border: 1px solid var(--glass-border); 
-            border-radius: 10px; 
-            overflow: hidden; 
-            position: relative;
-            box-shadow: 0 0 40px rgba(0,0,0,0.5), inset 0 0 30px rgba(212, 175, 55, 0.1);
-        }
-
-        /* Corner Brackets */
-        .glass-iframe-wrapper::before, .glass-iframe-wrapper::after {
-            content: ""; position: absolute; width: 20px; height: 20px; z-index: 5;
-        }
-        .corner-tl { top: 0; left: 0; border-top: 3px solid var(--gold); border-left: 3px solid var(--gold); }
-        .corner-tr { top: 0; right: 0; border-top: 3px solid var(--gold); border-right: 3px solid var(--gold); }
-        .corner-bl { bottom: 0; left: 0; border-bottom: 3px solid var(--gold); border-left: 3px solid var(--gold); }
-        .corner-br { bottom: 0; right: 0; border-bottom: 3px solid var(--gold); border-right: 3px solid var(--gold); }
-
-        iframe { width: 100%; height: 100%; border: none; background: transparent; }
-
-        footer { 
-            padding: 15px 20px; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            gap: 15px; 
-            background: rgba(0,0,0,0.5);
             backdrop-filter: blur(10px);
         }
 
-        .btn { 
-            padding: 12px 24px; 
+        .student-photo { 
+            width: 40px; height: 40px; 
             border-radius: 8px; 
-            border: none; 
-            font-weight: 700; 
-            cursor: pointer; 
-            transition: var(--transition); 
-            font-size: 0.75rem; 
-            font-family: 'Orbitron'; 
+            border: 1.5px solid var(--gold); 
+            object-fit: cover;
+            box-shadow: 0 0 10px var(--gold-glow);
+        }
+
+        .name { font-family: 'Cinzel', serif; font-size: 0.8rem; color: var(--gold); font-weight: 700; letter-spacing: 0.5px; }
+        .rank-tag { font-family: 'Orbitron', sans-serif; font-size: 0.55rem; color: #aaa; text-transform: uppercase; letter-spacing: 1px; }
+
+        .arena-title { text-align: center; }
+        .arena-title h1 { 
+            font-family: 'Cinzel', serif; 
+            color: var(--gold); 
+            font-size: 1.2rem; 
+            letter-spacing: 4px; 
+            text-shadow: 0 0 15px var(--gold-glow);
+        }
+
+        /* Modernized Viewport */
+        .arena-container { 
+            flex: 1; 
+            padding: 15px; 
             display: flex; 
+            justify-content: center; 
             align-items: center; 
-            gap: 8px;
+            position: relative;
+        }
+
+        .glass-iframe-wrapper { 
+            width: 100%; height: 100%; 
+            max-width: 1100px; 
+            background: #000;
+            border: 1px solid var(--glass-border); 
+            border-radius: 8px; 
+            overflow: hidden; 
+            position: relative;
+            box-shadow: inset 0 0 50px rgba(0,0,0,0.9), 0 0 30px rgba(0,0,0,0.5);
+        }
+
+        /* Scanline Effect */
+        .glass-iframe-wrapper::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%), 
+                        linear-gradient(90deg, rgba(255, 0, 0, 0.02), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.02));
+            background-size: 100% 3px, 3px 100%;
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        /* Corner Brackets */
+        .corner { position: absolute; width: 20px; height: 20px; border: 2px solid var(--gold); z-index: 3; filter: drop-shadow(0 0 5px var(--gold)); }
+        .top-l { top: 10px; left: 10px; border-right: none; border-bottom: none; }
+        .top-r { top: 10px; right: 10px; border-left: none; border-bottom: none; }
+        .bot-l { bottom: 10px; left: 10px; border-right: none; border-top: none; }
+        .bot-r { bottom: 10px; right: 10px; border-left: none; border-top: none; }
+
+        iframe { width: 100%; height: 100%; border: none; position: relative; z-index: 1; }
+
+        /* Tactical Footer */
+        footer { 
+            padding: 15px 20px; 
+            display: flex; 
+            gap: 12px; 
+            max-width: 1200px; 
+            margin: 0 auto; 
+            width: 100%; 
+        }
+
+        .btn { 
+            padding: 12px; border-radius: 8px; border: none; 
+            font-weight: 700; cursor: pointer; transition: var(--transition); 
+            font-size: 0.75rem; font-family: 'Orbitron', sans-serif; 
+            display: flex; align-items: center; justify-content: center; gap: 8px;
             text-transform: uppercase;
         }
 
         .btn-submit { 
             flex: 2; 
-            max-width: 400px;
             background: var(--gold-gradient); 
             color: #000; 
-            box-shadow: 0 4px 15px rgba(212, 175, 55, 0.4); 
+            box-shadow: 0 4px 15px var(--gold-glow);
         }
-        .btn-submit:hover { transform: translateY(-3px) scale(1.02); box-shadow: 0 8px 25px var(--gold-glow); }
-        .btn-submit:active { transform: translateY(0); }
+        .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 6px 25px var(--gold); }
+        .btn-submit:active { transform: translateY(1px); }
 
         .btn-side { 
-            background: rgba(255,255,255,0.05); 
+            flex: 1; 
+            background: rgba(255,255,255,0.03); 
             color: var(--gold); 
             border: 1px solid var(--glass-border); 
         }
         .btn-side:hover { background: rgba(212, 175, 55, 0.1); border-color: var(--gold); }
 
-        /* Sync Overlay Modernized */
+        /* Cyber Sync Overlay */
         #sync-overlay { 
             position: fixed; inset: 0; 
-            background: rgba(2, 2, 5, 0.95); 
+            background: #020205; 
             z-index: 2000; display: none; 
-            flex-direction: column; justify-content: center; 
-            align-items: center; backdrop-filter: blur(20px); 
+            flex-direction: column; justify-content: center; align-items: center; 
+            backdrop-filter: blur(20px);
         }
 
         .terminal-loader {
-            font-family: 'Courier New', monospace;
-            color: var(--gold);
-            font-size: 0.7rem;
-            margin-top: 20px;
-            height: 50px;
-            overflow: hidden;
-            text-align: left;
-            opacity: 0.7;
+            width: 300px; text-align: left; font-family: 'Orbitron', monospace; color: var(--gold); font-size: 0.7rem; margin-top: 20px;
         }
 
-        @keyframes pulse-gold {
-            0% { box-shadow: 0 0 10px var(--gold-glow); }
-            50% { box-shadow: 0 0 25px var(--gold-glow); }
-            100% { box-shadow: 0 0 10px var(--gold-glow); }
+        .fairy-loader i { 
+            font-size: 4rem; color: var(--gold); 
+            filter: drop-shadow(0 0 20px var(--gold));
+            animation: pulse 2s infinite ease-in-out; 
         }
 
-        /* Mobile Adjustments */
+        @keyframes pulse { 0%, 100% { opacity: 0.5; transform: scale(0.9); } 50% { opacity: 1; transform: scale(1.1); } }
+
+        .result-card { 
+            background: rgba(212, 175, 55, 0.05); 
+            padding: 30px; border-radius: 20px; 
+            border: 1px solid var(--gold); 
+            text-align: center;
+            max-width: 90%; width: 350px;
+            animation: slideUp 0.5s forwards;
+        }
+        @keyframes slideUp { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        
+        /* Mobile Optimization */
         @media (max-width: 600px) {
-            .battle-header .info-box:nth-child(2) { display: none; }
-            .name { font-size: 0.7rem; }
-            .btn span { display: none; }
-            .btn { padding: 12px; }
-            footer { padding: 10px; gap: 8px; }
+            .battle-header { gap: 5px; }
+            .info-box { padding: 4px 8px; }
+            .name { font-size: 0.65rem; }
+            .arena-title h1 { font-size: 0.9rem; letter-spacing: 2px; }
+            footer { padding: 10px; }
+            .btn { font-size: 0.65rem; padding: 10px 5px; }
         }
     </style>
 </head>
 <body>
 
     <div id="sync-overlay">
-        <div id="loader-content" style="text-align: center;">
-            <div class="fairy-loader"><i class="fas fa-wand-magic-sparkles" style="font-size: 3rem; color: var(--gold); margin-bottom: 20px;"></i></div>
-            <div style="color: var(--gold); font-family: 'Orbitron'; font-size: 1.1rem; letter-spacing: 2px;">ENCRYPTING DATA...</div>
-            <div class="terminal-loader" id="terminal-text"></div>
+        <div id="loader-content" style="display: flex; flex-direction: column; align-items: center;">
+            <div class="fairy-loader"><i class="fas fa-microchip"></i></div>
+            <div style="margin-top: 20px; text-align: center;">
+                <div style="color: var(--gold); font-family: 'Orbitron'; font-size: 1rem;">SECURE LINK ESTABLISHED</div>
+                <div id="status-msg" style="color: #666; font-size: 0.7rem; margin-top: 5px;">PROTOCOL: TITANIUM_MODE_ACTIVE</div>
+            </div>
+            <div class="terminal-loader" id="terminal-logs"></div>
         </div>
         <div id="result-display" style="display: none;" class="result-card"></div>
     </div>
@@ -194,45 +213,41 @@
     <header>
         <div class="battle-header">
             <div class="info-box">
-                <img id="student-img" class="student-photo" src="" alt="S">
-                <div>
-                    <span class="name" id="student-name">LOADING...</span>
-                    <div class="rank-bar"><div class="rank-progress"></div></div>
+                <img id="student-img" class="student-photo" src="" alt="A">
+                <div style="display: flex; flex-direction: column;">
+                    <span class="name" id="student-name">...</span>
+                    <span class="rank-tag" id="student-title">ELITE</span>
                 </div>
             </div>
-            
-            <div style="text-align: center;">
-                <div style="font-family: 'Cinzel'; color: var(--gold); font-weight: 900; letter-spacing: 4px; font-size: 1.2rem;">ARENA</div>
-                <div style="font-family: 'Orbitron'; font-size: 0.5rem; color: #888; letter-spacing: 2px;">TITANIUM MODE</div>
+            <div class="arena-title">
+                <h1>ARENA</h1>
             </div>
-
             <div class="info-box">
-                <div style="text-align: right;">
-                    <span class="name" id="activity-title" style="color: white;">ACTIVITY</span>
-                    <div id="mission-sub" style="font-size: 0.5rem; color: var(--gold); font-family: 'Orbitron';">MISSION --</div>
+                <div style="display: flex; flex-direction: column; text-align: right;">
+                    <span class="name" id="activity-title">...</span>
+                    <span id="mission-sub" class="rank-tag" style="color: var(--gold);">MISSION --</span>
                 </div>
-                <img id="activity-img" class="activity-logo" src="" alt="L">
+                <img id="activity-img" class="student-photo" style="border-radius: 50%;" src="" alt="L">
             </div>
         </div>
     </header>
 
     <main class="arena-container">
-        <div class="glass-iframe-wrapper" id="glass-iframe-wrapper">
-            <div class="corner-tl"></div><div class="corner-tr"></div>
-            <div class="corner-bl"></div><div class="corner-br"></div>
+        <div class="glass-iframe-wrapper">
+            <div class="corner top-l"></div><div class="corner top-r"></div>
+            <div class="corner bot-l"></div><div class="corner bot-r"></div>
             <iframe id="contentFrame" allow="autoplay"></iframe>
         </div>
     </main>
 
     <footer>
-        <button class="btn btn-side" onclick="showRules()"><i class="fas fa-scroll"></i> <span>RULES</span></button>
-        <button id="submitBtn" class="btn btn-submit" onclick="startSubmission()"><i class="fas fa-shield-alt"></i> SUBMIT MISSION</button>
-        <button class="btn btn-side" onclick="window.location.href='MC.html'"><i class="fas fa-door-open"></i> <span>EXIT</span></button>
+        <button class="btn btn-side" onclick="showRules()"><i class="fas fa-scroll"></i> RULES</button>
+        <button id="submitBtn" class="btn btn-submit" onclick="startSubmission()"><i class="fas fa-shield-halved"></i> SUBMIT MISSION</button>
+        <button class="btn btn-side" onclick="exitArena()"><i class="fas fa-power-off"></i> EXIT</button>
     </footer>
 
 <script>
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxHYyjTsl3YmWUQOaQ6Zm7dhCkPGFmaVgnmRxErFbKks4lOj3fq0RmYZ2dDSksa_vNDug/exec"; 
-
     let currentActivity, currentTask, userEmail, userName;
 
     function createStars() {
@@ -243,29 +258,17 @@
             star.style.width = star.style.height = Math.random() * 2 + 'px';
             star.style.top = Math.random() * 100 + '%';
             star.style.left = Math.random() * 100 + '%';
-            star.style.animation = `pulse-gold ${2 + Math.random() * 3}s infinite`;
+            star.style.animationDelay = Math.random() * 3 + 's';
             container.appendChild(star);
         }
     }
 
-    // Terminal effect for loading
-    function startTerminal() {
-        const logs = [
-            "> Establishing Secure Link...",
-            "> Bypassing Firewalls...",
-            "> Analyzing Mission Patterns...",
-            "> Transmission Encrypted...",
-            "> HQ Handshake Verified."
-        ];
-        let i = 0;
-        const div = document.getElementById('terminal-text');
-        div.innerHTML = "";
-        const interval = setInterval(() => {
-            if(i < logs.length) {
-                div.innerHTML += logs[i] + "<br>";
-                i++;
-            } else { clearInterval(interval); }
-        }, 800);
+    function addLog(text) {
+        const logs = document.getElementById('terminal-logs');
+        const line = document.createElement('div');
+        line.innerHTML = `> ${text}`;
+        logs.prepend(line);
+        if(logs.childNodes.length > 5) logs.removeChild(logs.lastChild);
     }
 
     window.onload = async function() {
@@ -285,7 +288,8 @@
 
         document.getElementById('student-name').innerText = userName.toUpperCase();
         document.getElementById('activity-title').innerText = currentActivity;
-        document.getElementById('mission-sub').innerText = `MISSION ${currentTask.padStart(2, '0')}`;
+        document.getElementById('mission-sub').innerText = `MSR-${currentTask.padStart(2, '0')}`;
+        document.getElementById('student-title').innerText = (urlParams.get('title') || savedUser.title || "ELITE AGENT").toUpperCase();
         
         let avatarUrl = urlParams.get('avatar') || savedUser.avatar || "assets/default-avatar.png";
         document.getElementById('student-img').src = decodeURIComponent(avatarUrl);
@@ -300,40 +304,31 @@
             const data = await response.json();
             
             if (data.done) {
-                showSuccessState(data);
+                renderResult(data.grade, data.maxGrade, "Mission already completed.");
             } else {
-                document.getElementById('sync-overlay').style.display = 'none';
                 document.getElementById('contentFrame').src = `${currentActivity}.html?task=${currentTask}`;
             }
         } catch (e) {
-            document.getElementById('sync-overlay').style.display = 'none';
             document.getElementById('contentFrame').src = `${currentActivity}.html?task=${currentTask}`;
         }
     }
 
-    function showSuccessState(data) {
+    function renderResult(grade, max, msg) {
         const resultDiv = document.getElementById('result-display');
         document.getElementById('sync-overlay').style.display = 'flex';
         document.getElementById('loader-content').style.display = 'none';
-        
         resultDiv.style.display = 'block';
-        resultDiv.className = "result-card";
-        resultDiv.style.textAlign = "center";
         resultDiv.innerHTML = `
-            <div style="font-size: 1.5rem; color: var(--gold); font-family: 'Orbitron'; margin-bottom:20px;">MISSION SECURED</div>
-            <div style="font-size: 4rem; font-weight: 900; color: white; text-shadow: 0 0 20px var(--gold-glow);">${data.grade || '--'}</div>
-            <div style="color: #888; margin-bottom: 25px;">TOTAL EVALUATION SCORE</div>
+            <i class="fas fa-award" style="font-size: 3rem; color: var(--gold); margin-bottom: 15px;"></i>
+            <div style="font-size: 1rem; color: var(--gold); font-family: 'Orbitron';">MISSION ARCHIVED</div>
+            <div style="font-size: 3.5rem; margin: 10px 0; font-family: 'Orbitron'; font-weight: 700;">${grade}<span style="font-size: 1.5rem; color: #555;">/${max}</span></div>
+            <p style="color: #aaa; font-size: 0.8rem; margin-bottom: 20px;">${msg}</p>
             <button class="btn btn-submit" style="width:100%" onclick="window.location.href='MC.html'">RETURN TO BASE</button>
         `;
-        
-        document.getElementById('glass-iframe-wrapper').innerHTML = `
-            <div style="display:flex; flex-direction:column; justify-content:center; align-items:center; height:100%; color:var(--gold); font-family:'Orbitron';">
-                <i class="fas fa-medal" style="font-size:5rem; margin-bottom:20px; filter: drop-shadow(0 0 15px var(--gold));"></i>
-                <h2>MISSION ACCOMPLISHED</h2>
-            </div>`;
     }
 
     function startSubmission() {
+        addLog("Initializing submission sequence...");
         const frame = document.getElementById('contentFrame').contentWindow;
         frame.postMessage({ type: 'REQUEST_MISSION_DATA' }, '*');
     }
@@ -344,54 +339,54 @@
         }
     });
 
-    function processAnswers(answers) {
-        if (!answers || (Array.isArray(answers) && answers.length === 0)) {
-            alert("⚠️ HQ: Report is empty! Provide data before submission.");
+    async function processAnswers(answers) {
+        if (!answers || (Array.isArray(answers) && answers.every(a => !a))) {
+            alert("⚠️ HQ: Submission rejected. Data fields are empty.");
             return;
         }
         
         document.getElementById('sync-overlay').style.display = 'flex';
-        document.getElementById('loader-content').style.display = 'block';
-        startTerminal();
+        addLog("Encrypting tactical data...");
+        setTimeout(() => addLog("Handshaking with AI Grader..."), 800);
         
-        sendToAiGrader(answers);
-    }
-
-    async function sendToAiGrader(answers) {
         let separator = (currentActivity === "FX" || currentActivity === "LX") ? "|" : ",";
         const cleanedAnswers = Array.isArray(answers) ? answers.map(a => String(a).trim()).join(separator) : String(answers).trim();
-
-        const payload = {
-            action: "submitReport",
-            email: userEmail,
-            actCode: currentActivity,
-            taskNum: currentTask,
-            answer: cleanedAnswers
-        };
 
         try {
             const response = await fetch(SCRIPT_URL, {
                 method: 'POST',
-                body: JSON.stringify(payload)
+                body: JSON.stringify({
+                    action: "submitReport",
+                    email: userEmail,
+                    actCode: currentActivity,
+                    taskNum: currentTask,
+                    answer: cleanedAnswers
+                })
             });
 
             const result = await response.json();
 
             if (result.success) {
-                showSuccessState(result);
+                addLog("Evaluation complete. Syncing...");
+                renderResult(result.grade, result.maxGrade, result.feedback || result.reason);
             } else {
-                throw new Error(result.reason || "Evaluation failed");
+                throw new Error(result.reason);
             }
-
         } catch (error) {
-            alert("⚠️ Connection Failed. Progress cached. Try again.");
+            addLog("Error: Connection unstable.");
+            alert("⚠️ Connection Lost. Retrying in background...");
             document.getElementById('sync-overlay').style.display = 'none';
         }
     }
 
     function showRules() {
-        // فكرة فخمة لعرض القوانين
-        alert("1. Maintain Integrity\n2. Speed is Key\n3. Excellence is Mandatory");
+        alert("ARENA PROTOCOLS:\n1. Integrity: External AI assistance is logged.\n2. Precision: Answers must be concise.\n3. Time: Efficiency affects rank.");
+    }
+
+    function exitArena() {
+        if(confirm("Are you sure you want to abort the mission?")) {
+            window.location.href='MC.html';
+        }
     }
 </script>
 </body>
