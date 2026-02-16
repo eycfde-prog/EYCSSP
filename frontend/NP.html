@@ -28,7 +28,6 @@
             z-index: -1;
         }
 
-        /* Container & Layout */
         .container { 
             display: flex; 
             flex-wrap: wrap; 
@@ -40,7 +39,6 @@
             margin: 0 auto;
         }
 
-        /* Sidebar & Avatar */
         .avatar-section {
             flex: 1;
             min-width: 280px;
@@ -99,7 +97,6 @@
             font-size: 1.2rem;
         }
 
-        /* Form Section */
         .form-section {
             flex: 2;
             min-width: 320px;
@@ -149,7 +146,6 @@
         .btn-group { display: flex; gap: 15px; }
         .prev-btn { background: rgba(255,255,255,0.1); color: white; }
 
-        /* Sub-options & Tickets */
         .sub-options { 
             display: none; margin-top: 15px; text-align: left;
             padding: 15px;
@@ -160,7 +156,6 @@
         .golden-ticket-area { display: none; margin-top: 10px; }
         .ticket-input { width: 100%; padding: 10px; margin-bottom: 10px; border-radius: 10px; border: 1px solid #d4af37; background: rgba(0,0,0,0.5); color: white; text-align: center; }
 
-        /* Progress Bar */
         .progress-container {
             position: fixed;
             top: 0; left: 0;
@@ -177,13 +172,6 @@
             box-shadow: 0 0 10px var(--gold);
         }
 
-        /* Success Card */
-        #success-card { display: none; text-align: center; }
-        .card-inner { background: rgba(255,255,255,0.05); padding: 20px; border-radius: 20px; border: 1px solid var(--gold); }
-        .code-box { background: #000; padding: 10px; border-radius: 10px; font-size: 1.5rem; font-weight: bold; color: var(--gold); margin-top: 15px; }
-        .final-btn { margin-top: 20px; }
-
-        /* Utils */
         .loading-overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -195,7 +183,6 @@
         .check-label { display: flex; align-items: center; gap: 8px; cursor: pointer; }
         .check-label input { width: 20px; height: 20px; }
 
-        /* --- Responsive Fixes --- */
         @media (max-width: 768px) {
             .container { padding: 10px; gap: 10px; }
             .avatar-section { 
@@ -397,14 +384,20 @@
             </div>
         </form>
 
-        <div id="success-card">
-            <h2>MISSION ACCOMPLISHED</h2>
-            <div class="card-inner">
-                <img id="card-avatar" src="" width="180">
-                <h3 id="card-name"></h3>
-                <div class="code-box"><span id="agent-code">----</span></div>
+        <div id="success-card" style="display:none; text-align: center;">
+            <h2 style="color: var(--gold);">MISSION ACCOMPLISHED</h2>
+            <div class="card-inner" style="background: rgba(255,255,255,0.05); padding: 20px; border-radius: 20px; border: 1px solid var(--gold); position: relative;">
+                <img id="card-avatar" src="" width="150" style="border-radius: 50%; border: 2px solid var(--gold); margin-bottom: 15px;">
+                <h3 id="card-name" style="color: white; margin-bottom: 5px;"></h3>
+                <p style="font-size: 0.8rem; color: #aaa;">YOUR UNIQUE AGENT CODE:</p>
+                <div class="code-box" style="display: flex; align-items: center; justify-content: center; gap: 10px; background: #000; padding: 15px; border-radius: 10px; border: 1px solid var(--gold);">
+                    <span id="agent-code" style="font-size: 1.4rem; letter-spacing: 2px; color: var(--gold);">----</span>
+                    <button type="button" onclick="copyCode(event)" style="width: auto; padding: 8px 12px; background: var(--gold); color: black; border-radius: 5px; font-size: 0.8rem;">
+                        <i class="fas fa-copy"></i>
+                    </button>
+                </div>
             </div>
-            <button onclick="window.location.href='MC.html'" class="final-btn">Enter Command Center</button>
+            <button onclick="window.location.href='MC.html'" class="final-btn" style="margin-top: 20px;">Enter Command Center</button>
         </div>
     </div>
 </div>
@@ -476,7 +469,7 @@
         const clothe = document.getElementById('clotheType').value;
         const accessories = document.getElementById('accessoriesType').value;
         const eye = document.getElementById('eyeType').value;
-        const mouth = forcedMouth || document.getElementById('mouthType').value; // يحترم اختيار الطالب إلا لو فيه حركة كلام
+        const mouth = forcedMouth || document.getElementById('mouthType').value; 
         
         const colorParam = top === 'Hijab' ? `&hatColor=${color}` : `&hairColor=${color}`;
         const url = `https://avataaars.io/?avatarStyle=Transparent&topType=${top}${colorParam}&accessoriesType=${accessories}&facialHairType=${facial}&clotheType=${clothe}&eyeType=${eye}&mouthType=${mouth}&skinColor=${skin}`;
@@ -490,10 +483,12 @@
         playClick();
         if (step > 1) {
             const prevStepEl = document.getElementById(`step${step-1}`);
-            const inputs = prevStepEl.querySelectorAll('input[required]');
-            let valid = true;
-            inputs.forEach(i => { if(!i.value) valid = false; });
-            if(!valid) { alert("Fill all fields, Agent!"); return; }
+            if (prevStepEl) {
+                const inputs = prevStepEl.querySelectorAll('input[required]');
+                let valid = true;
+                inputs.forEach(i => { if(!i.value) valid = false; });
+                if(!valid) { alert("Fill all fields, Agent!"); return; }
+            }
         }
         document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
         document.getElementById('step' + step).classList.add('active');
@@ -501,13 +496,11 @@
         window.scrollTo({top: 0, behavior: 'smooth'});
     }
 
-    // --- نظام الفم الذكي والمعدل ---
     let mouthOpen = false;
     let mouthInterval = null;
 
     function toggleMouth() {
         mouthOpen = !mouthOpen;
-        // نمرر حركات الفم للتبديل فقط أثناء الكلام
         updateAvatar(mouthOpen ? 'Twinkle' : 'Default');
     }
 
@@ -518,7 +511,7 @@
 
     document.getElementById('name').addEventListener('blur', () => {
         if(mouthInterval) clearInterval(mouthInterval);
-        updateAvatar(); // يرجع لشكل الفم اللي الطالب اختاره
+        updateAvatar();
     });
 
     function toggleRoyalOptions() {
@@ -531,47 +524,53 @@
         document.getElementById('ticketArea').style.display = isPaid ? 'block' : 'none';
     }
 
+    function copyCode(event) {
+        const codeText = document.getElementById('agent-code').innerText;
+        navigator.clipboard.writeText(codeText).then(() => {
+            const btn = event.currentTarget;
+            const originalHtml = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-check"></i>';
+            setTimeout(() => btn.innerHTML = originalHtml, 2000);
+        });
+    }
+
     document.getElementById('registrationForm').onsubmit = function(e) {
         e.preventDefault();
         playClick();
+        
         const programs = Array.from(document.querySelectorAll('input[name="program"]:checked')).map(cb => cb.value);
         if (programs.length === 0) { alert("Please select at least one mission program, Agent!"); return; }
 
         const loader = document.getElementById('loader');
         loader.style.display = 'flex';
-        const generatedCode = "EYC-" + Math.floor(1000 + Math.random() * 9000);
 
         const studentObj = {
-            action: "register",
             name: document.getElementById('name').value,
             email: document.getElementById('email').value,
             age: document.getElementById('age').value,
             programs: programs.join(", "),
-            avatar: document.getElementById('avatar-img').src,
-            studentCode: generatedCode
+            avatar: document.getElementById('avatar-img').src
         };
 
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz2iPWuQZKs4V9P569wcY62N_vTq4toLYoQoJ8_VGwc1vfkWbLNnVHtdZutOMrx8Bw/exec"; 
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzDbSUFKrFKORT8P8YAlO6rjDUVw19bXGARog_hIrEdgN4T8iS3vrHYYCKyR2IqHkNIVg/exec"; 
 
         fetch(SCRIPT_URL, {
             method: "POST",
             body: JSON.stringify(studentObj)
         })
-        .then(response => response.text())
-        .then(result => {
+        .then(response => response.json())
+        .then(res => {
             loader.style.display = 'none';
-            if (result.includes("Error: Email already exists")) {
-                alert("ACCESS DENIED: This email is already registered in our database! 🚫");
-            } else if (result.includes("Success")) {
-                showFinalCard(generatedCode); 
-                localStorage.setItem('eyc_user_code', generatedCode);
+            if (res.result === "Success") {
+                showFinalCard(res.code); 
+                localStorage.setItem('eyc_user_code', res.code);
             } else {
-                alert("System Error: " + result);
+                alert("SYSTEM ERROR: " + (res.error || "Unknown Error"));
             }
         })
         .catch(err => {
             loader.style.display = 'none';
-            alert("Transmission Failed: Check your connection, Agent! 📡");
+            alert("ACCESS DENIED: Email may already exist or connection lost! 🚫");
         });
     };
 
