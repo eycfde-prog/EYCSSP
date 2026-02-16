@@ -18,134 +18,86 @@
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
-
+        
         body { 
             background: var(--bg-deep); 
             color: white; 
-            height: 100vh; 
-            height: 100dvh; 
-            display: flex; 
-            flex-direction: column; 
-            overflow: hidden; 
-            position: relative; 
+            height: 100vh; height: 100dvh; 
+            display: flex; flex-direction: column; 
+            overflow: hidden; position: relative; 
         }
 
-        /* خلفية النجوم المتحركة */
         #star-container { position: fixed; inset: 0; z-index: -2; background: radial-gradient(ellipse at bottom, #1B2735 0%, #090A0F 100%); }
-        .star { position: absolute; background: white; border-radius: 50%; opacity: 0.5; animation: blink 3s infinite; }
-        @keyframes blink { 0%, 100% { opacity: 0.3; } 50% { opacity: 0.8; } }
+        .star { position: absolute; background: white; border-radius: 50%; opacity: 0.5; }
 
-        header { 
-            padding: 10px 15px; 
-            background: rgba(5, 5, 8, 0.85); 
-            backdrop-filter: blur(15px); 
-            border-bottom: 2px solid var(--gold);
-            box-shadow: 0 5px 20px rgba(0,0,0,0.5);
-            z-index: 10; 
-        }
-
+        /* --- Header & Power Bar --- */
+        header { padding: 8px 15px; background: rgba(5, 5, 8, 0.8); backdrop-filter: blur(15px); border-bottom: 1px solid var(--glass-border); z-index: 10; }
         .battle-header { display: flex; justify-content: space-between; align-items: center; max-width: 1200px; margin: 0 auto; width: 100%; }
+        
+        .student-info { display: flex; align-items: center; gap: 12px; }
+        .name { font-family: 'Cinzel', serif; font-size: 0.8rem; color: var(--gold); font-weight: 700; letter-spacing: 1px; }
+        .rank { font-family: 'Orbitron', sans-serif; font-size: 0.55rem; color: #aaa; }
+        
+        .power-container { width: 120px; height: 6px; background: rgba(255,255,255,0.1); border-radius: 10px; margin-top: 4px; overflow: hidden; border: 1px solid rgba(212,175,55,0.2); }
+        .power-bar { height: 100%; width: 100%; background: var(--gold-gradient); box-shadow: 0 0 10px var(--gold); transition: 1s linear; }
 
-        /* شريط الطاقة (Power Bar) */
-        .power-bar-container {
-            width: 100px;
-            height: 6px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 10px;
-            margin-top: 4px;
-            overflow: hidden;
-            border: 1px solid rgba(212, 175, 55, 0.3);
-        }
-        .power-fill {
-            width: 100%;
-            height: 100%;
-            background: var(--gold-gradient);
-            box-shadow: 0 0 10px var(--gold);
-            animation: powerPulse 2s infinite;
-        }
-        @keyframes powerPulse { 0% { opacity: 0.6; } 50% { opacity: 1; } 100% { opacity: 0.6; } }
-
-        .info-box { display: flex; align-items: center; gap: 10px; background: var(--glass); padding: 5px 12px; border-radius: 12px; border: 1px solid var(--glass-border); }
-        .student-photo { width: 40px; height: 40px; border-radius: 50%; border: 2px solid var(--gold); object-fit: cover; box-shadow: 0 0 10px var(--gold-glow); }
-        .name { font-family: 'Cinzel', serif; font-size: 0.85rem; color: var(--gold); font-weight: 900; letter-spacing: 1px; }
-        .title-text { font-family: 'Orbitron', sans-serif; font-size: 0.55rem; color: #aaa; }
-
-        /* Arena Viewport & Effects */
+        /* --- Viewport (Iframe Wrapper) --- */
         .arena-container { flex: 1; padding: 15px; display: flex; justify-content: center; align-items: center; min-height: 0; position: relative; }
         
         .glass-iframe-wrapper { 
             width: 100%; height: 100%; max-width: 1100px; 
             background: #000; 
             border: 1px solid var(--glass-border); 
-            border-radius: 10px; 
-            overflow: hidden; 
-            position: relative;
-            box-shadow: inset 0 0 80px rgba(0,0,0,0.9), 0 0 30px rgba(212, 175, 55, 0.1);
+            border-radius: 10px; position: relative; overflow: hidden;
+            box-shadow: inset 0 0 50px rgba(0,0,0,1), 0 0 30px rgba(212, 175, 55, 0.05);
+            animation: borderPulse 4s infinite;
         }
 
-        /* Scanlines Effect */
+        /* Scanning Line Effect */
         .glass-iframe-wrapper::before {
-            content: " ";
-            position: absolute; inset: 0;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%), 
+            content: ""; position: absolute; inset: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.2) 50%), 
                         linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
-            background-size: 100% 4px, 3px 100%;
-            z-index: 2; pointer-events: none;
+            background-size: 100% 4px, 3px 100%; pointer-events: none; z-index: 2;
         }
 
         /* Corner Brackets */
-        .corner { position: absolute; width: 25px; height: 25px; border: 3px solid var(--gold); z-index: 3; pointer-events: none; }
-        .tl { top: 10px; left: 10px; border-right: 0; border-bottom: 0; }
-        .tr { top: 10px; right: 10px; border-left: 0; border-bottom: 0; }
-        .bl { bottom: 10px; left: 10px; border-right: 0; border-top: 0; }
-        .br { bottom: 10px; right: 10px; border-left: 0; border-top: 0; }
+        .corner { position: absolute; width: 25px; height: 25px; border: 3px solid var(--gold); z-index: 3; pointer-events: none; opacity: 0.7; }
+        .top-left { top: 10px; left: 10px; border-right: 0; border-bottom: 0; }
+        .top-right { top: 10px; right: 10px; border-left: 0; border-bottom: 0; }
+        .bottom-left { bottom: 10px; left: 10px; border-right: 0; border-top: 0; }
+        .bottom-right { bottom: 10px; right: 10px; border-left: 0; border-top: 0; }
 
-        iframe { width: 100%; height: 100%; border: none; z-index: 1; }
+        iframe { width: 100%; height: 100%; border: none; z-index: 1; position: relative; }
 
-        /* Footer & Buttons */
-        footer { padding: 15px; display: flex; justify-content: center; gap: 15px; max-width: 1000px; margin: 0 auto; width: 100%; }
-        
+        /* --- Footer & Buttons --- */
+        footer { padding: 15px; display: flex; justify-content: center; gap: 15px; width: 100%; max-width: 1000px; margin: 0 auto; }
         .btn { 
             padding: 12px 25px; border-radius: 8px; border: none; font-weight: 700; cursor: pointer; 
-            transition: var(--transition); font-size: 0.8rem; font-family: 'Cinzel'; 
+            transition: var(--transition); font-size: 0.75rem; font-family: 'Cinzel';
             display: flex; align-items: center; gap: 8px; position: relative; overflow: hidden;
         }
+        .btn-submit { background: var(--gold-gradient); color: #000; flex: 2; box-shadow: 0 0 10px rgba(212,175,55,0.3); }
+        .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 0 25px var(--gold-glow); }
+        .btn-side { background: rgba(255,255,255,0.05); color: var(--gold); border: 1px solid var(--glass-border); flex: 1; }
+        .btn-side:hover { background: rgba(212,175,55,0.1); color: #fff; }
 
-        .btn-submit { 
-            flex: 2; background: var(--gold-gradient); color: #000; 
-            box-shadow: 0 0 15px rgba(212, 175, 55, 0.4); 
-        }
-        .btn-submit:hover { 
-            box-shadow: 0 0 30px var(--gold); transform: translateY(-2px); 
-        }
-
-        .btn-side { 
-            flex: 1; background: rgba(255,255,255,0.05); color: var(--gold); 
-            border: 1px solid var(--glass-border); 
-        }
-        .btn-side:hover { background: rgba(212, 175, 55, 0.1); border-color: var(--gold); }
-
-        /* Sync Overlay & Terminal Logs */
+        /* --- Sync Overlay (Cyber Terminal) --- */
         #sync-overlay { 
-            position: fixed; inset: 0; background: rgba(2, 2, 5, 0.98); 
-            z-index: 2000; display: none; flex-direction: column; 
-            justify-content: center; align-items: center; backdrop-filter: blur(15px); 
+            position: fixed; inset: 0; background: #020205; z-index: 2000; 
+            display: none; flex-direction: column; justify-content: center; align-items: center; 
+            padding: 20px; font-family: 'Orbitron', sans-serif;
         }
-
-        .terminal-container {
-            width: 80%; max-width: 500px; height: 150px;
-            background: rgba(0,0,0,0.5); border: 1px solid var(--glass-border);
-            border-radius: 5px; padding: 10px; font-family: 'Courier New', monospace;
-            font-size: 0.7rem; color: var(--gold); overflow: hidden; margin-top: 20px;
+        .terminal-box { 
+            width: 100%; max-width: 500px; height: 250px; background: #000; border: 1px solid var(--gold);
+            border-radius: 10px; padding: 15px; overflow: hidden; position: relative; margin-top: 20px;
         }
+        .terminal-text { color: #0f0; font-family: 'Courier New', monospace; font-size: 0.8rem; line-height: 1.5; }
+        .fairy-loader { font-size: 3rem; color: var(--gold); text-shadow: 0 0 20px var(--gold); margin-bottom: 20px; animation: float 2s infinite ease-in-out; }
 
-        .fairy-loader i { font-size: 3rem; color: var(--gold); animation: float 2s infinite; text-shadow: 0 0 20px var(--gold); }
-        @keyframes float { 0%, 100% { transform: translateY(0) scale(1); } 50% { transform: translateY(-15px) scale(1.1); } }
+        @keyframes borderPulse { 0%, 100% { border-color: var(--glass-border); } 50% { border-color: var(--gold); } }
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
 
-        @media (max-width: 600px) {
-            .battle-header { flex-direction: column; gap: 10px; }
-            .power-bar-container { width: 60px; }
-        }
     </style>
 </head>
 <body>
@@ -153,112 +105,98 @@
     <audio id="clickSound" src="https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3"></audio>
 
     <div id="sync-overlay">
-        <div class="fairy-loader"><i class="fas fa-atom"></i></div>
-        <div style="color: var(--gold); font-family: 'Orbitron'; margin-top: 15px; letter-spacing: 2px;">SECURE CONNECTION...</div>
-        <div class="terminal-container" id="terminal-logs"></div>
-        <div id="result-display" style="display: none;" class="result-card"></div>
+        <div class="fairy-loader"><i class="fas fa-wand-magic-sparkles"></i></div>
+        <div style="color: var(--gold); font-size: 1.2rem; text-align: center;">UPLOADING MISSION DATA...</div>
+        <div class="terminal-box">
+            <div id="terminal-content" class="terminal-text"></div>
+        </div>
+        <div id="result-display" style="display: none; width: 100%; max-width: 400px; margin-top: 20px;"></div>
     </div>
 
     <div id="star-container"></div>
 
     <header>
         <div class="battle-header">
-            <div class="info-box">
-                <img id="student-img" class="student-photo" src="" alt="S">
+            <div class="student-info">
+                <img id="student-img" class="student-photo" style="width:45px; height:45px; border-radius:5px; border:1px solid var(--gold);" src="" alt="A">
                 <div>
-                    <div class="name" id="student-name">AGENT NAME</div>
-                    <div class="title-text" id="student-title">ELITE AGENT</div>
-                    <div class="power-bar-container"><div class="power-fill"></div></div>
+                    <div class="name" id="student-name">LOADING AGENT...</div>
+                    <div class="rank" id="student-title">INITIATING STATUS...</div>
+                    <div class="power-container"><div class="power-bar" id="powerBar"></div></div>
                 </div>
             </div>
-            
-            <div style="font-family: 'Orbitron'; color: var(--gold); text-align: center;">
-                <div style="font-size: 0.6rem; opacity: 0.7;">BATTLEFIELD STATION</div>
-                <div style="font-weight: 900; letter-spacing: 4px; font-size: 1.2rem;">ARENA</div>
-            </div>
-
-            <div class="info-box">
-                <div style="text-align: right;">
-                    <div class="name" id="activity-title">MISSION</div>
-                    <div id="mission-sub" style="font-size: 0.6rem; color: var(--gold); font-family: 'Orbitron';">PHASE 01</div>
-                </div>
-                <img id="activity-img" style="width: 35px; height: 35px; border-radius: 5px;" src="" alt="L">
+            <div class="info-box" style="text-align: right;">
+                <div class="name" id="activity-title" style="font-size: 1rem;">ACTIVITY</div>
+                <div class="rank" id="mission-sub" style="color: var(--gold);">MISSION --</div>
             </div>
         </div>
     </header>
 
     <main class="arena-container">
         <div class="glass-iframe-wrapper">
-            <div class="corner tl"></div><div class="corner tr"></div>
-            <div class="corner bl"></div><div class="corner br"></div>
-            <iframe id="contentFrame" src="about:blank" allow="autoplay"></iframe>
+            <div class="corner top-left"></div>
+            <div class="corner top-right"></div>
+            <div class="corner bottom-left"></div>
+            <div class="corner bottom-right"></div>
+            <iframe id="contentFrame" allow="autoplay"></iframe>
         </div>
     </main>
 
     <footer>
-        <button class="btn btn-side" onclick="playEffect(); alert('Mission Rules: Innovation, Integrity, Impact.')">
-            <i class="fas fa-file-invoice"></i> RULES
+        <button class="btn btn-side" onclick="playSound(); alert('Rules: Precision, Integrity, Excellence.')">
+            <i class="fas fa-scroll"></i> RULES
         </button>
-        <button id="submitBtn" class="btn btn-submit" onclick="playEffect(); startSubmission()">
-            <i class="fas fa-bolt"></i> TRANSMIT DATA
+        <button id="submitBtn" class="btn btn-submit" onclick="startSubmission()">
+            <i class="fas fa-shield-alt"></i> SUBMIT MISSION
         </button>
-        <button class="btn btn-side" onclick="playEffect(); window.location.href='MC.html'">
-            <i class="fas fa-power-off"></i> EXIT
+        <button class="btn btn-side" onclick="playSound(); window.location.href='MC.html'">
+            <i class="fas fa-door-open"></i> EXIT
         </button>
     </footer>
 
 <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxHYyjTsl3YmWUQOaQ6Zm7dhCkPGFmaVgnmRxErFbKks4lOj3fq0RmYZ2dDSksa_vNDug/exec";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxHYyjTsl3YmWUQOaQ6Zm7dhCkPGFmaVgnmRxErFbKks4lOj3fq0RmYZ2dDSksa_vNDug/exec"; 
+    let userEmail, userName, currentActivity, currentTask;
 
-    // تفعيل الأصوات
-    function playEffect() {
+    function playSound() {
         const audio = document.getElementById('clickSound');
         audio.currentTime = 0;
-        audio.play().catch(e => {});
+        audio.play().catch(()=>{});
     }
 
-    // إنشاء النجوم
-    function createStars() {
-        const container = document.getElementById('star-container');
-        for (let i = 0; i < 60; i++) {
-            const star = document.createElement('div');
-            star.className = 'star';
-            star.style.width = star.style.height = Math.random() * 2 + 'px';
-            star.style.top = Math.random() * 100 + '%';
-            star.style.left = Math.random() * 100 + '%';
-            star.style.animationDelay = Math.random() * 5 + 's';
-            container.appendChild(star);
-        }
-    }
-
-    // نظام الـ Terminal Logs الوهمي
-    function addLog(text) {
-        const term = document.getElementById('terminal-logs');
-        const line = document.createElement('div');
-        line.textContent = `> ${text}`;
-        term.appendChild(line);
-        term.scrollTop = term.scrollHeight;
-    }
-
-    const mockLogs = [
-        "Initializing neural link...",
-        "Bypassing firewall filters...",
-        "Establishing handshake with HQ...",
-        "Uploading encrypted mission payload...",
-        "AI Evaluator online...",
-        "Analyzing response patterns...",
-        "Finalizing report metadata..."
+    // --- Cyber Terminal Logs ---
+    const logs = [
+        "> Initializing secure link...",
+        "> Establishing connection to HQ...",
+        "> Encrypting mission packets...",
+        "> Analyzing response patterns...",
+        "> Running AI Evaluation Grade-01...",
+        "> Verifying Agent credentials...",
+        "> final_report.exe generated.",
+        "> Syncing results with database..."
     ];
 
-    window.onload = async function() {
+    function runTerminal() {
+        const terminal = document.getElementById('terminal-content');
+        terminal.innerHTML = "";
+        let i = 0;
+        const interval = setInterval(() => {
+            if (i < logs.length) {
+                terminal.innerHTML += logs[i] + "<br>";
+                i++;
+            } else { clearInterval(interval); }
+        }, 400);
+    }
+
+    window.onload = function() {
         createStars();
         const urlParams = new URLSearchParams(window.location.search);
         const savedUser = JSON.parse(localStorage.getItem('eyc_user')) || {};
 
-        const userEmail = urlParams.get('email') || savedUser.email;
-        const userName = urlParams.get('name') || savedUser.name || "AGENT";
-        const currentActivity = urlParams.get('act');
-        const currentTask = urlParams.get('task') || "1";
+        userEmail = urlParams.get('email') || savedUser.email;
+        userName = urlParams.get('name') || savedUser.name || "AGENT";
+        currentActivity = urlParams.get('act'); 
+        currentTask = urlParams.get('task') || "1";
 
         if (!userEmail || !currentActivity) {
             window.location.href = 'MC.html';
@@ -266,49 +204,60 @@
         }
 
         document.getElementById('student-name').innerText = userName.toUpperCase();
-        document.getElementById('activity-title').innerText = currentActivity;
-        document.getElementById('mission-sub').innerText = `PHASE ${currentTask.padStart(2, '0')}`;
         document.getElementById('student-title').innerText = urlParams.get('title') || savedUser.title || "ELITE AGENT";
+        document.getElementById('activity-title').innerText = currentActivity;
+        document.getElementById('mission-sub').innerText = `MISSION ${currentTask.padStart(2, '0')}`;
         document.getElementById('student-img').src = decodeURIComponent(urlParams.get('avatar') || savedUser.avatar || "");
         
-        // تحميل المحتوى في الـ Iframe
-        document.getElementById('contentFrame').src = `${currentActivity}.html?task=${currentTask}`;
+        // Start Power Bar Drain (Visual only - 10 mins example)
+        document.getElementById('powerBar').style.width = "0%";
+
+        checkMissionStatus();
     };
 
-    function startSubmission() {
-        const overlay = document.getElementById('sync-overlay');
-        overlay.style.display = 'flex';
-        
-        let i = 0;
-        const logInterval = setInterval(() => {
-            if(i < mockLogs.length) {
-                addLog(mockLogs[i]);
-                i++;
+    async function checkMissionStatus() {
+        try {
+            const response = await fetch(`${SCRIPT_URL}?action=checkStatus&email=${userEmail}&act=${currentActivity}&task=${currentTask}`);
+            const data = await response.json();
+            if (data.done) {
+                showFinalResult(data.grade, data.maxGrade, "Already Secured");
             } else {
-                clearInterval(logInterval);
+                document.getElementById('contentFrame').src = `${currentActivity}.html?task=${currentTask}`;
             }
-        }, 600);
+        } catch (e) {
+            document.getElementById('contentFrame').src = `${currentActivity}.html?task=${currentTask}`;
+        }
+    }
 
+    function startSubmission() {
+        playSound();
         const frame = document.getElementById('contentFrame').contentWindow;
         frame.postMessage({ type: 'REQUEST_MISSION_DATA' }, '*');
     }
 
     window.addEventListener('message', function(event) {
         if (event.data.type === 'MISSION_ANSWERS') {
-            sendToAiGrader(event.data.answers);
+            processAnswers(event.data.answers);
         }
     });
 
+    function processAnswers(answers) {
+        if (!answers || (Array.isArray(answers) && answers.length === 0)) {
+            alert("⚠️ HQ: Submission rejected. Input required.");
+            return;
+        }
+        document.getElementById('sync-overlay').style.display = 'flex';
+        runTerminal();
+        sendToAiGrader(answers);
+    }
+
     async function sendToAiGrader(answers) {
-        const urlParams = new URLSearchParams(window.location.search);
-        const userEmail = urlParams.get('email') || JSON.parse(localStorage.getItem('eyc_user')).email;
-        
         const payload = {
             action: "submitReport",
             email: userEmail,
-            actCode: urlParams.get('act'),
-            taskNum: urlParams.get('task') || "1",
-            answer: Array.isArray(answers) ? answers.join(",") : answers
+            actCode: currentActivity,
+            taskNum: currentTask,
+            answer: Array.isArray(answers) ? answers.join("|") : answers
         };
 
         try {
@@ -317,17 +266,38 @@
                 body: JSON.stringify(payload)
             });
             const result = await response.json();
-            
-            if(result.success) {
-                addLog("TRANSMISSION COMPLETE.");
-                setTimeout(() => {
-                    alert(`Mission Evaluated! Grade: ${result.grade}/${result.maxGrade}`);
-                    window.location.href = 'MC.html';
-                }, 1000);
+            if (result.success) {
+                showFinalResult(result.grade, result.maxGrade, result.feedback || "Mission Accomplished.");
             }
-        } catch (e) {
-            addLog("ERROR: CONNECTION TIMEOUT.");
-            setTimeout(() => document.getElementById('sync-overlay').style.display = 'none', 2000);
+        } catch (error) {
+            alert("📡 Transmission Error. HQ link lost.");
+            document.getElementById('sync-overlay').style.display = 'none';
+        }
+    }
+
+    function showFinalResult(grade, max, msg) {
+        const res = document.getElementById('result-display');
+        document.querySelector('.terminal-box').style.display = 'none';
+        document.querySelector('.fairy-loader').innerHTML = '<i class="fas fa-check-double" style="color:#0f0"></i>';
+        res.style.display = 'block';
+        res.innerHTML = `
+            <div style="background:rgba(212,175,55,0.1); border:1px solid var(--gold); padding:20px; border-radius:10px; text-align:center;">
+                <h2 style="font-family:Orbitron; color:var(--gold)">SCORE: ${grade}/${max}</h2>
+                <p style="margin:10px 0; color:#aaa; font-size:0.8rem">${msg}</p>
+                <button class="btn btn-submit" style="width:100%" onclick="window.location.href='MC.html'">RETURN TO BASE</button>
+            </div>
+        `;
+    }
+
+    function createStars() {
+        const container = document.getElementById('star-container');
+        for (let i = 0; i < 40; i++) {
+            const star = document.createElement('div');
+            star.className = 'star';
+            star.style.width = star.style.height = Math.random() * 2 + 'px';
+            star.style.top = Math.random() * 100 + '%';
+            star.style.left = Math.random() * 100 + '%';
+            container.appendChild(star);
         }
     }
 </script>
