@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Dictation X | Royal Script | Glassy Edition</title>
+    <title>Dictation X | Royal Script | Titanium Edition</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Poppins:wght@300;600&display=swap" rel="stylesheet">
     <style>
         :root { 
             --gold: #D4AF37; 
             --gold-glow: rgba(212, 175, 55, 0.4);
             --error-red: #ff4444;
-            --glass: rgba(255, 255, 255, 0.03); 
+            --glass: rgba(255, 255, 255, 0.02); 
             --glass-border: rgba(212, 175, 55, 0.2);
         }
 
@@ -23,142 +23,172 @@
         }
 
         .dict-container {
-            background: rgba(10, 10, 15, 0.9); 
+            background: rgba(10, 10, 15, 0.85); 
             border: 1px solid var(--glass-border);
-            border-radius: 25px; 
-            padding: 25px; 
+            border-radius: 20px; 
+            padding: 30px; 
             text-align: center;
-            backdrop-filter: blur(20px);
-            max-width: 850px;
+            backdrop-filter: blur(15px);
+            max-width: 800px;
             margin: 0 auto;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.98); }
+            to { opacity: 1; transform: scale(1); }
         }
 
         .header-x h1 { 
             font-family: 'Orbitron'; 
             color: var(--gold); 
-            letter-spacing: 4px; 
-            font-size: 1.2rem;
-            margin: 0 0 10px 0;
-            text-shadow: 0 0 10px var(--gold-glow);
+            letter-spacing: 5px; 
+            font-size: 1.4rem;
+            margin: 0 0 5px 0;
+            text-shadow: 0 0 15px var(--gold-glow);
         }
 
         .principle-badge {
             display: inline-block;
-            font-family: 'Orbitron'; font-size: 9px; color: var(--gold);
-            border: 1px solid var(--gold); padding: 3px 10px;
-            border-radius: 50px; margin-bottom: 20px;
+            font-family: 'Orbitron'; font-size: 10px; color: var(--gold);
+            border: 1px solid var(--gold); padding: 4px 15px;
+            border-radius: 5px; margin-bottom: 25px;
+            letter-spacing: 2px;
+            background: rgba(212, 175, 55, 0.05);
         }
 
-        /* منطقة الصوتيات الملكية */
         .audio-section {
             display: grid; 
             grid-template-columns: 1fr 1fr; 
-            gap: 20px; 
-            margin: 30px 0;
+            gap: 25px; 
+            margin: 35px 0;
         }
 
         @media (max-width: 600px) { .audio-section { grid-template-columns: 1fr; } }
 
         .audio-card {
-            background: var(--glass); 
+            background: rgba(255,255,255,0.03); 
             border: 1px solid var(--glass-border);
-            padding: 20px; 
-            border-radius: 20px; 
+            padding: 25px 15px; 
+            border-radius: 15px; 
             position: relative;
-            transition: 0.4s;
+            transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        .audio-card:hover { border-color: var(--gold); box-shadow: 0 0 20px var(--gold-glow); }
+        .audio-card:hover:not(.locked) { 
+            border-color: var(--gold); 
+            box-shadow: 0 0 25px var(--gold-glow);
+            transform: translateY(-5px);
+        }
 
         .warning-label {
             display: block; 
             font-family: 'Orbitron'; 
             color: var(--error-red);
-            font-size: 8px; 
-            margin-bottom: 12px; 
-            letter-spacing: 1px;
-            animation: blink 2s infinite;
+            font-size: 9px; 
+            margin-bottom: 15px; 
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
         }
 
-        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
-
-        .speed-label { font-family: 'Orbitron'; color: var(--gold); font-size: 10px; margin-bottom: 15px; }
+        .speed-label { 
+            font-family: 'Orbitron'; 
+            color: #fff; 
+            font-size: 11px; 
+            margin-bottom: 20px; 
+            opacity: 0.8;
+        }
 
         audio { 
             width: 100%; 
-            filter: invert(1) sepia(1) saturate(5) hue-rotate(10deg); 
-            height: 35px; 
+            filter: invert(1) sepia(1) saturate(5) hue-rotate(-10deg); 
+            height: 40px; 
+            border-radius: 30px;
         }
 
-        /* منطقة الرفع */
         .upload-section {
             border-top: 1px solid var(--glass-border); 
-            padding-top: 30px; 
+            padding-top: 35px; 
+            margin-top: 20px;
         }
 
         .file-inputs-grid { 
             display: grid; 
             grid-template-columns: repeat(3, 1fr); 
-            gap: 15px; 
+            gap: 20px; 
         }
 
         @media (max-width: 500px) { .file-inputs-grid { grid-template-columns: 1fr; } }
 
         .file-box {
-            background: rgba(255,255,255,0.02); 
+            background: rgba(0,0,0,0.3); 
             border: 1px dashed var(--glass-border);
-            border-radius: 15px; 
-            padding: 15px; 
+            border-radius: 12px; 
+            padding: 20px 10px; 
             transition: 0.3s;
-            cursor: pointer;
+            position: relative;
         }
 
-        .file-box:hover { border-color: var(--gold); background: rgba(212, 175, 55, 0.05); }
+        .file-box:hover { border-color: var(--gold); }
 
-        .file-label { font-family: 'Orbitron'; font-size: 9px; color: #888; display: block; margin-bottom: 10px; }
+        .file-label { 
+            font-family: 'Orbitron'; 
+            font-size: 10px; 
+            color: var(--gold); 
+            display: block; 
+            margin-bottom: 12px; 
+        }
 
-        input[type="file"] { width: 100%; font-size: 10px; color: var(--gold); cursor: pointer; }
+        input[type="file"] { 
+            width: 100%; 
+            font-size: 10px; 
+            color: #666; 
+            cursor: pointer; 
+        }
 
         .preview-img {
             width: 100%; 
-            height: 120px; 
+            height: 140px; 
             object-fit: cover; 
-            border-radius: 10px;
+            border-radius: 8px;
             margin-top: 15px; 
             display: none; 
             border: 1px solid var(--gold);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            box-shadow: 0 0 15px var(--gold-glow);
         }
 
         .expired-msg { 
             color: var(--error-red); font-family: 'Orbitron'; 
-            font-size: 9px; margin-top: 10px; text-transform: uppercase;
+            font-size: 10px; margin-top: 15px; font-weight: bold;
+            letter-spacing: 1px;
         }
+        
+        .locked { opacity: 0.4; pointer-events: none; filter: grayscale(1); }
     </style>
 </head>
 <body>
 
 <div class="dict-container">
     <div class="header-x">
-        <span class="principle-badge">NLR PROTOCOL ACTIVE</span>
-        <h1 id="task-title">DICTATION-X MISSION</h1>
-        <p style="color: #aaa; font-size: 11px; font-weight: 300;">Handwrite your script, then upload the visual evidence.</p>
+        <span class="principle-badge">PROTOCOL: DICTATION-X</span>
+        <h1 id="task-title">LOADING MISSION...</h1>
+        <p style="color: #888; font-size: 12px; margin-top: 10px;">Listen carefully. You have one attempt per frequency.</p>
     </div>
 
     <div class="audio-section">
-        <div class="audio-card">
-            <span class="warning-label">SINGLE ACCESS ONLY</span>
+        <div class="audio-card" id="cardSlow">
+            <span class="warning-label"><i class="fas fa-exclamation-triangle"></i> SINGLE PLAYBACK</span>
             <div class="speed-label">PHASE 01: ANALYTICAL (0.7x)</div>
-            <audio id="slowAudio" controls onplay="disableAudio(this)">
+            <audio id="slowAudio" controls controlsList="nodownload noplaybackrate">
                 <source id="slowSource" src="" type="audio/wav">
             </audio>
         </div>
 
-        <div class="audio-card">
-            <span class="warning-label">SINGLE ACCESS ONLY</span>
+        <div class="audio-card" id="cardNormal">
+            <span class="warning-label"><i class="fas fa-exclamation-triangle"></i> SINGLE PLAYBACK</span>
             <div class="speed-label">PHASE 02: REAL-TIME (1.0x)</div>
-            <audio id="normalAudio" controls onplay="disableAudio(this)">
+            <audio id="normalAudio" controls controlsList="nodownload noplaybackrate">
                 <source id="normalSource" src="" type="audio/wav">
             </audio>
         </div>
@@ -167,17 +197,17 @@
     <div class="upload-section">
         <div class="file-inputs-grid">
             <div class="file-box">
-                <span class="file-label">EVIDENCE_PAGE_01</span>
+                <span class="file-label">SCRIPT_PAGE_01</span>
                 <input type="file" id="img1" accept="image/*" onchange="preview(this, 'p1')">
                 <img id="p1" class="preview-img">
             </div>
             <div class="file-box">
-                <span class="file-label">EVIDENCE_PAGE_02</span>
+                <span class="file-label">SCRIPT_PAGE_02</span>
                 <input type="file" id="img2" accept="image/*" onchange="preview(this, 'p2')">
                 <img id="p2" class="preview-img">
             </div>
             <div class="file-box">
-                <span class="file-label">EVIDENCE_PAGE_03</span>
+                <span class="file-label">SCRIPT_PAGE_03</span>
                 <input type="file" id="img3" accept="image/*" onchange="preview(this, 'p3')">
                 <img id="p3" class="preview-img">
             </div>
@@ -188,56 +218,58 @@
 <script>
     const urlParams = new URLSearchParams(window.location.search);
     const taskNum = urlParams.get('task') || "1";
-    const storageKey = `DX_Task_${taskNum}_Played`;
+    const storageKeySlow = `DX_Task_${taskNum}_Slow_Played`;
+    const storageKeyNormal = `DX_Task_${taskNum}_Normal_Played`;
 
     function initDictX() {
         document.getElementById('task-title').innerText = `MISSION DX-${taskNum.padStart(2, '0')}`;
         
-        // Joiner: ضبط المسارات بناءً على هيكلة المجلدات الجديدة
         const slowPath = `assets/dxaudio/DX${taskNum}S.wav`;
         const normalPath = `assets/dxaudio/DX${taskNum}.wav`;
         
-        document.getElementById('slowSource').src = slowPath;
-        document.getElementById('normalSource').src = normalPath;
-        
         const slowA = document.getElementById('slowAudio');
         const normalA = document.getElementById('normalAudio');
+
+        document.getElementById('slowSource').src = slowPath;
+        document.getElementById('normalSource').src = normalPath;
         
         slowA.load();
         normalA.load();
         
+        // تطبيق السرعات
         slowA.playbackRate = 0.7; 
         normalA.playbackRate = 1.0;
 
-        // التحقق من بروتوكول الوصول لمرة واحدة
-        if (localStorage.getItem(storageKey)) {
-            lockAudio(slowA);
-            lockAudio(normalA);
-        }
+        // التحقق من الحالة المخزنة
+        if (localStorage.getItem(storageKeySlow)) lockAudio(slowA, 'cardSlow');
+        if (localStorage.getItem(storageKeyNormal)) lockAudio(normalA, 'cardNormal');
+
+        // إضافة مستمعي الأحداث
+        setupAudioLogic(slowA, storageKeySlow, 'cardSlow');
+        setupAudioLogic(normalA, storageKeyNormal, 'cardNormal');
     }
 
-    function disableAudio(el) {
-        el.onplay = null; 
-        localStorage.setItem(storageKey, "true");
-
-        el.ontimeupdate = function() {
-            if (el.seeking) {
-                el.currentTime = el.played.end(0);
-            }
+    function setupAudioLogic(el, key, cardId) {
+        el.onplay = () => {
+            localStorage.setItem(key, "true");
+            // منع السعي (Seeking)
+            el.ontimeupdate = () => {
+                if (el.seeking) {
+                    el.currentTime = el.played.end(0);
+                }
+            };
         };
 
-        el.onended = function() {
-            lockAudio(el);
-        };
+        el.onended = () => lockAudio(el, cardId);
     }
 
-    function lockAudio(el) {
-        el.controls = false;
+    function lockAudio(el, cardId) {
         el.pause();
-        el.style.opacity = "0.1";
-        el.style.pointerEvents = "none";
-        if (!el.parentElement.querySelector('.expired-msg')) {
-            el.insertAdjacentHTML('afterend', '<p class="expired-msg">Access Terminated</p>');
+        el.controls = false;
+        const card = document.getElementById(cardId);
+        card.classList.add('locked');
+        if (!card.querySelector('.expired-msg')) {
+            card.insertAdjacentHTML('beforeend', '<p class="expired-msg">ACCESS TERMINATED</p>');
         }
     }
 
@@ -254,7 +286,6 @@
         }
     }
 
-    // استقبال نداء SUBMIT من Arena الأم
     window.addEventListener('message', function(event) {
         if (event.data.type === 'REQUEST_MISSION_DATA') {
             collectAndSubmit();
@@ -262,25 +293,22 @@
     });
 
     function collectAndSubmit() {
-        const p1 = document.getElementById('p1').src;
-        const p2 = document.getElementById('p2').src;
-        const p3 = document.getElementById('p3').src;
-        
+        const imgs = ['p1', 'p2', 'p3'];
         let files = [];
-        if(p1.startsWith("data:image")) files.push(p1);
-        if(p2.startsWith("data:image")) files.push(p2);
-        if(p3.startsWith("data:image")) files.push(p3);
+        
+        imgs.forEach(id => {
+            const src = document.getElementById(id).src;
+            if(src.startsWith("data:image")) files.push(src);
+        });
 
         if (files.length === 0) {
-            // إبلاغ الصفحة الأم بعدم اكتمال البيانات
             window.parent.postMessage({ type: 'MISSION_INCOMPLETE' }, '*');
             return;
         }
 
-        // إرسال الصور لصفحة المهام
         window.parent.postMessage({ 
             type: 'MISSION_ANSWERS', 
-            answers: files // ترسل كمصفوفة Base64
+            answers: files 
         }, '*');
     }
 
