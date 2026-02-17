@@ -392,7 +392,7 @@
                 <p style="font-size: 0.8rem; color: #aaa;">YOUR UNIQUE AGENT CODE:</p>
                 <div class="code-box" style="display: flex; align-items: center; justify-content: center; gap: 10px; background: #000; padding: 15px; border-radius: 10px; border: 1px solid var(--gold);">
                     <span id="agent-code" style="font-size: 1.4rem; letter-spacing: 2px; color: var(--gold);">----</span>
-                    <button type="button" onclick="copyCode(event)" style="width: auto; padding: 8px 12px; background: var(--gold); color: black; border-radius: 5px; font-size: 0.8rem;">
+                    <button type="button" onclick="copyCode()" style="width: auto; padding: 8px 12px; background: var(--gold); color: black; border-radius: 5px; font-size: 0.8rem;">
                         <i class="fas fa-copy"></i>
                     </button>
                 </div>
@@ -524,9 +524,10 @@
         document.getElementById('ticketArea').style.display = isPaid ? 'block' : 'none';
     }
 
-    function copyCode(code) {
-        navigator.clipboard.writeText(code).then(() => {
-            alert("Code copied to clipboard: " + code);
+    function copyCode() {
+        const codeText = document.getElementById('agent-code').innerText;
+        navigator.clipboard.writeText(codeText).then(() => {
+            alert("Code Copied to Clipboard! 📋");
         });
     }
 
@@ -555,21 +556,20 @@
             body: JSON.stringify(studentObj)
         })
         .then(response => response.json())
-        .then(res => {
+        .then(result => {
             loader.style.display = 'none';
-            if (res.result === "Success") {
-                const finalCode = res.code;
-                showFinalCard(finalCode); 
-                localStorage.setItem('eyc_user_code', finalCode);
-            } else if (res.error && res.error.includes("Email already exists")) {
+            if (result.status === "error" && result.message === "Email already exists") {
                 alert("ACCESS DENIED: This email is already registered! 🚫");
+            } else if (result.status === "success") {
+                showFinalCard(result.code);
+                localStorage.setItem('eyc_user_code', result.code);
             } else {
-                alert("SYSTEM ERROR: " + (res.error || "Unknown Error"));
+                alert("System Error: " + result.message);
             }
         })
         .catch(err => {
             loader.style.display = 'none';
-            alert("ACCESS DENIED: Email may already exist or connection lost! 🚫");
+            alert("ACCESS DENIED: Connection lost! 🚫");
         });
     };
 
@@ -583,8 +583,8 @@
         const codeBox = document.querySelector('.code-box');
         codeBox.innerHTML = `
             <span id="agent-code">${generatedCode}</span>
-            <button onclick="copyCode('${generatedCode}')" style="width:auto; padding:5px 10px; margin-left:10px; font-size:0.8rem;">
-                <i class="fas fa-copy"></i> Copy
+            <button onclick="copyCode()" style="width:auto; padding:5px 10px; margin-left:10px; font-size:0.8rem; display:inline-block;">
+                <i class="fas fa-copy"></i>
             </button>
         `;
         document.getElementById('pBar').style.width = "100%";
