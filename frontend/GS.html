@@ -125,10 +125,8 @@
     <div id="scanner-screen" class="scanner-grid"></div>
 
 <script>
-// البيانات تم تضمينها كما في المصدر
 const gsData = {
     "1": ["He go to school every day.", "They has a big house.", "She don't like apples.", "We was playing football.", "I am learn English now."],
-    // ... (بقية المهام)
 };
 
 const urlParams = new URLSearchParams(window.location.search);
@@ -137,7 +135,8 @@ const taskNum = urlParams.get('task') || "1";
 function loadScanner() {
     const sentences = gsData[taskNum] || gsData["1"];
     const screen = document.getElementById('scanner-screen');
-    document.getElementById('title-label').innerText = `SCANNER: UNIT ${taskNum.padStart(2, '0')}`;
+    const titleLabel = document.getElementById('title-label');
+    if(titleLabel) titleLabel.innerText = `SCANNER: UNIT ${taskNum.padStart(2, '0')}`;
     
     screen.innerHTML = sentences.map((s, i) => `
         <div class="sentence-card" id="card-${i}">
@@ -172,8 +171,8 @@ function collectAndSend() {
         const card = document.getElementById(`card-${i}`);
         if(!val) {
             hasError = true;
-            card.classList.add('error-card');
-            setTimeout(() => card.classList.remove('error-card'), 500);
+            if(card) card.classList.add('error-card');
+            setTimeout(() => { if(card) card.classList.remove('error-card') }, 500);
         } else {
             answers.push(val);
         }
