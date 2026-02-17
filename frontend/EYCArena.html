@@ -312,7 +312,7 @@
         }, 600);
     };
 
-    window.onload = async function() {
+window.onload = async function() {
         createStars();
         
         const savedUser = JSON.parse(localStorage.getItem('eyc_user'));
@@ -325,25 +325,30 @@
         const urlParams = new URLSearchParams(window.location.search);
         userEmail = savedUser.email;
         userName = savedUser.name;
-        currentActivity = urlParams.get('act'); 
+        
+        // التعديل هنا: نستخدم الكود (code) لاستدعاء الملف والاسم (act) للعرض فقط
+        currentActivity = urlParams.get('act');   // الاسم للعرض: Alike
+        const currentCode = urlParams.get('code'); // الكود للملف: AS
         currentTask = urlParams.get('task') || "1";
 
-        if (!currentActivity) {
+        if (!currentCode) {
             window.location.href = 'MC.html';
             return;
         }
 
+        // تحديث واجهة الأرينا بالبيانات
         document.getElementById('student-name').innerText = userName.toUpperCase();
         document.getElementById('student-title').innerText = (savedUser.title || "AGENT").toUpperCase();
         document.getElementById('student-img').src = savedUser.avatar || "assets/default-avatar.png";
         
-        document.getElementById('activity-title').innerText = currentActivity;
+        document.getElementById('activity-title').innerText = currentActivity; // يعرض Alike
         document.getElementById('mission-sub').innerText = `MISSION ${currentTask}`;
-        document.getElementById('activity-img').src = `assets/${currentActivity}.png`; 
+        document.getElementById('activity-img').src = `assets/${currentCode}.png`; 
 
-        document.getElementById('contentFrame').src = `${currentActivity}.html?task=${currentTask}`;
+        // التعديل الجوهري: استدعاء الملف بناءً على الكود المرسل
+        // سيقوم بفتح AS.html?task=1
+        document.getElementById('contentFrame').src = `${currentCode}.html?task=${currentTask}`;
     };
-
     function renderResult(grade, max, feedback) {
         const resultDiv = document.getElementById('result-display');
         document.getElementById('sync-overlay').style.display = 'flex';
