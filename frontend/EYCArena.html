@@ -149,16 +149,17 @@
             document.getElementById('loader-content').style.display = 'flex';
 
             try {
-                const response = await fetch(SCRIPT_URL, {
-                    method: 'POST',
-                    body: JSON.stringify({
-                        action: "submitMission",
-                        email: userEmail,
-                        activity: currentActivityCode, // AS, VS, etc.
-                        task: currentTask,
-                        studentData: studentAnswers 
-                    })
-                });
+               const response = await fetch(SCRIPT_URL, {
+    method: 'POST',
+    // حذف أي Headers معقدة لأن Google Script لا يدعمها في POST العادي من المتصفح
+    body: JSON.stringify({
+        action: "submitMission",
+        email: userEmail,
+        activity: currentActivityCode,
+        task: currentTask,
+        studentData: studentAnswers 
+    })
+});
                 
                 const res = await response.json();
                 if (res.status === "success") {
