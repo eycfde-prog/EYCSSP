@@ -103,7 +103,7 @@
     </footer>
 
 <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyuereKVHanr4wF8q-WkCfIrsLuMhtSyBxkVgVrbWvyBL_SiHkReduXN7zgWG2illuWlQ/exec"; 
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz90ivfqbJ01m8Zcyd2-7HK68zFsf3ZKB1w1AytWb0jao7TYgSbjBkC-3--NQh-q8_uZA/exec"; 
     let currentActivityCode, currentTask, userEmail, userName;
 
     window.onload = function() {
@@ -129,44 +129,62 @@
         document.getElementById('contentFrame').src = `${currentActivityCode}.html?task=${currentTask}`;
     };
 
-async function startSubmission() {
-    const frame = document.getElementById('contentFrame').contentWindow;
-    frame.postMessage({ type: 'REQUEST_MISSION_DATA' }, '*');
-}
-
-window.addEventListener('message', async function(event) {
-    if (event.data.type === 'MISSION_ANSWERS') {
-        const studentAnswers = event.data.answers;
-        
-        document.getElementById('sync-overlay').style.display = 'flex';
-        
-        const params = new URLSearchParams({
-            action: "submitMission",
-            email: userEmail,
-            activity: currentActivityCode,
-            task: currentTask,
-            studentData: JSON.stringify(studentAnswers)
-        });
-
-        // الحل: استخدام FETCH مع سماح بمرور البيانات عبر إعادة التوجيه
-        try {
-            const response = await fetch(`${SCRIPT_URL}?${params.toString()}`, {
-                method: 'GET' // نستخدم GET مع CORS عادي
-            });
-            
-            const result = await response.json(); // الآن يمكننا قراءة الرد الحقيقي!
-
-            if (result.status === "success") {
-                renderResult(result.grade, result.maxGrade, result.feedback);
-            } else {
-                renderResult("ERR", "!!", result.message);
-            }
-        } catch (err) {
-            // في حالة فشل CORS، سنخبر الطالب بالتحقق من لوحة التحكم
-            renderResult("SENT", "??", "Data sent to HQ. Please check your dashboard to see your final grade.");
-        }
+    function startSubmission() {
+        const frame = document.getElementById('contentFrame').contentWindow;
+        frame.postMessage({ type: 'REQUEST_MISSION_DATA' }, '*');
     }
-});
+
+    window.addEventListener('message', async function(event) {
+        if (event.data.type === 'MISSION_ANSWERS') {
+            const studentAnswers = event.data.answers;
+            
+            document.getElementById('sync-overlay').style.display = 'flex';
+            
+            const callbackName = 'gearCallback';
+            const params = new URLSearchParams({
+                action: "submitMission",
+                email: userEmail,
+                activity: currentActivityCode,
+                task: currentTask,
+                studentData: JSON.stringify(studentAnswers),
+                prefix: callbackName
+            });
+
+            // JSONP Fallback / Support
+            window[callbackName] = function(response) {
+                if (response.status === "success") {
+                    renderResult(response.grade, response.maxGrade, response.feedback);
+                } else {
+                    renderResult("ERR", "!!", response.message);
+                }
+                const oldScript = document.getElementById('jsonp-script');
+                if (oldScript) document.body.removeChild(oldScript);
+                delete window[callbackName];
+            };
+
+            // Fetch attempt
+            try {
+                const response = await fetch(`${SCRIPT_URL}?${params.toString()}`, {
+                    method: 'GET'
+                });
+                
+                const result = await response.json();
+
+                if (result.status === "success") {
+                    renderResult(result.grade, result.maxGrade, result.feedback);
+                } else {
+                    renderResult("ERR", "!!", result.message);
+                }
+            } catch (err) {
+                // Triggering JSONP if Fetch fails due to CORS or other network constraints
+                const script = document.createElement('script');
+                script.id = 'jsonp-script';
+                script.src = `${SCRIPT_URL}?${params.toString()}`;
+                document.body.appendChild(script);
+            }
+        }
+    });
+
     function renderResult(grade, max, feedback) {
         const resultDiv = document.getElementById('result-display');
         document.getElementById('loader-content').style.display = 'none';
