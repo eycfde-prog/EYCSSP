@@ -524,13 +524,9 @@
         document.getElementById('ticketArea').style.display = isPaid ? 'block' : 'none';
     }
 
-    function copyCode(event) {
-        const codeText = document.getElementById('agent-code').innerText;
-        navigator.clipboard.writeText(codeText).then(() => {
-            const btn = event.currentTarget;
-            const originalHtml = btn.innerHTML;
-            btn.innerHTML = '<i class="fas fa-check"></i>';
-            setTimeout(() => btn.innerHTML = originalHtml, 2000);
+    function copyCode(code) {
+        navigator.clipboard.writeText(code).then(() => {
+            alert("Code copied to clipboard: " + code);
         });
     }
 
@@ -552,7 +548,7 @@
             avatar: document.getElementById('avatar-img').src
         };
 
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzDbSUFKrFKORT8P8YAlO6rjDUVw19bXGARog_hIrEdgN4T8iS3vrHYYCKyR2IqHkNIVg/exec"; 
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyWUijBZu27X3VF68JygxZKm0clcOa4GwFbg0IEMePdP3iFdIQrehgXlTto1eVxeSqpDg/exec"; 
 
         fetch(SCRIPT_URL, {
             method: "POST",
@@ -562,8 +558,11 @@
         .then(res => {
             loader.style.display = 'none';
             if (res.result === "Success") {
-                showFinalCard(res.code); 
-                localStorage.setItem('eyc_user_code', res.code);
+                const finalCode = res.code;
+                showFinalCard(finalCode); 
+                localStorage.setItem('eyc_user_code', finalCode);
+            } else if (res.error && res.error.includes("Email already exists")) {
+                alert("ACCESS DENIED: This email is already registered! 🚫");
             } else {
                 alert("SYSTEM ERROR: " + (res.error || "Unknown Error"));
             }
@@ -580,7 +579,14 @@
         document.getElementById('success-card').style.display = 'block';
         document.getElementById('card-avatar').src = document.getElementById('avatar-img').src;
         document.getElementById('card-name').innerText = document.getElementById('name').value;
-        document.getElementById('agent-code').innerText = generatedCode; 
+        
+        const codeBox = document.querySelector('.code-box');
+        codeBox.innerHTML = `
+            <span id="agent-code">${generatedCode}</span>
+            <button onclick="copyCode('${generatedCode}')" style="width:auto; padding:5px 10px; margin-left:10px; font-size:0.8rem;">
+                <i class="fas fa-copy"></i> Copy
+            </button>
+        `;
         document.getElementById('pBar').style.width = "100%";
     }
 </script>
