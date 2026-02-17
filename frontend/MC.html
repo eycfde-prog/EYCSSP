@@ -97,6 +97,14 @@
             .stats-row { gap: 12px; padding: 8px 15px; }
             .stat-item { font-size: 0.7rem; }
         }
+
+        .fa-spin {
+            animation: fa-spin 2s infinite linear;
+        }
+        @keyframes fa-spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(359deg); }
+        }
     </style>
 </head>
 <body>
@@ -137,13 +145,13 @@
             <h2 style="font-family:'Cinzel'; color:var(--gold); margin-bottom:20px; letter-spacing:2px;">AUTHENTICATION</h2>
             <input type="email" id="loginEmail" style="width:100%; padding:15px; margin:8px 0; border-radius:12px; background:rgba(255,255,255,0.05); border:1px solid #333; color:#fff; font-family:'Orbitron'; font-size:0.8rem;" placeholder="EMAIL">
             <input type="password" id="loginCode" style="width:100%; padding:15px; margin:8px 0; border-radius:12px; background:rgba(255,255,255,0.05); border:1px solid #333; color:#fff; font-family:'Orbitron'; font-size:0.8rem;" placeholder="CODE">
-            <button onclick="handleLogin()" style="width:100%; margin-top:20px; padding:15px; border-radius:12px; background:var(--gold-gradient); border:none; font-weight:900; font-family:'Orbitron'; cursor:pointer;">SIGN IN</button>
+            <button onclick="handleLogin()" id="loginSubmitBtn" style="width:100%; margin-top:20px; padding:15px; border-radius:12px; background:var(--gold-gradient); border:none; font-weight:900; font-family:'Orbitron'; cursor:pointer;">SIGN IN</button>
             <button class="btn-exit" style="margin-top:10px; border:none;" onclick="closeModal('loginModal')">CANCEL</button>
         </div>
     </div>
 
     <script>
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxkVPJ5Ehmf0LMz9MsYHD_cguGE7AH7P7tBEm7XaIR8v7ZI8xO9FOexw-ndj0FS-NjHDw/exec";
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxexgB4KTyPB4wuj-tQWLOfEcZKbWKo7uN7vd3j6p_YOqeE9IYNZtvmdq_AOmX6Ae0nYw/exec";
         let currentUser = null;
         let isLoggedIn = false;
 
@@ -201,7 +209,6 @@
             }
         }
 
-        // --- Core Logic ---
         function generateCards() {
             const grid = document.getElementById('cardsGrid'); grid.innerHTML = '';
             const type = document.querySelector('.tab-btn.active').innerText.toLowerCase();
@@ -232,11 +239,21 @@
                 node.className = 'task-node';
                 node.innerText = i;
                 node.onclick = () => {
-                    if(!isLoggedIn) return openLogin();
+                    if(!isLoggedIn) {
+                        alert("Unauthorized! Redirecting to Authentication...");
+                        return openLogin();
+                    }
+                    
                     const params = new URLSearchParams({
-                        act: code, task: i, email: currentUser.email,
-                        name: currentUser.name, avatar: currentUser.avatar, title: currentUser.title 
+                        studentName: currentUser.name,
+                        studentEmail: currentUser.email,
+                        studentAvatar: currentUser.avatar,
+                        studentTitle: currentUser.title,
+                        activityName: name,
+                        activityCode: code,
+                        taskNumber: i
                     });
+                    
                     window.location.href = `EYCArena.html?${params.toString()}`;
                 };
                 tGrid.appendChild(node);
@@ -245,22 +262,68 @@
         }
 
         function handleLogin() {
-            const email = document.getElementById('loginEmail').value;
-            const code = document.getElementById('loginCode').value;
-            if (!email || !code) return alert("Credentials Required.");
+            const email = document.getElementById('loginEmail').value.trim();
+            const code = document.getElementById('loginCode').value.trim();
+            
+            if (!email) return alert("Please enter your email.");
+
+            const btn = document.getElementById('loginSubmitBtn');
+            const originalText = btn.innerText;
+            btn.innerText = "AUTHENTICATING...";
+            btn.disabled = true;
 
             fetch(`${SCRIPT_URL}?action=getProfile&email=${email}&code=${code}`)
                 .then(res => res.json())
                 .then(res => {
-                    if(res.error) alert(res.message);
-                    else {
-                        currentUser = { name: res.name, email: email, tokens: res.tokens, stars: res.stars, goldTickets: res.goldTickets || 0, avatar: res.avatar, title: res.title, rank: res.rank || "N/A" };
+                    btn.innerText = originalText;
+                    btn.disabled = false;
+
+                    if (res.status === "success") {
+                        currentUser = res;
+                        currentUser.email = email; // Preserve email
                         isLoggedIn = true;
                         localStorage.setItem('eyc_user', JSON.stringify(currentUser));
+                        localStorage.setItem('eyc_user_code', code);
                         closeModal('loginModal');
-                        renderHeader(); generateCards();
+                        renderHeader(); 
+                        generateCards();
+                    } else {
+                        if (res.message === "Not Registered") {
+                            if (confirm("Agent not found! Would you like to create a new account?")) {
+                                window.location.href = 'NP.html';
+                            }
+                        } else if (res.message === "Incorrect Code") {
+                            alert("Access Denied: The code you entered is incorrect. Please check your email for the recovery code.");
+                        } else {
+                            alert(res.message || "Login Failed.");
+                        }
                     }
+                })
+                .catch(err => {
+                    btn.innerText = originalText;
+                    btn.disabled = false;
+                    alert("Connection Error. Please try again.");
                 });
+        }
+
+        function refreshUserData() {
+            if (!currentUser) return;
+            const syncIcon = document.querySelector('.fa-sync-alt');
+            syncIcon.classList.add('fa-spin');
+
+            const code = localStorage.getItem('eyc_user_code') || currentUser.code;
+
+            fetch(`${SCRIPT_URL}?action=getProfile&email=${currentUser.email}&code=${code}`)
+                .then(res => res.json())
+                .then(res => {
+                    syncIcon.classList.remove('fa-spin');
+                    if (res.status === "success") {
+                        currentUser = res;
+                        localStorage.setItem('eyc_user', JSON.stringify(currentUser));
+                        renderHeader();
+                    }
+                })
+                .catch(() => syncIcon.classList.remove('fa-spin'));
         }
 
         function handleLogout() {
@@ -270,7 +333,6 @@
         function openLogin() { document.getElementById('loginModal').style.display = 'flex'; }
         function closeModal(id) { document.getElementById(id).style.display = 'none'; }
 
-        // --- Background Stars ---
         function createStars() {
             const container = document.getElementById('star-container');
             for (let i = 0; i < 60; i++) {
