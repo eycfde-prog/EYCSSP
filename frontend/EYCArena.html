@@ -104,7 +104,7 @@
 
 <script>
     // تأكد من تحديث الرابط عند رفع الـ Script الجديد
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxZJorVhCRhLSGyK2dhVppnM7GZOYM5_nQcj9MYe1VKRwrM1El2uon36d6ByJmiTC74TQ/exec"; 
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxjVPjg33I1NYtcZ0P6i9tlu_ucRfds72WKCLhLROuwLVLn5hoigosjl_TjF1KJCd9lNg/exec"; 
     let currentActivityCode, currentTask, userEmail, userName;
 
     // 1. استلام البيانات عند التحميل
@@ -149,9 +149,10 @@
             document.getElementById('loader-content').style.display = 'flex';
 
             try {
-               const response = await fetch(SCRIPT_URL, {
+// بدلاً من إرسال JSON خام، سنرسله كـ "نص" بسيط لتجنب فحص CORS المعقد
+const response = await fetch(SCRIPT_URL, {
     method: 'POST',
-    // حذف أي Headers معقدة لأن Google Script لا يدعمها في POST العادي من المتصفح
+    mode: 'no-cors', // جرب هذا الخيار فقط إذا استمر الخطأ، لكنه سيمنعك من قراءة النتيجة
     body: JSON.stringify({
         action: "submitMission",
         email: userEmail,
