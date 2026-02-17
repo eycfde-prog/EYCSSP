@@ -103,7 +103,7 @@
     </footer>
 
 <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz90ivfqbJ01m8Zcyd2-7HK68zFsf3ZKB1w1AytWb0jao7TYgSbjBkC-3--NQh-q8_uZA/exec"; 
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwf3reM66_4nWjDNH-_t8KdhKd6-qmQ1xwYGOXWZfChRFy6SnbajOZzXiYjVGcYfURElA/exec"; 
     let currentActivityCode, currentTask, userEmail, userName;
 
     window.onload = function() {
@@ -114,18 +114,13 @@
         const urlParams = new URLSearchParams(window.location.search);
         userEmail = savedUser.email;
         userName = savedUser.name;
-        
         currentActivityCode = urlParams.get('code'); 
         currentTask = urlParams.get('task') || "1";
 
-        if (!currentActivityCode) { window.location.href = 'MC.html'; return; }
-
         document.getElementById('student-name').innerText = userName.toUpperCase();
-        document.getElementById('student-title').innerText = (savedUser.title || "AGENT").toUpperCase();
         document.getElementById('student-img').src = savedUser.avatar || "";
         document.getElementById('activity-title').innerText = currentActivityCode;
         document.getElementById('mission-sub').innerText = `MISSION ${currentTask}`;
-        
         document.getElementById('contentFrame').src = `${currentActivityCode}.html?task=${currentTask}`;
     };
 
@@ -134,13 +129,14 @@
         frame.postMessage({ type: 'REQUEST_MISSION_DATA' }, '*');
     }
 
-    window.addEventListener('message', async function(event) {
+    // استلام البيانات من الـ Iframe وإرسالها للسيرفر
+    window.addEventListener('message', function(event) {
         if (event.data.type === 'MISSION_ANSWERS') {
             const studentAnswers = event.data.answers;
-            
             document.getElementById('sync-overlay').style.display = 'flex';
             
-            const callbackName = 'gearCallback';
+            // الحل: استخدام JSONP فقط وتجاهل Fetch تماماً لتجنب CORB/CORS
+            const callbackName = 'gearCallback_' + Date.now();
             const params = new URLSearchParams({
                 action: "submitMission",
                 email: userEmail,
@@ -150,38 +146,19 @@
                 prefix: callbackName
             });
 
-            // JSONP Fallback / Support
+            // تعريف الدالة التي سيستدعيها السيرفر
             window[callbackName] = function(response) {
-                if (response.status === "success") {
-                    renderResult(response.grade, response.maxGrade, response.feedback);
-                } else {
-                    renderResult("ERR", "!!", response.message);
-                }
-                const oldScript = document.getElementById('jsonp-script');
-                if (oldScript) document.body.removeChild(oldScript);
+                renderResult(response.grade, response.maxGrade, response.feedback);
                 delete window[callbackName];
+                document.getElementById('jsonp-engine').remove();
             };
 
-            // Fetch attempt
-            try {
-                const response = await fetch(`${SCRIPT_URL}?${params.toString()}`, {
-                    method: 'GET'
-                });
-                
-                const result = await response.json();
-
-                if (result.status === "success") {
-                    renderResult(result.grade, result.maxGrade, result.feedback);
-                } else {
-                    renderResult("ERR", "!!", result.message);
-                }
-            } catch (err) {
-                // Triggering JSONP if Fetch fails due to CORS or other network constraints
-                const script = document.createElement('script');
-                script.id = 'jsonp-script';
-                script.src = `${SCRIPT_URL}?${params.toString()}`;
-                document.body.appendChild(script);
-            }
+            // حقن السكربت في الصفحة
+            const script = document.createElement('script');
+            script.id = 'jsonp-engine';
+            script.src = `${SCRIPT_URL}?${params.toString()}`;
+            script.onerror = () => renderResult("ERR", "!!", "Connection Lost");
+            document.body.appendChild(script);
         }
     });
 
@@ -189,9 +166,6 @@
         const resultDiv = document.getElementById('result-display');
         document.getElementById('loader-content').style.display = 'none';
         resultDiv.style.display = 'block';
-        resultDiv.style.textAlign = 'center';
-        resultDiv.style.padding = '30px';
-        
         resultDiv.innerHTML = `
             <i class="fas fa-award" style="font-size: 3rem; color: var(--gold); margin-bottom: 15px;"></i>
             <div style="font-size: 1rem; color: var(--gold); font-family: 'Orbitron';">MISSION EVALUATED</div>
@@ -203,6 +177,7 @@
         `;
     }
 
+    // الدوال المساعدة (Stars, Loader)
     function createStars() {
         const container = document.getElementById('star-container');
         for (let i = 0; i < 80; i++) {
@@ -211,20 +186,12 @@
             star.style.width = star.style.height = Math.random() * 2 + 'px';
             star.style.top = Math.random() * 100 + '%';
             star.style.left = Math.random() * 100 + '%';
-            star.style.animationDelay = Math.random() * 3 + 's';
             container.appendChild(star);
         }
     }
-
-    const arenaIframe = document.getElementById('contentFrame');
-    const arenaLoader = document.getElementById('arena-loader');
-    arenaIframe.onload = () => { 
-        arenaLoader.style.opacity = '0'; 
-        setTimeout(() => arenaLoader.style.display = 'none', 600); 
+    document.getElementById('contentFrame').onload = () => { 
+        document.getElementById('arena-loader').style.display = 'none'; 
     };
-
-    function exitArena() { if(confirm("Abort Mission?")) window.location.href='MC.html'; }
-    function showRules() { alert("1. Automatic Correction\n2. Bonus added to Column L\n3. Report logged in HQ."); }
 </script>
 </body>
 </html>
