@@ -106,27 +106,6 @@
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz4nt8MCqUk0J9qcAfmH1Ro0lqdsOw5Tn8PbKXXIYtK0eAXSw9ZWVIPGniC33Djq3rs4w/exec"; 
     let currentActivityCode, currentTask, userEmail, userName;
 
-    function renderResult(grade, max, feedback) {
-        const resultDiv = document.getElementById('result-display');
-        document.getElementById('loader-content').style.display = 'none';
-        resultDiv.style.display = 'block';
-        
-        // تأمين القيم في حال وصولها فارغة
-        const displayGrade = grade !== undefined ? grade : "0";
-        const displayMax = max !== undefined ? max : "0";
-        const displayFeedback = feedback || "Check Connection";
-
-        resultDiv.innerHTML = `
-            <i class="fas fa-award" style="font-size: 3rem; color: var(--gold); margin-bottom: 15px;"></i>
-            <div style="font-size: 1rem; color: var(--gold); font-family: 'Orbitron';">MISSION EVALUATED</div>
-            <div style="font-size: 3.5rem; margin: 10px 0; font-family: 'Orbitron'; font-weight: 700; color:white;">${displayGrade}<span style="font-size: 1.5rem; color: #555;">/${displayMax}</span></div>
-            <p style="color: #aaa; font-size: 0.8rem; margin-bottom: 25px;">${displayFeedback}</p>
-            <button class="btn btn-submit" style="width:100%" onclick="window.location.href='MC.html'">
-                <i class="fas fa-check-circle"></i> DATA SYNCED - RETURN
-            </button>
-        `;
-    }
-
     window.onload = function() {
         createStars();
         const savedUser = JSON.parse(localStorage.getItem('eyc_user'));
@@ -151,49 +130,71 @@
     }
 
     // استلام البيانات من الـ Iframe وإرسالها للسيرفر
-    window.addEventListener('message', function(event) {
-        if (event.data.type === 'MISSION_ANSWERS') {
-            const studentAnswers = event.data.answers;
-            document.getElementById('sync-overlay').style.display = 'flex';
+window.addEventListener('message', function(event) {
+    if (event.data.type === 'MISSION_ANSWERS') {
+        const studentAnswers = event.data.answers;
+        document.getElementById('sync-overlay').style.display = 'flex';
 
-            const callbackName = 'gearCallback_' + Date.now();
-            const params = new URLSearchParams({
-                action: "submitMission",
-                email: userEmail,
-                activity: currentActivityCode,
-                task: currentTask,
-                studentData: JSON.stringify(studentAnswers),
-                prefix: callbackName
-            });
+        const callbackName = 'gearCallback_' + Date.now();
+        
+        // تأمين البيانات قبل الإرسال
+        const payload = {
+            action: "submitMission",
+            email: userEmail,
+            activity: currentActivityCode,
+            task: currentTask,
+            studentData: JSON.stringify(studentAnswers),
+            prefix: callbackName
+        };
 
-            const timeout = setTimeout(() => {
-                if (window[callbackName]) {
-                    renderResult("ERR", "!!", "Server Timeout - Check Logs");
-                    delete window[callbackName];
-                    const scriptNode = document.getElementById('jsonp-engine');
-                    if (scriptNode) scriptNode.remove();
-                }
-            }, 8000);
+        const queryString = Object.keys(payload)
+            .map(key => encodeURIComponent(key) + '=' + encodeURIComponent(payload[key]))
+            .join('&');
 
-            window[callbackName] = function(response) {
-                clearTimeout(timeout);
-                renderResult(response.grade, response.maxGrade, response.feedback);
+        const timeout = setTimeout(() => {
+            if (window[callbackName]) {
+                renderResult("ERR", "!!", "Connection Timeout - Network Heavy");
                 delete window[callbackName];
-                const scriptNode = document.getElementById('jsonp-engine');
-                if (scriptNode) scriptNode.remove();
-            };
+                const node = document.getElementById('jsonp-engine');
+                if (node) node.remove();
+            }
+        }, 10000);
 
-            const script = document.createElement('script');
-            script.id = 'jsonp-engine';
-            script.src = `${SCRIPT_URL}?${params.toString()}`;
-            script.onerror = () => {
-                clearTimeout(timeout);
-                renderResult("ERR", "!!", "Connection Lost");
-            };
-            document.body.appendChild(script);
-        }
-    });
+        window[callbackName] = function(response) {
+            clearTimeout(timeout);
+            renderResult(response.grade, response.maxGrade, response.feedback || response.message);
+            delete window[callbackName];
+            const node = document.getElementById('jsonp-engine');
+            if (node) node.remove();
+        };
 
+        const script = document.createElement('script');
+        script.id = 'jsonp-engine';
+        script.src = `${SCRIPT_URL}?${queryString}`;
+        script.onerror = () => {
+            clearTimeout(timeout);
+            renderResult("ERR", "!!", "Gateway Protocol Failure");
+        };
+        document.body.appendChild(script);
+    }
+});
+
+    function renderResult(grade, max, feedback) {
+        const resultDiv = document.getElementById('result-display');
+        document.getElementById('loader-content').style.display = 'none';
+        resultDiv.style.display = 'block';
+        resultDiv.innerHTML = `
+            <i class="fas fa-award" style="font-size: 3rem; color: var(--gold); margin-bottom: 15px;"></i>
+            <div style="font-size: 1rem; color: var(--gold); font-family: 'Orbitron';">MISSION EVALUATED</div>
+            <div style="font-size: 3.5rem; margin: 10px 0; font-family: 'Orbitron'; font-weight: 700; color:white;">${grade}<span style="font-size: 1.5rem; color: #555;">/${max}</span></div>
+            <p style="color: #aaa; font-size: 0.8rem; margin-bottom: 25px;">${feedback}</p>
+            <button class="btn btn-submit" style="width:100%" onclick="window.location.href='MC.html'">
+                <i class="fas fa-check-circle"></i> DATA SYNCED - RETURN
+            </button>
+        `;
+    }
+
+    // الدوال المساعدة (Stars, Loader)
     function createStars() {
         const container = document.getElementById('star-container');
         for (let i = 0; i < 80; i++) {
@@ -205,7 +206,6 @@
             container.appendChild(star);
         }
     }
-
     document.getElementById('contentFrame').onload = () => { 
         document.getElementById('arena-loader').style.display = 'none'; 
     };
