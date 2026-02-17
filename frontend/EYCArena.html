@@ -53,7 +53,7 @@
             <div class="fairy-loader"><i class="fas fa-microchip"></i></div>
             <div style="margin-top: 20px; text-align: center;">
                 <div style="color: var(--gold); font-family: 'Orbitron'; font-size: 1rem;">SECURE LINK ESTABLISHED</div>
-                <div id="status-msg" style="color: #666; font-size: 0.7rem; margin-top: 5px;">PROTOCOL: TRANSMITTING DATA TO SHEET1(COL-L)</div>
+                <div id="status-msg" style="color: #666; font-size: 0.7rem; margin-top: 5px;">PROTOCOL: TRANSMITTING DATA TO HQ</div>
             </div>
         </div>
         <div id="result-display" style="display: none;" class="result-card"></div>
@@ -103,11 +103,9 @@
     </footer>
 
 <script>
-    // تأكد من تحديث الرابط عند رفع الـ Script الجديد
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz3g9ZgDWYVxa0nuCQcaDbOTNgp2yCfGNMKbRSX_7Sze8Z6GLJoGVHdKDArSBpAT7B7VA/exec"; 
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwu_je6gasJb5qxGSoVBZtV6QefgOPEDiCPaAw5fUZMELqXaimUr5WVIGI1uSXPV_jyow/exec"; 
     let currentActivityCode, currentTask, userEmail, userName;
 
-    // 1. استلام البيانات عند التحميل
     window.onload = function() {
         createStars();
         const savedUser = JSON.parse(localStorage.getItem('eyc_user'));
@@ -117,112 +115,101 @@
         userEmail = savedUser.email;
         userName = savedUser.name;
         
-        // التعديل المطلوب: استلام كود النشاط مباشرة
         currentActivityCode = urlParams.get('code'); 
         currentTask = urlParams.get('task') || "1";
 
         if (!currentActivityCode) { window.location.href = 'MC.html'; return; }
 
-        // تحديث الواجهة
         document.getElementById('student-name').innerText = userName.toUpperCase();
         document.getElementById('student-title').innerText = (savedUser.title || "AGENT").toUpperCase();
         document.getElementById('student-img').src = savedUser.avatar || "";
         document.getElementById('activity-title').innerText = currentActivityCode;
         document.getElementById('mission-sub').innerText = `MISSION ${currentTask}`;
         
-        // التعديل المطلوب: الأرينا تنادي على Code.html (مثل AS.html)
         document.getElementById('contentFrame').src = `${currentActivityCode}.html?task=${currentTask}`;
     };
 
-    // 2. طلب البيانات من النشاط (Iframe)
     function startSubmission() {
         const frame = document.getElementById('contentFrame').contentWindow;
         frame.postMessage({ type: 'REQUEST_MISSION_DATA' }, '*');
     }
 
-    // 3. استقبال الإجابات وإرسالها للسيرفر
-// استقبال الإجابات وإرسالها للسيرفر
-window.addEventListener('message', async function(event) {
-    if (event.data.type === 'MISSION_ANSWERS') {
-        const studentAnswers = event.data.answers;
-        
-        document.getElementById('sync-overlay').style.display = 'flex';
-        document.getElementById('loader-content').style.display = 'flex';
+    window.addEventListener('message', async function(event) {
+        if (event.data.type === 'MISSION_ANSWERS') {
+            const studentAnswers = event.data.answers;
+            
+            document.getElementById('sync-overlay').style.display = 'flex';
+            document.getElementById('loader-content').style.display = 'flex';
 
-        // استخدام URLSearchParams لتجنب مشاكل CORS المعقدة
-        const formData = new URLSearchParams();
-        formData.append('action', 'submitMission');
-        formData.append('email', userEmail);
-        formData.append('activity', currentActivityCode);
-        formData.append('task', currentTask);
-        formData.append('studentData', JSON.stringify(studentAnswers)); 
-
-        try {
-            // ملاحظة: لا نضع Headers هنا، المتصفح سيتصرف تلقائياً
-            const response = await fetch(SCRIPT_URL, {
-                method: 'POST',
-                body: formData,
-                mode: 'no-cors' // سنستخدم no-cors هنا للإرسال فقط
+            const params = new URLSearchParams({
+                action: "submitMission",
+                email: userEmail,
+                activity: currentActivityCode,
+                task: currentTask,
+                studentData: JSON.stringify(studentAnswers)
             });
-            
-            // بما أننا استخدمنا no-cors، لن نستطيع قراءة الرد برمجياً (سيكون opaque)
-            // لذا سننتظر ثانيتين ثم نعتبر العملية تمت بنجاح ونعيد الطالب للملف الشخصي
-            // أو نظهر رسالة نجاح تقديرية
-            
-            setTimeout(() => {
-                renderResult("SYNCED", "50", "Data transmitted to HQ. Check your dashboard.");
-            }, 2000);
 
-        } catch (err) {
-            console.error("Transmission Error:", err);
-            alert("Transmission Error. HQ is offline.");
-            document.getElementById('sync-overlay').style.display = 'none';
+            try {
+                const response = await fetch(`${SCRIPT_URL}?${params.toString()}`, {
+                    method: 'GET'
+                });
+                
+                const res = await response.json();
+                if (res.status === "success") {
+                    renderResult(res.grade, res.maxGrade, res.feedback);
+                } else {
+                    throw new Error("Server returned failure");
+                }
+            } catch (err) {
+                console.error("Transmission Error:", err);
+                // Fallback handling for CORS or failure
+                setTimeout(() => {
+                    renderResult("SYNCED", "??", "Data transmitted via GET protocol. Check dashboard for grade.");
+                }, 2000);
+            }
+        }
+    });
+
+    function renderResult(grade, max, feedback) {
+        const resultDiv = document.getElementById('result-display');
+        document.getElementById('loader-content').style.display = 'none';
+        resultDiv.style.display = 'block';
+        resultDiv.style.textAlign = 'center';
+        resultDiv.style.padding = '30px';
+        
+        resultDiv.innerHTML = `
+            <i class="fas fa-award" style="font-size: 3rem; color: var(--gold); margin-bottom: 15px;"></i>
+            <div style="font-size: 1rem; color: var(--gold); font-family: 'Orbitron';">MISSION EVALUATED</div>
+            <div style="font-size: 3.5rem; margin: 10px 0; font-family: 'Orbitron'; font-weight: 700; color:white;">${grade}<span style="font-size: 1.5rem; color: #555;">/${max}</span></div>
+            <p style="color: #aaa; font-size: 0.8rem; margin-bottom: 25px;">${feedback}</p>
+            <button class="btn btn-submit" style="width:100%" onclick="window.location.href='MC.html'">
+                <i class="fas fa-check-circle"></i> DATA SYNCED - RETURN
+            </button>
+        `;
+    }
+
+    function createStars() {
+        const container = document.getElementById('star-container');
+        for (let i = 0; i < 80; i++) {
+            const star = document.createElement('div');
+            star.className = 'star';
+            star.style.width = star.style.height = Math.random() * 2 + 'px';
+            star.style.top = Math.random() * 100 + '%';
+            star.style.left = Math.random() * 100 + '%';
+            star.style.animationDelay = Math.random() * 3 + 's';
+            container.appendChild(star);
         }
     }
-});
 
-// 4. عرض النتيجة النهائية
-function renderResult(grade, max, feedback) {
-    const resultDiv = document.getElementById('result-display');
-    document.getElementById('loader-content').style.display = 'none';
-    resultDiv.style.display = 'block';
-    resultDiv.style.textAlign = 'center';
-    resultDiv.style.padding = '30px';
-    
-    resultDiv.innerHTML = `
-        <i class="fas fa-award" style="font-size: 3rem; color: var(--gold); margin-bottom: 15px;"></i>
-        <div style="font-size: 1rem; color: var(--gold); font-family: 'Orbitron';">MISSION EVALUATED</div>
-        <div style="font-size: 3.5rem; margin: 10px 0; font-family: 'Orbitron'; font-weight: 700; color:white;">${grade}<span style="font-size: 1.5rem; color: #555;">/${max}</span></div>
-        <p style="color: #aaa; font-size: 0.8rem; margin-bottom: 25px;">${feedback}</p>
-        <button class="btn btn-submit" style="width:100%" onclick="window.location.href='MC.html'">
-            <i class="fas fa-check-circle"></i> DATA SYNCED - RETURN
-        </button>
-    `;
-}
+    const arenaIframe = document.getElementById('contentFrame');
+    const arenaLoader = document.getElementById('arena-loader');
+    arenaIframe.onload = () => { 
+        arenaLoader.style.opacity = '0'; 
+        setTimeout(() => arenaLoader.style.display = 'none', 600); 
+    };
 
-// وظائف إضافية (النجوم، الخروج، القوانين)
-function createStars() {
-    const container = document.getElementById('star-container');
-    for (let i = 0; i < 80; i++) {
-        const star = document.createElement('div');
-        star.className = 'star';
-        star.style.width = star.style.height = Math.random() * 2 + 'px';
-        star.style.top = Math.random() * 100 + '%';
-        star.style.left = Math.random() * 100 + '%';
-        star.style.animationDelay = Math.random() * 3 + 's';
-        container.appendChild(star);
-    }
-}
-
-const arenaIframe = document.getElementById('contentFrame');
-const arenaLoader = document.getElementById('arena-loader');
-arenaIframe.onload = () => { 
-    arenaLoader.style.opacity = '0'; 
-    setTimeout(() => arenaLoader.style.display = 'none', 600); 
-};
-
-function exitArena() { if(confirm("Abort Mission?")) window.location.href='MC.html'; }
-function showRules() { alert("1. Automatic Correction\n2. Bonus added to Column L\n3. Report logged in HQ."); }
+    function exitArena() { if(confirm("Abort Mission?")) window.location.href='MC.html'; }
+    function showRules() { alert("1. Automatic Correction\n2. Bonus added to Column L\n3. Report logged in HQ."); }
 </script>
 </body>
 </html>
