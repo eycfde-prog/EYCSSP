@@ -103,7 +103,7 @@
     </footer>
 
 <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwf3reM66_4nWjDNH-_t8KdhKd6-qmQ1xwYGOXWZfChRFy6SnbajOZzXiYjVGcYfURElA/exec"; 
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwfvaJqm5059SHmLu2r_3sAS74zPuX_hKt8dwXFcgC8RnxOp0w5CcNeDcXnh7jRLCdUJA/exec"; 
     let currentActivityCode, currentTask, userEmail, userName;
 
     window.onload = function() {
@@ -130,37 +130,52 @@
     }
 
     // استلام البيانات من الـ Iframe وإرسالها للسيرفر
-    window.addEventListener('message', function(event) {
-        if (event.data.type === 'MISSION_ANSWERS') {
-            const studentAnswers = event.data.answers;
-            document.getElementById('sync-overlay').style.display = 'flex';
-            
-            // الحل: استخدام JSONP فقط وتجاهل Fetch تماماً لتجنب CORB/CORS
-            const callbackName = 'gearCallback_' + Date.now();
-            const params = new URLSearchParams({
-                action: "submitMission",
-                email: userEmail,
-                activity: currentActivityCode,
-                task: currentTask,
-                studentData: JSON.stringify(studentAnswers),
-                prefix: callbackName
-            });
+  window.addEventListener('message', function(event) {
+    if (event.data.type === 'MISSION_ANSWERS') {
+        const studentAnswers = event.data.answers;
+        document.getElementById('sync-overlay').style.display = 'flex';
 
-            // تعريف الدالة التي سيستدعيها السيرفر
-            window[callbackName] = function(response) {
-                renderResult(response.grade, response.maxGrade, response.feedback);
+        // الحل: استخدام JSONP فقط وتجاهل Fetch تماماً لتجنب CORB/CORS
+        const callbackName = 'gearCallback_' + Date.now();
+        const params = new URLSearchParams({
+            action: "submitMission",
+            email: userEmail,
+            activity: currentActivityCode,
+            task: currentTask,
+            studentData: JSON.stringify(studentAnswers),
+            prefix: callbackName
+        });
+
+        // إعداد التايم آوت للتصحيح
+        const timeout = setTimeout(() => {
+            if (window[callbackName]) {
+                renderResult("ERR", "!!", "Server Timeout - Check Logs");
                 delete window[callbackName];
-                document.getElementById('jsonp-engine').remove();
-            };
+                const scriptNode = document.getElementById('jsonp-engine');
+                if (scriptNode) scriptNode.remove();
+            }
+        }, 8000); // 8 ثواني انتظار
 
-            // حقن السكربت في الصفحة
-            const script = document.createElement('script');
-            script.id = 'jsonp-engine';
-            script.src = `${SCRIPT_URL}?${params.toString()}`;
-            script.onerror = () => renderResult("ERR", "!!", "Connection Lost");
-            document.body.appendChild(script);
-        }
-    });
+        // تعريف الدالة التي سيستدعيها السيرفر
+        window[callbackName] = function(response) {
+            clearTimeout(timeout); // إلغاء التايم آوت عند النجاح
+            renderResult(response.grade, response.maxGrade, response.feedback);
+            delete window[callbackName];
+            const scriptNode = document.getElementById('jsonp-engine');
+            if (scriptNode) scriptNode.remove();
+        };
+
+        // حقن السكربت في الصفحة
+        const script = document.createElement('script');
+        script.id = 'jsonp-engine';
+        script.src = `${SCRIPT_URL}?${params.toString()}`;
+        script.onerror = () => {
+            clearTimeout(timeout);
+            renderResult("ERR", "!!", "Connection Lost");
+        };
+        document.body.appendChild(script);
+    }
+});
 
     function renderResult(grade, max, feedback) {
         const resultDiv = document.getElementById('result-display');
