@@ -140,13 +140,22 @@
         </div>
     </div>
 
-    <div class="modal" id="loginModal">
+<div class="modal" id="loginModal">
         <div class="modal-content">
-            <h2 style="font-family:'Cinzel'; color:var(--gold); margin-bottom:20px; letter-spacing:2px;">AUTHENTICATION</h2>
-            <input type="email" id="loginEmail" style="width:100%; padding:15px; margin:8px 0; border-radius:12px; background:rgba(255,255,255,0.05); border:1px solid #333; color:#fff; font-family:'Orbitron'; font-size:0.8rem;" placeholder="EMAIL">
-            <input type="password" id="loginCode" style="width:100%; padding:15px; margin:8px 0; border-radius:12px; background:rgba(255,255,255,0.05); border:1px solid #333; color:#fff; font-family:'Orbitron'; font-size:0.8rem;" placeholder="CODE">
-            <button onclick="handleLogin()" id="loginSubmitBtn" style="width:100%; margin-top:20px; padding:15px; border-radius:12px; background:var(--gold-gradient); border:none; font-weight:900; font-family:'Orbitron'; cursor:pointer;">SIGN IN</button>
-            <button class="btn-exit" style="margin-top:10px; border:none;" onclick="closeModal('loginModal')">CANCEL</button>
+            <h2 style="font-family:'Cinzel'; color:var(--gold); margin-bottom:20px; letter-spacing:2px; text-align: center;">AUTHENTICATION</h2>
+            
+            <input type="email" id="loginEmail" style="width:100%; padding:15px; margin:8px 0; border-radius:12px; background:rgba(255,255,255,0.05); border:1px solid #333; color:#fff; font-family:'Orbitron'; font-size:0.8rem;" placeholder="REGISTERED EMAIL">
+            
+            <input type="password" id="loginCode" style="width:100%; padding:15px; margin:8px 0; border-radius:12px; background:rgba(255,255,255,0.05); border:1px solid #333; color:#fff; font-family:'Orbitron'; font-size:0.8rem;" placeholder="ACCESS CODE">
+            
+            <button onclick="handleLogin()" id="loginSubmitBtn" style="width:100%; margin-top:15px; padding:15px; border-radius:12px; background:var(--gold-gradient); border:none; font-weight:900; font-family:'Orbitron'; cursor:pointer; color: #000;">SIGN IN</button>
+
+            <div style="display: flex; gap: 10px; margin-top: 15px;">
+                <button onclick="forgotCode()" style="flex: 1; background: transparent; border: 1px solid rgba(212,175,55,0.3); color: var(--gold); padding: 10px; border-radius: 8px; font-size: 0.6rem; font-family: 'Orbitron'; cursor: pointer; transition: 0.3s;">FORGOT CODE?</button>
+                <button onclick="window.location.href='NP.html'" style="flex: 1; background: transparent; border: 1px solid #444; color: #aaa; padding: 10px; border-radius: 8px; font-size: 0.6rem; font-family: 'Orbitron'; cursor: pointer; transition: 0.3s;">NEW AGENT?</button>
+            </div>
+
+            <button class="btn-exit" style="margin-top:20px; border:none; color: #666;" onclick="closeModal('loginModal')">CLOSE</button>
         </div>
     </div>
 
@@ -344,6 +353,38 @@
                 star.style.setProperty('--duration', (Math.random() * 3 + 2) + 's');
                 container.appendChild(star);
             }
+        }
+        function forgotCode() {
+            const email = document.getElementById('loginEmail').value.trim();
+            if (!email) {
+                alert("Please enter your email address first so we can send your code.");
+                return;
+            }
+
+            if (!confirm("We will send your access code to: " + email + ". Continue?")) return;
+
+            // تغيير حالة الزر مؤقتاً
+            const forgotBtn = event.target;
+            const originalText = forgotBtn.innerText;
+            forgotBtn.innerText = "SENDING...";
+            forgotBtn.disabled = true;
+
+            fetch(`${SCRIPT_URL}?action=forgotCode&email=${email}`)
+                .then(res => res.json())
+                .then(res => {
+                    forgotBtn.innerText = originalText;
+                    forgotBtn.disabled = false;
+                    if (res.status === "success") {
+                        alert("Transmission Successful! Check your inbox (or spam) for your access code.");
+                    } else {
+                        alert("Error: " + (res.message || "Email not found in our database."));
+                    }
+                })
+                .catch(() => {
+                    forgotBtn.innerText = originalText;
+                    forgotBtn.disabled = false;
+                    alert("Network error. Please try again later.");
+                });
         }
 
         window.onload = () => {
