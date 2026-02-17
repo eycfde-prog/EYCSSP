@@ -104,7 +104,7 @@
 
 <script>
     // تأكد من تحديث الرابط عند رفع الـ Script الجديد
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxjVPjg33I1NYtcZ0P6i9tlu_ucRfds72WKCLhLROuwLVLn5hoigosjl_TjF1KJCd9lNg/exec"; 
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz6auy_9OXTUP43v6Y5mYVTzdes2ReuIQdJjUdjGOh7swrb2I_61UnXB9r1oiWOFQC5/exec"; 
     let currentActivityCode, currentTask, userEmail, userName;
 
     // 1. استلام البيانات عند التحميل
@@ -141,41 +141,47 @@
     }
 
     // 3. استقبال الإجابات وإرسالها للسيرفر
-    window.addEventListener('message', async function(event) {
-        if (event.data.type === 'MISSION_ANSWERS') {
-            const studentAnswers = event.data.answers;
-            
-            document.getElementById('sync-overlay').style.display = 'flex';
-            document.getElementById('loader-content').style.display = 'flex';
+// استقبال الإجابات وإرسالها للسيرفر
+window.addEventListener('message', async function(event) {
+    if (event.data.type === 'MISSION_ANSWERS') {
+        const studentAnswers = event.data.answers;
+        
+        document.getElementById('sync-overlay').style.display = 'flex';
+        document.getElementById('loader-content').style.display = 'flex';
 
-            try {
-// بدلاً من إرسال JSON خام، سنرسله كـ "نص" بسيط لتجنب فحص CORS المعقد
-const response = await fetch(SCRIPT_URL, {
-    method: 'POST',
-    mode: 'no-cors', // جرب هذا الخيار فقط إذا استمر الخطأ، لكنه سيمنعك من قراءة النتيجة
-    body: JSON.stringify({
-        action: "submitMission",
-        email: userEmail,
-        activity: currentActivityCode,
-        task: currentTask,
-        studentData: studentAnswers 
-    })
-});
-                
-                const res = await response.json();
-                if (res.status === "success") {
-                    renderResult(res.grade, res.maxGrade, res.feedback);
-                } else {
-                    alert("Error: " + res.message);
-                    document.getElementById('sync-overlay').style.display = 'none';
-                }
-            } catch (err) {
-                alert("Transmission Error. Check your connection.");
+        // تجهيز البيانات كـ Blob لتجنب مشاكل الـ Headers
+        const payload = JSON.stringify({
+            action: "submitMission",
+            email: userEmail,
+            activity: currentActivityCode,
+            task: currentTask,
+            studentData: studentAnswers 
+        });
+
+        try {
+            const response = await fetch(SCRIPT_URL, {
+                method: 'POST',
+                // نستخدم text/plain لتجنب إثارة جنون المتصفح بخصوص الـ CORS
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: payload
+            });
+            
+            const resText = await response.text(); // نستقبل الرد كنص أولاً
+            const res = JSON.parse(resText);       // ثم نحوله لـ JSON يدوياً
+            
+            if (res.status === "success") {
+                renderResult(res.grade, res.maxGrade, res.feedback);
+            } else {
+                alert("Mission Error: " + res.message);
                 document.getElementById('sync-overlay').style.display = 'none';
             }
+        } catch (err) {
+            console.error(err);
+            alert("Transmission Error. Check logs.");
+            document.getElementById('sync-overlay').style.display = 'none';
         }
-    });
-
+    }
+});
     // 4. عرض النتيجة النهائية
     function renderResult(grade, max, feedback) {
         const resultDiv = document.getElementById('result-display');
