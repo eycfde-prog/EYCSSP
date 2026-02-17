@@ -258,17 +258,16 @@ function openTasks(name, code) {
                     
                     // تحويل البيانات إلى تنسيق URL لكي تفهمها الأرينا
                     // ملاحظة: 'act' هو اسم الملف البرمجي (مثل Grammar) و 'task' هو رقم المهمة
-                    const params = new URLSearchParams({
-                        email: currentUser.email,
-                        name: currentUser.name,
-                        avatar: currentUser.avatar || '',
-                        title: currentUser.title || 'Elite Agent',
-act: name,    // الاسم (مثلاً Alike)
-    code: code,   // الكود (مثلاً AS)
-    task: i       // رقم المهمة
+const params = new URLSearchParams({
+    email: currentUser.email,
+    name: currentUser.name,
+    avatar: currentUser.avatar || '',
+    title: currentUser.title || 'Elite Agent',
+    act: name,
+    code: code,
+    task: i
 });
-                    رقم المهمة (1, 2, 3...)
-                    });
+window.location.href = `EYCArena.html?${params.toString()}`;
                     
                     // الانتقال لصفحة الأرينا مع البيانات
                     window.location.href = `EYCArena.html?${params.toString()}`;
