@@ -155,6 +155,7 @@ function preventSpaces(e) {
     }
 }
 
+// استلام الطلب من صفحة الأرينا
 window.addEventListener('message', function(event) {
     if (event.data.type === 'REQUEST_MISSION_DATA') {
         collectAndSend();
@@ -179,15 +180,14 @@ function collectAndSend() {
     });
 
     if(hasError) {
-        window.parent.postMessage({ type: 'MISSION_INCOMPLETE' }, '*');
-        return;
+        // تنبيه الصفحة الأم بأن البيانات ناقصة
+        return; 
     }
 
+    // إرسال البيانات كمصفوفة حقيقية (Array) ليتوافق مع JSON.stringify في الأرينا
     window.parent.postMessage({ 
         type: 'MISSION_ANSWERS', 
-        activityCode: 'GS',
-        answers: answers.join(','), 
-        missionNum: taskNum
+        answers: answers 
     }, '*');
 }
 
