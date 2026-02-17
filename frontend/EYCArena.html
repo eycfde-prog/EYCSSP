@@ -286,10 +286,9 @@
     </footer>
 
 <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxHYyjTsl3YmWUQOaQ6Zm7dhCkPGFmaVgnmRxErFbKks4lOj3fq0RmYZ2dDSksa_vNDug/exec"; 
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxV7Bx-2i9ohX-mzCotMTolSLaCWv6GZtlp3MuyfNPZHNkMXuq2bPkc3yvPWASHsAXIDg/exec"; 
     let currentActivity, currentTask, userEmail, userName;
 
-    // --- Core UI Functions ---
     function createStars() {
         const container = document.getElementById('star-container');
         for (let i = 0; i < 80; i++) {
@@ -303,7 +302,6 @@
         }
     }
 
-    // Handle Iframe Loader
     const arenaIframe = document.getElementById('contentFrame');
     const arenaLoader = document.getElementById('arena-loader');
 
@@ -316,59 +314,56 @@
 
     window.onload = async function() {
         createStars();
-        const urlParams = new URLSearchParams(window.location.search);
-        const savedUser = JSON.parse(localStorage.getItem('eyc_user')) || {};
+        
+        const savedUser = JSON.parse(localStorage.getItem('eyc_user'));
+        if (!savedUser || !savedUser.email) {
+            alert("🔒 Access Denied: Please login first.");
+            window.location.href = 'MC.html';
+            return;
+        }
 
-        userEmail = urlParams.get('email') || savedUser.email;
-        userName = urlParams.get('name') || savedUser.name || "AGENT";
+        const urlParams = new URLSearchParams(window.location.search);
+        userEmail = savedUser.email;
+        userName = savedUser.name;
         currentActivity = urlParams.get('act'); 
         currentTask = urlParams.get('task') || "1";
 
-        if (!userEmail || !currentActivity) {
+        if (!currentActivity) {
             window.location.href = 'MC.html';
             return;
         }
 
         document.getElementById('student-name').innerText = userName.toUpperCase();
-        document.getElementById('activity-title').innerText = currentActivity;
-        document.getElementById('mission-sub').innerText = `MSR-${currentTask.padStart(2, '0')}`;
-        document.getElementById('student-title').innerText = (urlParams.get('title') || savedUser.title || "ELITE AGENT").toUpperCase();
+        document.getElementById('student-title').innerText = (savedUser.title || "AGENT").toUpperCase();
+        document.getElementById('student-img').src = savedUser.avatar || "assets/default-avatar.png";
         
-        let avatarUrl = urlParams.get('avatar') || savedUser.avatar || "assets/default-avatar.png";
-        document.getElementById('student-img').src = decodeURIComponent(avatarUrl);
-        document.getElementById('activity-img').src = `assets/AL${currentActivity}.png`;
+        document.getElementById('activity-title').innerText = currentActivity;
+        document.getElementById('mission-sub').innerText = `MISSION ${currentTask}`;
+        document.getElementById('activity-img').src = `assets/${currentActivity}.png`; 
 
-        checkMissionStatus();
+        document.getElementById('contentFrame').src = `${currentActivity}.html?task=${currentTask}`;
     };
 
-    async function checkMissionStatus() {
-        try {
-            const response = await fetch(`${SCRIPT_URL}?action=checkStatus&email=${userEmail}&act=${currentActivity}&task=${currentTask}`);
-            const data = await response.json();
-            
-            if (data.done) {
-                renderResult(data.grade, data.maxGrade, "Mission already completed.");
-            } else {
-                document.getElementById('contentFrame').src = `${currentActivity}.html?task=${currentTask}`;
-            }
-        } catch (e) {
-            document.getElementById('contentFrame').src = `${currentActivity}.html?task=${currentTask}`;
-        }
-    }
-
-    // ... (rest of processing functions remain the same) ...
-
-    function renderResult(grade, max, msg) {
+    function renderResult(grade, max, feedback) {
         const resultDiv = document.getElementById('result-display');
         document.getElementById('sync-overlay').style.display = 'flex';
         document.getElementById('loader-content').style.display = 'none';
         resultDiv.style.display = 'block';
+        
         resultDiv.innerHTML = `
             <i class="fas fa-award" style="font-size: 3rem; color: var(--gold); margin-bottom: 15px;"></i>
-            <div style="font-size: 1rem; color: var(--gold); font-family: 'Orbitron';">MISSION ARCHIVED</div>
+            <div style="font-size: 1rem; color: var(--gold); font-family: 'Orbitron';">MISSION EVALUATED</div>
             <div style="font-size: 3.5rem; margin: 10px 0; font-family: 'Orbitron'; font-weight: 700;">${grade}<span style="font-size: 1.5rem; color: #555;">/${max}</span></div>
-            <p style="color: #aaa; font-size: 0.8rem; margin-bottom: 20px;">${msg}</p>
-            <button class="btn btn-submit" style="width:100%" onclick="window.location.href='MC.html'">RETURN TO BASE</button>
+            <p style="color: #aaa; font-size: 0.8rem; margin-bottom: 20px; padding:0 10px;">${feedback}</p>
+            
+            <div style="display:flex; flex-direction:column; gap:10px;">
+                <button class="btn btn-submit" style="width:100%" onclick="window.location.href='MC.html'">
+                    <i class="fas fa-check-circle"></i> ACCEPT & RETURN
+                </button>
+                <button class="btn btn-side" style="font-size:0.6rem;" onclick="disputeGrade('${grade}')">
+                    <i class="fas fa-exclamation-triangle"></i> DISPUTE GRADE
+                </button>
+            </div>
         `;
     }
 
@@ -384,36 +379,37 @@
     });
 
     async function processAnswers(answers) {
-        if (!answers || (Array.isArray(answers) && answers.every(a => !a))) {
-            alert("⚠️ HQ: Submission rejected. Empty data.");
-            return;
-        }
         document.getElementById('sync-overlay').style.display = 'flex';
-        
-        let separator = (currentActivity === "FX" || currentActivity === "LX") ? "|" : ",";
-        const cleanedAnswers = Array.isArray(answers) ? answers.map(a => String(a).trim()).join(separator) : String(answers).trim();
+        document.getElementById('loader-content').style.display = 'flex';
+        document.getElementById('result-display').style.display = 'none';
 
         try {
             const response = await fetch(SCRIPT_URL, {
                 method: 'POST',
                 body: JSON.stringify({
-                    action: "submitReport",
+                    action: "submitMission",
                     email: userEmail,
-                    actCode: currentActivity,
-                    taskNum: currentTask,
-                    answer: cleanedAnswers
+                    activity: currentActivity,
+                    task: currentTask,
+                    studentData: answers 
                 })
             });
-            const result = await response.json();
-            if (result.success) {
-                renderResult(result.grade, result.maxGrade, result.feedback || result.reason);
+            
+            const res = await response.json();
+            if (res.status === "success") {
+                renderResult(res.grade, res.maxGrade, res.feedback);
             } else {
-                throw new Error(result.reason);
+                alert("Error: " + res.message);
+                document.getElementById('sync-overlay').style.display = 'none';
             }
-        } catch (error) {
-            alert("⚠️ Connection Lost.");
+        } catch (err) {
+            alert("Connection Error. Your progress is safe.");
             document.getElementById('sync-overlay').style.display = 'none';
         }
+    }
+
+    function disputeGrade(grade) {
+        alert("HQ Notified. A human commander will review Mission " + currentTask + " (Score: " + grade + ").");
     }
 
     function showRules() {
