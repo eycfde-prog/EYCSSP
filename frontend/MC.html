@@ -237,32 +237,38 @@
             generateCards();
         }
 
-        function openTasks(name, code) {
+function openTasks(name, code) {
             document.getElementById('mTitle').innerText = name;
-            const tGrid = document.getElementById('tGrid'); tGrid.innerHTML = '';
-            const type = document.querySelector('.tab-btn.active').innerText;
-            const tasksCount = (type === 'TITANIUM') ? 5 : 10; 
+            const tGrid = document.getElementById('tGrid'); 
+            tGrid.innerHTML = '';
+            
+            const activeTab = document.querySelector('.tab-btn.active').innerText;
+            const tasksCount = (activeTab === 'TITANIUM') ? 5 : 10; 
 
             for (let i = 1; i <= tasksCount; i++) {
                 const node = document.createElement('div');
                 node.className = 'task-node';
                 node.innerText = i;
+                
                 node.onclick = () => {
                     if(!isLoggedIn) {
-                        alert("Unauthorized! Redirecting to Authentication...");
+                        alert("⚠️ ACCESS DENIED: Please authenticate first.");
                         return openLogin();
                     }
                     
+                    // تحويل البيانات إلى تنسيق URL لكي تفهمها الأرينا
+                    // ملاحظة: 'act' هو اسم الملف البرمجي (مثل Grammar) و 'task' هو رقم المهمة
                     const params = new URLSearchParams({
-                        studentName: currentUser.name,
-                        studentEmail: currentUser.email,
-                        studentAvatar: currentUser.avatar,
-                        studentTitle: currentUser.title,
-                        activityName: name,
-                        activityCode: code,
-                        taskNumber: i
+                        email: currentUser.email,
+                        name: currentUser.name,
+                        avatar: currentUser.avatar || '',
+                        title: currentUser.title || 'Elite Agent',
+                        act: name,    // سيفهمها الأرينا لاستدعاء الملف (مثلاً Grammar.html)
+                        code: code,   // كود النشاط المسجل في الداتا (مثلاً GS)
+                        task: i       // رقم المهمة (1, 2, 3...)
                     });
                     
+                    // الانتقال لصفحة الأرينا مع البيانات
                     window.location.href = `EYCArena.html?${params.toString()}`;
                 };
                 tGrid.appendChild(node);
