@@ -129,40 +129,44 @@
         document.getElementById('contentFrame').src = `${currentActivityCode}.html?task=${currentTask}`;
     };
 
-    function startSubmission() {
-        const frame = document.getElementById('contentFrame').contentWindow;
-        frame.postMessage({ type: 'REQUEST_MISSION_DATA' }, '*');
-    }
+async function startSubmission() {
+    const frame = document.getElementById('contentFrame').contentWindow;
+    frame.postMessage({ type: 'REQUEST_MISSION_DATA' }, '*');
+}
 
-    window.addEventListener('message', async function(event) {
-        if (event.data.type === 'MISSION_ANSWERS') {
-            const studentAnswers = event.data.answers;
+window.addEventListener('message', async function(event) {
+    if (event.data.type === 'MISSION_ANSWERS') {
+        const studentAnswers = event.data.answers;
+        
+        document.getElementById('sync-overlay').style.display = 'flex';
+        
+        const params = new URLSearchParams({
+            action: "submitMission",
+            email: userEmail,
+            activity: currentActivityCode,
+            task: currentTask,
+            studentData: JSON.stringify(studentAnswers)
+        });
+
+        // الحل: استخدام FETCH مع سماح بمرور البيانات عبر إعادة التوجيه
+        try {
+            const response = await fetch(`${SCRIPT_URL}?${params.toString()}`, {
+                method: 'GET' // نستخدم GET مع CORS عادي
+            });
             
-            document.getElementById('sync-overlay').style.display = 'flex';
-            document.getElementById('loader-content').style.display = 'flex';
+            const result = await response.json(); // الآن يمكننا قراءة الرد الحقيقي!
 
-            const params = new URLSearchParams({
-                action: "submitMission",
-                email: userEmail,
-                activity: currentActivityCode,
-                task: currentTask,
-                studentData: JSON.stringify(studentAnswers)
-            });
-
-            // استخدام بروتوكول الإرسال الصامت لتخطي جدار CORS
-            fetch(`${SCRIPT_URL}?${params.toString()}`, {
-                method: 'GET',
-                mode: 'no-cors',
-                cache: 'no-cache'
-            }).then(() => {
-                renderResult("SYNCED", "50", "Mission Data Synchronized with HQ. Grades will reflect on your dashboard shortly.");
-            }).catch(err => {
-                console.error("CORS Blocked read, but data might have been sent.");
-                renderResult("SYNCED", "??", "Sync initiated. Please check your profile in a moment.");
-            });
+            if (result.status === "success") {
+                renderResult(result.grade, result.maxGrade, result.feedback);
+            } else {
+                renderResult("ERR", "!!", result.message);
+            }
+        } catch (err) {
+            // في حالة فشل CORS، سنخبر الطالب بالتحقق من لوحة التحكم
+            renderResult("SENT", "??", "Data sent to HQ. Please check your dashboard to see your final grade.");
         }
-    });
-
+    }
+});
     function renderResult(grade, max, feedback) {
         const resultDiv = document.getElementById('result-display');
         document.getElementById('loader-content').style.display = 'none';
