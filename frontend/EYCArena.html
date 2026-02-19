@@ -7,7 +7,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Orbitron:wght@400;500;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        /* التنسيقات الأصلية هنا (نفس الكود الخاص بك دون تغيير) */
+        /* التنسيقات الأصلية */
         :root { --gold: #D4AF37; --gold-glow: rgba(212, 175, 55, 0.5); --gold-gradient: linear-gradient(135deg, #bf953f, #fcf6ba, #b38728); --bg-deep: #020205; --glass: rgba(255, 255, 255, 0.02); --glass-border: rgba(212, 175, 55, 0.2); --transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1); }
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { background: var(--bg-deep); color: white; height: 100dvh; display: flex; flex-direction: column; overflow: hidden; position: relative; font-family: 'Poppins', sans-serif; }
@@ -44,6 +44,9 @@
         .btn-side { flex: 1; background: rgba(255,255,255,0.03); color: var(--gold); border: 1px solid var(--glass-border); }
         #sync-overlay { position: fixed; inset: 0; background: #020205; z-index: 2000; display: none; flex-direction: column; justify-content: center; align-items: center; backdrop-filter: blur(20px); }
         .fairy-loader i { font-size: 4rem; color: var(--gold); filter: drop-shadow(0 0 20px var(--gold)); animation: pulse 2s infinite ease-in-out; }
+        
+        /* تصميم كارت النتيجة المطور */
+        .result-card { text-align: center; padding: 30px; border-radius: 20px; background: rgba(255,255,255,0.01); border: 1px solid var(--glass-border); max-width: 90%; width: 400px; }
     </style>
 </head>
 <body>
@@ -129,72 +132,83 @@
         frame.postMessage({ type: 'REQUEST_MISSION_DATA' }, '*');
     }
 
-    // استلام البيانات من الـ Iframe وإرسالها للسيرفر
-window.addEventListener('message', function(event) {
-    if (event.data.type === 'MISSION_ANSWERS') {
-        const studentAnswers = event.data.answers;
-        document.getElementById('sync-overlay').style.display = 'flex';
+    window.addEventListener('message', function(event) {
+        if (event.data.type === 'MISSION_ANSWERS') {
+            const studentAnswers = event.data.answers;
+            document.getElementById('sync-overlay').style.display = 'flex';
 
-        const callbackName = 'gearCallback_' + Date.now();
-        
-        // تأمين البيانات قبل الإرسال
-        const payload = {
-            action: "submitMission",
-            email: userEmail,
-            activity: currentActivityCode,
-            task: currentTask,
-            studentData: JSON.stringify(studentAnswers),
-            prefix: callbackName
-        };
+            const callbackName = 'gearCallback_' + Date.now();
+            
+            const payload = {
+                action: "submitMission",
+                email: userEmail,
+                activity: currentActivityCode,
+                task: currentTask,
+                studentData: JSON.stringify(studentAnswers),
+                prefix: callbackName
+            };
 
-        const queryString = Object.keys(payload)
-            .map(key => encodeURIComponent(key) + '=' + encodeURIComponent(payload[key]))
-            .join('&');
+            const queryString = Object.keys(payload)
+                .map(key => encodeURIComponent(key) + '=' + encodeURIComponent(payload[key]))
+                .join('&');
 
-        const timeout = setTimeout(() => {
-            if (window[callbackName]) {
-                renderResult("ERR", "!!", "Connection Timeout - Network Heavy");
+            window[callbackName] = function(response) {
+                renderResult(response.grade, response.maxGrade, response.feedback, response.why);
                 delete window[callbackName];
                 const node = document.getElementById('jsonp-engine');
                 if (node) node.remove();
-            }
-        }, 10000);
+            };
 
-        window[callbackName] = function(response) {
-            clearTimeout(timeout);
-            renderResult(response.grade, response.maxGrade, response.feedback || response.message);
-            delete window[callbackName];
-            const node = document.getElementById('jsonp-engine');
-            if (node) node.remove();
-        };
+            const script = document.createElement('script');
+            script.id = 'jsonp-engine';
+            script.src = `${SCRIPT_URL}?${queryString}`;
+            document.body.appendChild(script);
+        }
+    });
 
-        const script = document.createElement('script');
-        script.id = 'jsonp-engine';
-        script.src = `${SCRIPT_URL}?${queryString}`;
-        script.onerror = () => {
-            clearTimeout(timeout);
-            renderResult("ERR", "!!", "Gateway Protocol Failure");
-        };
-        document.body.appendChild(script);
-    }
-});
-
-    function renderResult(grade, max, feedback) {
+    function renderResult(grade, max, feedback, why) {
         const resultDiv = document.getElementById('result-display');
         document.getElementById('loader-content').style.display = 'none';
         resultDiv.style.display = 'block';
+        
         resultDiv.innerHTML = `
             <i class="fas fa-award" style="font-size: 3rem; color: var(--gold); margin-bottom: 15px;"></i>
-            <div style="font-size: 1rem; color: var(--gold); font-family: 'Orbitron';">MISSION EVALUATED</div>
-            <div style="font-size: 3.5rem; margin: 10px 0; font-family: 'Orbitron'; font-weight: 700; color:white;">${grade}<span style="font-size: 1.5rem; color: #555;">/${max}</span></div>
-            <p style="color: #aaa; font-size: 0.8rem; margin-bottom: 25px;">${feedback}</p>
-            <button class="btn btn-submit" style="width:100%" onclick="window.location.href='MC.html'">
-                <i class="fas fa-check-circle"></i> DATA SYNCED - RETURN
-            </button>
+            <div style="font-size: 0.8rem; color: var(--gold); font-family: 'Orbitron';">MISSION EVALUATED</div>
+            <div style="font-size: 3.5rem; margin: 10px 0; font-family: 'Orbitron'; font-weight: 700; color:white;">
+                ${grade}<span style="font-size: 1.5rem; color: #555;">/${max}</span>
+            </div>
+            
+            <p style="color: #fff; font-size: 0.9rem; font-weight:bold; margin-bottom:5px;">${feedback}</p>
+            <p style="color: #888; font-size: 0.7rem; margin-bottom: 20px; line-height:1.4;">Analysis: ${why || 'Data verified by Gear Engine.'}</p>
+
+            <div style="display:flex; gap:10px;">
+                <button id="appealBtn" class="btn btn-side" style="flex:1" onclick="submitAppeal()">
+                    <i class="fas fa-circle-exclamation"></i> APPEAL
+                </button>
+                <button class="btn btn-submit" style="flex:2" onclick="window.location.href='MC.html'">
+                    <i class="fas fa-check-circle"></i> RETURN
+                </button>
+            </div>
         `;
     }
 
-    // الدوال المساعدة (Stars, Loader)
+    function submitAppeal() {
+        const btn = document.getElementById('appealBtn');
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> SENDING...';
+        btn.disabled = true;
+
+        const callbackName = 'appealCallback_' + Date.now();
+        const script = document.createElement('script');
+        script.src = `${SCRIPT_URL}?action=submitMission&email=${userEmail}&activity=${currentActivityCode}&task=${currentTask}&appeal=true&prefix=${callbackName}`;
+        
+        window[callbackName] = function(res) {
+            btn.innerHTML = '<i class="fas fa-check"></i> REQUESTED';
+            alert("Your appeal has been logged. The administration will review your mission data.");
+            delete window[callbackName];
+        };
+        document.body.appendChild(script);
+    }
+
     function createStars() {
         const container = document.getElementById('star-container');
         for (let i = 0; i < 80; i++) {
@@ -206,6 +220,7 @@ window.addEventListener('message', function(event) {
             container.appendChild(star);
         }
     }
+
     document.getElementById('contentFrame').onload = () => { 
         document.getElementById('arena-loader').style.display = 'none'; 
     };
