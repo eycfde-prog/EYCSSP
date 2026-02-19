@@ -256,40 +256,41 @@
         const audio = new Audio(`assets/alikeaudio/AX${audioFileNum}.wav`);
         audio.play().catch(e => console.error("Signal Lost:", audioFileNum));
     }
-
-    window.addEventListener('message', function(event) {
-        if (event.data.type === 'REQUEST_MISSION_DATA') {
-            collectAndSend();
-        }
-    });
+// Gear Note: هذا الجزء هو المسؤول عن استقبال طلب الـ Arena والرد عليه
+window.addEventListener('message', function(event) {
+    if (event.data.type === 'REQUEST_MISSION_DATA') {
+        collectAndSend();
+    }
+});
 
 function collectAndSend() {
     let finalAnswers = [];
     let hasMissing = false;
+    const totalQuestions = 5; // عدد الأسئلة في كل مهمة
 
-    for(let i=0; i<5; i++) {
+    for(let i = 0; i < totalQuestions; i++) {
         if (!answers[i]) {
-            document.getElementById(`card-${i}`).classList.add('error-input');
+            // تفعيل تأثير الاهتزاز للكارت الناقص
+            const card = document.getElementById(`card-${i}`);
+            if(card) card.classList.add('error-input');
             hasMissing = true;
         } else {
-            // نرسل الإجابة فقط
             finalAnswers.push(answers[i]);
         }
     }
 
     if (hasMissing) {
-        // يمكنك إرسال تنبيه للمستخدم هنا
-        return;
+        // تنبيه الطالب لإكمال المهمة قبل الإرسال
+        console.log("Gear System: Missing Data Detected.");
+        return; 
     }
 
-    // Gear Note: نرسل المصفوفة مباشرة ليتعامل معها السيرفر كـ JSON
+    // إرسال البيانات للـ Parent (صفحة Arena)
     window.parent.postMessage({ 
         type: 'MISSION_ANSWERS', 
-        answers: finalAnswers // أرسلها كمصفوفة [ans1, ans2, ...]
+        answers: finalAnswers // ترسل كـ Array مثل: ["blew", "sea", ...]
     }, '*');
 }
-
-    window.onload = loadAlikeX;
 </script>
 </body>
 </html>
