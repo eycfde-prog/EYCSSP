@@ -531,47 +531,6 @@
         });
     }
 
-    document.getElementById('registrationForm').onsubmit = function(e) {
-        e.preventDefault();
-        playClick();
-        
-        const programs = Array.from(document.querySelectorAll('input[name="program"]:checked')).map(cb => cb.value);
-        if (programs.length === 0) { alert("Please select at least one mission program, Agent!"); return; }
-
-        const loader = document.getElementById('loader');
-        loader.style.display = 'flex';
-
-        const studentObj = {
-            name: document.getElementById('name').value,
-            email: document.getElementById('email').value,
-            age: document.getElementById('age').value,
-            programs: programs.join(", "),
-            avatar: document.getElementById('avatar-img').src
-        };
-
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxY1DtPSc0tNmrpA1vuxGE8BzmCUNO_qU-mAJ_M5-6PaSk-m2gRYgu4r1rAJqrOrYdYGw/exec"; 
-
-        const queryString = new URLSearchParams({
-            ...studentObj,
-            action: "register"
-        }).toString();
-
-        fetch(`${SCRIPT_URL}?${queryString}`, {
-            method: "GET",
-            mode: 'no-cors' 
-        })
-        .then(() => {
-            loader.style.display = 'none';
-            alert("Mission Registered! Please check the Leaderboard.");
-            // Manual fallback if server redirection logic isn't strictly necessary for success-card
-            showFinalCard("PENDING"); 
-        })
-        .catch(err => {
-            loader.style.display = 'none';
-            alert("Error connecting to command center.");
-        });
-    };
-
     function showFinalCard(generatedCode) {
         document.getElementById('registrationForm').style.display = 'none';
         document.getElementById('avatar-sidebar').style.display = 'none';
@@ -588,6 +547,53 @@
         `;
         document.getElementById('pBar').style.width = "100%";
     }
+
+    document.getElementById('registrationForm').onsubmit = function(e) {
+        e.preventDefault();
+        playClick();
+        
+        const programs = Array.from(document.querySelectorAll('input[name="program"]:checked')).map(cb => cb.value);
+        if (programs.length === 0) { alert("Please select at least one mission program, Agent!"); return; }
+
+        const loader = document.getElementById('loader');
+        loader.style.display = 'flex';
+
+        // 1. توليد كود العميل محلياً لتجنب انتظار الرد المحجوب
+        const generatedCode = "EYCSSP-" + Math.floor(1000 + Math.random() * 9000);
+
+        const studentObj = {
+            name: document.getElementById('name').value,
+            email: document.getElementById('email').value,
+            age: document.getElementById('age').value,
+            programs: programs.join(", "),
+            avatar: document.getElementById('avatar-img').src,
+            agentCode: generatedCode, // نرسل الكود الذي صنعناه
+            action: "register"
+        };
+
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby8STTO2PX4xcLvfppZ53zQcJ3R18k_XguD3X1OlPt-mseQm7GconkyS03aIf7XZNCA5w/exec"; 
+
+        // 2. إرسال البيانات باستخدام GET وتجاهل الـ CORS
+        const params = new URLSearchParams(studentObj).toString();
+        
+        fetch(`${SCRIPT_URL}?${params}`, {
+            method: "GET",
+            mode: "no-cors" // هذا يتخطى خطأ CORB تماماً
+        })
+        .then(() => {
+            // بما أننا استخدمنا no-cors، سننتظر ثانية ثم نظهر البطاقة
+            setTimeout(() => {
+                loader.style.display = 'none';
+                showFinalCard(generatedCode);
+                localStorage.setItem('eyc_user_code', generatedCode);
+            }, 1000);
+        })
+        .catch(err => {
+            console.error("Submission error:", err);
+            loader.style.display = 'none';
+            alert("System check failed, but data might have been sent. Check the Leaderboard!");
+        });
+    };
 </script>
 </body>
 </html>
