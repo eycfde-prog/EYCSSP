@@ -1,1 +1,396 @@
-https://script.google.com/macros/s/AKfycbyxaVyXc_8F5J_lv1R-i-cnSgaYjbV3k6ce61UXUU15pVRx129qGc6CrjGfuuPlH4wt/exec
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>EYC Super Stars | Elite Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Orbitron:wght@400;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --gold: #D4AF37;
+            --gold-gradient: linear-gradient(135deg, #bf953f, #fcf6ba, #b38728);
+            --bg-deep: #030306; 
+            --glass: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(212, 175, 55, 0.15);
+            --gold-glow: rgba(212, 175, 55, 0.3);
+            --titanium-gradient: linear-gradient(135deg, #71706e, #e5e4e2, #b8b8b8);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { background: var(--bg-deep); color: white; min-height: 100vh; overflow-x: hidden; }
+
+        /* --- Cyber Stars Background --- */
+        #star-container { position: fixed; inset: 0; z-index: -1; background: radial-gradient(circle at top, #0a0b14 0%, #030306 100%); }
+        .star { position: absolute; background: #fff; border-radius: 50%; opacity: 0.3; animation: pulse var(--duration) infinite ease-in-out; }
+        @keyframes pulse { 0%, 100% { opacity: 0.2; transform: scale(1); } 50% { opacity: 0.7; transform: scale(1.5); } }
+
+        /* --- Top Navigation --- */
+        .top-nav { position: fixed; top: 0; width: 100%; padding: 20px 6%; display: flex; justify-content: space-between; align-items: center; z-index: 1000; backdrop-filter: blur(10px); border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .nav-icon { font-size: 1.2rem; color: var(--gold); cursor: pointer; transition: 0.3s; opacity: 0.8; }
+        .nav-icon:hover { opacity: 1; transform: scale(1.1); filter: drop-shadow(0 0 8px var(--gold)); }
+
+        /* --- Profile Section (Refined) --- */
+        .hero-banner { width: 100%; padding: 100px 20px 40px; text-align: center; }
+        .profile-card { position: relative; display: inline-flex; flex-direction: column; align-items: center; }
+        
+        .avatar-wrapper {
+            position: relative; width: 120px; height: 120px; padding: 4px;
+            background: var(--gold-gradient); border-radius: 50%;
+            box-shadow: 0 0 30px var(--gold-glow); margin-bottom: 15px;
+        }
+        .avatar-main { width: 100%; height: 100%; border-radius: 50%; border: 4px solid #050508; background-size: cover; background-position: center; }
+        
+        /* Rank Badge as a Cyber Tag */
+        .rank-tag {
+            position: absolute; bottom: -5px; background: #000; border: 1px solid var(--gold);
+            padding: 2px 12px; border-radius: 10px; font-family: 'Orbitron';
+            font-size: 0.65rem; color: var(--gold); letter-spacing: 1px;
+        }
+
+        .student-name { font-family: 'Cinzel', serif; font-size: clamp(1.4rem, 5vw, 2rem); letter-spacing: 3px; background: var(--gold-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-top: 10px; }
+        .student-title { font-size: 0.7rem; color: #888; text-transform: uppercase; letter-spacing: 3px; margin-top: 5px; }
+
+        .stats-row { display: flex; gap: 20px; margin-top: 20px; background: rgba(255,255,255,0.03); padding: 10px 25px; border-radius: 30px; border: 1px solid var(--glass-border); }
+        .stat-item { font-family: 'Orbitron'; font-size: 0.85rem; display: flex; align-items: center; gap: 8px; }
+        .stat-item span { color: var(--gold); }
+
+        /* --- Tabs (Cyber Switch) --- */
+        .nav-container { display: flex; justify-content: center; margin: 20px 0; }
+        .tab-switcher { background: #000; padding: 4px; border-radius: 15px; display: flex; border: 1px solid var(--glass-border); width: 90%; max-width: 400px; }
+        .tab-btn { flex: 1; padding: 12px; border: none; background: transparent; color: #666; border-radius: 12px; cursor: pointer; font-weight: 700; font-size: 0.65rem; letter-spacing: 2px; transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+        .tab-btn.active { color: #000; background: var(--gold-gradient); box-shadow: 0 5px 15px rgba(212,175,55,0.3); }
+        .tab-btn.active.titanium-tab { background: var(--titanium-gradient); color: #000; }
+
+        /* --- Grid (Luxury Cards) --- */
+        .grid-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 20px; padding: 0 6% 100px; }
+        .activity-card {
+            background: linear-gradient(145deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.01) 100%);
+            border: 1px solid rgba(255,255,255,0.08); border-radius: 20px;
+            padding: 35px 15px; text-align: center; transition: 0.5s; cursor: pointer;
+            position: relative; overflow: hidden;
+        }
+        .activity-card::before { content: ''; position: absolute; inset: 0; background: var(--gold-gradient); opacity: 0; transition: 0.5s; z-index: 0; }
+        .activity-card:hover { transform: translateY(-10px); border-color: var(--gold); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .activity-card:hover::before { opacity: 0.05; }
+        
+        .card-icon { position: relative; z-index: 1; font-size: 2.2rem; margin-bottom: 15px; background: var(--gold-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; transition: 0.3s; }
+        .activity-card h3 { position: relative; z-index: 1; font-size: 0.8rem; letter-spacing: 1px; font-weight: 600; color: #ddd; }
+
+        /* --- Modals (Full Glass) --- */
+        .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.9); display: none; justify-content: center; align-items: center; z-index: 2000; backdrop-filter: blur(20px); }
+        .modal-content { background: #050508; border-radius: 25px; padding: 40px; width: 90%; max-width: 400px; border: 1px solid var(--glass-border); position: relative; box-shadow: 0 0 50px rgba(0,0,0,1); }
+        
+        .tasks-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin: 30px 0; }
+        .task-node { aspect-ratio: 1; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-family: 'Orbitron'; font-size: 0.8rem; color: #fff; transition: 0.3s; }
+        .task-node:hover { background: var(--gold-gradient); color: #000; border-color: transparent; transform: scale(1.1); }
+
+        /* --- Buttons --- */
+        .btn-exit { background: transparent; border: 1px solid #444; color: #888; padding: 12px 30px; border-radius: 12px; cursor: pointer; font-family: 'Orbitron'; font-size: 0.7rem; transition: 0.3s; width: 100%; }
+        .btn-exit:hover { border-color: var(--gold); color: var(--gold); }
+
+        /* Mobile Adjustments */
+        @media (max-width: 480px) {
+            .grid-container { grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 0 15px 100px; }
+            .hero-banner { padding-top: 80px; }
+            .avatar-wrapper { width: 100px; height: 100px; }
+            .stats-row { gap: 12px; padding: 8px 15px; }
+            .stat-item { font-size: 0.7rem; }
+        }
+
+        .fa-spin {
+            animation: fa-spin 2s infinite linear;
+        }
+        @keyframes fa-spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(359deg); }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="star-container"></div>
+
+    <nav class="top-nav">
+        <i class="fas fa-arrow-left nav-icon" onclick="window.location.href='index.html'"></i>
+        <div style="font-family:'Orbitron'; font-size: 0.7rem; letter-spacing: 2px; color: var(--gold);">DASHBOARD_v2</div>
+        <i class="fas fa-power-off nav-icon" id="logoutBtn" style="display:none;" onclick="handleLogout()"></i>
+    </nav>
+
+    <header class="hero-banner" id="heroBanner"></header>
+
+    <div class="nav-container">
+        <div class="tab-switcher">
+            <button class="tab-btn active" onclick="switchType('season', this)">SEASON</button>
+            <button class="tab-btn" onclick="switchType('royal', this)">ROYAL</button>
+            <button class="tab-btn" onclick="switchType('titanium', this)">TITANIUM</button>
+        </div>
+    </div>
+
+    <main><div class="grid-container" id="cardsGrid"></div></main>
+
+    <div class="modal" id="taskModal">
+        <div class="modal-content">
+            <div style="text-align:center; margin-bottom: 20px;">
+                <p style="font-family:'Orbitron'; font-size: 0.6rem; color: var(--gold); letter-spacing: 4px;">SECURE MISSION</p>
+                <h2 id="mTitle" style="font-family:'Cinzel'; color:#fff; font-size: 1.8rem;">MISSION</h2>
+            </div>
+            <div class="tasks-grid" id="tGrid"></div>
+            <button class="btn-exit" onclick="closeModal('taskModal')">CLOSE INTERFACE</button>
+        </div>
+    </div>
+
+    <div class="modal" id="loginModal">
+        <div class="modal-content">
+            <h2 style="font-family:'Cinzel'; color:var(--gold); margin-bottom:20px; letter-spacing:2px; text-align: center;">AUTHENTICATION</h2>
+            
+            <input type="email" id="loginEmail" style="width:100%; padding:15px; margin:8px 0; border-radius:12px; background:rgba(255,255,255,0.05); border:1px solid #333; color:#fff; font-family:'Orbitron'; font-size:0.8rem;" placeholder="REGISTERED EMAIL">
+            
+            <input type="password" id="loginCode" style="width:100%; padding:15px; margin:8px 0; border-radius:12px; background:rgba(255,255,255,0.05); border:1px solid #333; color:#fff; font-family:'Orbitron'; font-size:0.8rem;" placeholder="ACCESS CODE">
+            
+            <button onclick="handleLogin()" id="loginSubmitBtn" style="width:100%; margin-top:15px; padding:15px; border-radius:12px; background:var(--gold-gradient); border:none; font-weight:900; font-family:'Orbitron'; cursor:pointer; color: #000;">SIGN IN</button>
+
+            <div style="display: flex; gap: 10px; margin-top: 15px;">
+                <button onclick="forgotCode()" id="forgotBtn" style="flex: 1; background: transparent; border: 1px solid rgba(212,175,55,0.3); color: var(--gold); padding: 10px; border-radius: 8px; font-size: 0.6rem; font-family: 'Orbitron'; cursor: pointer; transition: 0.3s;">FORGOT CODE?</button>
+                <button onclick="window.location.href='NP.html'" style="flex: 1; background: transparent; border: 1px solid #444; color: #aaa; padding: 10px; border-radius: 8px; font-size: 0.6rem; font-family: 'Orbitron'; cursor: pointer; transition: 0.3s;">NEW AGENT?</button>
+            </div>
+
+            <button class="btn-exit" style="margin-top:20px; border:none; color: #666;" onclick="closeModal('loginModal')">CLOSE</button>
+        </div>
+    </div>
+
+    <script>
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyxaVyXc_8F5J_lv1R-i-cnSgaYjbV3k6ce61UXUU15pVRx129qGc6CrjGfuuPlH4wt/exec";
+        let currentUser = null;
+        let isLoggedIn = false;
+
+        const activities = {
+            season: [
+                { name: "Alike", icon: "fa-clone", code: "AS" },
+                { name: "Vivid", icon: "fa-wand-magic-sparkles", code: "VS" },
+                { name: "Label", icon: "fa-tag", code: "LS" },
+                { name: "Grammar", icon: "fa-spell-check", code: "GS" },
+                { name: "Golden Ear", icon: "fa-ear-listen", code: "GES" },
+                { name: "Seeds", icon: "fa-seedling", code: "SS" }
+            ],
+            royal: [
+                { name: "AlikeX", icon: "fa-star", code: "AX" },
+                { name: "VividX", icon: "fa-wand-magic", code: "VX" },
+                { name: "LabelX", icon: "fa-tags", code: "LX" },
+                { name: "SeedsX", icon: "fa-tree", code: "SX" },
+                { name: "Golden EarX", icon: "fa-ear-deaf", code: "GEX" },
+                { name: "GrammarX", icon: "fa-pen-fancy", code: "GX" }
+            ],
+            titanium: [
+                { name: "DictationX", icon: "fa-microphone-lines", code: "DX" },
+                { name: "Sing Sang Sung", icon: "fa-music", code: "SSSX" },
+                { name: "ElmagazineX", icon: "fa-book-open", code: "ELX" },
+                { name: "FigurativeX", icon: "fa-mask", code: "FX" }
+            ]
+        };
+
+        function renderHeader() {
+            const header = document.getElementById('heroBanner');
+            const logoutBtn = document.getElementById('logoutBtn');
+            if (isLoggedIn) {
+                logoutBtn.style.display = "block";
+                header.innerHTML = `
+                    <div class="profile-card">
+                        <div class="avatar-wrapper">
+                            <div class="avatar-main" style="background-image: url('${currentUser.avatar || 'https://via.placeholder.com/150'}')"></div>
+                            <div class="rank-tag">RANK #${currentUser.rank}</div>
+                        </div>
+                        <h1 class="student-name">${currentUser.name}</h1>
+                        <p class="student-title">${currentUser.title}</p>
+                        
+                        <div class="stats-row">
+                            <div class="stat-item">🪙 <span>${currentUser.tokens || 0}</span></div>
+                            <div class="stat-item">⭐ <span>${currentUser.stars || 0}</span></div>
+                            <div class="stat-item">🎟️ <span style="color:#FFD700">${currentUser.goldTickets || 0}</span></div>
+                            <i class="fas fa-sync-alt stat-item" style="cursor:pointer; font-size:0.7rem;" onclick="refreshUserData()"></i>
+                        </div>
+                    </div>`;
+            } else {
+                logoutBtn.style.display = "none";
+                header.innerHTML = `
+                    <h1 class="student-name">ARENA ACCESS</h1>
+                    <div style="margin-top:20px;"><button class="btn-exit" style="width:auto; padding: 12px 40px; border-color: var(--gold); color: var(--gold);" onclick="openLogin()">AUTHORIZE LOGIN</button></div>`;
+            }
+        }
+
+        function generateCards() {
+            const grid = document.getElementById('cardsGrid'); grid.innerHTML = '';
+            const type = document.querySelector('.tab-btn.active').innerText.toLowerCase();
+            activities[type].forEach(act => {
+                const card = document.createElement('div');
+                card.className = 'activity-card';
+                card.innerHTML = `<i class="fa-solid ${act.icon} card-icon"></i><h3>${act.name}</h3>`;
+                card.onclick = () => openTasks(act.name, act.code);
+                grid.appendChild(card);
+            });
+        }
+
+        function switchType(type, btn) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active', 'titanium-tab'));
+            btn.classList.add('active');
+            if(type === 'titanium') btn.classList.add('titanium-tab');
+            generateCards();
+        }
+
+        function openTasks(name, code) {
+            if (!isLoggedIn) {
+                alert("⚠️ ACCESS DENIED: Please authenticate first.");
+                return openLogin();
+            }
+
+            document.getElementById('mTitle').innerText = name;
+            const tGrid = document.getElementById('tGrid'); 
+            tGrid.innerHTML = '';
+            
+            const activeTab = document.querySelector('.tab-btn.active').innerText;
+            const tasksCount = (activeTab === 'TITANIUM') ? 5 : 10; 
+
+            for (let i = 1; i <= tasksCount; i++) {
+                const node = document.createElement('div');
+                node.className = 'task-node';
+                node.innerText = i;
+                
+                node.onclick = () => {
+                    const params = new URLSearchParams({
+                        email: currentUser.email,
+                        name: currentUser.name,
+                        avatar: currentUser.avatar || '',
+                        title: currentUser.title || 'Elite Agent',
+                        act: name,  
+                        code: code, 
+                        task: i      
+                    });
+                    
+                    window.location.href = `EYCArena.html?${params.toString()}`;
+                };
+                tGrid.appendChild(node);
+            }
+            document.getElementById('taskModal').style.display = 'flex';
+        }
+
+        function handleLogin() {
+            const email = document.getElementById('loginEmail').value.trim();
+            const code = document.getElementById('loginCode').value.trim();
+            
+            if (!email) return alert("Please enter your email.");
+
+            const btn = document.getElementById('loginSubmitBtn');
+            const originalText = btn.innerText;
+            btn.innerText = "AUTHENTICATING...";
+            btn.disabled = true;
+
+            fetch(`${SCRIPT_URL}?action=getProfile&email=${email}&code=${code}`)
+                .then(res => res.json())
+                .then(res => {
+                    btn.innerText = originalText;
+                    btn.disabled = false;
+
+                    if (res.status === "success") {
+                        currentUser = res;
+                        currentUser.email = email; 
+                        isLoggedIn = true;
+                        localStorage.setItem('eyc_user', JSON.stringify(currentUser));
+                        localStorage.setItem('eyc_user_code', code);
+                        closeModal('loginModal');
+                        renderHeader(); 
+                        generateCards();
+                    } else {
+                        if (res.message === "Not Registered") {
+                            if (confirm("Agent not found! Would you like to create a new account?")) {
+                                window.location.href = 'NP.html';
+                            }
+                        } else if (res.message === "Incorrect Code") {
+                            alert("Access Denied: The code you entered is incorrect. Please check your email for the recovery code.");
+                        } else {
+                            alert(res.message || "Login Failed.");
+                        }
+                    }
+                })
+                .catch(err => {
+                    btn.innerText = originalText;
+                    btn.disabled = false;
+                    alert("Connection Error. Please try again.");
+                });
+        }
+
+        function refreshUserData() {
+            if (!currentUser) return;
+            const syncIcon = document.querySelector('.fa-sync-alt');
+            syncIcon.classList.add('fa-spin');
+
+            const code = localStorage.getItem('eyc_user_code') || currentUser.code;
+
+            fetch(`${SCRIPT_URL}?action=getProfile&email=${currentUser.email}&code=${code}`)
+                .then(res => res.json())
+                .then(res => {
+                    syncIcon.classList.remove('fa-spin');
+                    if (res.status === "success") {
+                        currentUser = res;
+                        localStorage.setItem('eyc_user', JSON.stringify(currentUser));
+                        renderHeader();
+                    }
+                })
+                .catch(() => syncIcon.classList.remove('fa-spin'));
+        }
+
+        function handleLogout() {
+            if(confirm("Terminate Session?")) { localStorage.clear(); location.reload(); }
+        }
+
+        function openLogin() { document.getElementById('loginModal').style.display = 'flex'; }
+        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+
+        function createStars() {
+            const container = document.getElementById('star-container');
+            for (let i = 0; i < 60; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                const size = Math.random() * 2 + 1;
+                star.style.width = size + 'px'; star.style.height = size + 'px';
+                star.style.left = Math.random() * 100 + '%'; star.style.top = Math.random() * 100 + '%';
+                star.style.setProperty('--duration', (Math.random() * 3 + 2) + 's');
+                container.appendChild(star);
+            }
+        }
+
+function forgotCode() {
+    const email = document.getElementById('loginEmail').value.trim();
+    if (!email) return alert("Please enter email first.");
+
+    const forgotBtn = document.getElementById('forgotBtn');
+    forgotBtn.innerText = "SENDING...";
+    forgotBtn.disabled = true;
+
+    // استخدام نفس أسلوب GET الموحد
+    fetch(`${SCRIPT_URL}?action=forgotCode&email=${email}`)
+        .then(() => {
+            forgotBtn.innerText = "SENT ✅";
+            alert("If registered, your code has been sent to your email.");
+            forgotBtn.disabled = false;
+        })
+        .catch(err => {
+            alert("Request sent. Please check your inbox.");
+            forgotBtn.innerText = "FORGOT CODE?";
+            forgotBtn.disabled = false;
+        });
+}
+
+        window.onload = () => {
+            createStars();
+            const saved = localStorage.getItem('eyc_user');
+            if(saved) {
+                currentUser = JSON.parse(saved);
+                isLoggedIn = true;
+                renderHeader(); generateCards();
+            } else {
+                renderHeader(); generateCards();
+            }
+        };
+    </script>
+</body>
+</html>
