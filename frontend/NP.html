@@ -549,27 +549,26 @@
             avatar: document.getElementById('avatar-img').src
         };
 
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby8STTO2PX4xcLvfppZ53zQcJ3R18k_XguD3X1OlPt-mseQm7GconkyS03aIf7XZNCA5w/exec"; 
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzzOVHTZGTrAWTBz9nT4QXfmGwbgJzbtTfaJ3aEaxGFHVjCo3NAVsbPFTLfvmKY5qeOZQ/exec"; 
 
-        fetch(SCRIPT_URL, {
-            method: "POST",
-            body: JSON.stringify(studentObj)
+        const queryString = new URLSearchParams({
+            ...studentObj,
+            action: "register"
+        }).toString();
+
+        fetch(`${SCRIPT_URL}?${queryString}`, {
+            method: "GET",
+            mode: 'no-cors' 
         })
-        .then(response => response.json())
-        .then(result => {
+        .then(() => {
             loader.style.display = 'none';
-            if (result.status === "error" && result.message === "Email already exists") {
-                alert("ACCESS DENIED: This email is already registered! 🚫");
-            } else if (result.status === "success") {
-                showFinalCard(result.code);
-                localStorage.setItem('eyc_user_code', result.code);
-            } else {
-                alert("System Error: " + result.message);
-            }
+            alert("Mission Registered! Please check the Leaderboard.");
+            // Manual fallback if server redirection logic isn't strictly necessary for success-card
+            showFinalCard("PENDING"); 
         })
         .catch(err => {
             loader.style.display = 'none';
-            alert("ACCESS DENIED: Connection lost! 🚫");
+            alert("Error connecting to command center.");
         });
     };
 
