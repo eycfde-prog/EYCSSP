@@ -263,35 +263,31 @@
         }
     });
 
-    function collectAndSend() {
-        const inputs = document.querySelectorAll('.alike-input');
-        let answersArray = [];
-        let hasError = false;
+function collectAndSend() {
+    let finalAnswers = [];
+    let hasMissing = false;
 
-        inputs.forEach(input => {
-            const val = input.value.trim();
-            if(!val) {
-                hasError = true;
-                input.classList.add('error');
-                // إزالة فئة الخطأ بعد ثانية واحدة
-                setTimeout(() => input.classList.remove('error'), 1000);
-            } else {
-                input.classList.remove('error');
-                answersArray.push(val.toLowerCase());
-            }
-        });
-
-        if(hasError) {
-            // يمكننا إرسال رسالة للأب لإخباره بوجود حقول فارغة إذا لزم الأمر
-            return;
+    for(let i=0; i<5; i++) {
+        if (!answers[i]) {
+            document.getElementById(`card-${i}`).classList.add('error-input');
+            hasMissing = true;
+        } else {
+            // نرسل الإجابة فقط
+            finalAnswers.push(answers[i]);
         }
-
-        // إرسال البيانات للأرينا
-        window.parent.postMessage({
-            type: 'MISSION_ANSWERS', 
-            answers: answersArray // إرسال مصفوفة نظيفة لسهولة المعالجة في الـ AI Grader
-        }, '*');
     }
+
+    if (hasMissing) {
+        // يمكنك إرسال تنبيه للمستخدم هنا
+        return;
+    }
+
+    // Gear Note: نرسل المصفوفة مباشرة ليتعامل معها السيرفر كـ JSON
+    window.parent.postMessage({ 
+        type: 'MISSION_ANSWERS', 
+        answers: finalAnswers // أرسلها كمصفوفة [ans1, ans2, ...]
+    }, '*');
+}
 
     window.onload = loadAlikeX;
 </script>
