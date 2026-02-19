@@ -263,29 +263,27 @@
         }
     });
 
-    function collectAndSend() {
-        let finalAnswers = [];
-        let hasMissing = false;
+function collectAndSend() {
+    let finalAnswers = [];
+    let hasMissing = false;
 
-        for(let i=0; i<5; i++) {
-            if (!answers[i]) {
-                document.getElementById(`card-${i}`).classList.add('error-input');
-                hasMissing = true;
-            } else {
-                finalAnswers.push(answers[i]);
-            }
+    for(let i=0; i<5; i++) {
+        if (!answers[i]) {
+            document.getElementById(`card-${i}`).classList.add('error-input');
+            hasMissing = true;
+        } else {
+            finalAnswers.push(answers[i]); // سنرسل مصفوفة
         }
-
-        if (hasMissing) {
-            window.parent.postMessage({ type: 'MISSION_INCOMPLETE' }, '*');
-            return;
-        }
-
-        window.parent.postMessage({ 
-            type: 'MISSION_ANSWERS', 
-            answers: finalAnswers.join(', ')
-        }, '*');
     }
+
+    if (hasMissing) return;
+
+    // إرسال المصفوفة كما هي
+    window.parent.postMessage({ 
+        type: 'MISSION_ANSWERS', 
+        answers: finalAnswers 
+    }, '*');
+}
 
     window.onload = loadAlikeX;
 </script>
