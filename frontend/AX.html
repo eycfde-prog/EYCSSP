@@ -263,27 +263,35 @@
         }
     });
 
-function collectAndSend() {
-    let finalAnswers = [];
-    let hasMissing = false;
+    function collectAndSend() {
+        const inputs = document.querySelectorAll('.alike-input');
+        let answersArray = [];
+        let hasError = false;
 
-    for(let i=0; i<5; i++) {
-        if (!answers[i]) {
-            document.getElementById(`card-${i}`).classList.add('error-input');
-            hasMissing = true;
-        } else {
-            finalAnswers.push(answers[i]); // سنرسل مصفوفة
+        inputs.forEach(input => {
+            const val = input.value.trim();
+            if(!val) {
+                hasError = true;
+                input.classList.add('error');
+                // إزالة فئة الخطأ بعد ثانية واحدة
+                setTimeout(() => input.classList.remove('error'), 1000);
+            } else {
+                input.classList.remove('error');
+                answersArray.push(val.toLowerCase());
+            }
+        });
+
+        if(hasError) {
+            // يمكننا إرسال رسالة للأب لإخباره بوجود حقول فارغة إذا لزم الأمر
+            return;
         }
+
+        // إرسال البيانات للأرينا
+        window.parent.postMessage({
+            type: 'MISSION_ANSWERS', 
+            answers: answersArray // إرسال مصفوفة نظيفة لسهولة المعالجة في الـ AI Grader
+        }, '*');
     }
-
-    if (hasMissing) return;
-
-    // إرسال المصفوفة كما هي
-    window.parent.postMessage({ 
-        type: 'MISSION_ANSWERS', 
-        answers: finalAnswers 
-    }, '*');
-}
 
     window.onload = loadAlikeX;
 </script>
