@@ -565,37 +565,32 @@
         const loader = document.getElementById('loader');
         loader.style.display = 'flex';
 
-        const generatedAgentCode = "EYCSSP-" + Math.floor(1000 + Math.random() * 9000);
-
         const studentObj = {
             name: document.getElementById('name').value,
             email: document.getElementById('email').value,
             age: document.getElementById('age').value,
             programs: programs.join(", "),
             avatar: document.getElementById('avatar-img').src,
-            agentCode: generatedAgentCode,
             action: "register"
         };
 
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzSkJUdNDkVqYFBzoZFnnk_r-EnBmkmDQe5w50Z7Y5YSUTxWv3hs2BU0Wi-_VCj-UKwBw/exec"; 
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzFgHdBeCShW2EVn9YhZzD6D0hCiXEDn53Yuac0wiOeVhHSwtN7y4CGoSnoki8FmZRiAw/exec"; 
 
+        studentObj.prefix = "callbackFunc"; 
         const queryString = new URLSearchParams(studentObj).toString();
+        const script = document.createElement('script');
+        script.src = `${SCRIPT_URL}?${queryString}`;
+        document.body.appendChild(script);
 
-        fetch(`${SCRIPT_URL}?${queryString}`, {
-            method: "GET",
-            mode: 'no-cors' 
-        })
-        .then(() => {
-            setTimeout(() => {
-                loader.style.display = 'none';
-                showFinalCard(generatedAgentCode);
-                localStorage.setItem('eyc_user_code', generatedAgentCode);
-            }, 1000);
-        })
-        .catch(err => {
+        window.callbackFunc = function(response) {
             loader.style.display = 'none';
-            alert("System error, but your mission might be registered. Check Leaderboard!");
-        });
+            if(response.status === "success") {
+                showFinalCard(response.code);
+                localStorage.setItem('eyc_user_code', response.code);
+            } else {
+                alert("Error: " + response.message);
+            }
+        };
     };
 </script>
 </body>
