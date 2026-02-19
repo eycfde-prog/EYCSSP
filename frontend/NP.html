@@ -565,16 +565,23 @@
         const loader = document.getElementById('loader');
         loader.style.display = 'flex';
 
+        const isRoyal = programs.includes("Royal");
+        const royalType = document.getElementById('royalType').value;
+        const plan = (isRoyal && royalType === 'paid') ? "Paid" : "Free";
+        
         const studentObj = {
             name: document.getElementById('name').value,
             email: document.getElementById('email').value,
             age: document.getElementById('age').value,
             programs: programs.join(", "),
+            plan: plan,
+            ticket1: document.getElementById('ticket1').value,
+            ticket2: document.getElementById('ticket2').value,
             avatar: document.getElementById('avatar-img').src,
             action: "register"
         };
 
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzFgHdBeCShW2EVn9YhZzD6D0hCiXEDn53Yuac0wiOeVhHSwtN7y4CGoSnoki8FmZRiAw/exec"; 
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzaKLhMGZUc45CCTN_nCLfuNludSClQp5P14yb-zHLuheQIfIeVxUGSsJjipWqSfIY/exec"; 
 
         studentObj.prefix = "callbackFunc"; 
         const queryString = new URLSearchParams(studentObj).toString();
@@ -588,7 +595,13 @@
                 showFinalCard(response.code);
                 localStorage.setItem('eyc_user_code', response.code);
             } else {
-                alert("Error: " + response.message);
+                if(response.message === "INVALID_TICKETS") {
+                    alert("❌ خطأ: أكواد التذاكر الذهبية غير صالحة أو تم استخدامها مسبقاً!");
+                } else if(response.message === "EMAIL_ALREADY_EXISTS") {
+                    alert("⚠️ هذا الإيميل مسجل لدينا بالفعل، حاول تسجيل الدخول.");
+                } else {
+                    alert("Error: " + response.message);
+                }
             }
         };
     };
