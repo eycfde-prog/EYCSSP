@@ -8,26 +8,36 @@
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Cairo:wght@400;600;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root { --gold: #fcc200; --bg: #0a0a0a; --neon-shadow: none; }
-        body { font-family: 'Cairo', sans-serif; background: var(--bg); color: white; transition: 0.5s; }
+        :root { --gold: #fcc200; --bg: #0a0a0a; }
+        body { font-family: 'Cairo', sans-serif; background: var(--bg); color: white; transition: 0.5s; overflow-x: hidden; }
         .orbitron { font-family: 'Orbitron', sans-serif; }
         
-        /* Sticky Note Base */
+        /* Sticky Note Styles */
         .sticky-note {
             padding: 25px; min-height: 220px; position: relative;
             box-shadow: 5px 10px 20px rgba(0,0,0,0.3);
             transition: 0.4s all ease; cursor: default; color: #1a1a1a;
+            overflow: hidden;
         }
         
-        /* Neon Mode Styles */
+        .sticky-note::after {
+            content: ''; position: absolute; top: 0; left: -100%;
+            width: 50%; height: 100%;
+            background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.4), transparent);
+            transform: skewX(-25deg); animation: shine 4s infinite;
+        }
+
+        @keyframes shine {
+            0% { left: -100%; } 20% { left: 100%; } 100% { left: 100%; }
+        }
+
+        /* Neon Mode */
         body.neon-active { background: #000; }
         .neon-active .sticky-note { color: #fff !important; background: transparent !important; border: 2px solid currentColor; }
         .neon-active .note-yellow { color: #fff176 !important; box-shadow: 0 0 15px #fff176; }
         .neon-active .note-blue { color: #81d4fa !important; box-shadow: 0 0 15px #81d4fa; }
         .neon-active .note-pink { color: #f48fb1 !important; box-shadow: 0 0 15px #f48fb1; }
-        .neon-active .note-green { color: #a5d6a7 !important; box-shadow: 0 0 15px #a5d6a7; }
 
-        /* Standard Colors */
         .note-yellow { background: #fff176; transform: rotate(-1.5deg); }
         .note-blue { background: #81d4fa; transform: rotate(1deg); }
         .note-pink { background: #f48fb1; transform: rotate(-0.5deg); }
@@ -36,52 +46,13 @@
         .pin {
             width: 14px; height: 14px; background: #ff5252;
             border-radius: 50%; position: absolute; top: -7px; left: 50%;
-            transform: translateX(-50%); box-shadow: 0 2px 5px rgba(0,0,0,0.3);
-            z-index: 5;
+            transform: translateX(-50%); box-shadow: 0 2px 5px rgba(0,0,0,0.3); z-index: 5;
         }
 
-        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 1000; align-items: center; justify-content: center; padding: 20px; }
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 1000; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(5px); }
         .glass-card { background: rgba(255,255,255,0.03); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 30px; }
-        
-        .heart-btn.liked { color: #e91e63; transform: scale(1.3); pointer-events: none; }
-        .ai-btn { position: fixed; left: 20px; bottom: 20px; z-index: 100; }
-
-        /* Toggle Switch */
+        .heart-btn.liked { color: #e91e63; transform: scale(1.2); }
         .theme-switch { position: fixed; top: 20px; left: 20px; z-index: 100; display: flex; align-items: center; gap: 10px; background: rgba(255,255,255,0.05); padding: 8px 15px; border-radius: 50px; border: 1px solid rgba(212, 175, 55, 0.2); }
-    /* تأثير اللمعة المتحركة */
-@keyframes shine {
-    0% { left: -100%; }
-    20% { left: 100%; }
-    100% { left: 100%; }
-}
-
-.sticky-note {
-    overflow: hidden; /* ضروري لعمل اللمعة داخل الورقة فقط */
-}
-
-.sticky-note::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 50%;
-    height: 100%;
-    background: linear-gradient(
-        to right, 
-        transparent, 
-        rgba(255, 255, 255, 0.4), 
-        transparent
-    );
-    transform: skewX(-25deg);
-    animation: shine 4s infinite; /* اللمعة تظهر كل 4 ثواني */
-}
-
-/* ألوان مختلفة لكل ورقة (سيتم توزيعها بواسطة الـ JS تلقائياً) */
-.note-yellow { background: #fff176 !important; }
-.note-blue   { background: #81d4fa !important; }
-.note-pink   { background: #f48fb1 !important; }
-.note-green  { background: #a5d6a7 !important; }
-.note-purple { background: #d1c4e9 !important; }
     </style>
 </head>
 <body class="pb-20" onload="loadReviews()">
@@ -91,29 +62,20 @@
         <input type="checkbox" id="neonToggle" onchange="toggleNeon()" class="cursor-pointer">
     </div>
 
-    <div id="aiModal" class="modal">
-        <div class="glass-card p-8 max-w-lg w-full text-center border-2 border-blue-500/30">
-            <i class="fas fa-robot text-5xl text-blue-400 mb-4"></i>
-            <h2 class="orbitron text-2xl text-blue-400 mb-6">AI ANALYSIS</h2>
-            <div id="aiContent" class="text-right leading-relaxed text-gray-200">
-                <p>جاري تحليل مشاعر المبدعين...</p>
-            </div>
-            <button onclick="closeModal('aiModal')" class="mt-8 px-10 py-3 bg-blue-600 rounded-full font-bold">إغلاق</button>
-        </div>
-    </div>
-
     <div id="commentModal" class="modal">
         <div class="glass-card p-8 max-w-md w-full">
             <h3 class="text-xl font-black mb-4 text-yellow-500">سجل رأيك في اللوحة ✨</h3>
             <input type="email" id="userEmail" placeholder="بريدك الإلكتروني (المسجل)" class="w-full p-4 bg-white/5 border border-white/10 rounded-2xl mb-4 text-right outline-none focus:border-yellow-500">
             <textarea id="userText" placeholder="اكتب إبداعك هنا..." class="w-full p-4 bg-white/5 border border-white/10 rounded-2xl mb-4 h-32 text-right outline-none focus:border-yellow-500"></textarea>
-            <button onclick="submitReview()" id="sendBtn" class="w-full py-4 bg-yellow-500 text-black font-black rounded-2xl shadow-lg hover:brightness-110">تثبيت رأيي 📌</button>
+            <button onclick="submitReview()" id="sendBtn" class="w-full py-4 bg-yellow-500 text-black font-black rounded-2xl shadow-lg hover:brightness-110 transition-all">
+                تثبيت رأيي 📌
+            </button>
             <button onclick="closeModal('commentModal')" class="w-full mt-4 text-gray-500 text-xs">إلغاء</button>
         </div>
     </div>
 
     <header class="text-center py-12 px-6">
-        <img src="MrEzz.png" alt="Mr. Ezz" class="w-28 h-28 rounded-full border-2 border-yellow-500 mx-auto shadow-2xl mb-4">
+        <img src="MrEzz.png" alt="Mr. Ezz" class="w-28 h-28 rounded-full border-2 border-yellow-500 mx-auto shadow-2xl mb-4 object-cover">
         <h1 class="text-3xl font-black orbitron tracking-widest">THE HALL OF FAME</h1>
         <p class="text-yellow-500 text-[10px] orbitron tracking-[4px]">WHERE LEGENDS SPEAK</p>
     </header>
@@ -130,12 +92,8 @@
             </div>
     </main>
 
-    <button onclick="openModal('aiModal')" class="ai-btn bg-blue-600/20 backdrop-blur-md border border-blue-500 p-4 rounded-full">
-        <i class="fas fa-robot text-blue-400 text-2xl"></i>
-    </button>
-
     <script>
-        const scriptURL = 'https://script.google.com/macros/s/AKfycbxI0wBI7Hd2_aNS4ul4Cde8gBySYhWNPBQ7QkAxg3VAutejhjVaM8n14gqQABsxb1kR-Q/exec'; // حط الرابط بتاعك هنا
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbxI0wBI7Hd2_aNS4ul4Cde8gBySYhWNPBQ7QkAxg3VAutejhjVaM8n14gqQABsxb1kR-Q/exec'; 
 
         function openModal(id) { document.getElementById(id).style.display = 'flex'; }
         function closeModal(id) { document.getElementById(id).style.display = 'none'; }
@@ -152,79 +110,70 @@
             }
 
             try {
-                // هنسحب الداتا من الباك إيند (لازم الباك إيند يبعت الصورة واللقب)
                 const response = await fetch(`${scriptURL}?action=getReviews`);
                 const reviews = await response.json();
                 const container = document.getElementById('commentsContainer');
                 container.innerHTML = '';
                 
                 const colors = ['note-yellow', 'note-blue', 'note-pink', 'note-green'];
-                const likedItems = JSON.parse(localStorage.getItem('eyc_liked_reviews') || '[]');
-
                 reviews.reverse().forEach((rev, index) => {
                     const colorClass = colors[index % colors.length];
-                    const isLiked = likedItems.includes(rev.id);
-                    
-                    const note = `
+                    container.innerHTML += `
                         <div class="sticky-note ${colorClass} rounded-sm shadow-xl hover:-translate-y-2 transition-all">
                             <div class="pin"></div>
                             <div class="flex items-center gap-3 mb-4">
                                 <img src="${rev.avatar || 'https://via.placeholder.com/40'}" class="w-10 h-10 rounded-lg border border-black/10 object-cover">
                                 <div>
-                                    <h4 class="font-black text-xs leading-none">${rev.name || 'طالب مبدع'}</h4>
-                                    <span class="text-[8px] font-bold opacity-60 uppercase orbitron">${rev.title || 'Elite Agent'}</span>
+                                    <h4 class="font-black text-xs leading-none">${rev.name}</h4>
+                                    <span class="text-[8px] font-bold opacity-60 uppercase orbitron">${rev.title}</span>
                                 </div>
                             </div>
                             <p class="text-md font-bold mb-6 leading-relaxed text-right">"${rev.text}"</p>
                             <div class="absolute bottom-4 left-4 right-4 flex justify-between items-center">
-                                <span class="text-[9px] font-bold opacity-30 orbitron">ID: ${rev.id}</span>
-                                <button onclick="likeComment(this, ${rev.id})" class="heart-btn ${isLiked ? 'liked' : ''} text-black/20 flex items-center gap-1">
-                                    <span class="text-sm font-black">${rev.likes}</span> <i class="fas fa-heart text-xl"></i>
-                                </button>
+                                <span class="text-[9px] font-bold opacity-30 orbitron">${new Date(rev.timestamp).toLocaleDateString()}</span>
+                                <div class="text-black/20"><i class="fas fa-heart"></i> <span class="text-xs font-black">${rev.likes}</span></div>
                             </div>
                         </div>`;
-                    container.innerHTML += note;
                 });
-            } catch (e) {
-                console.error("Fetch Error", e);
-            }
+            } catch (e) { console.error("Load Error", e); }
         }
 
-async function submitReview() {
-    const email = document.getElementById('userEmail').value;
-    const text = document.getElementById('userText').value;
-    if(!email || !text) return alert("البيانات ناقصة يا بطل!");
+        async function submitReview() {
+            const email = document.getElementById('userEmail').value;
+            const text = document.getElementById('userText').value;
+            if(!email || !text) return alert("البيانات ناقصة يا بطل!");
 
-    const btn = document.getElementById('sendBtn');
-    btn.disabled = true;
-    btn.innerText = "جاري الإرسال...";
+            const btn = document.getElementById('sendBtn');
+            btn.disabled = true;
+            btn.innerText = "جاري التحقق من البروتوكول...";
 
-    // تحويل البيانات لـ FormData لتجنب مشاكل الـ CORS في Apps Script
-    const formData = new URLSearchParams();
-    formData.append('action', 'addReview');
-    formData.append('email', email);
-    formData.append('text', text);
+            // استخدام طريقة GET مع البراميترز لتجنب مشاكل الـ CORS في قراءة الرد
+            try {
+                // ملاحظة: قمنا بتغيير الـ doPost في السكريبت ليدعم الـ GET في حال كانت الأكشن addReview
+                // أو نستخدم fetch العادي هنا مع إضافة callback إذا فعلت الـ JSONP في السكريبت
+                const response = await fetch(`${scriptURL}?action=addReview&email=${email}&text=${encodeURIComponent(text)}`);
+                const result = await response.text();
 
-    try {
-        // إرسال كـ POST بالطريقة المتوافقة مع Apps Script
-        await fetch(scriptURL, {
-            method: 'POST',
-            mode: 'no-cors', // مهم جداً عند الإرسال لـ Google Script
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: formData.toString()
-        });
-        
-        // بما أن no-cors لا تعيد استجابة، ننتظر ثانية ثم نحدث الصفحة
-        setTimeout(() => {
-            location.reload();
-        }, 1000);
-        
-    } catch (e) {
-        alert("حدث خطأ في الاتصال.");
-        btn.disabled = false;
-        btn.innerText = "تثبيت رأيي 📌";
-    }
-}
+                if (result.includes("SUCCESS")) {
+                    alert("تم تثبيت إبداعك في لوحة المشاهير! ✨");
+                    location.reload();
+                } else if (result.includes("WAIT_7_DAYS")) {
+                    alert("يسمح بتعليق واحد فقط أسبوعياً! دع فرصة لزملائك المبدعين. ⏳");
+                } else if (result.includes("USER_NOT_FOUND")) {
+                    alert("هذا الإيميل غير مسجل. سجل دخولك في المنصة أولاً!");
+                } else {
+                    alert("تم الإرسال بنجاح! سيظهر تعليقك فوراً.");
+                    location.reload();
+                }
+            } catch (e) {
+                // إذا فشل الـ CORS تماماً في قراءة الرد، نبلغ المستخدم بالنجاح المحتمل
+                alert("تم إرسال الطلب للمحرك.. حدث الصفحة بعد قليل.");
+                location.reload();
+            } finally {
+                btn.disabled = false;
+                btn.innerText = "تثبيت رأيي 📌";
+            }
+        }
     </script>
 </body>
 </html>
