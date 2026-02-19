@@ -176,7 +176,7 @@
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.9);
-            display: none; align-items: center; justify-content: center;
+            display: none; flex-direction: column; align-items: center; justify-content: center;
             z-index: 3000; color: var(--gold); letter-spacing: 5px; font-weight: bold;
         }
 
@@ -219,7 +219,9 @@
 
 <div class="container">
     <div class="progress-container"><div class="progress-bar" id="pBar"></div></div>
-    <div class="loading-overlay" id="loader">DEPLOYING AGENT...</div>
+    <div class="loading-overlay" id="loader">
+        <p>DEPLOYING AGENT...</p>
+    </div>
     
     <div class="avatar-section" id="avatar-sidebar">
         <div id="avatar-container">
@@ -410,6 +412,9 @@
 </div>
 
 <script>
+    // --- INTEGRATION SETTINGS ---
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyxaVyXc_8F5J_lv1R-i-cnSgaYjbV3k6ce61UXUU15pVRx129qGc6CrjGfuuPlH4wt/exec"; 
+
     const options = {
         maleHair: ["ShortHairShortFlat", "ShortHairShortWaved", "NoHair", "ShortHairTheCaesar", "ShortHairDreads01"],
         femaleHair: ["LongHairCurvy", "Hijab", "LongHairStraight", "LongHairBob", "LongHairNotTooLong", "LongHairCurly"],
@@ -503,24 +508,6 @@
         window.scrollTo({top: 0, behavior: 'smooth'});
     }
 
-    let mouthOpen = false;
-    let mouthInterval = null;
-
-    function toggleMouth() {
-        mouthOpen = !mouthOpen;
-        updateAvatar(mouthOpen ? 'Twinkle' : 'Default');
-    }
-
-    document.getElementById('name').addEventListener('focus', () => {
-        if(mouthInterval) clearInterval(mouthInterval);
-        mouthInterval = setInterval(toggleMouth, 300);
-    });
-
-    document.getElementById('name').addEventListener('blur', () => {
-        if(mouthInterval) clearInterval(mouthInterval);
-        updateAvatar();
-    });
-
     function toggleRoyalOptions() {
         const isRoyal = document.getElementById('royalCheck').checked;
         document.getElementById('royalSubOptions').style.display = isRoyal ? 'block' : 'none';
@@ -544,14 +531,7 @@
         document.getElementById('success-card').style.display = 'block';
         document.getElementById('card-avatar').src = document.getElementById('avatar-img').src;
         document.getElementById('card-name').innerText = document.getElementById('name').value;
-        
-        const codeBox = document.querySelector('.code-box');
-        codeBox.innerHTML = `
-            <span id="agent-code">${generatedCode}</span>
-            <button onclick="copyCode()" style="width:auto; padding:5px 10px; margin-left:10px; font-size:0.8rem; display:inline-block;">
-                <i class="fas fa-copy"></i>
-            </button>
-        `;
+        document.getElementById('agent-code').innerText = generatedCode;
         document.getElementById('pBar').style.width = "100%";
     }
 
@@ -559,51 +539,41 @@
         e.preventDefault();
         playClick();
         
-        const programs = Array.from(document.querySelectorAll('input[name="program"]:checked')).map(cb => cb.value);
-        if (programs.length === 0) { alert("Please select at least one mission program, Agent!"); return; }
+        const programsArr = Array.from(document.querySelectorAll('input[name="program"]:checked')).map(cb => cb.value);
+        if (programsArr.length === 0) { alert("Please select at least one mission program, Agent!"); return; }
+
+        const formData = {
+            action: "register",
+            name: document.getElementById('name').value,
+            email: document.getElementById('email').value,
+            age: document.getElementById('age').value,
+            programs: programsArr.join(", "),
+            avatar: document.getElementById('avatar-img').src,
+            ticket1: document.getElementById('ticket1').value || "",
+            ticket2: document.getElementById('ticket2').value || ""
+        };
 
         const loader = document.getElementById('loader');
         loader.style.display = 'flex';
 
-        const isRoyal = programs.includes("Royal");
-        const royalType = document.getElementById('royalType').value;
-        const plan = (isRoyal && royalType === 'paid') ? "Paid" : "Free";
+        // Fetch Bridge to Google Apps Script
+        const queryString = new URLSearchParams(formData).toString();
         
-        const studentObj = {
-            name: document.getElementById('name').value,
-            email: document.getElementById('email').value,
-            age: document.getElementById('age').value,
-            programs: programs.join(", "),
-            plan: plan,
-            ticket1: document.getElementById('ticket1').value,
-            ticket2: document.getElementById('ticket2').value,
-            avatar: document.getElementById('avatar-img').src,
-            action: "register"
-        };
-
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyxaVyXc_8F5J_lv1R-i-cnSgaYjbV3k6ce61UXUU15pVRx129qGc6CrjGfuuPlH4wt/exec"; 
-
-        studentObj.prefix = "callbackFunc"; 
-        const queryString = new URLSearchParams(studentObj).toString();
-        const script = document.createElement('script');
-        script.src = `${SCRIPT_URL}?${queryString}`;
-        document.body.appendChild(script);
-
-        window.callbackFunc = function(response) {
-            loader.style.display = 'none';
-            if(response.status === "success") {
-                showFinalCard(response.code);
-                localStorage.setItem('eyc_user_code', response.code);
-            } else {
-                if(response.message === "INVALID_TICKETS") {
-                    alert("❌ خطأ: أكواد التذاكر الذهبية غير صالحة أو تم استخدامها مسبقاً!");
-                } else if(response.message === "EMAIL_ALREADY_EXISTS") {
-                    alert("⚠️ هذا الإيميل مسجل لدينا بالفعل، حاول تسجيل الدخول.");
+        fetch(`${SCRIPT_URL}?${queryString}`)
+            .then(response => response.json())
+            .then(result => {
+                loader.style.display = 'none';
+                if (result.status === "success") {
+                    showFinalCard(result.code);
                 } else {
-                    alert("Error: " + response.message);
+                    alert("Error: " + result.message);
                 }
-            }
-        };
+            })
+            .catch(error => {
+                loader.style.display = 'none';
+                alert("Connection Failed: Ensure SCRIPT_URL is correct and Web App is deployed as 'Anyone'.");
+                console.error(error);
+            });
     };
 </script>
 </body>
