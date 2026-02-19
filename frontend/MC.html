@@ -237,7 +237,12 @@
             generateCards();
         }
 
-function openTasks(name, code) {
+        function openTasks(name, code) {
+            if (!isLoggedIn) {
+                alert("⚠️ ACCESS DENIED: Please authenticate first.");
+                return openLogin();
+            }
+
             document.getElementById('mTitle').innerText = name;
             const tGrid = document.getElementById('tGrid'); 
             tGrid.innerHTML = '';
@@ -251,25 +256,16 @@ function openTasks(name, code) {
                 node.innerText = i;
                 
                 node.onclick = () => {
-                    if(!isLoggedIn) {
-                        alert("⚠️ ACCESS DENIED: Please authenticate first.");
-                        return openLogin();
-                    }
+                    const params = new URLSearchParams({
+                        email: currentUser.email,
+                        name: currentUser.name,
+                        avatar: currentUser.avatar || '',
+                        title: currentUser.title || 'Elite Agent',
+                        act: name,  
+                        code: code, 
+                        task: i      
+                    });
                     
-                    // تحويل البيانات إلى تنسيق URL لكي تفهمها الأرينا
-                    // ملاحظة: 'act' هو اسم الملف البرمجي (مثل Grammar) و 'task' هو رقم المهمة
-const params = new URLSearchParams({
-    email: currentUser.email,
-    name: currentUser.name,
-    avatar: currentUser.avatar || '',
-    title: currentUser.title || 'Elite Agent',
-    act: name,
-    code: code,
-    task: i
-});
-window.location.href = `EYCArena.html?${params.toString()}`;
-                    
-                    // الانتقال لصفحة الأرينا مع البيانات
                     window.location.href = `EYCArena.html?${params.toString()}`;
                 };
                 tGrid.appendChild(node);
