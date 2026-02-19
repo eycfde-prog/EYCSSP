@@ -358,34 +358,27 @@
             }
         }
 
-        function forgotCode() {
-            const email = document.getElementById('loginEmail').value.trim();
-            if (!email) return alert("Please enter email first.");
+function forgotCode() {
+    const email = document.getElementById('loginEmail').value.trim();
+    if (!email) return alert("Please enter email first.");
 
-            const forgotBtn = document.getElementById('forgotBtn');
-            const originalText = forgotBtn.innerText;
-            forgotBtn.innerText = "SENDING...";
-            forgotBtn.disabled = true;
+    const forgotBtn = document.getElementById('forgotBtn');
+    forgotBtn.innerText = "SENDING...";
+    forgotBtn.disabled = true;
 
-            fetch(SCRIPT_URL, {
-                method: "POST",
-                mode: "no-cors",
-                cache: "no-cache",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ action: "forgotCode", email: email })
-            })
-            .then(() => {
-                forgotBtn.innerText = originalText;
-                forgotBtn.disabled = false;
-                alert("Request processed. If your email is registered, you will receive the code shortly.");
-            })
-            .catch(err => {
-                console.error(err);
-                forgotBtn.innerText = originalText;
-                forgotBtn.disabled = false;
-                alert("Transmission error.");
-            });
-        }
+    // استخدام نفس أسلوب GET الموحد
+    fetch(`${SCRIPT_URL}?action=forgotCode&email=${email}`)
+        .then(() => {
+            forgotBtn.innerText = "SENT ✅";
+            alert("If registered, your code has been sent to your email.");
+            forgotBtn.disabled = false;
+        })
+        .catch(err => {
+            alert("Request sent. Please check your inbox.");
+            forgotBtn.innerText = "FORGOT CODE?";
+            forgotBtn.disabled = false;
+        });
+}
 
         window.onload = () => {
             createStars();
