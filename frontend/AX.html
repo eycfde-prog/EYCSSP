@@ -138,7 +138,18 @@
     <div id="quiz-screen"></div>
 
 <script>
-    // الداتا الكاملة تم حقنها بواسطة Joiner
+    window.addEventListener('message', function(e) {
+      if (e.data.type === 'REQUEST_MISSION_DATA') {
+        const allInputs = Array.from(document.querySelectorAll('input'));
+        const answers = allInputs.map(input => input.value.trim());
+
+        window.parent.postMessage({
+          type: 'MISSION_ANSWERS',
+          answers: answers 
+        }, '*');
+      }
+    });
+
     const alikeXData = {
     "1": [
         { s: "The wind _______ the blue paper away.", options: ["blew", "blue", "blow"] },
@@ -251,12 +262,11 @@
     function playAudio(idx) {
         const t = parseInt(taskNum);
         const qIdx = parseInt(idx);
-        // حساب رقم الملف الصوتي: AX1, AX2... AX50
         const audioFileNum = ((t - 1) * 5) + (qIdx + 1);
         const audio = new Audio(`assets/alikeaudio/AX${audioFileNum}.wav`);
         audio.play().catch(e => console.error("Signal Lost:", audioFileNum));
     }
-// Gear Note: هذا الجزء هو المسؤول عن استقبال طلب الـ Arena والرد عليه
+
 window.addEventListener('message', function(event) {
     if (event.data.type === 'REQUEST_MISSION_DATA') {
         collectAndSend();
@@ -266,11 +276,10 @@ window.addEventListener('message', function(event) {
 function collectAndSend() {
     let finalAnswers = [];
     let hasMissing = false;
-    const totalQuestions = 5; // عدد الأسئلة في كل مهمة
+    const totalQuestions = 5;
 
     for(let i = 0; i < totalQuestions; i++) {
         if (!answers[i]) {
-            // تفعيل تأثير الاهتزاز للكارت الناقص
             const card = document.getElementById(`card-${i}`);
             if(card) card.classList.add('error-input');
             hasMissing = true;
@@ -280,18 +289,15 @@ function collectAndSend() {
     }
 
     if (hasMissing) {
-        // تنبيه الطالب لإكمال المهمة قبل الإرسال
         console.log("Gear System: Missing Data Detected.");
         return; 
     }
 
-    // إرسال البيانات للـ Parent (صفحة Arena)
     window.parent.postMessage({ 
         type: 'MISSION_ANSWERS', 
-        answers: finalAnswers // ترسل كـ Array مثل: ["blew", "sea", ...]
+        answers: finalAnswers 
     }, '*');
 }
-    // تشغيل بناء المهمة عند تحميل الصفحة
 window.onload = loadAlikeX;
 </script>
 </body>
