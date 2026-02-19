@@ -59,7 +59,7 @@
             background: var(--glass);
             color: var(--gold); 
             border: 1px solid var(--gold); 
-            padding: 10px 18px; 
+            padding: 10px 188px; 
             border-radius: 12px; 
             cursor: pointer; 
             font-family: 'Orbitron'; 
@@ -138,18 +138,6 @@
     <div id="quiz-screen"></div>
 
 <script>
-    window.addEventListener('message', function(e) {
-      if (e.data.type === 'REQUEST_MISSION_DATA') {
-        const allInputs = Array.from(document.querySelectorAll('input'));
-        const answers = allInputs.map(input => input.value.trim());
-
-        window.parent.postMessage({
-          type: 'MISSION_ANSWERS',
-          answers: answers 
-        }, '*');
-      }
-    });
-
     const alikeXData = {
     "1": [
         { s: "The wind _______ the blue paper away.", options: ["blew", "blue", "blow"] },
@@ -221,7 +209,7 @@
         { s: "The _______ of the box is 5kg.", options: ["wait", "weight", "white"] },
         { s: "He is my _______ friend.", options: ["dear", "deer", "dare"] }
     ]
-}
+};
 
     const urlParams = new URLSearchParams(window.location.search);
     const taskNum = urlParams.get('task') || "1"; 
@@ -267,38 +255,39 @@
         audio.play().catch(e => console.error("Signal Lost:", audioFileNum));
     }
 
-window.addEventListener('message', function(event) {
-    if (event.data.type === 'REQUEST_MISSION_DATA') {
-        collectAndSend();
-    }
-});
-
-function collectAndSend() {
-    let finalAnswers = [];
-    let hasMissing = false;
-    const totalQuestions = 5;
-
-    for(let i = 0; i < totalQuestions; i++) {
-        if (!answers[i]) {
-            const card = document.getElementById(`card-${i}`);
-            if(card) card.classList.add('error-input');
-            hasMissing = true;
-        } else {
-            finalAnswers.push(answers[i]);
+    window.addEventListener('message', function(event) {
+        if (event.data.type === 'REQUEST_MISSION_DATA') {
+            collectAndSend();
         }
+    });
+
+    function collectAndSend() {
+        let finalAnswers = [];
+        let hasMissing = false;
+        const totalQuestions = 5;
+
+        for(let i = 0; i < totalQuestions; i++) {
+            if (!answers[i]) {
+                const card = document.getElementById(`card-${i}`);
+                if(card) card.classList.add('error-input');
+                hasMissing = true;
+            } else {
+                finalAnswers.push(answers[i]);
+            }
+        }
+
+        if (hasMissing) {
+            console.log("Gear System: Missing Data Detected.");
+            return; 
+        }
+
+        window.parent.postMessage({ 
+            type: 'MISSION_ANSWERS', 
+            answers: finalAnswers 
+        }, '*');
     }
 
-    if (hasMissing) {
-        console.log("Gear System: Missing Data Detected.");
-        return; 
-    }
-
-    window.parent.postMessage({ 
-        type: 'MISSION_ANSWERS', 
-        answers: finalAnswers 
-    }, '*');
-}
-window.onload = loadAlikeX;
+    window.onload = loadAlikeX;
 </script>
 </body>
 </html>
