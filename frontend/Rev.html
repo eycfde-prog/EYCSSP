@@ -48,6 +48,10 @@
             border-radius: 50%; position: absolute; top: -7px; left: 50%;
             transform: translateX(-50%); box-shadow: 0 2px 5px rgba(0,0,0,0.3); z-index: 5;
         }
+        .neon-active .pin {
+    background: #fff !important;
+    box-shadow: 0 0 10px #fff, 0 0 20px var(--gold);
+}
 
         .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 1000; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(5px); }
         .glass-card { background: rgba(255,255,255,0.03); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 30px; }
@@ -93,7 +97,7 @@
     </main>
 
     <script>
-        const scriptURL = 'https://script.google.com/macros/s/AKfycbxI0wBI7Hd2_aNS4ul4Cde8gBySYhWNPBQ7QkAxg3VAutejhjVaM8n14gqQABsxb1kR-Q/exec'; 
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbx0hNx1zshift1_zVao1rTaNCoWslxYamme4BAytPXzvmnsBDCQdact-Xna2apENcUz/exec'; 
 
         function openModal(id) { document.getElementById(id).style.display = 'flex'; }
         function closeModal(id) { document.getElementById(id).style.display = 'none'; }
