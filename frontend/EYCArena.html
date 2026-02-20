@@ -76,9 +76,7 @@
     </footer>
 
 <script>
-    // 1. رابط السكريبت القديم (لجلب البروفايل وتحديث البيانات العامة)
     const CORE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx0hNx1zshift1_zVao1rTaNCoWslxYamme4BAytPXzvmnsBDCQdact-Xna2apENcUz/exec"; 
-    // 2. رابط السكريبت الجديد (الخاص بالتصحيح وشيت Missions_Submissions)
     const MISSIONS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyINsZ7zmV9iR4SJTORxl8F9CLFJa4G3swcdpMPrvvQgm6Ljbiw8qbbbOaIy5L85y8kdw/exec"; 
 
     let userEmail, currentActivity, currentTask;
@@ -90,7 +88,7 @@
 
         const params = new URLSearchParams(window.location.search);
         userEmail = user.email;
-        currentActivity = params.get('act'); // اسم النشاط
+        currentActivity = params.get('act'); 
         currentTask = params.get('task') || "1";
 
         document.getElementById('student-name').innerText = user.name;
@@ -99,71 +97,78 @@
         document.getElementById('activity-title').innerText = currentActivity;
         document.getElementById('mission-sub').innerText = `TASK ${currentTask}`;
 
-        // تشغيل صفحة النشاط (يجب أن يكون اسم الملف مطابق لـ currentActivity)
-document.getElementById('contentFrame').src = `missions/${currentActivity}.html?task=${currentTask}`;
+        document.getElementById('contentFrame').src = `missions/${currentActivity}.html?task=${currentTask}`;
     };
 
-// التعديل في Arena Page
-function submitToHQ(answers) {
-    document.getElementById('sync-overlay').style.display = 'flex';
-    const callbackName = 'gear_' + Date.now();
+    // --- الدالة التي كانت ناقصة وتسببت في الخطأ ---
+    function startSubmission() {
+        const frame = document.getElementById('contentFrame').contentWindow;
+        frame.postMessage({ type: 'REQUEST_MISSION_DATA' }, '*');
+    }
 
-    // بناء الباراميترز لتتوافق تماماً مع توقعات السكريبت المركزي
-    const params = new URLSearchParams({
-        email: userEmail,
-        activity: currentActivity, // تأكد أنه DTX
-        task: currentTask,
-        studentData: JSON.stringify(answers), // الصور مضغوطة Base64
-        prefix: callbackName
+    // استقبال البيانات من المهمة (الصور)
+    window.addEventListener('message', function(event) {
+        if (event.data.type === 'MISSION_ANSWERS') {
+            submitToHQ(event.data.answers);
+        }
     });
 
-    window[callbackName] = function(res) {
-        renderResult(res);
-        delete window[callbackName];
-        const oldScript = document.getElementById('jsonp-engine');
-        if(oldScript) oldScript.remove();
-    };
+    function submitToHQ(answers) {
+        document.getElementById('sync-overlay').style.display = 'flex';
+        const callbackName = 'gear_' + Date.now();
 
-    const script = document.createElement('script');
-    script.id = 'jsonp-engine';
-    // استخدام رابط سكريبت المهمات الذي يحتوي على دالة handleDictationUpload
-    script.src = `${MISSIONS_SCRIPT_URL}?${params.toString()}`; 
-    document.body.appendChild(script);
-}
+        const params = new URLSearchParams({
+            action: "submitMission", // أضفنا هذا ليتوافق مع السكريبت الموحد
+            email: userEmail,
+            activity: currentActivity,
+            task: currentTask,
+            studentData: JSON.stringify(answers),
+            prefix: callbackName
+        });
 
-function renderResult(res) {
-    const display = document.getElementById('result-display');
-    document.getElementById('loader-content').style.display = 'none';
-    display.style.display = 'block';
+        window[callbackName] = function(res) {
+            renderResult(res);
+            delete window[callbackName];
+            const oldScript = document.getElementById('jsonp-engine');
+            if(oldScript) oldScript.remove();
+        };
 
-    if (res.status === "success") {
-        // التحقق مما إذا كانت المهمة تحت المراجعة (مثل DX) أو تم تصحيحها (مثل AX)
-        const isPending = (res.grade === "PENDING");
-        
-        const icon = isPending ? "fa-cloud-upload-alt" : "fa-check-circle";
-        const title = isPending ? "MISSION RECEIVED" : "MISSION COMPLETE";
-        const gradeDisplay = isPending ? "FILES UPLOADED" : res.grade + "/10";
-        const subText = isPending ? 
-            "HQ is reviewing your script. Tokens will be added shortly." : 
-            "Tokens and XP have been added to your profile.";
-
-        display.innerHTML = `
-            <i class="fas ${icon}" style="font-size:3rem; color:var(--gold);"></i>
-            <h2 style="font-family:'Orbitron'; color:#fff; margin:15px 0;">${title}</h2>
-            <div style="font-size:2rem; color:var(--gold); font-weight:bold;">${gradeDisplay}</div>
-            <p style="color:#888; font-size:0.7rem; margin-top:10px;">${subText}</p>
-            <button class="btn btn-submit" style="margin-top:20px; width:100%" onclick="exitArena()">RETURN TO BASE</button>
-        `;
-    } else {
-        // كود رسالة الخطأ في حالة فشل الاتصال
-        display.innerHTML = `
-            <i class="fas fa-exclamation-triangle" style="font-size:3rem; color:red;"></i>
-            <h2 style="font-family:'Orbitron'; color:#fff; margin:15px 0;">MISSION ERROR</h2>
-            <p style="color:#888;">${res.message || "Connection Interrupted"}</p>
-            <button class="btn btn-side" style="margin-top:20px; width:100%" onclick="location.reload()">RETRY</button>
-        `;
+        const script = document.createElement('script');
+        script.id = 'jsonp-engine';
+        script.src = `${MISSIONS_SCRIPT_URL}?${params.toString()}`; 
+        document.body.appendChild(script);
     }
-}
+
+    function renderResult(res) {
+        const display = document.getElementById('result-display');
+        document.getElementById('loader-content').style.display = 'none';
+        display.style.display = 'block';
+
+        if (res.status === "success") {
+            const isPending = (res.grade === "PENDING");
+            const icon = isPending ? "fa-cloud-upload-alt" : "fa-check-circle";
+            const title = isPending ? "MISSION RECEIVED" : "MISSION COMPLETE";
+            const gradeDisplay = isPending ? "FILES UPLOADED" : res.grade + "/10";
+            const subText = isPending ? 
+                "HQ is reviewing your script. Tokens will be added shortly." : 
+                "Tokens and XP have been added to your profile.";
+
+            display.innerHTML = `
+                <i class="fas ${icon}" style="font-size:3rem; color:var(--gold);"></i>
+                <h2 style="font-family:'Orbitron'; color:#fff; margin:15px 0;">${title}</h2>
+                <div style="font-size:2rem; color:var(--gold); font-weight:bold;">${gradeDisplay}</div>
+                <p style="color:#888; font-size:0.7rem; margin-top:10px;">${subText}</p>
+                <button class="btn btn-submit" style="margin-top:20px; width:100%" onclick="exitArena()">RETURN TO BASE</button>
+            `;
+        } else {
+            display.innerHTML = `
+                <i class="fas fa-exclamation-triangle" style="font-size:3rem; color:red;"></i>
+                <h2 style="font-family:'Orbitron'; color:#fff; margin:15px 0;">MISSION ERROR</h2>
+                <p style="color:#888;">${res.message || "Connection Interrupted"}</p>
+                <button class="btn btn-side" style="margin-top:20px; width:100%" onclick="location.reload()">RETRY</button>
+            `;
+        }
+    }
 
     function exitArena() { window.location.href = 'MC.html'; }
 
