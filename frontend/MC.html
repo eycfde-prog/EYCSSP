@@ -167,25 +167,25 @@
         const activities = {
             season: [
                 { name: "Alike", icon: "fa-clone", code: "AS" },
-                { name: "Vivid", icon: "fa-wand-magic-sparkles", code: "VS" },
-                { name: "Label", icon: "fa-tag", code: "LS" },
-                { name: "Grammar", icon: "fa-spell-check", code: "GS" },
-                { name: "Golden Ear", icon: "fa-ear-listen", code: "GES" },
-                { name: "Seeds", icon: "fa-seedling", code: "SS" }
+                { name: "Vivid", icon: "fa-wand-magic-sparkles", code: "VV" },
+                { name: "Label", icon: "fa-tag", code: "LB" },
+                { name: "Grammar", icon: "fa-spell-check", code: "GR" },
+                { name: "Golden Ear", icon: "fa-ear-listen", code: "GE" },
+                { name: "Seeds", icon: "fa-seedling", code: "SD" }
             ],
             royal: [
-                { name: "AlikeX", icon: "fa-star", code: "AX" },
-                { name: "VividX", icon: "fa-wand-magic", code: "VX" },
-                { name: "LabelX", icon: "fa-tags", code: "LX" },
-                { name: "SeedsX", icon: "fa-tree", code: "SX" },
+                { name: "AlikeX", icon: "fa-star", code: "ASX" },
+                { name: "VividX", icon: "fa-wand-magic", code: "VVX" },
+                { name: "LabelX", icon: "fa-tags", code: "LBX" },
+                { name: "SeedsX", icon: "fa-tree", code: "SDX" },
                 { name: "Golden EarX", icon: "fa-ear-deaf", code: "GEX" },
-                { name: "GrammarX", icon: "fa-pen-fancy", code: "GX" }
+                { name: "GrammarX", icon: "fa-pen-fancy", code: "GRX" }
             ],
             titanium: [
-                { name: "DictationX", icon: "fa-microphone-lines", code: "DX" },
+                { name: "DictationX", icon: "fa-microphone-lines", code: "DTX" },
                 { name: "Sing Sang Sung", icon: "fa-music", code: "SSSX" },
-                { name: "ElmagazineX", icon: "fa-book-open", code: "ELX" },
-                { name: "FigurativeX", icon: "fa-mask", code: "FX" }
+                { name: "ElmagazineX", icon: "fa-book-open", code: "EMX" },
+                { name: "FigurativeX", icon: "fa-mask", code: "FGX" }
             ]
         };
 
@@ -198,7 +198,7 @@
                     <div class="profile-card">
                         <div class="avatar-wrapper">
                             <div class="avatar-main" style="background-image: url('${currentUser.avatar || 'https://via.placeholder.com/150'}')"></div>
-                           <div class="rank-tag">RANK #${currentUser.rank}</div>                       
+                            <div class="rank-tag">RANK #${currentUser.rank}</div>                       
                            </div>
                         <h1 class="student-name">${currentUser.name}</h1>
                         <p class="student-title">${currentUser.title}</p>
@@ -257,15 +257,17 @@
                 
                 node.onclick = () => {
                     const params = new URLSearchParams({
+                        // بيانات العميل
                         email: currentUser.email,
                         name: currentUser.name,
                         avatar: currentUser.avatar || '',
                         title: currentUser.title || 'Elite Agent',
-                        act: name,  
-                        code: code, 
+                        // بيانات المهمة
+                        act: code,  // نرسل الكود (مثلاً AS) لفتح الملف AS.html
                         task: i      
                     });
                     
+                    // التوجه للأرينا
                     window.location.href = `EYCArena.html?${params.toString()}`;
                 };
                 tGrid.appendChild(node);
@@ -358,27 +360,26 @@
             }
         }
 
-function forgotCode() {
-    const email = document.getElementById('loginEmail').value.trim();
-    if (!email) return alert("Please enter email first.");
+        function forgotCode() {
+            const email = document.getElementById('loginEmail').value.trim();
+            if (!email) return alert("Please enter email first.");
 
-    const forgotBtn = document.getElementById('forgotBtn');
-    forgotBtn.innerText = "SENDING...";
-    forgotBtn.disabled = true;
+            const forgotBtn = document.getElementById('forgotBtn');
+            forgotBtn.innerText = "SENDING...";
+            forgotBtn.disabled = true;
 
-    // استخدام نفس أسلوب GET الموحد
-    fetch(`${SCRIPT_URL}?action=forgotCode&email=${email}`)
-        .then(() => {
-            forgotBtn.innerText = "SENT ✅";
-            alert("If registered, your code has been sent to your email.");
-            forgotBtn.disabled = false;
-        })
-        .catch(err => {
-            alert("Request sent. Please check your inbox.");
-            forgotBtn.innerText = "FORGOT CODE?";
-            forgotBtn.disabled = false;
-        });
-}
+            fetch(`${SCRIPT_URL}?action=forgotCode&email=${email}`)
+                .then(() => {
+                    forgotBtn.innerText = "SENT ✅";
+                    alert("If registered, your code has been sent to your email.");
+                    forgotBtn.disabled = false;
+                })
+                .catch(err => {
+                    alert("Request sent. Please check your inbox.");
+                    forgotBtn.innerText = "FORGOT CODE?";
+                    forgotBtn.disabled = false;
+                });
+        }
 
         window.onload = () => {
             createStars();
