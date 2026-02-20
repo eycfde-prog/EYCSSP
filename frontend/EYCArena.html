@@ -103,46 +103,33 @@
 document.getElementById('contentFrame').src = `missions/${currentActivity}.html?task=${currentTask}`;
     };
 
-    function startSubmission() {
-        const frame = document.getElementById('contentFrame').contentWindow;
-        // نطلب البيانات من صفحة النشاط
-        frame.postMessage({ type: 'REQUEST_MISSION_DATA' }, '*');
-    }
+// التعديل في Arena Page
+function submitToHQ(answers) {
+    document.getElementById('sync-overlay').style.display = 'flex';
+    const callbackName = 'gear_' + Date.now();
 
-    window.addEventListener('message', function(event) {
-        if (event.data.type === 'MISSION_ANSWERS') {
-            submitToHQ(event.data.answers);
-        }
+    // بناء الباراميترز لتتوافق تماماً مع توقعات السكريبت المركزي
+    const params = new URLSearchParams({
+        email: userEmail,
+        activity: currentActivity, // تأكد أنه DTX
+        task: currentTask,
+        studentData: JSON.stringify(answers), // الصور مضغوطة Base64
+        prefix: callbackName
     });
 
-    function submitToHQ(answers) {
-        document.getElementById('sync-overlay').style.display = 'flex';
-        const callbackName = 'gear_' + Date.now();
+    window[callbackName] = function(res) {
+        renderResult(res);
+        delete window[callbackName];
+        const oldScript = document.getElementById('jsonp-engine');
+        if(oldScript) oldScript.remove();
+    };
 
-        const params = new URLSearchParams({
-            action: "submitMission", 
-            email: userEmail,
-            activity: currentActivity, 
-            task: currentTask,
-            studentData: JSON.stringify(answers),
-            prefix: callbackName
-        });
-
-        window[callbackName] = function(res) {
-            renderResult(res);
-            delete window[callbackName];
-            if(document.getElementById('jsonp-engine')) document.getElementById('jsonp-engine').remove();
-            
-            // ملاحظة: لو التصحيح نجح، ممكن هنا نستخدم CORE_SCRIPT_URL 
-            // عشان نحدث التوكنز في السكريبت التاني لو حبيت
-        };
-
-        const script = document.createElement('script');
-        script.id = 'jsonp-engine';
-        // ⚠️ نستخدم هنا رابط سكريبت المهمات الجديد
-        script.src = `${MISSIONS_SCRIPT_URL}?${params.toString()}`; 
-        document.body.appendChild(script);
-    }
+    const script = document.createElement('script');
+    script.id = 'jsonp-engine';
+    // استخدام رابط سكريبت المهمات الذي يحتوي على دالة handleDictationUpload
+    script.src = `${MISSIONS_SCRIPT_URL}?${params.toString()}`; 
+    document.body.appendChild(script);
+}
 
 function renderResult(res) {
     const display = document.getElementById('result-display');
