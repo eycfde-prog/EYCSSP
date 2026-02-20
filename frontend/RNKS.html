@@ -162,37 +162,37 @@
         }
 
 function renderData(data) {
-            const podiumContainer = document.getElementById('podium-container');
-            const ranksContainer = document.getElementById('ranks-container');
+    const podiumContainer = document.getElementById('podium-container');
+    const ranksContainer = document.getElementById('ranks-container');
 
-            // 1. معالجة بيانات منصة التتويج (أول 3 مراكز)
-            const top3 = data.slice(0, 3);
-            const order = [1, 0, 2]; // الترتيب البصري: الثاني على اليسار، الأول في المنتصف، الثالث على اليمين
-            let podiumHTML = '';
-            
-            order.forEach(displayIdx => {
-                const student = top3[displayIdx];
-                if (!student) return;
+    // 1. معالجة بيانات منصة التتويج (أول 3 مراكز)
+    const top3 = data.slice(0, 3);
+    const order = [1, 0, 2]; // الترتيب البصري: الثاني على اليسار، الأول في المنتصف، الثالث على اليمين
+    let podiumHTML = '';
 
-                // تنبيه: idx هنا هو ترتيبه الحقيقي في الداتا
-                const isGold = displayIdx === 0; 
-                
-                podiumHTML += `
-                    <div class="podium-item rank-${displayIdx + 1}">
-                        ${isGold ? '<i class="fas fa-crown crown-icon"></i>' : ''}
-                        <div class="tier-tag">${student.Title || 'Greeny'}</div>
-                        <div class="avatar-frame">
-                            <img src="${student.Image || 'https://via.placeholder.com/150'}" class="avatar">
-                        </div>
-                        <h3 style="font-family: 'Cinzel'; font-size: 1.1rem;">${student.Name}</h3>
-                        <div class="tk-text" style="margin: 8px 0;">${student.Tokens || 0} <span style="font-size:0.6rem">TK</span></div>
-                        <div class="sub-stats">Rank #${student.Rank} • ELITE AGENT</div>
-                    </div>
-                `;
-            });
-            podiumContainer.innerHTML = podiumHTML;
-            podiumContainer.style.display = 'flex';
+    order.forEach(displayIdx => {
+        const student = top3[displayIdx];
+        if (!student) return;
 
+        // تنبيه: idx هنا هو ترتيبه الحقيقي في الداتا
+        const isGold = displayIdx === 0;
+
+        podiumHTML += `
+            <div class="podium-item rank-${displayIdx + 1}">
+                ${isGold ? '<i class="fas fa-crown crown-icon"></i>' : ''}
+                <div class="tier-tag">${student.Title || 'Greeny'}</div>
+                <div class="avatar-frame">
+                    <img src="${student.Image || 'https://via.placeholder.com/150'}" class="avatar">
+                </div>
+                <h3 style="font-family: 'Cinzel'; font-size: 1.1rem;">${student.Name}</h3>
+                <div class="tk-text" style="margin: 8px 0;">${student.Tokens || 0} <span style="font-size:0.6rem">TK</span></div>
+                <div class="sub-stats">Rank #${student.Rank} • ELITE AGENT</div>
+            </div>
+        `;
+    });
+    podiumContainer.innerHTML = podiumHTML;
+    podiumContainer.style.display = 'flex';
+}
             // 2. معالجة قائمة بقية الأبطال
             let listHTML = '';
             data.slice(3).forEach((student) => {
