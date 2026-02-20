@@ -144,28 +144,39 @@ document.getElementById('contentFrame').src = `missions/${currentActivity}.html?
         document.body.appendChild(script);
     }
 
-    function renderResult(res) {
-        const display = document.getElementById('result-display');
-        document.getElementById('loader-content').style.display = 'none';
-        display.style.display = 'block';
+function renderResult(res) {
+    const display = document.getElementById('result-display');
+    document.getElementById('loader-content').style.display = 'none';
+    display.style.display = 'block';
 
-        if(res.status === "success") {
-            display.innerHTML = `
-                <i class="fas fa-check-circle" style="font-size:3rem; color:var(--gold);"></i>
-                <h2 style="font-family:'Orbitron'; color:#fff; margin:15px 0;">MISSION COMPLETE</h2>
-                <div style="font-size:2rem; color:var(--gold); font-weight:bold;">${res.grade}/10</div>
-                <p style="color:#888; font-size:0.7rem; margin-top:10px;">Tokens and XP have been added to your profile.</p>
-                <button class="btn btn-submit" style="margin-top:20px; width:100%" onclick="exitArena()">RETURN TO BASE</button>
-            `;
-        } else {
-            display.innerHTML = `
-                <i class="fas fa-exclamation-triangle" style="font-size:3rem; color:red;"></i>
-                <h2 style="font-family:'Orbitron'; color:#fff; margin:15px 0;">MISSION ERROR</h2>
-                <p style="color:#888;">${res.message || "Connection Interrupted"}</p>
-                <button class="btn btn-side" style="margin-top:20px; width:100%" onclick="location.reload()">RETRY</button>
-            `;
-        }
+    if (res.status === "success") {
+        // التحقق مما إذا كانت المهمة تحت المراجعة (مثل DX) أو تم تصحيحها (مثل AX)
+        const isPending = (res.grade === "PENDING");
+        
+        const icon = isPending ? "fa-cloud-upload-alt" : "fa-check-circle";
+        const title = isPending ? "MISSION RECEIVED" : "MISSION COMPLETE";
+        const gradeDisplay = isPending ? "FILES UPLOADED" : res.grade + "/10";
+        const subText = isPending ? 
+            "HQ is reviewing your script. Tokens will be added shortly." : 
+            "Tokens and XP have been added to your profile.";
+
+        display.innerHTML = `
+            <i class="fas ${icon}" style="font-size:3rem; color:var(--gold);"></i>
+            <h2 style="font-family:'Orbitron'; color:#fff; margin:15px 0;">${title}</h2>
+            <div style="font-size:2rem; color:var(--gold); font-weight:bold;">${gradeDisplay}</div>
+            <p style="color:#888; font-size:0.7rem; margin-top:10px;">${subText}</p>
+            <button class="btn btn-submit" style="margin-top:20px; width:100%" onclick="exitArena()">RETURN TO BASE</button>
+        `;
+    } else {
+        // كود رسالة الخطأ في حالة فشل الاتصال
+        display.innerHTML = `
+            <i class="fas fa-exclamation-triangle" style="font-size:3rem; color:red;"></i>
+            <h2 style="font-family:'Orbitron'; color:#fff; margin:15px 0;">MISSION ERROR</h2>
+            <p style="color:#888;">${res.message || "Connection Interrupted"}</p>
+            <button class="btn btn-side" style="margin-top:20px; width:100%" onclick="location.reload()">RETRY</button>
+        `;
     }
+}
 
     function exitArena() { window.location.href = 'MC.html'; }
 
