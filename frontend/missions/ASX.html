@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Alike X | Phonetic Radar | Glassy Edition</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Poppins:wght@300;600&display=swap" rel="stylesheet">
+    <style>
+        :root { 
+            --gold: #D4AF37; 
+            --gold-glow: rgba(212, 175, 55, 0.4);
+            --glass: rgba(255, 255, 255, 0.03); 
+            --glass-border: rgba(212, 175, 55, 0.2);
+            --bg-dark: rgba(10, 10, 15, 0.9);
+        }
+
+        body { 
+            font-family: 'Poppins', sans-serif; 
+            background: transparent; 
+            color: white; 
+            margin: 0; 
+            padding: 15px; 
+            direction: ltr; 
+        }
+
+        /* سكرول بار جلاسي */
+        body::-webkit-scrollbar { width: 4px; }
+        body::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 10px; }
+
+        .header-x { 
+            text-align: center; 
+            margin-bottom: 20px; 
+            border-bottom: 1px solid var(--glass-border); 
+            padding-bottom: 15px;
+        }
+
+        .principle-tag {
+            float: right; font-family: 'Orbitron'; font-size: 8px; color: var(--gold);
+            border: 1px solid var(--glass-border); padding: 2px 6px; border-radius: 4px;
+            background: rgba(0,0,0,0.3); margin-top: -30px;
+        }
+
+        .question-card { 
+            background: var(--glass); 
+            border: 1px solid var(--glass-border); 
+            border-radius: 20px; 
+            padding: 20px; 
+            margin-bottom: 20px; 
+            backdrop-filter: blur(15px);
+            transition: all 0.4s ease;
+        }
+
+        .question-card:hover { 
+            border-color: var(--gold); 
+            box-shadow: 0 5px 20px rgba(212, 175, 55, 0.1);
+        }
+
+        .audio-btn { 
+            background: var(--glass);
+            color: var(--gold); 
+            border: 1px solid var(--gold); 
+            padding: 10px 188px; 
+            border-radius: 12px; 
+            cursor: pointer; 
+            font-family: 'Orbitron'; 
+            font-size: 10px; 
+            margin-bottom: 15px; 
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: 0.3s;
+            letter-spacing: 1px;
+        }
+
+        .audio-btn:hover { 
+            background: var(--gold); 
+            color: black; 
+            box-shadow: 0 0 15px var(--gold-glow); 
+        }
+
+        .sentence-text { 
+            font-size: 1.1rem; 
+            margin-bottom: 20px; 
+            color: #eee; 
+            line-height: 1.6;
+            font-weight: 300;
+        }
+        
+        .missing-word { 
+            color: var(--gold); 
+            font-weight: bold; 
+            border-bottom: 2px solid var(--gold);
+            padding: 0 8px;
+            font-family: 'Orbitron';
+        }
+
+        .options-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+
+        @media (max-width: 500px) {
+            .options-grid { grid-template-columns: 1fr; }
+        }
+
+        .opt-btn { 
+            background: rgba(255,255,255,0.05); 
+            border: 1px solid var(--glass-border); 
+            color: #ccc; 
+            padding: 12px; 
+            border-radius: 12px; 
+            cursor: pointer; 
+            font-family: 'Poppins'; 
+            font-size: 0.95rem; 
+            transition: 0.3s; 
+        }
+
+        .opt-btn:hover { border-color: var(--gold); color: white; background: rgba(212, 175, 55, 0.1); }
+        
+        .opt-btn.active { 
+            background: var(--gold); 
+            color: black; 
+            font-weight: 600; 
+            box-shadow: 0 0 20px var(--gold-glow);
+            border-color: white;
+        }
+
+        .error-input { border: 1px solid #ff4444 !important; animation: shake 0.3s ease; }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+    </style>
+</head>
+<body>
+    <div class="header-x">
+        <span class="principle-tag">NLR SYSTEM</span>
+        <h1 id="x-title" style="font-family: 'Orbitron'; letter-spacing: 2px; font-size: 1rem; color: var(--gold);">PHONETIC RADAR</h1>
+    </div>
+    <div id="quiz-screen"></div>
+
+<script>
+    const alikeXData = {
+    "1": [
+        { s: "The wind _______ the blue paper away.", options: ["blew", "blue", "blow"] },
+        { s: "I can see the deep blue _______ from here.", options: ["see", "sea", "seed"] },
+        { s: "It is not allowed to speak out _______.", options: ["loud", "allowed", "lord"] },
+        { s: "He _______ eight apples for breakfast.", options: ["ate", "eight", "eat"] },
+        { s: "The _______ shines bright, my dear son.", options: ["sun", "son", "soon"] }
+    ],
+    "2": [
+        { s: "I _______ you liked the new shoes.", options: ["knew", "new", "now"] },
+        { s: "This bread is made of wheat _______.", options: ["flower", "flour", "floor"] },
+        { s: "The _______ rode through the dark night.", options: ["knight", "night", "knife"] },
+        { s: "_______ your name on the right side.", options: ["Write", "Right", "White"] },
+        { s: "The _______ team fell into the hole.", options: ["hole", "whole", "hall"] }
+    ],
+    "3": [
+        { s: "I will _______ to see the heavy weight.", options: ["wait", "weight", "wet"] },
+        { s: "There is a _______ in the car brake.", options: ["break", "brake", "brick"] },
+        { s: "The weak boy felt better in a _______.", options: ["week", "weak", "wake"] },
+        { s: "He sent a _______ to the poor man.", options: ["cent", "sent", "scent"] },
+        { s: "Use the _______ to go to the second floor.", options: ["stair", "stare", "stay"] }
+    ],
+    "4": [
+        { s: "I want to _______ the red car.", options: ["buy", "by", "bye"] },
+        { s: "The _______ has soft fur.", options: ["hair", "hare", "here"] },
+        { s: "I _______ a loud noise outside.", options: ["heard", "herd", "hard"] },
+        { s: "He is the _______ to the throne.", options: ["air", "heir", "hair"] },
+        { s: "We _______ the game yesterday.", options: ["one", "won", "win"] }
+    ],
+    "5": [
+        { s: "I need to _______ you at the gate.", options: ["meet", "meat", "met"] },
+        { s: "The _______ is fresh and lean.", options: ["meet", "meat", "main"] },
+        { s: "The _______ leads to the city.", options: ["road", "rode", "row"] },
+        { s: "He _______ his bike to school.", options: ["road", "rode", "ride"] },
+        { s: "The _______ was very beautiful.", options: ["scene", "seen", "sun"] }
+    ],
+    "6": [
+        { s: "I can see the wooden _______.", options: ["board", "bored", "bird"] },
+        { s: "I am _______ of this game.", options: ["board", "bored", "born"] },
+        { s: "The _______ of the cat is long.", options: ["tail", "tale", "tall"] },
+        { s: "The fairy _______ is very old.", options: ["tail", "tale", "tell"] },
+        { s: "There is _______ water in the well.", options: ["no", "know", "now"] }
+    ],
+    "7": [
+        { s: "I _______ the answer to this.", options: ["know", "no", "now"] },
+        { s: "The _______ is sweet and juicy.", options: ["pear", "pair", "pure"] },
+        { s: "I have a new _______ of shoes.", options: ["pear", "pair", "pay"] },
+        { s: "The _______ goal is to win.", options: ["main", "mane", "mean"] },
+        { s: "The lion has a thick _______.", options: ["main", "mane", "money"] }
+    ],
+    "8": [
+        { s: "The _______ of cake is small.", options: ["piece", "peace", "price"] },
+        { s: "We all want world _______.", options: ["piece", "peace", "pace"] },
+        { s: "The _______ bird is colorful.", options: ["male", "mail", "mile"] },
+        { s: "I sent the _______ yesterday.", options: ["male", "mail", "mall"] },
+        { s: "The _______ door is very strong.", options: ["steel", "steal", "still"] }
+    ],
+    "9": [
+        { s: "Don't _______ the golden ring.", options: ["steel", "steal", "still"] },
+        { s: "The _______ cleaned the room.", options: ["maid", "made", "mad"] },
+        { s: "He _______ a delicious cake.", options: ["maid", "made", "make"] },
+        { s: "The _______ was flat and wide.", options: ["plain", "plane", "plan"] },
+        { s: "The _______ took off on time.", options: ["plain", "plane", "plant"] }
+    ],
+    "10": [
+        { s: "The _______ from the factory.", options: ["waste", "waist", "west"] },
+        { s: "The belt goes around my _______.", options: ["waste", "waist", "wrist"] },
+        { s: "I can't _______ for the party.", options: ["wait", "weight", "wet"] },
+        { s: "The _______ of the box is 5kg.", options: ["wait", "weight", "white"] },
+        { s: "He is my _______ friend.", options: ["dear", "deer", "dare"] }
+    ]
+};
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const taskNum = urlParams.get('task') || "1"; 
+    let answers = {};
+
+    function loadAlikeX() {
+        const questions = alikeXData[taskNum] || alikeXData["1"];
+        const screen = document.getElementById('quiz-screen');
+        screen.innerHTML = questions.map((q, i) => `
+            <div class="question-card" id="card-${i}">
+                <button class="audio-btn" onclick="playAudio(${i})">
+                    <span style="font-size:14px">📡</span> INTERCEPT AUDIO CLUE
+                </button>
+                <div class="sentence-text">
+                    ${q.s.replace('_______', `<span class="missing-word" id="display-${i}">_______</span>`)}
+                </div>
+                <div class="options-grid">
+                    ${q.options.map(opt => `<button class="opt-btn" onclick="selectOpt(${i}, '${opt}', this)">${opt}</button>`).join('')}
+                </div>
+            </div>
+        `).join('');
+        document.getElementById('x-title').innerText = `RADAR MISSION: ${taskNum.padStart(2, '0')}`;
+    }
+
+    function selectOpt(qIdx, val, btn) {
+        const container = btn.parentElement;
+        container.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        
+        const display = document.getElementById(`display-${qIdx}`);
+        display.innerText = val.toUpperCase();
+        display.style.color = "var(--gold)";
+        
+        document.getElementById(`card-${qIdx}`).classList.remove('error-input');
+        answers[qIdx] = val;
+    }
+
+    function playAudio(idx) {
+        const t = parseInt(taskNum);
+        const qIdx = parseInt(idx);
+        const audioFileNum = ((t - 1) * 5) + (qIdx + 1);
+        const audio = new Audio(`assets/alikeaudio/AX${audioFileNum}.wav`);
+        audio.play().catch(e => console.error("Signal Lost:", audioFileNum));
+    }
+
+    window.addEventListener('message', function(event) {
+        if (event.data.type === 'REQUEST_MISSION_DATA') {
+            collectAndSend();
+        }
+    });
+
+    function collectAndSend() {
+        let finalAnswers = [];
+        let hasMissing = false;
+        const totalQuestions = 5;
+
+        for(let i = 0; i < totalQuestions; i++) {
+            if (!answers[i]) {
+                const card = document.getElementById(`card-${i}`);
+                if(card) card.classList.add('error-input');
+                hasMissing = true;
+            } else {
+                finalAnswers.push(answers[i]);
+            }
+        }
+
+        if (hasMissing) {
+            console.log("Gear System: Missing Data Detected.");
+            return; 
+        }
+
+        window.parent.postMessage({ 
+            type: 'MISSION_ANSWERS', 
+            answers: finalAnswers 
+        }, '*');
+    }
+
+    window.onload = loadAlikeX;
+</script>
+</body>
+</html>
