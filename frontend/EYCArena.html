@@ -58,7 +58,7 @@
             </div>
             <div class="info-box">
                 <div style="text-align: right;"><div class="name" id="activity-title">ACTIVITY</div><div id="mission-sub" class="rank-tag">TASK 01</div></div>
-                <img id="activity-img" class="student-photo" style="border-radius:50%" src="frontend/logo.png" alt="">
+                <img id="activity-img" class="student-photo" style="border-radius:50%" src="frontend/assets/logo.png" alt="">
             </div>
         </div>
     </header>
@@ -100,7 +100,7 @@
         document.getElementById('mission-sub').innerText = `TASK ${currentTask}`;
 
         // تشغيل صفحة النشاط (يجب أن يكون اسم الملف مطابق لـ currentActivity)
-        document.getElementById('contentFrame').src = `${currentActivity}.html?task=${currentTask}`;
+document.getElementById('contentFrame').src = `missions/${currentActivity}.html?task=${currentTask}`;
     };
 
     function startSubmission() {
