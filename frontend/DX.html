@@ -236,15 +236,12 @@
         slowA.load();
         normalA.load();
         
-        // تطبيق السرعات
         slowA.playbackRate = 0.7; 
         normalA.playbackRate = 1.0;
 
-        // التحقق من الحالة المخزنة
         if (localStorage.getItem(storageKeySlow)) lockAudio(slowA, 'cardSlow');
         if (localStorage.getItem(storageKeyNormal)) lockAudio(normalA, 'cardNormal');
 
-        // إضافة مستمعي الأحداث
         setupAudioLogic(slowA, storageKeySlow, 'cardSlow');
         setupAudioLogic(normalA, storageKeyNormal, 'cardNormal');
     }
@@ -252,7 +249,6 @@
     function setupAudioLogic(el, key, cardId) {
         el.onplay = () => {
             localStorage.setItem(key, "true");
-            // منع السعي (Seeking)
             el.ontimeupdate = () => {
                 if (el.seeking) {
                     el.currentTime = el.played.end(0);
@@ -278,9 +274,37 @@
         if (file) {
             const reader = new FileReader();
             reader.onload = (e) => {
-                const img = document.getElementById(imgId);
+                const img = new Image();
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    let width = img.width;
+                    let height = img.height;
+
+                    const max_size = 1200;
+                    if (width > height) {
+                        if (width > max_size) {
+                            height *= max_size / width;
+                            width = max_size;
+                        }
+                    } else {
+                        if (height > max_size) {
+                            width *= max_size / height;
+                            height = max_size;
+                        }
+                    }
+
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+
+                    const compressedBase64 = canvas.toDataURL('image/jpeg', 0.7);
+                    
+                    const previewImg = document.getElementById(imgId);
+                    previewImg.src = compressedBase64;
+                    previewImg.style.display = "block";
+                };
                 img.src = e.target.result;
-                img.style.display = "block";
             };
             reader.readAsDataURL(file);
         }
@@ -297,12 +321,14 @@
         let files = [];
         
         imgs.forEach(id => {
-            const src = document.getElementById(id).src;
-            if(src.startsWith("data:image")) files.push(src);
+            const displayImg = document.getElementById(id);
+            if(displayImg.src && displayImg.src.startsWith("data:image")) {
+                files.push(displayImg.src);
+            }
         });
 
         if (files.length === 0) {
-            window.parent.postMessage({ type: 'MISSION_INCOMPLETE' }, '*');
+            alert("⚠️ PLEASE UPLOAD AT LEAST ONE SCRIPT PAGE");
             return;
         }
 
