@@ -76,8 +76,11 @@
     </footer>
 
 <script>
-    // الرابط الموحد للسكريبت المركزي
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx1OWCMgPpA5ozr8gKSKS63U2qSso_aVnFC7Y9dGQm2GkjyhbUxEvFC9r7hYJlhWN5E/exec"; 
+    // 1. رابط السكريبت القديم (لجلب البروفايل وتحديث البيانات العامة)
+    const CORE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx0hNx1zshift1_zVao1rTaNCoWslxYamme4BAytPXzvmnsBDCQdact-Xna2apENcUz/exec"; 
+    // 2. رابط السكريبت الجديد (الخاص بالتصحيح وشيت Missions_Submissions)
+    const MISSIONS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwEuYPX4CAxPeOCS95mITrxOWGS_KHz3Dz5hoh37hQtiFMBSRor9WmzqCxf6e7ID9iNmA/exec"; 
+
     let userEmail, currentActivity, currentTask;
 
     window.onload = function() {
@@ -102,7 +105,7 @@
 
     function startSubmission() {
         const frame = document.getElementById('contentFrame').contentWindow;
-        // نطلب البيانات من صفحة النشاط (التي سنقوم ببرمجتها لاحقاً)
+        // نطلب البيانات من صفحة النشاط
         frame.postMessage({ type: 'REQUEST_MISSION_DATA' }, '*');
     }
 
@@ -117,23 +120,27 @@
         const callbackName = 'gear_' + Date.now();
 
         const params = new URLSearchParams({
-            action: "submitMission",
+            action: "submitMission", 
             email: userEmail,
-            activity: currentActivity,
+            activity: currentActivity, 
             task: currentTask,
-            studentData: JSON.stringify(answers), // إرسال الإجابات كمصوفة نصية
+            studentData: JSON.stringify(answers),
             prefix: callbackName
         });
 
         window[callbackName] = function(res) {
             renderResult(res);
             delete window[callbackName];
-            document.getElementById('jsonp-engine').remove();
+            if(document.getElementById('jsonp-engine')) document.getElementById('jsonp-engine').remove();
+            
+            // ملاحظة: لو التصحيح نجح، ممكن هنا نستخدم CORE_SCRIPT_URL 
+            // عشان نحدث التوكنز في السكريبت التاني لو حبيت
         };
 
         const script = document.createElement('script');
         script.id = 'jsonp-engine';
-        script.src = `${SCRIPT_URL}?${params.toString()}`;
+        // ⚠️ نستخدم هنا رابط سكريبت المهمات الجديد
+        script.src = `${MISSIONS_SCRIPT_URL}?${params.toString()}`; 
         document.body.appendChild(script);
     }
 
