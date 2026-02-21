@@ -173,33 +173,32 @@
         }
     });
 
-    function collectAndSend() {
-        const answers = [];
-        let allFilled = true;
+// ابحث عن دالة collectAndSend واستبدلها بهذا الجزء
+function collectAndSend() {
+    const answers = [];
+    let allFilled = true;
 
-        for (let i = 1; i <= 5; i++) {
-            const val = document.getElementById(`sent-${i}`).value.trim();
-            if (!val) {
-                document.getElementById(`sent-${i}`).parentElement.style.borderColor = '#ff4444';
-                allFilled = false;
-            } else {
-                document.getElementById(`sent-${i}`).parentElement.style.borderColor = 'rgba(188, 19, 254, 0.15)';
-                answers.push(val);
-            }
+    for (let i = 1; i <= 5; i++) {
+        const val = document.getElementById(`sent-${i}`).value.trim();
+        if (!val) {
+            allFilled = false;
+        } else {
+            answers.push(val);
         }
-
-        if (!allFilled) {
-            window.parent.postMessage({ type: 'MISSION_INCOMPLETE' }, '*');
-            return; 
-        }
-
-        window.parent.postMessage({ 
-            type: 'MISSION_ANSWERS', 
-            activityCode: 'GEX',
-            answers: answers.join(' | '),
-            missionNum: taskNum
-        }, '*');
     }
+
+    if (!allFilled) {
+        window.parent.postMessage({ type: 'MISSION_INCOMPLETE' }, '*');
+        return; 
+    }
+
+    window.parent.postMessage({ 
+        type: 'MISSION_ANSWERS', 
+        activityCode: 'GEX',
+        answers: answers, // إرسال مصفوفة Array
+        task: taskNum
+    }, '*');
+}
 
     window.onload = initGEX;
 </script>
