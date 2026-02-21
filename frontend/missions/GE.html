@@ -203,27 +203,29 @@
         }
     });
 
-    function collectAndSubmit() {
-        const answersArray = [];
-        let missing = false;
+// ابحث عن دالة collectAndSubmit واستبدلها بهذا الجزء
+function collectAndSubmit() {
+    const answersArray = [];
+    let missing = false;
 
-        for(let i=0; i<5; i++) {
-            if(!selectedAnswers[i]) missing = true;
-            answersArray.push(selectedAnswers[i] || "");
-        }
-
-        if(missing) {
-            window.parent.postMessage({ type: 'MISSION_INCOMPLETE' }, '*');
-            return;
-        }
-        
-        window.parent.postMessage({
-            type: 'MISSION_ANSWERS',
-            activityCode: 'GES',
-            answers: answersArray.join(', '),
-            missionNum: taskNum
-        }, '*');
+    for(let i=0; i<5; i++) {
+        if(!selectedAnswers[i]) missing = true;
+        // نرسل المصفوفة كما هي
+        answersArray.push(selectedAnswers[i] || "");
     }
+
+    if(missing) {
+        window.parent.postMessage({ type: 'MISSION_INCOMPLETE' }, '*');
+        return;
+    }
+    
+    window.parent.postMessage({
+        type: 'MISSION_ANSWERS',
+        activityCode: 'GE', // تأكد أنها GE لتطابق السكريبت
+        answers: answersArray, // إرسال مصفوفة وليس نص join
+        task: taskNum
+    }, '*');
+}
 
     window.onload = initGE;
 </script>
