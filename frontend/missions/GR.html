@@ -6,51 +6,28 @@
     <title>GS | Grammar Scanner</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Poppins:wght@300;500&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --gold: #D4AF37; --gold-glow: rgba(212, 175, 55, 0.4);
-            --error-red: #ff4444; --glass: rgba(15, 15, 20, 0.95);
-            --glass-border: rgba(212, 175, 55, 0.25);
-        }
-        body {
-            font-family: 'Poppins', sans-serif; background: transparent;
-            color: #ffffff; margin: 0; padding: 10px; direction: ltr;
-            overflow-x: hidden;
-        }
-        .header-gs { text-align: center; margin-bottom: 20px; border-bottom: 1px solid var(--glass-border); padding-bottom: 10px; }
-        .header-gs h1 { font-family: 'Orbitron'; font-size: 1.1rem; color: var(--gold); letter-spacing: 3px; margin: 0; }
+        :root { --gold: #D4AF37; --glass: rgba(15, 15, 20, 0.95); --glass-border: rgba(212, 175, 55, 0.25); }
+        body { font-family: 'Poppins', sans-serif; background: transparent; color: white; margin: 0; padding: 10px; direction: ltr; }
         .scanner-grid { display: flex; flex-direction: column; gap: 12px; }
         .sentence-card {
-            background: var(--glass); backdrop-filter: blur(10px);
-            border: 1px solid var(--glass-border); border-left: 4px solid var(--gold);
-            border-radius: 12px; padding: 15px; display: flex;
-            align-items: center; justify-content: space-between; gap: 15px;
+            background: var(--glass); border: 1px solid var(--glass-border); border-left: 4px solid var(--gold);
+            border-radius: 12px; padding: 15px; display: flex; align-items: center; justify-content: space-between; gap: 15px;
         }
-        .sentence-text { font-size: 0.95rem; flex-grow: 1; color: #e0e0e0; }
+        .sentence-text { font-size: 0.95rem; flex-grow: 1; }
         .correction-input {
-            width: 130px; background: rgba(0, 0, 0, 0.6); border: 1px solid var(--glass-border);
-            border-radius: 8px; color: var(--gold); padding: 10px;
-            font-family: 'Orbitron'; font-size: 0.85rem; outline: none; text-align: center;
+            width: 140px; background: rgba(0, 0, 0, 0.6); border: 1px solid var(--glass-border);
+            border-radius: 8px; color: var(--gold); padding: 10px; font-family: 'Orbitron'; text-align: center;
         }
-        .correction-input:focus { border-color: var(--gold); box-shadow: 0 0 10px var(--gold-glow); }
-        .error-card { border-color: var(--error-red) !important; animation: shake 0.4s; }
-        @keyframes shake { 0%, 100% {transform: translateX(0);} 25% {transform: translateX(-5px);} 75% {transform: translateX(5px);} }
-        @media (max-width: 500px) {
-            .sentence-card { flex-direction: column; }
-            .correction-input { width: 100%; }
-        }
+        .error-card { border-color: #ff4444 !important; }
+        @media (max-width: 500px) { .sentence-card { flex-direction: column; } .correction-input { width: 100%; } }
     </style>
 </head>
 <body>
-    <div class="header-gs">
-        <h1 id="title-label">GRAMMAR SCANNER</h1>
-    </div>
     <div id="scanner-screen" class="scanner-grid"></div>
 
 <script>
-// بيانات المهام
 const gsData = {
-    "1": ["He go to school every day.", "They has a big house.", "She don't like apples.", "We was playing football.", "I am learn English now."],
-    "2": ["She drink milk.", "Cat like fish.", "He play tennis.", "I goes home.", "They is happy."]
+    "1": ["He go to school every day.", "They has a big house.", "She don't like apples.", "We was playing football.", "I am learn English now."]
 };
 
 const urlParams = new URLSearchParams(window.location.search);
@@ -59,17 +36,15 @@ const taskNum = urlParams.get('task') || "1";
 function loadScanner() {
     const sentences = gsData[taskNum] || gsData["1"];
     const screen = document.getElementById('scanner-screen');
-    document.getElementById('title-label').innerText = `SCANNER: UNIT ${taskNum.padStart(2, '0')}`;
-    
     screen.innerHTML = sentences.map((s, i) => `
         <div class="sentence-card" id="card-${i}">
             <div class="sentence-text">${s}</div>
-            <input type="text" class="correction-input alike-input" id="fix-${i}" placeholder="FIX..." autocomplete="off">
+            <input type="text" class="alike-input" id="fix-${i}" placeholder="FIX..." autocomplete="off">
         </div>
     `).join('');
 }
 
-// استلام طلب البيانات من الأرينا (الصفحة الأم)
+// استلام طلب البيانات من الأرينا
 window.addEventListener('message', function(event) {
     if (event.data.type === 'REQUEST_MISSION_DATA') {
         collectAndSend();
@@ -83,19 +58,18 @@ function collectAndSend() {
 
     inputs.forEach((input, i) => {
         const val = input.value.trim();
-        const card = document.getElementById(`card-${i}`);
         if(!val) {
             hasError = true;
-            card.classList.add('error-card');
-            setTimeout(() => card.classList.remove('error-card'), 500);
+            input.parentElement.classList.add('error-card');
         } else {
-            answers.push(val);
+            input.parentElement.classList.remove('error-card');
+            answers.push(val); // نرسلها كما هي والسكربت يحولها لـ lowercase
         }
     });
 
-    if(hasError) return; // لا نرسل شيئاً إذا كان هناك نقص
+    if(hasError) return;
 
-    // إرسال الإجابات للأرينا
+    // الإرسال للأرينا (هذا هو السطر الحيوي)
     window.parent.postMessage({ 
         type: 'MISSION_ANSWERS', 
         answers: answers 
