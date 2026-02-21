@@ -179,12 +179,12 @@
                 return;
             }
 
-            window.parent.postMessage({
-                type: 'MISSION_ANSWERS',
-                activityCode: 'Sd',
-                answers: text, 
-                missionNum: task
-            }, '*');
+window.parent.postMessage({
+    type: 'MISSION_ANSWERS',
+    activityCode: 'SD', // توحيد الرمز
+    answers: [text],    // وضع النص داخل مصفوفة
+    missionNum: task
+}, '*');
         }
     });
 
