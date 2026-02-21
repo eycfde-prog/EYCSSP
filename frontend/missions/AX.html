@@ -281,10 +281,12 @@
             return; 
         }
 
-        window.parent.postMessage({ 
-            type: 'MISSION_ANSWERS', 
-            answers: finalAnswers 
-        }, '*');
+window.parent.postMessage({ 
+    type: 'MISSION_ANSWERS', 
+    activityCode: 'ASX', // أضف هذا السطر ليعرف السيرفر أنه AlikeX
+    task: taskNum,       // أضف هذا السطر
+    answers: finalAnswers 
+}, '*');
     }
 
     window.onload = loadAlikeX;
