@@ -71,7 +71,7 @@
 
 <script>
     const CORE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz1D8BkAHFH0mwiw_n_2yL6jvQ04rrOb3mwiqKuxmHVTrynxzYzzF7XwIJQ-QnrrfQb/exec"; 
-    const MISSIONS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzLkLTEfZt9Yv-Qqv2TTksbAuGV5LpVgfTJCY8PknoXi9BeV-8wwKw1kanEvKyxpNFs/exec"; 
+    const MISSIONS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbytBIws47PZIBXuRqdxL7MTJBBKzHvBTsGRUFwkajuECqt96cweo7z_jkwBSOwrSZG1BA/exec"; 
 
     let userEmail, currentActivity, currentTask;
 
@@ -127,26 +127,24 @@
         }
     });
 
-function submitToHQ(answers) {
-    document.getElementById('sync-overlay').style.display = 'flex';
-    const userObj = JSON.parse(localStorage.getItem('eyc_user'));
+    function submitToHQ(answers) {
+        document.getElementById('sync-overlay').style.display = 'flex';
+        const userObj = JSON.parse(localStorage.getItem('eyc_user'));
 
-    const gradingPayload = {
-        activity: currentActivity,
-        task: currentTask,
-        email: userEmail,
-        name: userObj ? userObj.name : "Unknown",
-        studentData: answers // ارسل المصفوفة كما هي هنا (بدون stringify داخلي)
-    };
+        const gradingPayload = {
+            activity: currentActivity,
+            task: currentTask,
+            email: userEmail,
+            name: userObj ? userObj.name : "Unknown",
+            studentData: JSON.stringify(answers)
+        };
 
-    fetch(MISSIONS_SCRIPT_URL, {
-        method: "POST",
-        mode: "cors",
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify(gradingPayload) // هنا يتم التحويل الشامل لمرة واحدة
-    })
-    // ... بقية الكود
-}
+        fetch(MISSIONS_SCRIPT_URL, {
+            method: "POST",
+            mode: "cors",
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify(gradingPayload)
+        })
         .then(res => res.json())
         .then(gradingRes => {
             if (gradingRes.status === "success") {
