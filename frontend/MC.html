@@ -189,45 +189,64 @@
             ]
         };
 
-function renderHeader() {
-    const header = document.getElementById('heroBanner');
-    const logoutBtn = document.getElementById('logoutBtn');
-    if (isLoggedIn) {
-        logoutBtn.style.display = "block";
+        function renderHeader() {
+            const header = document.getElementById('heroBanner');
+            const logoutBtn = document.getElementById('logoutBtn');
+            if (isLoggedIn) {
+                logoutBtn.style.display = "block";
 
-        let notifyHtml = '';
-        if (currentUser.notifications && currentUser.notifications.length > 0) {
-            notifyHtml = currentUser.notifications.map(msg =>
-                `<div style="background:rgba(212,175,55,0.1); border-left:3px solid var(--gold); padding:8px; margin:10px 0; font-size:0.7rem; border-radius:4px;">
-                🔔 ${msg}
-                </div>`
-            ).join('');
+                let notifyHtml = '';
+                if (currentUser.notifications && currentUser.notifications.length > 0) {
+                    notifyHtml = `
+                    <div class="notifications-center" style="margin-top:15px; width:100%;">
+                        <div style="font-family:'Orbitron'; font-size:0.6rem; color:var(--gold); margin-bottom:5px;">
+                            <i class="fas fa-bell"></i> MISSION LOGS
+                        </div>
+                        <div style="max-height:100px; overflow-y:auto; background:rgba(0,0,0,0.3); border-radius:10px; padding:10px;">
+                            ${currentUser.notifications.map(msg => `
+                                <div style="font-size:0.65rem; color:#fff; border-bottom:1px solid rgba(212,175,55,0.1); padding:5px 0;">
+                                    ◈ ${msg}
+                                </div>`).join('')
+                            }
+                        </div>
+                    </div>`;
+                } else {
+                    notifyHtml = `
+                    <div class="notifications-center" style="margin-top:15px; width:100%;">
+                        <div style="font-family:'Orbitron'; font-size:0.6rem; color:var(--gold); margin-bottom:5px;">
+                            <i class="fas fa-bell"></i> MISSION LOGS
+                        </div>
+                        <div style="max-height:100px; overflow-y:auto; background:rgba(0,0,0,0.3); border-radius:10px; padding:10px;">
+                            <p style="font-size:0.6rem; color:#666;">No new messages from HQ.</p>
+                        </div>
+                    </div>`;
+                }
+
+                header.innerHTML = `
+                    <div class="profile-card">
+                        <div class="avatar-wrapper">
+                            <div class="avatar-main" style="background-image: url('${currentUser.avatar || 'https://via.placeholder.com/150'}')"></div>
+                            <div class="rank-tag">RANK #${currentUser.rank}</div>                       
+                        </div>
+                        <h1 class="student-name">${currentUser.name}</h1>
+                        <p class="student-title">${currentUser.title}</p>
+                        
+                        <div class="stats-row">
+                            <div class="stat-item">🪙 <span>${currentUser.tokens || 0}</span></div>
+                            <div class="stat-item">⭐ <span>${currentUser.stars || 0}</span></div>
+                            <div class="stat-item">🎟️ <span style="color:#FFD700">${currentUser.goldTickets || 0}</span></div>
+                            <i class="fas fa-sync-alt stat-item" style="cursor:pointer; font-size:0.7rem;" onclick="refreshUserData()"></i>
+                        </div>
+                        ${notifyHtml}
+                    </div>`;
+            } else {
+                logoutBtn.style.display = "none";
+                header.innerHTML = `
+                    <h1 class="student-name">ARENA ACCESS</h1>
+                    <div style="margin-top:20px;"><button class="btn-exit" style="width:auto; padding: 12px 40px; border-color: var(--gold); color: var(--gold);" onclick="openLogin()">AUTHORIZE LOGIN</button></div>`;
+            }
         }
 
-        header.innerHTML = `
-            <div class="profile-card">
-                <div class="avatar-wrapper">
-                    <div class="avatar-main" style="background-image: url('${currentUser.avatar || 'https://via.placeholder.com/150'}')"></div>
-                    <div class="rank-tag">RANK #${currentUser.rank}</div>                       
-                </div>
-                <h1 class="student-name">${currentUser.name}</h1>
-                <p class="student-title">${currentUser.title}</p>
-                
-                <div class="stats-row">
-                    <div class="stat-item">🪙 <span>${currentUser.tokens || 0}</span></div>
-                    <div class="stat-item">⭐ <span>${currentUser.stars || 0}</span></div>
-                    <div class="stat-item">🎟️ <span style="color:#FFD700">${currentUser.goldTickets || 0}</span></div>
-                    <i class="fas fa-sync-alt stat-item" style="cursor:pointer; font-size:0.7rem;" onclick="refreshUserData()"></i>
-                </div>
-                ${notifyHtml}
-            </div>`;
-    } else {
-        logoutBtn.style.display = "none";
-        header.innerHTML = `
-            <h1 class="student-name">ARENA ACCESS</h1>
-            <div style="margin-top:20px;"><button class="btn-exit" style="width:auto; padding: 12px 40px; border-color: var(--gold); color: var(--gold);" onclick="openLogin()">AUTHORIZE LOGIN</button></div>`;
-    }
-}
         function generateCards() {
             const grid = document.getElementById('cardsGrid'); grid.innerHTML = '';
             const type = document.querySelector('.tab-btn.active').innerText.toLowerCase();
@@ -267,17 +286,14 @@ function renderHeader() {
                 
                 node.onclick = () => {
                     const params = new URLSearchParams({
-                        // بيانات العميل
                         email: currentUser.email,
                         name: currentUser.name,
                         avatar: currentUser.avatar || '',
                         title: currentUser.title || 'Elite Agent',
-                        // بيانات المهمة
-                        act: code,  // نرسل الكود (مثلاً AS) لفتح الملف AS.html
+                        act: code,
                         task: i      
                     });
                     
-                    // التوجه للأرينا
                     window.location.href = `EYCArena.html?${params.toString()}`;
                 };
                 tGrid.appendChild(node);
