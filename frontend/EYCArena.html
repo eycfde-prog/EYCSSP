@@ -77,7 +77,7 @@
 
 <script>
     const CORE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx0hNx1zshift1_zVao1rTaNCoWslxYamme4BAytPXzvmnsBDCQdact-Xna2apENcUz/exec"; 
-    const MISSIONS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyR_vHE5niBrEX-yprfuTWCZLxDeN25QqHcf1y5Caub4677h25HmrNC4yhEZ3gt6sHG9A/exec"; 
+    const MISSIONS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxSDFKe5ajkOKC1PPnIK0p0Gu4FHCLm84zHUXBbTggk0L5sZyDIn30IlVHgku3QMboU1w/exec"; 
 
     let userEmail, currentActivity, currentTask;
 
@@ -117,9 +117,10 @@ function submitToHQ(answers) {
     document.getElementById('sync-overlay').style.display = 'flex';
 
     // تجهيز البيانات كجسم للطلب (Body) وليس كروابط
-    const payload = {
+const payload = {
         action: "submitMission",
         email: userEmail,
+        name: JSON.parse(localStorage.getItem('eyc_user')).name, // إرسال الاسم مباشرة
         activity: currentActivity,
         task: currentTask,
         studentData: JSON.stringify(answers)
