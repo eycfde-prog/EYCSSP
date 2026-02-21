@@ -169,12 +169,12 @@
                 return;
             }
 
-            window.parent.postMessage({ 
-                type: 'MISSION_ANSWERS', 
-                activityCode: 'SX',
-                answers: story, 
-                missionNum: taskNum 
-            }, '*');
+window.parent.postMessage({ 
+    type: 'MISSION_ANSWERS', 
+    activityCode: 'SDX', // توحيد الرمز
+    answers: [story],    // وضع النص داخل مصفوفة
+    missionNum: taskNum 
+}, '*');
         }
     });
 
