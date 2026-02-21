@@ -131,19 +131,19 @@ function submitToHQ(answers) {
     document.getElementById('sync-overlay').style.display = 'flex';
     const userObj = JSON.parse(localStorage.getItem('eyc_user'));
 
-    const gradingPayload = {
+const gradingPayload = {
         activity: currentActivity,
         task: currentTask,
         email: userEmail,
         name: userObj ? userObj.name : "Unknown",
-        studentData: answers 
+        studentData: answers // أرسلها كمصفوفة مباشرة، لا تضع JSON.stringify هنا!
     };
 
-    fetch(MISSIONS_SCRIPT_URL, {
+fetch(MISSIONS_SCRIPT_URL, {
         method: "POST",
         mode: "cors",
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify(gradingPayload)
+        body: JSON.stringify(gradingPayload) // التحويل الوحيد المسموح به هنا
     })
     .then(res => res.json())
     .then(gradingRes => {
