@@ -7,33 +7,27 @@
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Orbitron:wght@400;500;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        /* التنسيقات (مبنية على الهوية البصرية السابقة) */
         :root { --gold: #D4AF37; --gold-glow: rgba(212, 175, 55, 0.5); --gold-gradient: linear-gradient(135deg, #bf953f, #fcf6ba, #b38728); --bg-deep: #020205; --glass: rgba(255, 255, 255, 0.02); --glass-border: rgba(212, 175, 55, 0.2); }
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { background: var(--bg-deep); color: white; height: 100dvh; display: flex; flex-direction: column; overflow: hidden; font-family: 'Poppins', sans-serif; }
         #star-container { position: fixed; inset: 0; z-index: -2; background: radial-gradient(circle at center, #0a0c14 0%, #020205 100%); }
         .star { position: absolute; background: white; border-radius: 50%; opacity: 0.3; }
-        
         header { padding: 12px 20px; background: rgba(0,0,0,0.8); border-bottom: 1px solid var(--glass-border); z-index: 10; }
         .battle-header { display: flex; justify-content: space-between; align-items: center; max-width: 1200px; margin: 0 auto; width: 100%; }
         .info-box { display: flex; align-items: center; gap: 10px; background: var(--glass); padding: 5px 10px; border-radius: 10px; border: 1px solid var(--glass-border); }
         .student-photo { width: 35px; height: 35px; border-radius: 5px; border: 1px solid var(--gold); object-fit: cover; }
         .name { font-family: 'Cinzel'; font-size: 0.75rem; color: var(--gold); font-weight: 700; }
         .rank-tag { font-family: 'Orbitron'; font-size: 0.5rem; color: #888; }
-
         .arena-container { flex: 1; padding: 10px; position: relative; }
         .glass-iframe-wrapper { width: 100%; height: 100%; background: #000; border: 1px solid var(--glass-border); border-radius: 10px; overflow: hidden; position: relative; }
         iframe { width: 100%; height: 100%; border: none; }
-
         #arena-loader { position: absolute; inset: 0; background: var(--bg-deep); z-index: 100; display: flex; flex-direction: column; justify-content: center; align-items: center; }
         .gear { color: var(--gold); animation: spin 4s linear infinite; font-size: 30px; }
         @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-
         footer { padding: 10px 20px; display: flex; gap: 10px; max-width: 1200px; margin: 0 auto; width: 100%; }
         .btn { flex: 1; padding: 12px; border-radius: 8px; border: none; font-family: 'Orbitron'; font-size: 0.7rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; }
         .btn-submit { background: var(--gold-gradient); color: #000; font-weight: 900; }
         .btn-side { background: rgba(255,255,255,0.05); color: #fff; border: 1px solid #333; }
-
         #sync-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 2000; display: none; flex-direction: column; justify-content: center; align-items: center; backdrop-filter: blur(15px); }
         .result-card { text-align: center; padding: 30px; border-radius: 20px; border: 1px solid var(--gold); background: #050508; width: 85%; max-width: 400px; }
     </style>
@@ -76,8 +70,8 @@
     </footer>
 
 <script>
-    const CORE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzBs2DBqD8Dvq6q9-6NbwozbsIPf5HOdOD3K8QpOG13r2Kdzsda977FlnI36YsIWCfeMA/exec"; 
-    const MISSIONS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzBs2DBqD8Dvq6q9-6NbwozbsIPf5HOdOD3K8QpOG13r2Kdzsda977FlnI36YsIWCfeMA/exec"; 
+    const CORE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw4irXZ91EmCTtXCDmZ2Co2dsk6VgWfE_gF3Q6bhGTyhh2XXbeACHRYQKRhzl_4M6sZ/exec"; 
+    const MISSIONS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxP-8QI_gtJ7JyXG48fDG9ULjLxWxCfL8pfRDi4gG3dsyG-6YlRUY7o6A1VkDBB6RJVnw/exec"; 
 
     let userEmail, currentActivity, currentTask;
 
@@ -100,80 +94,87 @@
         document.getElementById('contentFrame').src = `missions/${currentActivity}.html?task=${currentTask}`;
     };
 
-    // --- الدالة التي كانت ناقصة وتسببت في الخطأ ---
     function startSubmission() {
         const frame = document.getElementById('contentFrame').contentWindow;
         frame.postMessage({ type: 'REQUEST_MISSION_DATA' }, '*');
     }
 
-    // استقبال البيانات من المهمة (الصور)
     window.addEventListener('message', function(event) {
         if (event.data.type === 'MISSION_ANSWERS') {
             submitToHQ(event.data.answers);
         }
     });
 
-function submitToHQ(answers) {
-    document.getElementById('sync-overlay').style.display = 'flex';
-    const userObj = JSON.parse(localStorage.getItem('eyc_user'));
+    function submitToHQ(answers) {
+        document.getElementById('sync-overlay').style.display = 'flex';
+        const userObj = JSON.parse(localStorage.getItem('eyc_user'));
 
-    const payload = {
-        action: "submitMission",
-        email: userEmail,
-        name: userObj ? userObj.name : "Unknown",
-        activity: currentActivity, // تأكد أن قيمته "AS" لنشاط Alike
-        task: currentTask,
-        studentData: JSON.stringify(answers)
-    };
+        const gradingPayload = {
+            activity: currentActivity,
+            task: currentTask,
+            email: userEmail,
+            name: userObj ? userObj.name : "Unknown",
+            studentData: JSON.stringify(answers)
+        };
 
-    fetch(MISSIONS_SCRIPT_URL, {
-        method: "POST",
-        mode: "cors", // تغيير للوضع الافتراضي
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify(payload)
-    })
-    .then(res => res.json())
-    .then(data => renderResult(data))
-    .catch(err => {
-        console.error("Fetch Error:", err);
-        renderResult({ status: "error", message: "CRITICAL_ERROR: Check Network or Script URL" });
-    });
-}
-
-function renderResult(res) {
-    const display = document.getElementById('result-display');
-    document.getElementById('loader-content').style.display = 'none';
-    display.style.display = 'block';
-
-    if (res.status === "success") {
-        // إذا كانت الدرجة موجودة (رقم)، نعرضها. إذا كانت PENDING، نعرض رسالة الرفع.
-        const isAutoGraded = (typeof res.grade === 'number'); 
-        const icon = isAutoGraded ? "fa-check-circle" : "fa-cloud-upload-alt";
-        const title = isAutoGraded ? "MISSION COMPLETE" : "MISSION RECEIVED";
-        
-        // تعديل العرض بناءً على نوع النشاط
-        const gradeDisplay = isAutoGraded ? `${res.grade} / ${res.maxGrade || 10}` : "FILES UPLOADED";
-        const subText = isAutoGraded ? 
-            "Your performance has been evaluated. Tokens added to your profile." : 
-            "HQ is reviewing your script. Tokens will be added shortly.";
-
-        display.innerHTML = `
-            <i class="fas ${icon}" style="font-size:3rem; color:var(--gold);"></i>
-            <h2 style="font-family:'Orbitron'; color:#fff; margin:15px 0;">${title}</h2>
-            <div style="font-size:2rem; color:var(--gold); font-weight:bold;">${gradeDisplay}</div>
-            <p style="color:#888; font-size:0.7rem; margin-top:10px;">${subText}</p>
-            <button class="btn btn-submit" style="margin-top:20px; width:100%" onclick="exitArena()">RETURN TO BASE</button>
-        `;
-    } else {
-        // عرض الخطأ كما هو
-        display.innerHTML = `
-            <i class="fas fa-exclamation-triangle" style="font-size:3rem; color:red;"></i>
-            <h2 style="font-family:'Orbitron'; color:#fff; margin:15px 0;">MISSION ERROR</h2>
-            <p style="color:#888;">${res.message || "Execution Failed"}</p>
-            <button class="btn btn-side" style="margin-top:20px; width:100%" onclick="location.reload()">RETRY</button>
-        `;
+        fetch(MISSIONS_SCRIPT_URL, {
+            method: "POST",
+            mode: "cors",
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify(gradingPayload)
+        })
+        .then(res => res.json())
+        .then(gradingRes => {
+            if (gradingRes.status === "success") {
+                saveGradeToStudents(gradingRes.grade);
+            } else {
+                renderResult(gradingRes);
+            }
+        })
+        .catch(err => renderResult({ status: "error", message: "Grading Failed" }));
     }
-}
+
+    function saveGradeToStudents(grade) {
+        const saveUrl = `${CORE_SCRIPT_URL}?action=submitMission&email=${userEmail}&activity=${currentActivity}&task=${currentTask}&grade=${grade}`;
+
+        fetch(saveUrl)
+        .then(res => res.json())
+        .then(finalRes => {
+            renderResult(finalRes);
+        })
+        .catch(err => renderResult({ status: "error", message: "Failed to record grade" }));
+    }
+
+    function renderResult(res) {
+        const display = document.getElementById('result-display');
+        document.getElementById('loader-content').style.display = 'none';
+        display.style.display = 'block';
+
+        if (res.status === "success") {
+            const isAutoGraded = (typeof res.grade === 'number'); 
+            const icon = isAutoGraded ? "fa-check-circle" : "fa-cloud-upload-alt";
+            const title = isAutoGraded ? "MISSION COMPLETE" : "MISSION RECEIVED";
+            const gradeDisplay = isAutoGraded ? `${res.grade} / ${res.maxGrade || 10}` : "FILES UPLOADED";
+            const subText = isAutoGraded ? 
+                "Your performance has been evaluated. Tokens added to your profile." : 
+                "HQ is reviewing your script. Tokens will be added shortly.";
+
+            display.innerHTML = `
+                <i class="fas ${icon}" style="font-size:3rem; color:var(--gold);"></i>
+                <h2 style="font-family:'Orbitron'; color:#fff; margin:15px 0;">${title}</h2>
+                <div style="font-size:2rem; color:var(--gold); font-weight:bold;">${gradeDisplay}</div>
+                <p style="color:#888; font-size:0.7rem; margin-top:10px;">${subText}</p>
+                <button class="btn btn-submit" style="margin-top:20px; width:100%" onclick="exitArena()">RETURN TO BASE</button>
+            `;
+        } else {
+            display.innerHTML = `
+                <i class="fas fa-exclamation-triangle" style="font-size:3rem; color:red;"></i>
+                <h2 style="font-family:'Orbitron'; color:#fff; margin:15px 0;">MISSION ERROR</h2>
+                <p style="color:#888;">${res.message || "Execution Failed"}</p>
+                <button class="btn btn-side" style="margin-top:20px; width:100%" onclick="location.reload()">RETRY</button>
+            `;
+        }
+    }
 
     function exitArena() { window.location.href = 'MC.html'; }
 
