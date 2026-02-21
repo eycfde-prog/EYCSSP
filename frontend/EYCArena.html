@@ -71,7 +71,7 @@
 
 <script>
     const CORE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz1D8BkAHFH0mwiw_n_2yL6jvQ04rrOb3mwiqKuxmHVTrynxzYzzF7XwIJQ-QnrrfQb/exec"; 
-    const MISSIONS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbytBIws47PZIBXuRqdxL7MTJBBKzHvBTsGRUFwkajuECqt96cweo7z_jkwBSOwrSZG1BA/exec"; 
+    const MISSIONS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxWggatD9kl40ZZbpYthUQ_a_60qLndoSBiH2nmNoRX1RsSCpcSiNwOfedbyjpB_yLpCA/exec"; 
 
     let userEmail, currentActivity, currentTask;
 
@@ -131,19 +131,19 @@ function submitToHQ(answers) {
     document.getElementById('sync-overlay').style.display = 'flex';
     const userObj = JSON.parse(localStorage.getItem('eyc_user'));
 
-const gradingPayload = {
+    const gradingPayload = {
         activity: currentActivity,
         task: currentTask,
         email: userEmail,
         name: userObj ? userObj.name : "Unknown",
-        studentData: answers // أرسلها كمصفوفة مباشرة، لا تضع JSON.stringify هنا!
+        studentData: answers // Raw array [ "val1", "val2" ]
     };
 
-fetch(MISSIONS_SCRIPT_URL, {
+    fetch(MISSIONS_SCRIPT_URL, {
         method: "POST",
         mode: "cors",
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify(gradingPayload) // التحويل الوحيد المسموح به هنا
+        body: JSON.stringify(gradingPayload) // Single stringification for the entire payload
     })
     .then(res => res.json())
     .then(gradingRes => {
