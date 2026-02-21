@@ -127,35 +127,34 @@
         }
     });
 
-    function submitToHQ(answers) {
-        document.getElementById('sync-overlay').style.display = 'flex';
-        const userObj = JSON.parse(localStorage.getItem('eyc_user'));
+function submitToHQ(answers) {
+    document.getElementById('sync-overlay').style.display = 'flex';
+    const userObj = JSON.parse(localStorage.getItem('eyc_user'));
 
-        const gradingPayload = {
-            activity: currentActivity,
-            task: currentTask,
-            email: userEmail,
-            name: userObj ? userObj.name : "Unknown",
-            studentData: JSON.stringify(answers)
-        };
+    const gradingPayload = {
+        activity: currentActivity,
+        task: currentTask,
+        email: userEmail,
+        name: userObj ? userObj.name : "Unknown",
+        studentData: answers 
+    };
 
-        fetch(MISSIONS_SCRIPT_URL, {
-            method: "POST",
-            mode: "cors",
-            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-            body: JSON.stringify(gradingPayload)
-        })
-        .then(res => res.json())
-        .then(gradingRes => {
-            if (gradingRes.status === "success") {
-                saveGradeToStudents(gradingRes);
-            } else {
-                renderResult(gradingRes);
-            }
-        })
-        .catch(err => renderResult({ status: "error", message: "Grading Failed" }));
-    }
-
+    fetch(MISSIONS_SCRIPT_URL, {
+        method: "POST",
+        mode: "cors",
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify(gradingPayload)
+    })
+    .then(res => res.json())
+    .then(gradingRes => {
+        if (gradingRes.status === "success") {
+            saveGradeToStudents(gradingRes);
+        } else {
+            renderResult(gradingRes);
+        }
+    })
+    .catch(err => renderResult({ status: "error", message: "Grading Failed" }));
+}
     function saveGradeToStudents(res) {
         const saveUrl = `${CORE_SCRIPT_URL}?action=submitMission&email=${userEmail}&activity=${currentActivity}&task=${currentTask}&grade=${res.grade}&answers=${encodeURIComponent(res.answers)}&analysis=${encodeURIComponent(res.analysis)}`;
 
