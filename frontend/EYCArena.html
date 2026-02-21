@@ -77,7 +77,7 @@
 
 <script>
     const CORE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx0hNx1zshift1_zVao1rTaNCoWslxYamme4BAytPXzvmnsBDCQdact-Xna2apENcUz/exec"; 
-    const MISSIONS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwjsbXcRUR5Y92rjICk5Tx_i-nVeRcu-SUx6qoGFUsPJ83lOlJjdNm2XlKB_GRSZV9UKA/exec"; 
+    const MISSIONS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxF5qcYSH6nUCcg6WNcc3Cj3VP4OK6cBegyz73c0QdBv4rj0q7CnCrcELSDFnit2ethHA/exec"; 
 
     let userEmail, currentActivity, currentTask;
 
@@ -115,66 +115,66 @@
 
 function submitToHQ(answers) {
     document.getElementById('sync-overlay').style.display = 'flex';
-
-    // التأكد من استخراج الاسم من localStorage
     const userObj = JSON.parse(localStorage.getItem('eyc_user'));
-    const studentName = userObj ? userObj.name : "Unknown_Agent";
 
     const payload = {
         action: "submitMission",
         email: userEmail,
-        name: studentName, 
+        name: userObj ? userObj.name : "Unknown",
         activity: currentActivity,
         task: currentTask,
         studentData: JSON.stringify(answers)
     };
 
-    // نستخدم fetch بدون mode: no-cors إذا أمكن، أو نستخدم الطريقة التقليدية لضمان وصول الجسم (Body)
     fetch(MISSIONS_SCRIPT_URL, {
         method: "POST",
-        body: JSON.stringify(payload) // جوجل سكريبت يحتاج البيانات كـ String في الجسم
+        body: JSON.stringify(payload)
     })
-    .then(res => {
-        // حتى لو لم نحصل على رد بسبب CORS، البيانات ستكون قد وصلت للسيرفر
-        setTimeout(() => {
-            renderResult({ status: "success", grade: "PENDING" });
-        }, 2000);
+    .then(res => res.json()) // قراءة الرد الحقيقي من السيرفر
+    .then(data => {
+        // نرسل البيانات الحقيقية لدالة العرض
+        renderResult(data); 
     })
     .catch(err => {
         console.error(err);
-        renderResult({ status: "error", message: "Connection issue, but mission might be sent." });
+        renderResult({ status: "error", message: "Network error or invalid mission format." });
     });
 }
-    function renderResult(res) {
-        const display = document.getElementById('result-display');
-        document.getElementById('loader-content').style.display = 'none';
-        display.style.display = 'block';
 
-        if (res.status === "success") {
-            const isPending = (res.grade === "PENDING");
-            const icon = isPending ? "fa-cloud-upload-alt" : "fa-check-circle";
-            const title = isPending ? "MISSION RECEIVED" : "MISSION COMPLETE";
-            const gradeDisplay = isPending ? "FILES UPLOADED" : res.grade + "/10";
-            const subText = isPending ? 
-                "HQ is reviewing your script. Tokens will be added shortly." : 
-                "Tokens and XP have been added to your profile.";
+function renderResult(res) {
+    const display = document.getElementById('result-display');
+    document.getElementById('loader-content').style.display = 'none';
+    display.style.display = 'block';
 
-            display.innerHTML = `
-                <i class="fas ${icon}" style="font-size:3rem; color:var(--gold);"></i>
-                <h2 style="font-family:'Orbitron'; color:#fff; margin:15px 0;">${title}</h2>
-                <div style="font-size:2rem; color:var(--gold); font-weight:bold;">${gradeDisplay}</div>
-                <p style="color:#888; font-size:0.7rem; margin-top:10px;">${subText}</p>
-                <button class="btn btn-submit" style="margin-top:20px; width:100%" onclick="exitArena()">RETURN TO BASE</button>
-            `;
-        } else {
-            display.innerHTML = `
-                <i class="fas fa-exclamation-triangle" style="font-size:3rem; color:red;"></i>
-                <h2 style="font-family:'Orbitron'; color:#fff; margin:15px 0;">MISSION ERROR</h2>
-                <p style="color:#888;">${res.message || "Connection Interrupted"}</p>
-                <button class="btn btn-side" style="margin-top:20px; width:100%" onclick="location.reload()">RETRY</button>
-            `;
-        }
+    if (res.status === "success") {
+        // إذا كانت الدرجة موجودة (رقم)، نعرضها. إذا كانت PENDING، نعرض رسالة الرفع.
+        const isAutoGraded = (typeof res.grade === 'number'); 
+        const icon = isAutoGraded ? "fa-check-circle" : "fa-cloud-upload-alt";
+        const title = isAutoGraded ? "MISSION COMPLETE" : "MISSION RECEIVED";
+        
+        // تعديل العرض بناءً على نوع النشاط
+        const gradeDisplay = isAutoGraded ? `${res.grade} / ${res.maxGrade || 10}` : "FILES UPLOADED";
+        const subText = isAutoGraded ? 
+            "Your performance has been evaluated. Tokens added to your profile." : 
+            "HQ is reviewing your script. Tokens will be added shortly.";
+
+        display.innerHTML = `
+            <i class="fas ${icon}" style="font-size:3rem; color:var(--gold);"></i>
+            <h2 style="font-family:'Orbitron'; color:#fff; margin:15px 0;">${title}</h2>
+            <div style="font-size:2rem; color:var(--gold); font-weight:bold;">${gradeDisplay}</div>
+            <p style="color:#888; font-size:0.7rem; margin-top:10px;">${subText}</p>
+            <button class="btn btn-submit" style="margin-top:20px; width:100%" onclick="exitArena()">RETURN TO BASE</button>
+        `;
+    } else {
+        // عرض الخطأ كما هو
+        display.innerHTML = `
+            <i class="fas fa-exclamation-triangle" style="font-size:3rem; color:red;"></i>
+            <h2 style="font-family:'Orbitron'; color:#fff; margin:15px 0;">MISSION ERROR</h2>
+            <p style="color:#888;">${res.message || "Execution Failed"}</p>
+            <button class="btn btn-side" style="margin-top:20px; width:100%" onclick="location.reload()">RETRY</button>
+        `;
     }
+}
 
     function exitArena() { window.location.href = 'MC.html'; }
 
