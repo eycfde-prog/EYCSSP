@@ -207,37 +207,33 @@
         }
     });
 
-    function collectAndSend() {
-        const inputs = document.querySelectorAll('.alike-input');
-        let answersArray = [];
-        let hasError = false;
+function collectAndSend() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const taskNum = urlParams.get('task') || "1"; // جلب رقم المهمة
+    const inputs = document.querySelectorAll('.alike-input');
+    let answersArray = [];
+    let hasError = false;
 
-        inputs.forEach(input => {
-            const val = input.value.trim();
-            if(!val) {
-                hasError = true;
-                input.classList.add('error');
-                // إزالة فئة الخطأ بعد ثانية واحدة
-                setTimeout(() => input.classList.remove('error'), 1000);
-            } else {
-                input.classList.remove('error');
-                answersArray.push(val.toLowerCase());
-            }
-        });
-
-        if(hasError) {
-            // يمكننا إرسال رسالة للأب لإخباره بوجود حقول فارغة إذا لزم الأمر
-            return;
+    inputs.forEach(input => {
+        const val = input.value.trim();
+        if(!val) {
+            hasError = true;
+            input.classList.add('error');
+            setTimeout(() => input.classList.remove('error'), 1000);
+        } else {
+            answersArray.push(val);
         }
+    });
 
-        // إرسال البيانات للأرينا
-window.parent.postMessage({
-    type: 'MISSION_ANSWERS', 
-    activityCode: 'AS', // أضف هذا السطر ليعرف السيرفر أنه نشاط Alike
-    task: taskNum,      // أضف هذا السطر
-    answers: answersArray 
-}, '*');
-    }
+    if(hasError) return;
+
+    window.parent.postMessage({
+        type: 'MISSION_ANSWERS', 
+        activityCode: 'AS', // الكود المتفق عليه
+        task: taskNum, 
+        answers: answersArray 
+    }, '*');
+}
 
     window.onload = renderActiveMission;
 </script>
