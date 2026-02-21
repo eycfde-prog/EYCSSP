@@ -231,10 +231,12 @@
         }
 
         // إرسال البيانات للأرينا
-        window.parent.postMessage({
-            type: 'MISSION_ANSWERS', 
-            answers: answersArray // إرسال مصفوفة نظيفة لسهولة المعالجة في الـ AI Grader
-        }, '*');
+window.parent.postMessage({
+    type: 'MISSION_ANSWERS', 
+    activityCode: 'AS', // أضف هذا السطر ليعرف السيرفر أنه نشاط Alike
+    task: taskNum,      // أضف هذا السطر
+    answers: answersArray 
+}, '*');
     }
 
     window.onload = renderActiveMission;
