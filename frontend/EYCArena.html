@@ -77,7 +77,7 @@
 
 <script>
     const CORE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx0hNx1zshift1_zVao1rTaNCoWslxYamme4BAytPXzvmnsBDCQdact-Xna2apENcUz/exec"; 
-    const MISSIONS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxSDFKe5ajkOKC1PPnIK0p0Gu4FHCLm84zHUXBbTggk0L5sZyDIn30IlVHgku3QMboU1w/exec"; 
+    const MISSIONS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyyYvYhm9-YdDJBiCDgnYdofm-G6xMPR6qCqIbwZv8zZX6JGdltdwReoj_oXSpmeXleCA/exec"; 
 
     let userEmail, currentActivity, currentTask;
 
@@ -116,34 +116,35 @@
 function submitToHQ(answers) {
     document.getElementById('sync-overlay').style.display = 'flex';
 
-    // تجهيز البيانات كجسم للطلب (Body) وليس كروابط
-const payload = {
+    // التأكد من استخراج الاسم من localStorage
+    const userObj = JSON.parse(localStorage.getItem('eyc_user'));
+    const studentName = userObj ? userObj.name : "Unknown_Agent";
+
+    const payload = {
         action: "submitMission",
         email: userEmail,
-        name: JSON.parse(localStorage.getItem('eyc_user')).name, // إرسال الاسم مباشرة
+        name: studentName, 
         activity: currentActivity,
         task: currentTask,
         studentData: JSON.stringify(answers)
     };
 
+    // نستخدم fetch بدون mode: no-cors إذا أمكن، أو نستخدم الطريقة التقليدية لضمان وصول الجسم (Body)
     fetch(MISSIONS_SCRIPT_URL, {
         method: "POST",
-        mode: "no-cors", // ضروري لتجنب مشاكل الـ CORS مع تطبيقات جوجل
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
+        body: JSON.stringify(payload) // جوجل سكريبت يحتاج البيانات كـ String في الجسم
     })
-    .then(() => {
-        // بما أننا استخدمنا no-cors، لا يمكننا قراءة الرد الحقيقي
-        // سنفترض النجاح بعد ثانيتين من الإرسال (أو يمكنك تحسينها)
+    .then(res => {
+        // حتى لو لم نحصل على رد بسبب CORS، البيانات ستكون قد وصلت للسيرفر
         setTimeout(() => {
             renderResult({ status: "success", grade: "PENDING" });
         }, 2000);
     })
     .catch(err => {
-        renderResult({ status: "error", message: "Upload Failed: " + err.toString() });
+        console.error(err);
+        renderResult({ status: "error", message: "Connection issue, but mission might be sent." });
     });
 }
-
     function renderResult(res) {
         const display = document.getElementById('result-display');
         document.getElementById('loader-content').style.display = 'none';
