@@ -261,31 +261,30 @@
         }
     });
 
-    function collectAndSend() {
-        let finalAnswers = [];
-        let hasMissing = false;
-        const totalQuestions = 5;
+function collectAndSend() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const taskNum = urlParams.get('task') || "1";
+    let finalAnswers = [];
+    let hasMissing = false;
 
-        for(let i = 0; i < totalQuestions; i++) {
-            if (!answers[i]) {
-                const card = document.getElementById(`card-${i}`);
-                if(card) card.classList.add('error-input');
-                hasMissing = true;
-            } else {
-                finalAnswers.push(answers[i]);
-            }
+    for(let i = 0; i < 5; i++) {
+        if (!answers[i]) {
+            document.getElementById(`card-${i}`).classList.add('error-input');
+            hasMissing = true;
+        } else {
+            finalAnswers.push(answers[i]);
         }
-
-        if (hasMissing) {
-            console.log("Gear System: Missing Data Detected.");
-            return; 
-        }
-
-        window.parent.postMessage({ 
-            type: 'MISSION_ANSWERS', 
-            answers: finalAnswers 
-        }, '*');
     }
+
+    if (hasMissing) return;
+
+    window.parent.postMessage({ 
+        type: 'MISSION_ANSWERS', 
+        activityCode: 'ASX', // أضفنا الكود هنا أيضاً
+        task: taskNum,       // ورقم المهمة
+        answers: finalAnswers 
+    }, '*');
+}
 
     window.onload = loadAlikeX;
 </script>
