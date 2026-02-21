@@ -70,8 +70,8 @@
     </footer>
 
 <script>
-    const CORE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxICiTKDRvqu-ZW8E3Q_fmNaatG9OGOMHvJJWmpHT49IEaDB3844Ir518ywwle79kj8/exec"; 
-    const MISSIONS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxKIBz8XV8gCckK1vXWrop5W4HS0yAUc817D7ERNzXB8iqnh1Qh-379pRJK0dd194-gDg/exec"; 
+    const CORE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbym-mVmiXbQrtr3vIC783DNdG93Y4HZO30Foql9sNW3G7pBgHtscA4P9gRgdOCjW9tr/exec"; 
+    const MISSIONS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbKIBz8XV8gCckK1vXWrop5W4HS0yAUc817D7ERNzXB8iqnh1Qh-379pRJK0dd194-gDg/exec"; 
 
     let userEmail, currentActivity, currentTask;
 
@@ -91,8 +91,30 @@
         document.getElementById('activity-title').innerText = currentActivity;
         document.getElementById('mission-sub').innerText = `TASK ${currentTask}`;
 
-        document.getElementById('contentFrame').src = `missions/${currentActivity}.html?task=${currentTask}`;
+        checkMissionPresence();
     };
+
+    function checkMissionPresence() {
+        fetch(`${CORE_SCRIPT_URL}?action=checkMission&email=${userEmail}&activity=${currentActivity}&task=${currentTask}`)
+        .then(res => res.json())
+        .then(data => {
+            if (data.status === "completed") {
+                document.getElementById('sync-overlay').style.display = 'flex';
+                renderResult({
+                    status: "success",
+                    grade: data.grade,
+                    analysis: data.analysis,
+                    isManual: data.isManual,
+                    alreadyDone: true 
+                });
+            } else {
+                document.getElementById('contentFrame').src = `missions/${currentActivity}.html?task=${currentTask}`;
+            }
+        })
+        .catch(() => {
+            document.getElementById('contentFrame').src = `missions/${currentActivity}.html?task=${currentTask}`;
+        });
+    }
 
     function startSubmission() {
         const frame = document.getElementById('contentFrame').contentWindow;
@@ -160,58 +182,56 @@
         });
     }
 
-function renderResult(res) {
-    const display = document.getElementById('result-display');
-    document.getElementById('loader-content').style.display = 'none';
-    display.style.display = 'block';
+    function renderResult(res) {
+        const display = document.getElementById('result-display');
+        document.getElementById('loader-content').style.display = 'none';
+        document.getElementById('sync-overlay').style.display = 'flex'; 
+        display.style.display = 'block';
 
-    if (res.status === "success") {
-        // التحقق هل النشاط يدوي أم تلقائي
-        const isManual = (res.grade === "PENDING" || res.isManual === true);
-        
-        let icon, title, gradeDisplay, subText, appealBtnHtml;
+        if (res.status === "success") {
+            const isManual = (res.grade === "PENDING" || res.isManual === true);
+            let icon, title, gradeDisplay, subText, appealBtnHtml;
 
-        if (isManual) {
-            // واجهة الأنشطة اليدوية (DTX, EMX, SSSX)
-            icon = "fa-cloud-upload-alt";
-            title = "MISSION RECEIVED";
-            gradeDisplay = "PENDING";
-            subText = `Your answer has been sent to the HQ.<br>Your tokens will be added after the revision.`;
-            appealBtnHtml = ""; // لا يوجد التماس للأنشطة التي لم تُصحح بعد
+            if (isManual) {
+                icon = "fa-cloud-upload-alt";
+                title = res.alreadyDone ? "MISSION RECORDED" : "MISSION RECEIVED";
+                gradeDisplay = "PENDING";
+                subText = `Your answer is under revision at HQ.`;
+                appealBtnHtml = "";
+            } else {
+                icon = "fa-check-circle";
+                title = res.alreadyDone ? "PREVIOUS SCORE" : "MISSION COMPLETE";
+                gradeDisplay = `${res.grade} / 50`;
+                subText = res.alreadyDone ? "You have already passed this mission." : "Data synchronized with HQ Command.";
+                
+                appealBtnHtml = `<button id="appealBtn" class="btn btn-side" style="margin-top:10px; width:100%; border-color:rgba(255,0,0,0.3)" onclick="requestReview()">
+                                    <i class="fas fa-circle-exclamation"></i> REQUEST REVIEW (RR)
+                                 </button>`;
+            }
+
+            display.innerHTML = `
+                <i class="fas ${icon}" style="font-size:3rem; color:var(--gold);"></i>
+                <h2 style="font-family:'Orbitron'; color:#fff; margin:15px 0;">${title}</h2>
+                <div style="font-size:2.5rem; color:var(--gold); font-weight:bold;">${gradeDisplay}</div>
+                <p style="color:#888; font-size:0.9rem; margin-top:10px; line-height:1.5;">${subText}</p>
+                <button class="btn btn-submit" style="margin-top:20px; width:100%" onclick="exitArena()">RETURN TO BASE</button>
+                ${appealBtnHtml}
+            `;
         } else {
-            // واجهة التصحيح التلقائي
-            icon = "fa-check-circle";
-            title = "MISSION COMPLETE";
-            gradeDisplay = `${res.grade} / 50`;
-            subText = "Data synchronized with HQ Command.";
-            appealBtnHtml = `<button id="appealBtn" class="btn btn-side" style="margin-top:10px; width:100%; border-color:rgba(255,0,0,0.3)" onclick="requestReview()">
-                                <i class="fas fa-circle-exclamation"></i> REQUEST REVIEW (RR)
-                             </button>`;
+            display.innerHTML = `
+                <i class="fas fa-exclamation-triangle" style="font-size:3rem; color:red;"></i>
+                <h2 style="font-family:'Orbitron'; color:#fff; margin:15px 0;">MISSION ERROR</h2>
+                <p style="color:#888;">${res.message || "Execution Failed"}</p>
+                <button class="btn btn-side" style="margin-top:20px; width:100%" onclick="location.reload()">RETRY</button>
+            `;
         }
-
-        display.innerHTML = `
-            <i class="fas ${icon}" style="font-size:3rem; color:var(--gold);"></i>
-            <h2 style="font-family:'Orbitron'; color:#fff; margin:15px 0;">${title}</h2>
-            <div style="font-size:2.5rem; color:var(--gold); font-weight:bold;">${gradeDisplay}</div>
-            <p style="color:#888; font-size:0.9rem; margin-top:10px; line-height:1.5;">${subText}</p>
-            
-            <button class="btn btn-submit" style="margin-top:20px; width:100%" onclick="exitArena()">RETURN TO BASE</button>
-            ${appealBtnHtml}
-        `;
-    } else {
-        // واجهة الخطأ
-        display.innerHTML = `
-            <i class="fas fa-exclamation-triangle" style="font-size:3rem; color:red;"></i>
-            <h2 style="font-family:'Orbitron'; color:#fff; margin:15px 0;">MISSION ERROR</h2>
-            <p style="color:#888;">${res.message || "Execution Failed"}</p>
-            <button class="btn btn-side" style="margin-top:20px; width:100%" onclick="location.reload()">RETRY</button>
-        `;
     }
-}
+
     function exitArena() { window.location.href = 'MC.html'; }
 
     function createStars() {
         const container = document.getElementById('star-container');
+        if(!container) return;
         for (let i = 0; i < 50; i++) {
             const star = document.createElement('div');
             star.className = 'star';
@@ -223,7 +243,8 @@ function renderResult(res) {
     }
 
     document.getElementById('contentFrame').onload = () => {
-        document.getElementById('arena-loader').style.display = 'none';
+        const loader = document.getElementById('arena-loader');
+        if(loader) loader.style.display = 'none';
     };
 </script>
 </body>
