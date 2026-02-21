@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Vivid X | Royal Narrative | Jessy Edition</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root { 
+            --gold: #D4AF37; 
+            --gold-glow: rgba(212, 175, 55, 0.4);
+            --deep-dark: #050508;
+            --glass-border: rgba(212, 175, 55, 0.25);
+            --success-neon: #39ff14;
+        }
+
+        body { 
+            font-family: 'Poppins', sans-serif; 
+            background: transparent; color: white; 
+            margin: 0; padding: 12px; overflow: hidden;
+            display: flex; flex-direction: column; height: 100vh;
+            box-sizing: border-box;
+        }
+
+        .vividx-container {
+            width: 100%; height: 100%;
+            display: flex; flex-direction: column; gap: 10px;
+        }
+
+        .header-vx { 
+            text-align: center; border-bottom: 1px solid var(--glass-border);
+            padding-bottom: 8px; flex-shrink: 0;
+        }
+        
+        .header-vx h1 { 
+            font-family: 'Orbitron'; color: var(--gold); 
+            letter-spacing: 3px; margin: 0; font-size: 0.95rem;
+            text-shadow: 0 0 12px var(--gold-glow);
+        }
+
+        .image-frame-x {
+            background: rgba(0,0,0,0.6); border: 1px solid var(--glass-border);
+            padding: 8px; border-radius: 15px; position: relative;
+            height: 220px; flex-shrink: 0;
+            display: flex; justify-content: center; align-items: center;
+            overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        #target-image-x {
+            width: 100%; height: 100%; object-fit: contain;
+            border-radius: 10px; transition: 0.5s;
+        }
+
+        .chrono-tag {
+            position: absolute; top: 15px; right: 15px;
+            background: var(--deep-dark); border: 1px solid var(--gold);
+            padding: 4px 12px; border-radius: 6px;
+            font-family: 'Orbitron'; font-size: 9px;
+            color: var(--gold); z-index: 10;
+            box-shadow: 0 0 10px rgba(0,0,0,0.8);
+        }
+
+        .story-zone {
+            background: rgba(15, 15, 25, 0.8); border-radius: 20px;
+            padding: 15px; border: 1px solid var(--glass-border);
+            backdrop-filter: blur(10px); flex-grow: 1;
+            display: flex; flex-direction: column; min-height: 0;
+        }
+
+        .story-zone label {
+            display: block; font-family: 'Orbitron'; color: var(--gold);
+            font-size: 8px; margin-bottom: 8px; letter-spacing: 2px;
+        }
+
+        textarea {
+            width: 100%; flex-grow: 1;
+            background: rgba(0,0,0,0.3); border: 1px solid rgba(212, 175, 55, 0.1);
+            border-radius: 12px; color: #e0e0e0; font-family: 'Poppins'; 
+            font-size: 0.95rem; line-height: 1.6; outline: none; 
+            resize: none; padding: 15px; transition: 0.3s;
+            overflow-y: auto;
+        }
+
+        textarea:focus { 
+            border-color: var(--gold); 
+            background: rgba(212, 175, 55, 0.03);
+            box-shadow: inset 0 0 15px rgba(0,0,0,0.5);
+        }
+
+        .footer-info {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-top: 10px; font-family: 'Orbitron'; font-size: 9px;
+            color: #777; flex-shrink: 0;
+        }
+
+        .word-counter { font-size: 12px; font-weight: 700; color: var(--gold); }
+        .sync-active { color: var(--success-neon); text-shadow: 0 0 8px var(--success-neon); }
+
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 10px; }
+    </style>
+</head>
+<body>
+
+    <div class="vividx-container">
+        <div class="header-vx">
+            <h1 id="vx-title">MISSION VX-ARCHIVE</h1>
+        </div>
+
+        <div class="image-frame-x">
+            <img id="target-image-x" src="" alt="VividX Visual Target">
+            <div class="chrono-tag" id="time-frame-text">SYNCING...</div>
+        </div>
+
+        <div class="story-zone">
+            <label>NARRATIVE CHRONICLE TRANSMISSION:</label>
+            <textarea id="storyInput" oninput="updateCount()" placeholder="Accessing neural link..."></textarea>
+            
+            <div class="footer-info">
+                <span>OBJECTIVE: 150 WORDS</span>
+                <span>SYNC STATUS: <span id="wordCount" class="word-counter">0</span> WORDS</span>
+            </div>
+        </div>
+    </div>
+
+<script>
+    const GITHUB_USER = 'eycfde-prog'; 
+    const REPO_NAME = 'superstars-page';
+
+    const vividXScenarios = {
+        "1": { img: "VX1.png", time: "PAST", desc: "Analyze the sequence of events that culminated in this chaotic scene..." },
+        "2": { img: "VX2.png", time: "FUTURE", desc: "Extrapolate the journey of this individual beyond this temporal frame..." },
+        "3": { img: "VX3.png", time: "PAST", desc: "Trace the origins of this object and the path it took to arrive here..." },
+        "4": { img: "VX4.png", time: "FUTURE", desc: "Predict the celestial discoveries awaiting after this launch sequence..." },
+        "5": { img: "VX5.png", time: "PAST", desc: "Recall the forgotten history and the echoes of life in this silent space..." },
+        "6": { img: "VX6.png", time: "FUTURE", desc: "Foresee the destination and the challenges beyond the horizon..." },
+        "7": { img: "VX7.png", time: "PAST", desc: "Chronicle the creative struggle and the inspiration before the first stroke..." },
+        "8": { img: "VX8.png", time: "FUTURE", desc: "Visualize the technological evolution or decay in the coming cycles..." },
+        "9": { img: "VX9.png", time: "PAST", desc: "Uncover the legends and the rise of this civilization before the ruins..." },
+        "10": { img: "VX10.png", time: "FUTURE", desc: "Describe the growth, the ecosystem, and the legacy of this single seed..." }
+    };
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const taskNum = urlParams.get('task') || "1";
+
+    function initVividX() {
+        const scenario = vividXScenarios[taskNum] || vividXScenarios["1"];
+        const imgElement = document.getElementById('target-image-x');
+        
+        imgElement.src = `https://raw.githubusercontent.com/${GITHUB_USER}/${REPO_NAME}/main/assets/vxpics/VX${taskNum}.png`;
+        imgElement.onerror = () => { imgElement.src = "https://via.placeholder.com/800x450/050505/D4AF37?text=VX+VISUAL+NOT+FOUND"; };
+
+        document.getElementById('time-frame-text').innerText = scenario.time;
+        document.getElementById('storyInput').placeholder = scenario.desc;
+        document.getElementById('vx-title').innerText = `VIVID X | MISSION ${taskNum.padStart(2, '0')}`;
+    }
+
+    function updateCount() {
+        const text = document.getElementById('storyInput').value.trim();
+        const words = text ? text.split(/\s+/).filter(w => w.length > 0).length : 0;
+        const display = document.getElementById('wordCount');
+        display.innerText = words;
+        display.classList.toggle('sync-active', words >= 150);
+    }
+
+    window.addEventListener('message', function(event) {
+        if (event.data.type === 'REQUEST_MISSION_DATA') {
+            const story = document.getElementById('storyInput').value.trim();
+            const count = story ? story.split(/\s+/).filter(w => w.length > 0).length : 0;
+            
+            if(!story || count < 150) {
+                 window.parent.postMessage({ type: 'MISSION_INCOMPLETE', message: "Data insufficient. 150 words minimum required." }, '*');
+                 return;
+            }
+            
+            window.parent.postMessage({ 
+                type: 'MISSION_ANSWERS', 
+                activityCode: 'VX',
+                answers: story, 
+                missionNum: taskNum 
+            }, '*');
+        }
+    });
+
+    window.onload = initVividX;
+</script>
+</body>
+</html>
