@@ -160,39 +160,54 @@
         });
     }
 
-    function renderResult(res) {
-        const display = document.getElementById('result-display');
-        document.getElementById('loader-content').style.display = 'none';
-        display.style.display = 'block';
+function renderResult(res) {
+    const display = document.getElementById('result-display');
+    document.getElementById('loader-content').style.display = 'none';
+    display.style.display = 'block';
 
-        if (res.status === "success") {
-            const isAutoGraded = (typeof res.grade === 'number'); 
-            const gradeDisplay = isAutoGraded ? `${res.grade} / 50` : "FILES UPLOADED";
-            
-            const appealBtnHtml = isAutoGraded ? 
-                `<button id="appealBtn" class="btn btn-side" style="margin-top:10px; width:100%; border-color:rgba(255,0,0,0.3)" onclick="requestReview()">
-                    <i class="fas fa-circle-exclamation"></i> REQUEST REVIEW (RR)
-                 </button>` : "";
+    if (res.status === "success") {
+        // التحقق هل النشاط يدوي أم تلقائي
+        const isManual = (res.grade === "PENDING" || res.isManual === true);
+        
+        let icon, title, gradeDisplay, subText, appealBtnHtml;
 
-            display.innerHTML = `
-                <i class="fas ${isAutoGraded ? 'fa-check-circle' : 'fa-cloud-upload'}" style="font-size:3rem; color:var(--gold);"></i>
-                <h2 style="font-family:'Orbitron'; color:#fff; margin:15px 0;">MISSION COMPLETE</h2>
-                <div style="font-size:2.5rem; color:var(--gold); font-weight:bold;">${gradeDisplay}</div>
-                <p style="color:#888; font-size:0.7rem; margin-top:10px;">Data synchronized with HQ Command.</p>
-                
-                <button class="btn btn-submit" style="margin-top:20px; width:100%" onclick="exitArena()">RETURN TO BASE</button>
-                ${appealBtnHtml}
-            `;
+        if (isManual) {
+            // واجهة الأنشطة اليدوية (DTX, EMX, SSSX)
+            icon = "fa-cloud-upload-alt";
+            title = "MISSION RECEIVED";
+            gradeDisplay = "PENDING";
+            subText = `Your answer has been sent to the HQ.<br>Your tokens will be added after the revision.`;
+            appealBtnHtml = ""; // لا يوجد التماس للأنشطة التي لم تُصحح بعد
         } else {
-            display.innerHTML = `
-                <i class="fas fa-exclamation-triangle" style="font-size:3rem; color:red;"></i>
-                <h2 style="font-family:'Orbitron'; color:#fff; margin:15px 0;">MISSION ERROR</h2>
-                <p style="color:#888;">${res.message || "Execution Failed"}</p>
-                <button class="btn btn-side" style="margin-top:20px; width:100%" onclick="location.reload()">RETRY</button>
-            `;
+            // واجهة التصحيح التلقائي
+            icon = "fa-check-circle";
+            title = "MISSION COMPLETE";
+            gradeDisplay = `${res.grade} / 50`;
+            subText = "Data synchronized with HQ Command.";
+            appealBtnHtml = `<button id="appealBtn" class="btn btn-side" style="margin-top:10px; width:100%; border-color:rgba(255,0,0,0.3)" onclick="requestReview()">
+                                <i class="fas fa-circle-exclamation"></i> REQUEST REVIEW (RR)
+                             </button>`;
         }
-    }
 
+        display.innerHTML = `
+            <i class="fas ${icon}" style="font-size:3rem; color:var(--gold);"></i>
+            <h2 style="font-family:'Orbitron'; color:#fff; margin:15px 0;">${title}</h2>
+            <div style="font-size:2.5rem; color:var(--gold); font-weight:bold;">${gradeDisplay}</div>
+            <p style="color:#888; font-size:0.9rem; margin-top:10px; line-height:1.5;">${subText}</p>
+            
+            <button class="btn btn-submit" style="margin-top:20px; width:100%" onclick="exitArena()">RETURN TO BASE</button>
+            ${appealBtnHtml}
+        `;
+    } else {
+        // واجهة الخطأ
+        display.innerHTML = `
+            <i class="fas fa-exclamation-triangle" style="font-size:3rem; color:red;"></i>
+            <h2 style="font-family:'Orbitron'; color:#fff; margin:15px 0;">MISSION ERROR</h2>
+            <p style="color:#888;">${res.message || "Execution Failed"}</p>
+            <button class="btn btn-side" style="margin-top:20px; width:100%" onclick="location.reload()">RETRY</button>
+        `;
+    }
+}
     function exitArena() { window.location.href = 'MC.html'; }
 
     function createStars() {
