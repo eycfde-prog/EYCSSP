@@ -235,44 +235,35 @@ const gxData = {
         }
     });
 
-    function collectAndSend() {
-        const cards = document.querySelectorAll('.extraction-card');
-        let answersArray = [];
-        let hasError = false;
+function collectAndSend() {
+    const cards = document.querySelectorAll('.extraction-card');
+    let answersArray = []; // سنرسل مصفوفة وليس نص مدمج بـ |
+    let hasError = false;
 
-        cards.forEach((card) => {
-            const inputs = card.querySelectorAll('.gx-input');
-            let groupAnswers = [];
-            let groupEmpty = false;
-
-            inputs.forEach(input => {
-                const val = input.value.trim();
-                if(!val) groupEmpty = true;
-                groupAnswers.push(val);
-            });
-
-            if(groupEmpty) {
-                hasError = true;
-                card.classList.add('error-card');
-                setTimeout(() => card.classList.remove('error-card'), 500);
-            } else {
-                answersArray.push(groupAnswers.join(' ')); 
-            }
+    cards.forEach((card) => {
+        const inputs = card.querySelectorAll('.gx-input');
+        let groupAnswers = [];
+        inputs.forEach(input => {
+            const val = input.value.trim();
+            if(!val) hasError = true;
+            groupAnswers.push(val);
         });
+        // دمج كلمات المجموعة الواحدة بفاصلة ليتوافق مع split(",") في الـ Backend
+        answersArray.push(groupAnswers.join(',')); 
+    });
 
-        if(hasError) {
-            window.parent.postMessage({ type: 'MISSION_INCOMPLETE' }, '*');
-            return;
-        }
-
-        window.parent.postMessage({ 
-            type: 'MISSION_ANSWERS', 
-            activityCode: 'GX',
-            answers: answersArray.join('|'), 
-            missionNum: taskNum
-        }, '*');
+    if(hasError) {
+        window.parent.postMessage({ type: 'MISSION_INCOMPLETE' }, '*');
+        return;
     }
 
+    window.parent.postMessage({ 
+        type: 'MISSION_ANSWERS', 
+        activityCode: 'GRX', // توحيد الكود ليكون GRX
+        answers: answersArray, // إرسالها كمصفوفة Array مباشرة
+        missionNum: taskNum
+    }, '*');
+}
     window.onload = loadExtractor;
 </script>
 </body>
