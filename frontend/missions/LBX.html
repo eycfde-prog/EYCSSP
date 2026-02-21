@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Label X | Grammar Radar | Glassy Edition</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --neon-blue: #00f2ff;
+            --neon-purple: #bc13fe;
+            --glass-bg: rgba(10, 10, 18, 0.9);
+            --border-purple: rgba(188, 19, 254, 0.25);
+            --error-glow: rgba(255, 68, 68, 0.3);
+        }
+
+        body { 
+            font-family: 'Rajdhani', sans-serif; 
+            background: transparent; 
+            color: #fff; 
+            margin: 0; padding: 20px; 
+            direction: ltr;
+        }
+
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-thumb { background: var(--neon-purple); border-radius: 10px; }
+
+        .header-x {
+            text-align: center; 
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid var(--border-purple);
+            border-radius: 15px;
+            background: linear-gradient(135deg, rgba(188, 19, 254, 0.1), transparent);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header-x::after {
+            content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(188, 19, 254, 0.1), transparent);
+            animation: sweep 4s infinite linear;
+        }
+        @keyframes sweep { 100% { left: 200%; } }
+
+        .header-x h1 {
+            font-family: 'Orbitron'; 
+            font-size: 1.2rem;
+            color: var(--neon-purple); 
+            letter-spacing: 5px; 
+            margin: 0 0 8px 0;
+            text-shadow: 0 0 15px rgba(188, 19, 254, 0.6);
+        }
+
+        .header-x p {
+            font-size: 0.85rem; 
+            color: var(--neon-blue); 
+            margin: 0;
+            letter-spacing: 2px;
+            font-family: 'Orbitron';
+            opacity: 0.8;
+        }
+
+        .label-x-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .grammar-card {
+            background: var(--glass-bg);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-top: 2px solid var(--neon-purple);
+            border-radius: 15px;
+            padding: 20px;
+            position: relative;
+            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            backdrop-filter: blur(10px);
+            animation: cardIn 0.5s ease-out backwards;
+        }
+
+        .grammar-card:hover {
+            box-shadow: 0 10px 30px rgba(188, 19, 254, 0.2);
+            border-color: var(--neon-purple);
+            transform: translateY(-5px);
+        }
+
+        .grammar-card.error-state {
+            border-color: #ff4444;
+            box-shadow: 0 0 20px var(--error-glow);
+            animation: shake 0.4s ease-in-out;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        @keyframes cardIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .case-id {
+            position: absolute; 
+            top: 10px; right: 15px;
+            font-family: 'Orbitron'; 
+            font-size: 8px; 
+            color: rgba(255, 255, 255, 0.3);
+            letter-spacing: 1px;
+        }
+
+        .grammar-formula {
+            font-family: 'Orbitron';
+            font-size: 0.8rem;
+            color: #fff;
+            margin-bottom: 20px;
+            line-height: 1.5;
+            min-height: 40px;
+            display: flex; 
+            align-items: center;
+            border-left: 3px solid var(--neon-blue);
+            padding-left: 12px;
+            text-align: left;
+        }
+
+        .x-input {
+            width: 100%;
+            background: rgba(0,0,0,0.5);
+            border: 1px solid rgba(188, 19, 254, 0.2);
+            border-radius: 10px;
+            color: var(--neon-blue);
+            padding: 12px 15px;
+            font-family: 'Rajdhani';
+            font-size: 1.1rem;
+            outline: none;
+            transition: 0.3s;
+            box-sizing: border-box;
+            text-align: center;
+        }
+
+        .x-input:focus {
+            border-color: var(--neon-purple);
+            background: rgba(188, 19, 254, 0.08);
+            box-shadow: 0 0 15px rgba(188, 19, 254, 0.2);
+        }
+
+        .x-input::placeholder {
+            color: #444;
+            font-size: 0.8rem;
+            letter-spacing: 1px;
+        }
+
+        @media (max-width: 600px) {
+            .label-x-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header-x">
+        <h1 id="level-display">GRAMMAR RADAR: LVL 01</h1>
+        <p>CONSTRUCT TARGET STRUCTURES</p>
+    </div>
+
+    <div id="radar-screen" class="label-x-grid"></div>
+
+<script>
+    const labelXData = {
+        "1": ["Present Simple (Positive)", "Present Simple (Negative)", "Present Simple (Question)", "Past Simple (Positive)", "Past Simple (Negative)", "Past Simple (Question)", "Subject Pronouns", "Object Pronouns", "Possessive Adjectives", "Possessive Pronouns"],
+        "2": ["Present Continuous (Positive)", "Present Continuous (Negative)", "Present Continuous (Question)", "Past Continuous (Positive)", "Past Continuous (Negative)", "Past Continuous (Question)", "Present Simple vs Continuous", "Stative Verbs (Usage)", "Spelling rules for -ing", "Time markers for Continuous"],
+        "3": ["Future Simple (Will - Positive)", "Future Simple (Will - Negative)", "Future Simple (Will - Question)", "Future (Going to - Positive)", "Future (Going to - Question)", "Can / Can't (Ability)", "Must / Mustn't (Obligation)", "Should / Shouldn't (Advice)", "Have to (Positive)", "Don't have to (Lack of necessity)"],
+        "4": ["Present Perfect Simple (Positive)", "Present Perfect Simple (Negative)", "Present Perfect Simple (Question)", "Ever / Never (Usage)", "Just / Already / Yet", "Since vs For", "Present Perfect vs Past Simple", "Been vs Gone", "Have you ever...?", "Past Perfect (Positive)"],
+        "5": ["Present Simple (Passive Positive)", "Present Simple (Passive Negative)", "Present Simple (Passive Question)", "Past Simple (Passive Positive)", "Past Simple (Passive Negative)", "Past Simple (Passive Question)", "By + Agent in Passive", "Passive with two objects", "Passive (It is said that...)", "Active to Passive Conversion"],
+        "6": ["Present Perfect Continuous (Positive)", "Present Perfect Continuous (Question)", "Past Perfect Continuous (Positive)", "Past Perfect Continuous (Negative)", "Future Continuous (Positive)", "Future Perfect (Positive)", "State vs Action Verbs in Continuous", "Emphasis on duration (For/Since)", "Mixed Continuous Tenses", "Narrative Tenses"],
+        "7": ["Present Continuous (Passive)", "Past Continuous (Passive)", "Present Perfect Simple (Passive Positive)", "Present Perfect Simple (Passive Negative)", "Past Perfect Simple (Passive)", "Future Simple (Passive)", "Going to (Passive)", "Modals in Passive (Can be + P.P)", "Passive Voice (Question Forms)", "Passive with Verbs like 'Believe/Think'"],
+        "8": ["May / Might (Possibility)", "Could / Should (Perfect Modals)", "Must have + P.P (Certainty)", "Can't have + P.P (Impossibility)", "Should have + P.P (Regret)", "Needn't vs Don't have to", "Passive Modals (Question)", "Passive with Gerunds", "Passive with Infinitives", "Reporting Passive"],
+        "9": ["Zero Conditional (If/When)", "First Conditional (Real Possibility)", "Second Conditional (Hypothetical)", "Third Conditional (Regret in Past)", "Unless in Conditionals", "Provided that / As long as", "Mixed Conditionals (Type 2 + 3)", "Mixed Conditionals (Type 3 + 2)", "I wish / If only (Present)", "I wish / If only (Past)"],
+        "10": ["Future Perfect Passive", "Modals in Passive (Negative Question)", "Passive with Causative (Have/Get something done)", "Advanced Relative Clauses", "Inversion with Negative Adverbs", "Subjunctive Mood (I suggest that...)", "Gerund vs Infinitive (Passive)", "Future in the Past", "Participle Clauses", "Complex Passive (Modals + Perfect)"]
+    };
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const taskNum = urlParams.get('task') || "1";
+
+    function loadRadar() {
+        const cases = labelXData[taskNum] || labelXData["1"];
+        document.getElementById('level-display').innerText = `GRAMMAR RADAR: LVL ${taskNum.padStart(2, '0')}`;
+        
+        const screen = document.getElementById('radar-screen');
+        screen.innerHTML = cases.map((c, i) => `
+            <div class="grammar-card" id="card-${i}" style="animation-delay: ${i * 0.05}s">
+                <span class="case-id">CASE ID: LX-${taskNum}.${i+1}</span>
+                <div class="grammar-formula">${c}</div>
+                <input type="text" class="x-input" id="case-${i}" placeholder="Synthesize sentence..." autocomplete="off">
+            </div>
+        `).join('');
+    }
+
+    window.addEventListener('message', function(event) {
+        if (event.data.type === 'REQUEST_MISSION_DATA') {
+            sendData();
+        }
+    });
+
+    function sendData() {
+        const answers = [];
+        let missing = false;
+
+        for(let i=0; i<10; i++) {
+            const el = document.getElementById(`case-${i}`);
+            const val = el.value.trim();
+            const card = document.getElementById(`card-${i}`);
+            
+            if(!val) {
+                missing = true;
+                card.classList.add('error-state');
+                setTimeout(() => card.classList.remove('error-state'), 500);
+            } else {
+                card.classList.remove('error-state');
+            }
+            answers.push(val);
+        }
+
+        if(missing) {
+            window.parent.postMessage({ type: 'MISSION_INCOMPLETE' }, '*');
+            return;
+        }
+
+        window.parent.postMessage({ 
+            type: 'MISSION_ANSWERS', 
+            activityCode: 'LX',
+            answers: answers.join(' | '), 
+            missionNum: taskNum 
+        }, '*');
+    }
+
+    window.onload = loadRadar;
+</script>
+</body>
+</html>
