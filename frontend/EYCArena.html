@@ -116,33 +116,33 @@
 function submitToHQ(answers) {
     document.getElementById('sync-overlay').style.display = 'flex';
 
-    // التأكد من استخراج الاسم من localStorage
     const userObj = JSON.parse(localStorage.getItem('eyc_user'));
-    const studentName = userObj ? userObj.name : "Unknown_Agent";
+    const studentName = userObj ? userObj.name : "Agent_Unknown";
 
     const payload = {
         action: "submitMission",
         email: userEmail,
-        name: studentName, 
+        name: studentName,
         activity: currentActivity,
         task: currentTask,
         studentData: JSON.stringify(answers)
     };
 
-    // نستخدم fetch بدون mode: no-cors إذا أمكن، أو نستخدم الطريقة التقليدية لضمان وصول الجسم (Body)
+    // نرسل البيانات كـ text/plain لتجنب مشاكل الـ CORS تماماً مع Google Apps Script
     fetch(MISSIONS_SCRIPT_URL, {
         method: "POST",
-        body: JSON.stringify(payload) // جوجل سكريبت يحتاج البيانات كـ String في الجسم
+        mode: "no-cors", 
+        headers: { "Content-Type": "text/plain" },
+        body: JSON.stringify(payload)
     })
-    .then(res => {
-        // حتى لو لم نحصل على رد بسبب CORS، البيانات ستكون قد وصلت للسيرفر
+    .then(() => {
+        // بما أننا استخدمنا no-cors، جوجل لن يعيد استجابة مقروءة، لذا سنعتبر العملية نجحت
         setTimeout(() => {
             renderResult({ status: "success", grade: "PENDING" });
         }, 2000);
     })
     .catch(err => {
-        console.error(err);
-        renderResult({ status: "error", message: "Connection issue, but mission might be sent." });
+        renderResult({ status: "error", message: "Network failure" });
     });
 }
     function renderResult(res) {
