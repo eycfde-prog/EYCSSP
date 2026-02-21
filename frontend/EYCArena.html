@@ -76,8 +76,8 @@
     </footer>
 
 <script>
-    const CORE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx0hNx1zshift1_zVao1rTaNCoWslxYamme4BAytPXzvmnsBDCQdact-Xna2apENcUz/exec"; 
-    const MISSIONS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxF5qcYSH6nUCcg6WNcc3Cj3VP4OK6cBegyz73c0QdBv4rj0q7CnCrcELSDFnit2ethHA/exec"; 
+    const CORE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzUS2e3uTmKlzIJCHj7xvo9xCtdm8cK5ARiGjvpi4DhFfE1ELC3jvbmYCSX9_basA2s/exec"; 
+    const MISSIONS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzBs2DBqD8Dvq6q9-6NbwozbsIPf5HOdOD3K8QpOG13r2Kdzsda977FlnI36YsIWCfeMA/exec"; 
 
     let userEmail, currentActivity, currentTask;
 
@@ -121,23 +121,22 @@ function submitToHQ(answers) {
         action: "submitMission",
         email: userEmail,
         name: userObj ? userObj.name : "Unknown",
-        activity: currentActivity,
+        activity: currentActivity, // تأكد أن قيمته "AS" لنشاط Alike
         task: currentTask,
         studentData: JSON.stringify(answers)
     };
 
     fetch(MISSIONS_SCRIPT_URL, {
         method: "POST",
+        mode: "cors", // تغيير للوضع الافتراضي
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
         body: JSON.stringify(payload)
     })
-    .then(res => res.json()) // قراءة الرد الحقيقي من السيرفر
-    .then(data => {
-        // نرسل البيانات الحقيقية لدالة العرض
-        renderResult(data); 
-    })
+    .then(res => res.json())
+    .then(data => renderResult(data))
     .catch(err => {
-        console.error(err);
-        renderResult({ status: "error", message: "Network error or invalid mission format." });
+        console.error("Fetch Error:", err);
+        renderResult({ status: "error", message: "CRITICAL_ERROR: Check Network or Script URL" });
     });
 }
 
