@@ -142,14 +142,6 @@
     <div id="quiz-container" class="questions-grid"></div>
 
 <script>
-    function shuffleArray(array) {
-    for (let i = array.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [array[i], array[j]] = [array[j], array[i]];
-    }
-    return array;
-}
-    // تم تضمين قاعدة بيانات الأسئلة كما في الكود المرفق
     const geMissions = {
         "1": { questions: [ { q: "What is the core definition of critical thinking?", options: ["The ability to analyze information objectively and make a reasoned judgment.", "The ability to memorize large amounts of data quickly.", "The process of accepting information without question.", "The act of forming conclusions based solely on emotion."] }, { q: "What is one thing critical thinking helps individuals avoid?", options: ["Logical fallacies.", "Basic conversation.", "Routine physical exercise.", "Reading books."] }, { q: "What two qualities are required to develop critical thinking?", options: ["Curiosity and a willingness to question assumptions.", "Ignoring all external opinions.", "Speed reading and perfect recall.", "Strict adherence to tradition."] }, { q: "Where is critical thinking considered a vital skill?", options: ["In everyday decision-making and academic settings.", "Only in highly specialized scientific fields.", "Only when dealing with political issues.", "Exclusively in historical research."] }, { q: "What is the foundation of scientific inquiry?", options: ["Critical thinking.", "Simple belief.", "Emotional response.", "Random guesswork."] } ] },
         "2": { questions: [ { q: "What primary challenge does the internet present, despite offering information?", options: ["It hosts vast amounts of misinformation.", "It requires expensive equipment.", "It is only available during the day.", "It forces people to read slower."] }, { q: "What does the concept of digital citizenship require users to be?", options: ["Responsible, respectful, and safe online.", "Completely anonymous at all times.", "Experts in coding and software design.", "Always agreeing with others online."] }, { q: "What specific skill is described as no longer optional?", options: ["Learning to evaluate online sources for credibility.", "Learning a new foreign language.", "Starting a professional blog.", "Building a personal website."] }, { q: "What must users protect as part of being a responsible digital citizen?", options: ["Personal data.", "Their computer's physical location.", "The history of the internet.", "Old printed books."] }, { q: "What is the goal of conscious effort in using the internet?", options: ["Harnessing its power while minimizing its potential for harm.", "To completely avoid using all social media platforms.", "To only use it for professional work tasks.", "To spend the maximum amount of time online possible."] } ] },
@@ -161,19 +153,21 @@
         "8": { questions: [ { q: "What does the SMART acronym stand for in goal setting?", options: ["Specific, Measurable, Achievable, Relevant, and Time-bound.", "Simple, Mysterious, Artistic, Realistic, and Technical.", "Strong, Meaningful, Always, Responsible, and True.", "Soft, Manageable, Angry, Red, and Transparent."] }, { q: "What is the benefit of breaking down large goals into smaller milestones?", options: ["It prevents feelings of overwhelm and provides continuous psychological wins.", "It ensures the goal is never actually finished.", "It makes the goal seem unnecessarily complex.", "It reduces the motivation to start."] }, { q: "What do well-defined goals provide?", options: ["Direction, increased motivation, and focused effort.", "Immediate and guaranteed wealth.", "A reason to stop working immediately.", "A simple life with no challenges."] }, { q: "What does the structured approach of goal setting turn vague aspirations into?", options: ["Clear action plans.", "Unnecessary paperwork.", "More complex problems.", "Long philosophical debates."] }, { q: "Regularly reviewing and adjusting goals ensures they remain aligned with what?", options: ["Personal and professional priorities.", "Random daily events.", "The latest fashion trends.", "The opinions of strangers."] } ] },
         "9": { questions: [ { q: "What is time management fundamentally about?", options: ["Working smarter, not harder.", "Adding more hours to the calendar.", "Ignoring all incoming communication.", "Rushing through every single task."] }, { q: "What is one common technique used in effective time management?", options: ["Using the Eisenhower Matrix.", "Avoiding all types of planning.", "Relying entirely on luck.", "Sleeping for most of the day."] }, { q: "What must professionals learn to say \"no\" to?", options: ["Non-essential commitments.", "Required daily tasks.", "All forms of communication.", "Necessary physical exercise."] }, { q: "What can significantly increase a professional's productivity?", options: ["Allocating specific time blocks for deep work and avoiding distractions.", "Working on five different tasks simultaneously.", "Allowing interruptions every five minutes.", "Starting work very late in the day."] }, { q: "Mastering time management leads to what positive outcomes?", options: ["Less stress, better work-life balance, and consistent achievement.", "More arguments with colleagues.", "Guaranteed promotion regardless of performance.", "A sudden change in job location."] } ] },
         "10": { questions: [ { q: "What is the critical role of the ozone layer?", options: ["Protecting life on our planet by absorbing harmful UV radiation.", "Reflecting all visible light back into space.", "Producing all the oxygen we breathe.", "Controlling the speed of the wind."] }, { q: "What environmental effort was successfully phased out globally since the 1980s?", options: ["Ozone-depleting substances.", "Using all forms of electricity.", "Driving cars on roads.", "Planting new trees."] }, { q: "What type of radiation does the ozone layer primarily absorb?", options: ["Harmful ultraviolet (UV) radiation.", "Infrared heat radiation.", "Radio waves for communication.", "Visible light spectrum."] }, { q: "What is the ongoing recovery of the ozone layer a testament to?", options: ["The effectiveness of coordinated international environmental policy.", "The fact that ozone is no longer needed.", "A natural cosmic intervention.", "The failure of global cooperation."] }, { q: "What would life on Earth face without the ozone layer's protection?", options: ["Severe health and environmental damage.", "A pleasant increase in temperature.", "Unnecessary political debates.", "A sudden burst of creativity."] } ] }
-    };        // ... (سيتم تحميل الأسئلة بناءً على رقم المهمة)
-
+    };
 
     const urlParams = new URLSearchParams(window.location.search);
     const taskNum = urlParams.get('task') || "1";
     let selectedAnswers = {};
 
+    function shuffleArray(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+        return array;
+    }
+
     function initGE() {
-        const audio = document.getElementById('mainAudio');
-        const source = document.getElementById('audioSource');
-        
-        // ضبط المسار السمعي
-function initGE() {
         const audio = document.getElementById('mainAudio');
         const source = document.getElementById('audioSource');
         
@@ -187,7 +181,6 @@ function initGE() {
         const container = document.getElementById('quiz-container');
         
         container.innerHTML = mission.questions.map((qObj, qIdx) => {
-            // نأخذ نسخة من الخيارات ونقوم بخلطها عشوائياً
             const shuffledOptions = shuffleArray([...qObj.options]);
             
             return `
@@ -219,29 +212,27 @@ function initGE() {
         }
     });
 
-// ابحث عن دالة collectAndSubmit واستبدلها بهذا الجزء
-function collectAndSubmit() {
-    const answersArray = [];
-    let missing = false;
+    function collectAndSubmit() {
+        const answersArray = [];
+        let missing = false;
 
-    for(let i=0; i<5; i++) {
-        if(!selectedAnswers[i]) missing = true;
-        // نرسل المصفوفة كما هي
-        answersArray.push(selectedAnswers[i] || "");
-    }
+        for(let i=0; i<5; i++) {
+            if(!selectedAnswers[i]) missing = true;
+            answersArray.push(selectedAnswers[i] || "");
+        }
 
-    if(missing) {
-        window.parent.postMessage({ type: 'MISSION_INCOMPLETE' }, '*');
-        return;
+        if(missing) {
+            window.parent.postMessage({ type: 'MISSION_INCOMPLETE' }, '*');
+            return;
+        }
+        
+        window.parent.postMessage({
+            type: 'MISSION_ANSWERS',
+            activityCode: 'GE',
+            answers: answersArray,
+            task: taskNum
+        }, '*');
     }
-    
-    window.parent.postMessage({
-        type: 'MISSION_ANSWERS',
-        activityCode: 'GE', // تأكد أنها GE لتطابق السكريبت
-        answers: answersArray, // إرسال مصفوفة وليس نص join
-        task: taskNum
-    }, '*');
-}
 
     window.onload = initGE;
 </script>
