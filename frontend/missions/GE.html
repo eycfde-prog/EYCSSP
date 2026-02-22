@@ -142,6 +142,13 @@
     <div id="quiz-container" class="questions-grid"></div>
 
 <script>
+    function shuffleArray(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
+}
     // تم تضمين قاعدة بيانات الأسئلة كما في الكود المرفق
     const geMissions = {
         "1": { questions: [ { q: "What is the core definition of critical thinking?", options: ["The ability to analyze information objectively and make a reasoned judgment.", "The ability to memorize large amounts of data quickly.", "The process of accepting information without question.", "The act of forming conclusions based solely on emotion."] }, { q: "What is one thing critical thinking helps individuals avoid?", options: ["Logical fallacies.", "Basic conversation.", "Routine physical exercise.", "Reading books."] }, { q: "What two qualities are required to develop critical thinking?", options: ["Curiosity and a willingness to question assumptions.", "Ignoring all external opinions.", "Speed reading and perfect recall.", "Strict adherence to tradition."] }, { q: "Where is critical thinking considered a vital skill?", options: ["In everyday decision-making and academic settings.", "Only in highly specialized scientific fields.", "Only when dealing with political issues.", "Exclusively in historical research."] }, { q: "What is the foundation of scientific inquiry?", options: ["Critical thinking.", "Simple belief.", "Emotional response.", "Random guesswork."] } ] },
