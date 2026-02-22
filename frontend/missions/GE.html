@@ -173,6 +173,10 @@
         const source = document.getElementById('audioSource');
         
         // ضبط المسار السمعي
+function initGE() {
+        const audio = document.getElementById('mainAudio');
+        const source = document.getElementById('audioSource');
+        
         const audioPath = `../../assets/gesaudio/GES${taskNum}.wav`;
         source.src = audioPath;
         audio.load();
@@ -182,19 +186,24 @@
         const mission = geMissions[taskNum] || geMissions["1"];
         const container = document.getElementById('quiz-container');
         
-        container.innerHTML = mission.questions.map((qObj, qIdx) => `
-            <div class="question-card">
-                <div class="question-text">${qIdx + 1}. ${qObj.q}</div>
-                <div class="options-list" id="q-${qIdx}">
-                    ${qObj.options.map(opt => `
-                        <div class="option-item" onclick="selectOption(${qIdx}, '${opt.replace(/'/g, "\\'")}', this)">
-                            <div class="radio-dot"></div>
-                            ${opt}
-                        </div>
-                    `).join('')}
+        container.innerHTML = mission.questions.map((qObj, qIdx) => {
+            // نأخذ نسخة من الخيارات ونقوم بخلطها عشوائياً
+            const shuffledOptions = shuffleArray([...qObj.options]);
+            
+            return `
+                <div class="question-card">
+                    <div class="question-text">${qIdx + 1}. ${qObj.q}</div>
+                    <div class="options-list" id="q-${qIdx}">
+                        ${shuffledOptions.map(opt => `
+                            <div class="option-item" onclick="selectOption(${qIdx}, '${opt.replace(/'/g, "\\'")}', this)">
+                                <div class="radio-dot"></div>
+                                ${opt}
+                            </div>
+                        `).join('')}
+                    </div>
                 </div>
-            </div>
-        `).join('');
+            `;
+        }).join('');
     }
 
     function selectOption(qIdx, val, el) {
