@@ -141,43 +141,58 @@
     const urlParams = new URLSearchParams(window.location.search);
     const taskNum = parseInt(urlParams.get('task')) || 1;
 
-    function loadLabelMission() {
-        const currentTask = labelData[taskNum.toString()] || labelData["1"];
-        document.getElementById('topic-title').innerText = `SEC: ${currentTask.topic}`;
+function loadLabelMission() {
+    const currentTask = labelData[taskNum.toString()] || labelData["1"];
+    document.getElementById('topic-title').innerText = `SEC: ${currentTask.topic}`;
+    
+    const container = document.getElementById('label-zone');
+    let html = '';
+
+    for (let i = 0; i < 10; i++) {
+        const imgID = ((taskNum - 1) * 10) + (i + 1);
         
-        const container = document.getElementById('label-zone');
-        let html = '';
+        // المحاولة الأولى: المسار الذي ذكرته (داخل نفس مجلد الـ frontend)
+        // جربنا ../ لأنك قلت إنه بجانبه
+        const imgSrc = `../eyclogs/${imgID}.png`;
 
-        for (let i = 0; i < 10; i++) {
-            const imgID = ((taskNum - 1) * 10) + (i + 1);
-            
-            // تصحيح المسار: حذف كلمة src من داخل النص وإضافة النقاط للرجوع للخلف
-            const imgSrc = `../eyclogs/${imgID}.png`;
-
-            html += `
-                <div class="image-card" id="card-${i}" style="animation-delay: ${i * 0.08}s">
-                    <div class="img-container" onclick="openZoom(this.querySelector('img').src)">
-                        <img src="${imgSrc}" onerror="smartLoader(this, ${imgID})">
-                    </div>
-                    <input type="text" class="label-input" id="label-${i}" placeholder="IDENTIFY..." autocomplete="off">
+        html += `
+            <div class="image-card" id="card-${i}">
+                <div class="img-container" onclick="openZoom(this.querySelector('img').src)">
+                    <img src="${imgSrc}" 
+                         data-id="${imgID}"
+                         onload="console.log('✅ SUCCESS ID ' + ${imgID} + ' AT: ' + this.src)"
+                         onerror="ultimateSmartLoader(this)">
                 </div>
-            `;
-        }
-        container.innerHTML = html;
+                <input type="text" class="label-input" id="label-${i}" placeholder="IDENTIFY..." autocomplete="off">
+            </div>
+        `;
     }
+    container.innerHTML = html;
+}
 
-    // دالة المعالجة الذكية للامتدادات (png, jpg, PNG)
-    function smartLoader(img, id) {
-        if (img.src.includes('.png')) {
-            img.src = `../eyclogs/${id}.jpg`;
-        } else if (img.src.includes('.jpg')) {
-            img.src = `../eyclogs/${id}.PNG`;
-        } else {
-            img.onerror = null;
-            // استخدام رابط بديل مستقر لا يعتمد على placeholder
-            img.src = "https://placehold.jp/24/00f2ff/000000/150x150.png?text=NOT_FOUND";
-        }
+function ultimateSmartLoader(img) {
+    const id = img.dataset.id;
+    if (!img.dataset.attempt) img.dataset.attempt = "0";
+    let attempt = parseInt(img.dataset.attempt);
+
+    // قائمة الاحتمالات للمسارات بناءً على هيكلة ملفاتك
+    const strategies = [
+        `./eyclogs/${id}.png`,           // احتمال 1: المجلد بجانب الملف مباشرة
+        `/frontend/eyclogs/${id}.png`,   // احتمال 2: المسار الكامل من الـ Root
+        `/eyclogs/${id}.png`,            // احتمال 3: من الـ Root مباشرة
+        `../eyclogs/${id}.jpg`,          // احتمال 4: تغيير الامتداد لـ jpg
+        `../eyclogs/${id}.PNG`           // احتمال 5: تغيير الامتداد لـ PNG كبير
+    ];
+
+    if (attempt < strategies.length) {
+        console.warn(`Attempting path #${attempt} for ID ${id}: ${strategies[attempt]}`);
+        img.dataset.attempt = (attempt + 1).toString();
+        img.src = strategies[attempt];
+    } else {
+        img.onerror = null;
+        img.src = 'https://placehold.jp/24/00f2ff/000000/150x150.png?text=NOT_FOUND';
     }
+}
 
     function openZoom(src) {
         document.getElementById('zoomed-img').src = src;
