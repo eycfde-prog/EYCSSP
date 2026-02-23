@@ -146,7 +146,7 @@
     const urlParams = new URLSearchParams(window.location.search);
     const taskNum = parseInt(urlParams.get('task')) || 1;
 
-    function loadLabelMission() {
+function loadLabelMission() {
         const currentTask = labelData[taskNum.toString()] || labelData["1"];
         document.getElementById('topic-title').innerText = `SEC: ${currentTask.topic}`;
         
@@ -154,14 +154,17 @@
         let html = '';
 
         for (let i = 0; i < 10; i++) {
-            // حساب رقم الصورة التسلسلي (1-100)
             const imgID = ((taskNum - 1) * 10) + (i + 1);
-            const imgSrc = `/assests/lbpics/${imgID}.png`;
+            
+            // محاولة الوصول للمسار بالاعتماد على المجلد الرئيسي مباشرة
+            const imgSrc = `../assests/lbpics/${imgID}.png`;
 
             html += `
                 <div class="image-card" id="card-${i}" style="animation-delay: ${i * 0.08}s">
                     <div class="img-container" onclick="openZoom('${imgSrc}')">
-                        <img src="${imgSrc}" onerror="this.src='https://via.placeholder.com/150/111/00f2ff?text=IMG_${imgID}'">
+                        <img src="${imgSrc}" 
+                             onload="console.log('Success loading: ' + this.src)"
+                             onerror="console.error('FAILED to load: ' + this.src); this.src='https://placehold.co/150x150/111/00f2ff?text=NOT+FOUND'">
                     </div>
                     <input type="text" class="label-input" id="label-${i}" placeholder="IDENTIFY..." autocomplete="off">
                 </div>
