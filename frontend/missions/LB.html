@@ -144,24 +144,25 @@
 function loadLabelMission() {
     const currentTask = labelData[taskNum.toString()] || labelData["1"];
     document.getElementById('topic-title').innerText = `SEC: ${currentTask.topic}`;
-    
     const container = document.getElementById('label-zone');
     let html = '';
+
+    // الرابط المباشر للمستودع (تأكد من اسم المستخدم واسم المستودع)
+    const repoBase = "https://raw.githubusercontent.com/eycfde-prog/EYCSSP/main/frontend/eyclogs/";
 
     for (let i = 0; i < 10; i++) {
         const imgID = ((taskNum - 1) * 10) + (i + 1);
         
-        // المحاولة الأولى: المسار الذي ذكرته (داخل نفس مجلد الـ frontend)
-        // جربنا ../ لأنك قلت إنه بجانبه
-        const imgSrc = `../eyclogs/${imgID}.png`;
+        // هنجرب الـ png أول حاجة من لينك الـ Raw بتاع جيت هاب
+        const imgSrc = `${repoBase}${imgID}.png`;
 
         html += `
             <div class="image-card" id="card-${i}">
                 <div class="img-container" onclick="openZoom(this.querySelector('img').src)">
                     <img src="${imgSrc}" 
                          data-id="${imgID}"
-                         onload="console.log('✅ SUCCESS ID ' + ${imgID} + ' AT: ' + this.src)"
-                         onerror="ultimateSmartLoader(this)">
+                         onload="console.log('🔥 BINGO! ID ' + ${imgID})"
+                         onerror="githubFallback(this)">
                 </div>
                 <input type="text" class="label-input" id="label-${i}" placeholder="IDENTIFY..." autocomplete="off">
             </div>
@@ -170,30 +171,24 @@ function loadLabelMission() {
     container.innerHTML = html;
 }
 
-function ultimateSmartLoader(img) {
+function githubFallback(img) {
     const id = img.dataset.id;
-    if (!img.dataset.attempt) img.dataset.attempt = "0";
-    let attempt = parseInt(img.dataset.attempt);
+    const repoBase = "https://raw.githubusercontent.com/eycfde-prog/EYCSSP/main/frontend/eyclogs/";
+    
+    if (!img.dataset.failcount) img.dataset.failcount = "0";
+    let fail = parseInt(img.dataset.failcount);
 
-    // قائمة الاحتمالات للمسارات بناءً على هيكلة ملفاتك
-    const strategies = [
-        `./eyclogs/${id}.png`,           // احتمال 1: المجلد بجانب الملف مباشرة
-        `/frontend/eyclogs/${id}.png`,   // احتمال 2: المسار الكامل من الـ Root
-        `/eyclogs/${id}.png`,            // احتمال 3: من الـ Root مباشرة
-        `../eyclogs/${id}.jpg`,          // احتمال 4: تغيير الامتداد لـ jpg
-        `../eyclogs/${id}.PNG`           // احتمال 5: تغيير الامتداد لـ PNG كبير
-    ];
-
-    if (attempt < strategies.length) {
-        console.warn(`Attempting path #${attempt} for ID ${id}: ${strategies[attempt]}`);
-        img.dataset.attempt = (attempt + 1).toString();
-        img.src = strategies[attempt];
+    if (fail === 0) {
+        img.dataset.failcount = "1";
+        img.src = `${repoBase}${id}.jpg`; // جرب jpg
+    } else if (fail === 1) {
+        img.dataset.failcount = "2";
+        img.src = `${repoBase}${id}.PNG`; // جرب PNG كبيرة
     } else {
         img.onerror = null;
-        img.src = 'https://placehold.jp/24/00f2ff/000000/150x150.png?text=NOT_FOUND';
+        img.src = "https://placehold.jp/24/00f2ff/000000/150x150.png?text=NOT_FOUND";
     }
 }
-
     function openZoom(src) {
         document.getElementById('zoomed-img').src = src;
         document.getElementById('zoom-overlay').style.display = 'flex';
