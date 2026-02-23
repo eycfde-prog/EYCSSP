@@ -147,33 +147,48 @@
     const taskNum = parseInt(urlParams.get('task')) || 1;
 
 function loadLabelMission() {
+    console.log("Current Page Path:", window.location.pathname);
     const currentTask = labelData[taskNum.toString()] || labelData["1"];
     document.getElementById('topic-title').innerText = `SEC: ${currentTask.topic}`;
-    
     const container = document.getElementById('label-zone');
     let html = '';
 
     for (let i = 0; i < 10; i++) {
         const imgID = ((taskNum - 1) * 10) + (i + 1);
         
-        // المسار المطلق بيبدأ بـ / عشان يروح للجذر فوراً
-        // كتبنا assests بالسين الزيادة زي ما هي في المستودع
-        const imgSrc = `/assests/lbpics/${imgID}.png`;
+        // سنحاول استخدام مسار "نسبي مرن" جداً
+        const imgSrc = `../assests/lbpics/${imgID}.png`;
 
         html += `
-            <div class="image-card" id="card-${i}" style="animation-delay: ${i * 0.08}s">
-                <div class="img-container" onclick="openZoom(this.querySelector('img').src)">
+            <div class="image-card" id="card-${i}">
+                <div class="img-container">
                     <img src="${imgSrc}" 
-                         onload="console.log('SUCCESS ✅: ' + this.src)"
-                         onerror="smartLoader(this, ${imgID})">
+                         onload="console.log('✅ FOUND AT: ' + this.src)"
+                         onerror="checkPath(this, ${imgID})">
                 </div>
-                <input type="text" class="label-input" id="label-${i}" placeholder="IDENTIFY..." autocomplete="off">
+                <input type="text" class="label-input" id="label-${i}" placeholder="IDENTIFY...">
             </div>
         `;
     }
     container.innerHTML = html;
 }
 
+function checkPath(img, id) {
+    // محاولة أخيرة: إذا كنا في /frontend/missions/LB.html
+    // سنحاول الخروج 3 مستويات بدلاً من 2 أو 1
+    if (!img.dataset.tried) {
+        img.dataset.tried = "1";
+        console.log("Trying Level 1 backup for ID:", id);
+        img.src = `../../assests/lbpics/${id}.png`; 
+    } else if (img.dataset.tried === "1") {
+        img.dataset.tried = "2";
+        console.log("Trying Level 2 (Root) backup for ID:", id);
+        img.src = `./assests/lbpics/${id}.png`;
+    } else {
+        img.onerror = null;
+        img.src = 'https://placehold.co/150x150/111/00f2ff?text=NOT_FOUND';
+    }
+}
 function smartLoader(img, id) {
     console.warn('🔄 Trying alternative for ID:', id);
     
