@@ -147,31 +147,47 @@
     const taskNum = parseInt(urlParams.get('task')) || 1;
 
 function loadLabelMission() {
-    console.log("Current Page Path:", window.location.pathname);
-    const currentTask = labelData[taskNum.toString()] || labelData["1"];
-    document.getElementById('topic-title').innerText = `SEC: ${currentTask.topic}`;
-    const container = document.getElementById('label-zone');
-    let html = '';
-
-    for (let i = 0; i < 10; i++) {
-        const imgID = ((taskNum - 1) * 10) + (i + 1);
+        const currentTask = labelData[taskNum.toString()] || labelData["1"];
+        document.getElementById('topic-title').innerText = `SEC: ${currentTask.topic}`;
         
-        // سنحاول استخدام مسار "نسبي مرن" جداً
-        const imgSrc = `../assests/lbpics/${imgID}.png`;
+        const container = document.getElementById('label-zone');
+        let html = '';
 
-        html += `
-            <div class="image-card" id="card-${i}">
-                <div class="img-container">
-                    <img src="${imgSrc}" 
-                         onload="console.log('✅ FOUND AT: ' + this.src)"
-                         onerror="checkPath(this, ${imgID})">
+        for (let i = 0; i < 10; i++) {
+            const imgID = ((taskNum - 1) * 10) + (i + 1);
+            
+            // المسار الجديد: نخرج من missions وندخل eyclogs
+            const imgSrc = `../eyclogs/${imgID}.png`;
+
+            html += `
+                <div class="image-card" id="card-${i}" style="animation-delay: ${i * 0.08}s">
+                    <div class="img-container" onclick="openZoom(this.querySelector('img').src)">
+                        <img src="${imgSrc}" 
+                             onload="console.log('✅ Loaded: ' + ${imgID})"
+                             onerror="smartLoader(this, ${imgID})">
+                    </div>
+                    <input type="text" class="label-input" id="label-${i}" placeholder="IDENTIFY..." autocomplete="off">
                 </div>
-                <input type="text" class="label-input" id="label-${i}" placeholder="IDENTIFY...">
-            </div>
-        `;
+            `;
+        }
+        container.innerHTML = html;
     }
-    container.innerHTML = html;
-}
+
+    // دالة المعالجة للامتدادات المختلفة داخل المجلد الجديد
+    function smartLoader(img, id) {
+        if (img.src.includes('.png')) {
+            // محاولة jpg (للصور من 11 لـ 20)
+            img.src = `../eyclogs/${id}.jpg`;
+        } else if (img.src.includes('.jpg')) {
+            // محاولة PNG (لصورة رقم 1)
+            img.src = `../eyclogs/${id}.PNG`;
+        } else {
+            // الصورة البديلة النهائية في حال عدم وجود الملف تماماً
+            img.onerror = null;
+            img.src = 'https://placehold.co/150x150/111/00f2ff?text=NOT+FOUND';
+            console.error('❌ Missing Image ID:', id);
+        }
+    }
 
 function checkPath(img, id) {
     // محاولة أخيرة: إذا كنا في /frontend/missions/LB.html
