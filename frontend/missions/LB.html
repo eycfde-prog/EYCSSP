@@ -22,7 +22,6 @@
             direction: ltr;
         }
 
-        /* رأس الصفحة التقني */
         .topic-header {
             font-family: 'Orbitron';
             color: var(--neon-blue);
@@ -37,7 +36,7 @@
 
         .label-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
             gap: 20px;
         }
 
@@ -52,16 +51,6 @@
             animation: cardSlide 0.6s ease-out backwards;
         }
 
-        @keyframes cardSlide {
-            from { opacity: 0; transform: scale(0.9) translateY(20px); }
-            to { opacity: 1; transform: scale(1) translateY(0); }
-        }
-
-        .image-card:hover {
-            border-color: var(--neon-blue);
-            box-shadow: 0 0 20px rgba(0, 242, 255, 0.15);
-        }
-
         .img-container {
             width: 100%; height: 110px;
             background: rgba(0,0,0,0.5);
@@ -70,16 +59,14 @@
             display: flex; align-items: center; justify-content: center;
             border: 1px solid rgba(0, 242, 255, 0.1);
             overflow: hidden;
+            cursor: zoom-in; /* مؤشر للتكبير */
         }
 
         .img-container img {
-            max-width: 85%; max-height: 85%;
+            max-width: 90%; max-height: 90%;
             object-fit: contain;
-            filter: drop-shadow(0 0 5px rgba(255,255,255,0.2));
             transition: 0.5s;
         }
-
-        .image-card:hover img { transform: scale(1.1); }
 
         .label-input {
             width: 100%;
@@ -92,22 +79,44 @@
             font-size: 0.8rem;
             outline: none;
             border-radius: 8px;
-            box-sizing: border-box;
-            transition: 0.3s;
         }
 
-        .label-input:focus {
-            border-color: var(--gold);
-            background: rgba(255, 204, 0, 0.08);
-            box-shadow: 0 0 10px rgba(255, 204, 0, 0.2);
+        /* --- نظام الـ Pop-up (المكبر) --- */
+        #zoom-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.95);
+            z-index: 1000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(10px);
+        }
+
+        #zoom-overlay img {
+            max-width: 90%;
+            max-height: 80%;
+            border: 2px solid var(--neon-blue);
+            box-shadow: 0 0 30px var(--border-glow);
+            border-radius: 15px;
+        }
+
+        .close-zoom {
+            position: absolute;
+            top: 30px;
+            right: 30px;
+            background: var(--neon-blue);
+            color: #000;
+            border: none;
+            padding: 10px 20px;
+            font-family: 'Orbitron';
+            font-weight: bold;
+            border-radius: 5px;
+            cursor: pointer;
         }
 
         .error-card { border-color: var(--error-red) !important; animation: shake 0.4s ease-in-out; }
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-6px); }
-            75% { transform: translateX(6px); }
-        }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-6px); } 75% { transform: translateX(6px); } }
     </style>
 </head>
 <body>
@@ -115,41 +124,60 @@
     <div id="topic-title" class="topic-header">SCANNING DATA...</div>
     <div id="label-zone" class="label-grid"></div>
 
+    <div id="zoom-overlay" onclick="closeZoom()">
+        <button class="close-zoom">BACK</button>
+        <img id="zoomed-img" src="" alt="Zoomed View">
+    </div>
+
 <script>
     const labelData = {
-        "1": { topic: "Kitchen Tech", words: ["Grater", "Kettle", "Whisk", "Spatula", "Peeler", "Blender", "Strainer", "Toaster", "Microwave", "Oven-mitts"] },
-        "2": { topic: "Deep Space", words: ["Astronaut", "Galaxy", "Telescope", "Meteor", "Satellite", "Eclipse", "Spaceship", "Comet", "Planet", "Rocket"] },
-        "3": { topic: "Office HQ", words: ["Stapler", "Paperclip", "Highlighter", "Folder", "Scissors", "Clipboard", "Calculator", "Protractor", "Eraser", "Notebook"] },
-        "4": { topic: "Force of Nature", words: ["Volcano", "Earthquake", "Tsunami", "Tornado", "Flood", "Drought", "Avalanche", "Wildfire", "Hurricane", "Blizzard"] },
-        "5": { topic: "Medical Lab", words: ["Stethoscope", "Syringe", "Thermometer", "Bandage", "Wheelchair", "Microscope", "Scalpel", "Crutches", "First-aid", "Tablet"] },
-        "6": { topic: "Expedition Gear", words: ["Backpack", "Compass", "Flashlight", "Sleeping-bag", "Lantern", "Tent", "Hammock", "Campfire", "Binoculars", "Map"] },
-        "7": { topic: "The Garden", words: ["Wheelbarrow", "Watering-can", "Shovel", "Rake", "Seeds", "Lawn-mower", "Flowerpot", "Pruning-shears", "Soil", "Fence"] },
-        "8": { topic: "Rapid Transit", words: ["Helicopter", "Submarine", "Scooter", "Motorcycle", "Yacht", "Tram", "Caravan", "Ferry", "Bulldozer", "Hot-air-balloon"] },
-        "9": { topic: "Fashion Specs", words: ["Collar", "Sleeve", "Zipper", "Button", "Pocket", "Hood", "Belt", "Scarf", "Cufflink", "Shoelace"] },
-        "10": { topic: "Music Studio", words: ["Violin", "Saxophone", "Trumpet", "Flute", "Cello", "Harp", "Accordion", "Tambourine", "Electric-guitar", "Drum-sticks"] }
+        "1": { topic: "Kitchen Tech" },
+        "2": { topic: "Animal Kingdom" },
+        "3": { topic: "Office HQ" },
+        "4": { topic: "Nature & Veggies" },
+        "5": { topic: "Medical Lab" },
+        "6": { topic: "Expedition Gear" },
+        "7": { topic: "Occupations" },
+        "8": { topic: "Transport" },
+        "9": { topic: "Fashion Specs" },
+        "10": { topic: "Music Studio" }
     };
 
     const urlParams = new URLSearchParams(window.location.search);
     const taskNum = parseInt(urlParams.get('task')) || 1;
-    let currentTaskWords = [];
 
     function loadLabelMission() {
         const currentTask = labelData[taskNum.toString()] || labelData["1"];
-        currentTaskWords = currentTask.words;
         document.getElementById('topic-title').innerText = `SEC: ${currentTask.topic}`;
         
         const container = document.getElementById('label-zone');
-        container.innerHTML = currentTaskWords.map((w, i) => {
+        let html = '';
+
+        for (let i = 0; i < 10; i++) {
+            // حساب رقم الصورة التسلسلي (1-100)
             const imgID = ((taskNum - 1) * 10) + (i + 1);
-            return `
+            const imgSrc = `../../assets/lbpics/${imgID}.png`;
+
+            html += `
                 <div class="image-card" id="card-${i}" style="animation-delay: ${i * 0.08}s">
-                    <div class="img-container">
-                        <img src="../../assets/aspics/LS${imgID}.png" alt="ID_${imgID}" onerror="this.src='https://via.placeholder.com/150/111/00f2ff?text=OBJ_${imgID}'">
+                    <div class="img-container" onclick="openZoom('${imgSrc}')">
+                        <img src="${imgSrc}" onerror="this.src='https://via.placeholder.com/150/111/00f2ff?text=IMG_${imgID}'">
                     </div>
                     <input type="text" class="label-input" id="label-${i}" placeholder="IDENTIFY..." autocomplete="off">
                 </div>
             `;
-        }).join('');
+        }
+        container.innerHTML = html;
+    }
+
+    // وظائف التكبير
+    function openZoom(src) {
+        document.getElementById('zoomed-img').src = src;
+        document.getElementById('zoom-overlay').style.display = 'flex';
+    }
+
+    function closeZoom() {
+        document.getElementById('zoom-overlay').style.display = 'none';
     }
 
     function collectData() {
@@ -174,10 +202,9 @@
         
         window.parent.postMessage({
             type: 'MISSION_ANSWERS',
-            activityCode: 'LS',
-            answers: studentAnswers.join(' | '),
-            modelAnswers: currentTaskWords.join(' | '),
-            missionNum: taskNum.toString()
+            activityCode: 'LB', // تم تعديله لـ LB ليتوافق مع السكريبت
+            answers: studentAnswers, // إرسال مصفوفة مباشرة
+            task: taskNum.toString()
         }, '*');
     }
 
