@@ -58,7 +58,8 @@
             background: var(--glass);
             color: var(--gold); 
             border: 1px solid var(--gold); 
-            padding: 10px 188px; 
+            padding: 10px 0; /* Changed from fixed 188px to responsive */
+            width: 100%;
             border-radius: 12px; 
             cursor: pointer; 
             font-family: 'Orbitron'; 
@@ -66,6 +67,7 @@
             margin-bottom: 15px; 
             display: flex;
             align-items: center;
+            justify-content: center;
             gap: 10px;
             transition: 0.3s;
             letter-spacing: 1px;
@@ -248,10 +250,13 @@
             const t = parseInt(taskNum);
             const qIdx = parseInt(idx);
             const audioFileNum = ((t - 1) * 5) + (qIdx + 1);
-            const rawUrl = "https://raw.githubusercontent.com/eycfde-prog/EYCSSP/bea0670e00e02897a2d3c2d237332efbcb27f636/frontend/eyclgos/alxaudio/";
+            
+            // تم تصحيح الرابط ليكون Raw ومباشر وتصحيح اسم المجلد ليكون eyclogs
+            const rawUrl = "https://raw.githubusercontent.com/eycfde-prog/EYCSSP/main/frontend/eyclogs/alxaudio/";
+            
             const audio = new Audio(`${rawUrl}${audioFileNum}.wav`);
             audio.play().catch(e => {
-                console.error("Signal Lost for file:", audioFileNum);
+                console.error("Signal Lost for file:", audioFileNum, "Error:", e);
             });
         }
 
