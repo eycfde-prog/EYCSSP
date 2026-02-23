@@ -130,56 +130,55 @@
     const localPath = "../eyclogs/lbpics/";
     const githubPath = "https://raw.githubusercontent.com/eycfde-prog/EYCSSP/main/frontend/eyclogs/lbpics/";
 
-    function loadLabelMission() {
-        const currentTask = labelData[taskNum.toString()] || labelData["1"];
-        document.getElementById('topic-title').innerText = `SEC: ${currentTask.topic}`;
-        const container = document.getElementById('label-zone');
-        let html = '';
+function loadLabelMission() {
+    const currentTask = labelData[taskNum.toString()] || labelData["1"];
+    document.getElementById('topic-title').innerText = `SEC: ${currentTask.topic}`;
+    const container = document.getElementById('label-zone');
+    let html = '';
 
-        for (let i = 0; i < 10; i++) {
-            const imgID = ((taskNum - 1) * 10) + (i + 1);
-            // نبدأ بالمحاولة المحلية أولاً لسرعة التحميل
-            const imgSrc = `${localPath}${imgID}.png`;
+    // الرابط المباشر للمستودع الجديد (تأكد من السبيلنج eyclogs وليس eyclgos)
+    // لاحظ أننا أضفنا "main/frontend/eyclogs/lbpics/"
+    const githubBase = "https://raw.githubusercontent.com/eycfde-prog/EYCSSP/main/frontend/eyclogs/lbpics/";
 
-            html += `
-                <div class="image-card" id="card-${i}">
-                    <div class="img-container" onclick="openZoom(this.querySelector('img').src)">
-                        <img src="${imgSrc}" 
-                             data-id="${imgID}"
-                             onload="console.log('✅ Loaded ID: ' + ${imgID})"
-                             onerror="smartFallback(this)">
-                    </div>
-                    <input type="text" class="label-input" id="label-${i}" placeholder="IDENTIFY..." autocomplete="off">
+    for (let i = 0; i < 10; i++) {
+        const imgID = ((taskNum - 1) * 10) + (i + 1);
+        
+        // سنضيف "توقيت" عشوائي للرابط لمنع المتصفح من استخدام الذاكرة القديمة (Cache Busting)
+        const cacheBuster = `?v=${new Date().getTime()}`;
+        const imgSrc = `${githubBase}${imgID}.png${cacheBuster}`;
+
+        html += `
+            <div class="image-card" id="card-${i}">
+                <div class="img-container" onclick="openZoom(this.querySelector('img').src)">
+                    <img src="${imgSrc}" 
+                         data-id="${imgID}"
+                         onload="console.log('✅ NEW IMAGE LOADED: ' + ${imgID})"
+                         onerror="finalFallback(this)">
                 </div>
-            `;
-        }
-        container.innerHTML = html;
+                <input type="text" class="label-input" id="label-${i}" placeholder="IDENTIFY..." autocomplete="off">
+            </div>
+        `;
     }
+    container.innerHTML = html;
+}
 
-    function smartFallback(img) {
-        const id = img.dataset.id;
-        if (!img.dataset.step) img.dataset.step = "0";
-        let step = parseInt(img.dataset.step);
-
-        const fallbacks = [
-            `${localPath}${id}.jpg`,          // محلي jpg
-            `${localPath}${id}.PNG`,          // محلي PNG كبير
-            `${githubPath}${id}.png`,         // جيت هاب png
-            `${githubPath}${id}.jpg`,         // جيت هاب jpg
-            `${githubPath}${id}.PNG`          // جيت هاب PNG كبير
-        ];
-
-        if (step < fallbacks.length) {
-            console.warn(`🔄 Trial ${step + 1} for ID ${id}: ${fallbacks[step]}`);
-            img.dataset.step = step + 1;
-            img.src = fallbacks[step];
-        } else {
-            img.onerror = null;
-            img.src = "https://placehold.jp/24/00f2ff/000000/150x150.png?text=NOT_FOUND";
-            console.error(`❌ All paths failed for ID ${id}`);
-        }
+function finalFallback(img) {
+    const id = img.dataset.id;
+    const githubBase = "https://raw.githubusercontent.com/eycfde-prog/EYCSSP/main/frontend/eyclogs/lbpics/";
+    
+    // إذا فشل الـ png، نجرب الـ jpg والـ PNG الكبيرة
+    if (!img.dataset.retry) {
+        img.dataset.retry = "1";
+        img.src = `${githubBase}${id}.jpg`;
+    } else if (img.dataset.retry === "1") {
+        img.dataset.retry = "2";
+        img.src = `${githubBase}${id}.PNG`;
+    } else {
+        img.onerror = null;
+        img.src = "https://placehold.jp/24/00f2ff/000000/150x150.png?text=FILE_NOT_IN_REPO";
+        console.error("🔴 Fatal: Image " + id + " does not exist in the repository folder.");
     }
-
+}
     function openZoom(src) {
         document.getElementById('zoomed-img').src = src;
         document.getElementById('zoom-overlay').style.display = 'flex';
