@@ -147,45 +147,51 @@
     const taskNum = parseInt(urlParams.get('task')) || 1;
 
 function loadLabelMission() {
-        const currentTask = labelData[taskNum.toString()] || labelData["1"];
-        document.getElementById('topic-title').innerText = `SEC: ${currentTask.topic}`;
+    const currentTask = labelData[taskNum.toString()] || labelData["1"];
+    document.getElementById('topic-title').innerText = `SEC: ${currentTask.topic}`;
+    
+    const container = document.getElementById('label-zone');
+    let html = '';
+
+    // تحديد أصل الموقع تلقائياً (مثل https://eycssp.pages.dev)
+    const origin = window.location.origin;
+
+    for (let i = 0; i < 10; i++) {
+        const imgID = ((taskNum - 1) * 10) + (i + 1);
         
-        const container = document.getElementById('label-zone');
-        let html = '';
+        // بناء المسار المطلق من الجذر مباشرة
+        // نستخدم assests (بالسين المزدوجة) كما هي في مستودعك
+        const imgSrc = `${origin}/assests/lbpics/${imgID}.png`;
 
-        for (let i = 0; i < 10; i++) {
-            const imgID = ((taskNum - 1) * 10) + (i + 1);
-            
-            // المحاولة الأولى الافتراضية
-            const imgSrc = `../assests/lbpics/${imgID}.png`;
-
-            html += `
-                <div class="image-card" id="card-${i}" style="animation-delay: ${i * 0.08}s">
-                    <div class="img-container" onclick="openZoom(this.querySelector('img').src)">
-                        <img src="${imgSrc}" 
-                             onerror="smartLoader(this, ${imgID})">
-                    </div>
-                    <input type="text" class="label-input" id="label-${i}" placeholder="IDENTIFY..." autocomplete="off">
+        html += `
+            <div class="image-card" id="card-${i}" style="animation-delay: ${i * 0.08}s">
+                <div class="img-container" onclick="openZoom(this.querySelector('img').src)">
+                    <img src="${imgSrc}" 
+                         onload="console.log('OK: ' + this.src)"
+                         onerror="smartLoader(this, ${imgID})">
                 </div>
-            `;
-        }
-        container.innerHTML = html;
+                <input type="text" class="label-input" id="label-${i}" placeholder="IDENTIFY..." autocomplete="off">
+            </div>
+        `;
     }
+    container.innerHTML = html;
+}
 
-    // دالة المعالجة الذكية للامتدادات المختلفة في مستودعك
-    function smartLoader(img, id) {
-        if (img.src.includes('.png')) {
-            // إذا فشل الـ png الصغير، جرب الـ jpg (عشان الصور من 11 لـ 20)
-            img.src = `../assests/lbpics/${id}.jpg`;
-        } else if (img.src.includes('.jpg')) {
-            // إذا فشل الـ jpg، جرب الـ PNG الكبير (عشان صورة رقم 1)
-            img.src = `../assests/lbpics/${id}.PNG`;
-        } else {
-            // لو كله فشل، ضع الصورة الاحتياطية
-            img.onerror = null;
-            img.src = 'https://placehold.co/150x150/111/00f2ff?text=NOT+FOUND';
-        }
+// دالة المحاولات الذكية باستخدام المسار المطلق أيضاً
+function smartLoader(img, id) {
+    const origin = window.location.origin;
+    console.warn('Attempting backup for ID:', id);
+
+    if (img.src.includes('.png')) {
+        img.src = `${origin}/assests/lbpics/${id}.jpg`;
+    } else if (img.src.includes('.jpg')) {
+        img.src = `${origin}/assests/lbpics/${id}.PNG`;
+    } else {
+        img.onerror = null;
+        img.src = 'https://placehold.co/150x150/111/00f2ff?text=NOT+FOUND';
+        console.error('All paths failed for ID:', id);
     }
+}
     // وظائف التكبير
     function openZoom(src) {
         document.getElementById('zoomed-img').src = src;
