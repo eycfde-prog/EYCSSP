@@ -5,119 +5,69 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Label Master | Visual Intelligence | Titanium Edition</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --neon-blue: #00f2ff;
-            --gold: #ffcc00;
-            --glass-bg: rgba(10, 10, 18, 0.9);
-            --border-glow: rgba(0, 242, 255, 0.25);
-            --error-red: #ff4444;
-        }
+<style>
+    /* ... نفس الاستايل القديم مع تعديل بسيط هنا ... */
+    .img-container {
+        width: 100%; height: 120px; /* كبرنا الارتفاع شوية */
+        background: #000; /* خلفية سودة صريحة */
+        border-radius: 12px;
+        margin-bottom: 15px;
+        display: flex; align-items: center; justify-content: center;
+        border: 1px solid var(--neon-blue);
+        overflow: hidden;
+    }
 
-        body { 
-            font-family: 'Rajdhani', sans-serif; 
-            background: transparent; 
-            color: #fff; 
-            margin: 0; padding: 15px; 
-            direction: ltr;
-        }
+    .img-container img {
+        width: 100%; height: 100%; /* خلي الصورة تملأ المكان */
+        object-fit: cover; /* أو contain حسب رغبتك في شكل الصور */
+        display: block;
+    }
+</style>
 
-        .topic-header {
-            font-family: 'Orbitron';
-            color: var(--neon-blue);
-            text-transform: uppercase;
-            margin-bottom: 25px;
-            letter-spacing: 5px;
-            text-align: center;
-            font-size: 1.2rem;
-            border-bottom: 1px solid var(--border-glow);
-            padding-bottom: 15px;
-        }
+<script>
+    // ... نفس المصفوفة والـ urlParams ...
 
-        .label-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-            gap: 20px;
-        }
+    function loadLabelMission() {
+        const currentTask = labelData[taskNum.toString()] || labelData["1"];
+        document.getElementById('topic-title').innerText = `SEC: ${currentTask.topic}`;
+        const container = document.getElementById('label-zone');
+        container.innerHTML = ""; // نمسح القديم تماماً
 
-        .image-card {
-            background: var(--glass-bg);
-            backdrop-filter: blur(15px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 18px;
-            padding: 15px;
-            text-align: center;
-            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            animation: cardSlide 0.6s ease-out backwards;
-        }
+        const repoBase = "https://raw.githubusercontent.com/eycfde-prog/EYCSSP/main/frontend/eyclogs/";
 
-        .img-container {
-            width: 100%; height: 110px;
-            background: rgba(0,0,0,0.5);
-            border-radius: 12px;
-            margin-bottom: 15px;
-            display: flex; align-items: center; justify-content: center;
-            border: 1px solid rgba(0, 242, 255, 0.1);
-            overflow: hidden;
-            cursor: zoom-in; /* مؤشر للتكبير */
-        }
+        for (let i = 0; i < 10; i++) {
+            const imgID = ((taskNum - 1) * 10) + (i + 1);
+            const imgSrc = `${repoBase}${imgID}.png`;
 
-        .img-container img {
-            max-width: 90%; max-height: 90%;
-            object-fit: contain;
-            transition: 0.5s;
+            const card = document.createElement('div');
+            card.className = "image-card";
+            card.id = `card-${i}`;
+            card.innerHTML = `
+                <div class="img-container" onclick="openZoom('${imgSrc}')">
+                    <img src="${imgSrc}" 
+                         id="img-tag-${i}"
+                         onload="console.log('✅ VISIBLE: ID ${imgID}')" 
+                         onerror="githubFallback(this, ${imgID})">
+                </div>
+                <input type="text" class="label-input" id="label-${i}" placeholder="IDENTIFY..." autocomplete="off">
+            `;
+            container.appendChild(card);
         }
+    }
 
-        .label-input {
-            width: 100%;
-            background: rgba(0,0,0,0.7);
-            border: 1px solid rgba(255,255,255,0.1);
-            color: var(--gold);
-            font-family: 'Orbitron';
-            text-align: center;
-            padding: 10px 0;
-            font-size: 0.8rem;
-            outline: none;
-            border-radius: 8px;
+    function githubFallback(img, id) {
+        const repoBase = "https://raw.githubusercontent.com/eycfde-prog/EYCSSP/main/frontend/eyclogs/";
+        if (img.src.includes('.png')) {
+            img.src = `${repoBase}${id}.jpg`;
+        } else if (img.src.includes('.jpg')) {
+            img.src = `${repoBase}${id}.PNG`;
+        } else {
+            img.onerror = null;
+            img.src = "https://placehold.jp/24/00f2ff/000000/150x150.png?text=ERROR";
         }
-
-        /* --- نظام الـ Pop-up (المكبر) --- */
-        #zoom-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.95);
-            z-index: 1000;
-            display: none;
-            justify-content: center;
-            align-items: center;
-            backdrop-filter: blur(10px);
-        }
-
-        #zoom-overlay img {
-            max-width: 90%;
-            max-height: 80%;
-            border: 2px solid var(--neon-blue);
-            box-shadow: 0 0 30px var(--border-glow);
-            border-radius: 15px;
-        }
-
-        .close-zoom {
-            position: absolute;
-            top: 30px;
-            right: 30px;
-            background: var(--neon-blue);
-            color: #000;
-            border: none;
-            padding: 10px 20px;
-            font-family: 'Orbitron';
-            font-weight: bold;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-
-        .error-card { border-color: var(--error-red) !important; animation: shake 0.4s ease-in-out; }
-        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-6px); } 75% { transform: translateX(6px); } }
-    </style>
+    }
+    // ... باقي الدوال (openZoom, collectData) ...
+</script>
 </head>
 <body>
 
