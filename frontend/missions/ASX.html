@@ -234,7 +234,7 @@
         document.getElementById('x-title').innerText = `RADAR MISSION: ${taskNum.padStart(2, '0')}`;
     }
 
-    function selectOpt(qIdx, val, btn) {
+function selectOpt(qIdx, val, btn) {
         const container = btn.parentElement;
         container.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
@@ -245,6 +245,21 @@
         
         document.getElementById(`card-${qIdx}`).classList.remove('error-input');
         answers[qIdx] = val;
+    }
+
+    function playAudio(idx) {
+        const t = parseInt(taskNum);
+        const qIdx = parseInt(idx);
+        const audioFileNum = ((t - 1) * 5) + (qIdx + 1);
+        
+        // مسار ملفات الصوت الخاص بك على GitHub (Raw)
+        const audioUrl = `https://raw.githubusercontent.com/eycfde-prog/EYCSSP/49caf1a1c1e29d8cb759b5271ef8e589773947f4/frontend/eyclgos/lbpics/${audioFileNum}.wav`;
+        
+        const audio = new Audio(audioUrl);
+        audio.play().catch(e => {
+            console.error("Audio Playback Failed:", e);
+            alert("Connection error: Could not load audio signal " + audioFileNum);
+        });
     }
 
     function playAudio(idx) {
