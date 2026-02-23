@@ -115,24 +115,22 @@
     const urlParams = new URLSearchParams(window.location.search);
     const taskNum = parseInt(urlParams.get('task')) || 1;
     
-    // الرابط الخام المباشر من مستودعك
-    const GITHUB_BASE = "https://raw.githubusercontent.com/eycfde-prog/EYCSSP/main/frontend/eyclogs/lbpics/";
-
     function loadLabelMission() {
         const currentTask = labelData[taskNum.toString()] || labelData["1"];
         document.getElementById('topic-title').innerText = `SEC: ${currentTask.topic}`;
+        
         const container = document.getElementById('label-zone');
         let html = '';
 
         for (let i = 0; i < 10; i++) {
+            // حساب رقم الصورة التسلسلي (1-100)
             const imgID = ((taskNum - 1) * 10) + (i + 1);
-            // المحاولة الافتراضية بـ png صغير
-            const imgSrc = `${GITHUB_BASE}${imgID}.png`;
+            const imgSrc = `../lbpics/${imgID}.png`;
 
             html += `
-                <div class="image-card" id="card-${i}">
-                    <div class="img-container" onclick="openZoom(this.querySelector('img').src)">
-                        <img src="${imgSrc}" onerror="smartLoader(this, ${imgID})">
+                <div class="image-card" id="card-${i}" style="animation-delay: ${i * 0.08}s">
+                    <div class="img-container" onclick="openZoom('${imgSrc}')">
+                        <img src="${imgSrc}" onerror="this.src='https://via.placeholder.com/150/111/00f2ff?text=IMG_${imgID}'">
                     </div>
                     <input type="text" class="label-input" id="label-${i}" placeholder="IDENTIFY..." autocomplete="off">
                 </div>
