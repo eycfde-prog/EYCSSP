@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Label Master | EYC Intelligence</title>
+    <title>Label Master | Visual Intelligence | Titanium Edition</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -47,7 +47,8 @@
             border-radius: 18px;
             padding: 15px;
             text-align: center;
-            transition: 0.4s;
+            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            animation: cardSlide 0.6s ease-out backwards;
         }
 
         .img-container {
@@ -58,12 +59,13 @@
             display: flex; align-items: center; justify-content: center;
             border: 1px solid rgba(0, 242, 255, 0.1);
             overflow: hidden;
-            cursor: zoom-in;
+            cursor: zoom-in; /* مؤشر للتكبير */
         }
 
         .img-container img {
             max-width: 90%; max-height: 90%;
             object-fit: contain;
+            transition: 0.5s;
         }
 
         .label-input {
@@ -75,22 +77,46 @@
             text-align: center;
             padding: 10px 0;
             font-size: 0.8rem;
-            border-radius: 8px;
             outline: none;
+            border-radius: 8px;
         }
 
+        /* --- نظام الـ Pop-up (المكبر) --- */
         #zoom-overlay {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.95);
-            z-index: 1000; display: none; justify-content: center; align-items: center;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.95);
+            z-index: 1000;
+            display: none;
+            justify-content: center;
+            align-items: center;
             backdrop-filter: blur(10px);
         }
 
-        #zoom-overlay img { max-width: 90%; max-height: 80%; border: 2px solid var(--neon-blue); border-radius: 15px; }
+        #zoom-overlay img {
+            max-width: 90%;
+            max-height: 80%;
+            border: 2px solid var(--neon-blue);
+            box-shadow: 0 0 30px var(--border-glow);
+            border-radius: 15px;
+        }
 
-        .close-zoom { position: absolute; top: 30px; right: 30px; background: var(--neon-blue); border: none; padding: 10px 20px; font-family: 'Orbitron'; cursor: pointer; border-radius: 5px; }
+        .close-zoom {
+            position: absolute;
+            top: 30px;
+            right: 30px;
+            background: var(--neon-blue);
+            color: #000;
+            border: none;
+            padding: 10px 20px;
+            font-family: 'Orbitron';
+            font-weight: bold;
+            border-radius: 5px;
+            cursor: pointer;
+        }
 
-        .error-card { border-color: var(--error-red) !important; animation: shake 0.4s; }
-        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
+        .error-card { border-color: var(--error-red) !important; animation: shake 0.4s ease-in-out; }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-6px); } 75% { transform: translateX(6px); } }
     </style>
 </head>
 <body>
@@ -100,21 +126,26 @@
 
     <div id="zoom-overlay" onclick="closeZoom()">
         <button class="close-zoom">BACK</button>
-        <img id="zoomed-img" src="">
+        <img id="zoomed-img" src="" alt="Zoomed View">
     </div>
 
 <script>
     const labelData = {
-        "1": { topic: "Kitchen Tech" }, "2": { topic: "Animal Kingdom" },
-        "3": { topic: "Office HQ" }, "4": { topic: "Nature & Veggies" },
-        "5": { topic: "Medical Lab" }, "6": { topic: "Expedition Gear" },
-        "7": { topic: "Occupations" }, "8": { topic: "Transport" },
-        "9": { topic: "Fashion Specs" }, "10": { topic: "Music Studio" }
+        "1": { topic: "Kitchen Tech" },
+        "2": { topic: "Animal Kingdom" },
+        "3": { topic: "Office HQ" },
+        "4": { topic: "Nature & Veggies" },
+        "5": { topic: "Medical Lab" },
+        "6": { topic: "Expedition Gear" },
+        "7": { topic: "Occupations" },
+        "8": { topic: "Transport" },
+        "9": { topic: "Fashion Specs" },
+        "10": { topic: "Music Studio" }
     };
 
     const urlParams = new URLSearchParams(window.location.search);
     const taskNum = parseInt(urlParams.get('task')) || 1;
-    
+
     function loadLabelMission() {
         const currentTask = labelData[taskNum.toString()] || labelData["1"];
         document.getElementById('topic-title').innerText = `SEC: ${currentTask.topic}`;
@@ -125,7 +156,7 @@
         for (let i = 0; i < 10; i++) {
             // حساب رقم الصورة التسلسلي (1-100)
             const imgID = ((taskNum - 1) * 10) + (i + 1);
-            const imgSrc = `../lbpics/${imgID}.png`;
+            const imgSrc = `src="/eyclogs/${imgID}.png"`;
 
             html += `
                 <div class="image-card" id="card-${i}" style="animation-delay: ${i * 0.08}s">
@@ -139,25 +170,7 @@
         container.innerHTML = html;
     }
 
-    function smartLoader(img, id) {
-        // إذا فشل png نجرب jpg (للصور 11-20)
-        if (img.src.includes('.png')) {
-            img.src = `${GITHUB_BASE}${id}.jpg`;
-        } 
-        // إذا فشل jpg نجرب PNG كبير (لصورة 1)
-        else if (img.src.includes('.jpg')) {
-            img.src = `${GITHUB_BASE}${id}.PNG`;
-        } 
-        // لو كل المسارات الخارجية فشلت، نجرب المسار المحلي كفرصة أخيرة
-        else if (!img.src.includes('../eyclogs/')) {
-            img.src = `../eyclogs/${id}.png`;
-        }
-        else {
-            img.onerror = null;
-            img.src = 'https://placehold.co/150x150/111/00f2ff?text=NOT+FOUND';
-        }
-    }
-
+    // وظائف التكبير
     function openZoom(src) {
         document.getElementById('zoomed-img').src = src;
         document.getElementById('zoom-overlay').style.display = 'flex';
@@ -170,6 +183,7 @@
     function collectData() {
         const studentAnswers = [];
         let missing = false;
+
         for(let i=0; i<10; i++) {
             const el = document.getElementById(`label-${i}`);
             const val = el.value.trim();
@@ -180,20 +194,24 @@
             }
             studentAnswers.push(val);
         }
+
         if(missing) {
             window.parent.postMessage({ type: 'MISSION_INCOMPLETE' }, '*');
             return;
         }
+        
         window.parent.postMessage({
             type: 'MISSION_ANSWERS',
-            activityCode: 'LB',
-            answers: studentAnswers,
+            activityCode: 'LB', // تم تعديله لـ LB ليتوافق مع السكريبت
+            answers: studentAnswers, // إرسال مصفوفة مباشرة
             task: taskNum.toString()
         }, '*');
     }
 
-    window.addEventListener('message', (e) => {
-        if (e.data.type === 'REQUEST_MISSION_DATA') collectData();
+    window.addEventListener('message', function(event) {
+        if (event.data.type === 'REQUEST_MISSION_DATA') {
+            collectData();
+        }
     });
 
     window.onload = loadLabelMission;
