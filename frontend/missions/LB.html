@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Label Master | Visual Intelligence | Titanium Edition</title>
+    <title>Label Master | Visual Intelligence</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -48,7 +48,6 @@
             padding: 15px;
             text-align: center;
             transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            animation: cardSlide 0.6s ease-out backwards;
         }
 
         .img-container {
@@ -59,11 +58,11 @@
             display: flex; align-items: center; justify-content: center;
             border: 1px solid rgba(0, 242, 255, 0.1);
             overflow: hidden;
-            cursor: zoom-in; /* مؤشر للتكبير */
+            cursor: zoom-in;
         }
 
         .img-container img {
-            max-width: 90%; max-height: 90%;
+            max-width: 95%; max-height: 95%;
             object-fit: contain;
             transition: 0.5s;
         }
@@ -81,38 +80,24 @@
             border-radius: 8px;
         }
 
-        /* --- نظام الـ Pop-up (المكبر) --- */
         #zoom-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.95);
-            z-index: 1000;
-            display: none;
-            justify-content: center;
-            align-items: center;
+            position: fixed; inset: 0; background: rgba(0,0,0,0.95);
+            z-index: 1000; display: none; justify-content: center; align-items: center;
             backdrop-filter: blur(10px);
         }
 
         #zoom-overlay img {
-            max-width: 90%;
-            max-height: 80%;
+            max-width: 90%; max-height: 80%;
             border: 2px solid var(--neon-blue);
             box-shadow: 0 0 30px var(--border-glow);
             border-radius: 15px;
         }
 
         .close-zoom {
-            position: absolute;
-            top: 30px;
-            right: 30px;
-            background: var(--neon-blue);
-            color: #000;
-            border: none;
-            padding: 10px 20px;
-            font-family: 'Orbitron';
-            font-weight: bold;
-            border-radius: 5px;
-            cursor: pointer;
+            position: absolute; top: 30px; right: 30px;
+            background: var(--neon-blue); color: #000;
+            border: none; padding: 10px 20px; font-family: 'Orbitron';
+            font-weight: bold; border-radius: 5px; cursor: pointer;
         }
 
         .error-card { border-color: var(--error-red) !important; animation: shake 0.4s ease-in-out; }
@@ -141,54 +126,60 @@
     const urlParams = new URLSearchParams(window.location.search);
     const taskNum = parseInt(urlParams.get('task')) || 1;
 
-function loadLabelMission() {
-    const currentTask = labelData[taskNum.toString()] || labelData["1"];
-    document.getElementById('topic-title').innerText = `SEC: ${currentTask.topic}`;
-    const container = document.getElementById('label-zone');
-    let html = '';
+    // المسارات المحسنة
+    const localPath = "../eyclogs/lbpics/";
+    const githubPath = "https://raw.githubusercontent.com/eycfde-prog/EYCSSP/main/frontend/eyclogs/lbpics/";
 
-    // الرابط المباشر للمستودع (تأكد من اسم المستخدم واسم المستودع)
-    const repoBase = "https://raw.githubusercontent.com/eycfde-prog/EYCSSP/main/frontend/eyclogs/lbpics";
+    function loadLabelMission() {
+        const currentTask = labelData[taskNum.toString()] || labelData["1"];
+        document.getElementById('topic-title').innerText = `SEC: ${currentTask.topic}`;
+        const container = document.getElementById('label-zone');
+        let html = '';
 
-    for (let i = 0; i < 10; i++) {
-        const imgID = ((taskNum - 1) * 10) + (i + 1);
-        
-        // هنجرب الـ png أول حاجة من لينك الـ Raw بتاع جيت هاب
-        const imgSrc = `${repoBase}${imgID}.png`;
+        for (let i = 0; i < 10; i++) {
+            const imgID = ((taskNum - 1) * 10) + (i + 1);
+            // نبدأ بالمحاولة المحلية أولاً لسرعة التحميل
+            const imgSrc = `${localPath}${imgID}.png`;
 
-        html += `
-            <div class="image-card" id="card-${i}">
-                <div class="img-container" onclick="openZoom(this.querySelector('img').src)">
-                    <img src="${imgSrc}" 
-                         data-id="${imgID}"
-                         onload="console.log('🔥 BINGO! ID ' + ${imgID})"
-                         onerror="githubFallback(this)">
+            html += `
+                <div class="image-card" id="card-${i}">
+                    <div class="img-container" onclick="openZoom(this.querySelector('img').src)">
+                        <img src="${imgSrc}" 
+                             data-id="${imgID}"
+                             onload="console.log('✅ Loaded ID: ' + ${imgID})"
+                             onerror="smartFallback(this)">
+                    </div>
+                    <input type="text" class="label-input" id="label-${i}" placeholder="IDENTIFY..." autocomplete="off">
                 </div>
-                <input type="text" class="label-input" id="label-${i}" placeholder="IDENTIFY..." autocomplete="off">
-            </div>
-        `;
+            `;
+        }
+        container.innerHTML = html;
     }
-    container.innerHTML = html;
-}
 
-function githubFallback(img) {
-    const id = img.dataset.id;
-    const repoBase = "https://raw.githubusercontent.com/eycfde-prog/EYCSSP/main/frontend/eyclogs/";
-    
-    if (!img.dataset.failcount) img.dataset.failcount = "0";
-    let fail = parseInt(img.dataset.failcount);
+    function smartFallback(img) {
+        const id = img.dataset.id;
+        if (!img.dataset.step) img.dataset.step = "0";
+        let step = parseInt(img.dataset.step);
 
-    if (fail === 0) {
-        img.dataset.failcount = "1";
-        img.src = `${repoBase}${id}.jpg`; // جرب jpg
-    } else if (fail === 1) {
-        img.dataset.failcount = "2";
-        img.src = `${repoBase}${id}.PNG`; // جرب PNG كبيرة
-    } else {
-        img.onerror = null;
-        img.src = "https://placehold.jp/24/00f2ff/000000/150x150.png?text=NOT_FOUND";
+        const fallbacks = [
+            `${localPath}${id}.jpg`,          // محلي jpg
+            `${localPath}${id}.PNG`,          // محلي PNG كبير
+            `${githubPath}${id}.png`,         // جيت هاب png
+            `${githubPath}${id}.jpg`,         // جيت هاب jpg
+            `${githubPath}${id}.PNG`          // جيت هاب PNG كبير
+        ];
+
+        if (step < fallbacks.length) {
+            console.warn(`🔄 Trial ${step + 1} for ID ${id}: ${fallbacks[step]}`);
+            img.dataset.step = step + 1;
+            img.src = fallbacks[step];
+        } else {
+            img.onerror = null;
+            img.src = "https://placehold.jp/24/00f2ff/000000/150x150.png?text=NOT_FOUND";
+            console.error(`❌ All paths failed for ID ${id}`);
+        }
     }
-}
+
     function openZoom(src) {
         document.getElementById('zoomed-img').src = src;
         document.getElementById('zoom-overlay').style.display = 'flex';
