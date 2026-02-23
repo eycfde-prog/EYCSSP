@@ -153,21 +153,18 @@ function loadLabelMission() {
     const container = document.getElementById('label-zone');
     let html = '';
 
-    // تحديد أصل الموقع تلقائياً (مثل https://eycssp.pages.dev)
-    const origin = window.location.origin;
-
     for (let i = 0; i < 10; i++) {
         const imgID = ((taskNum - 1) * 10) + (i + 1);
         
-        // بناء المسار المطلق من الجذر مباشرة
-        // نستخدم assests (بالسين المزدوجة) كما هي في مستودعك
-        const imgSrc = `${origin}/assests/lbpics/${imgID}.png`;
+        // جرب المسار ده بالظبط (باعتبار إن assests في الـ root)
+        // شيلنا النقط وشيلنا الـ origin
+        const imgSrc = `/assests/lbpics/${imgID}.png`;
 
         html += `
-            <div class="image-card" id="card-${i}" style="animation-delay: ${i * 0.08}s">
+            <div class="image-card" id="card-${i}">
                 <div class="img-container" onclick="openZoom(this.querySelector('img').src)">
                     <img src="${imgSrc}" 
-                         onload="console.log('OK: ' + this.src)"
+                         onload="console.log('YES! Loaded: ' + this.src)"
                          onerror="smartLoader(this, ${imgID})">
                 </div>
                 <input type="text" class="label-input" id="label-${i}" placeholder="IDENTIFY..." autocomplete="off">
@@ -175,6 +172,26 @@ function loadLabelMission() {
         `;
     }
     container.innerHTML = html;
+}
+
+function smartLoader(img, id) {
+    // لو المسار الأول فشل، هنجرب نضيف frontend في المسار
+    if (img.src.includes('/assests/') && !img.src.includes('/frontend/')) {
+        console.log('Trying with /frontend/ prefix for ID:', id);
+        img.src = `/frontend/assests/lbpics/${id}.png`;
+    } 
+    // لو لسه فاشل، جرب الـ jpg
+    else if (img.src.includes('.png')) {
+        img.src = img.src.replace('.png', '.jpg');
+    }
+    // لو لسه فاشل، جرب الـ PNG
+    else if (img.src.includes('.jpg')) {
+        img.src = img.src.replace('.jpg', '.PNG');
+    }
+    else {
+        img.onerror = null;
+        img.src = 'https://placehold.co/150x150/111/00f2ff?text=NOT+FOUND';
+    }
 }
 
 // دالة المحاولات الذكية باستخدام المسار المطلق أيضاً
