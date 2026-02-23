@@ -131,16 +131,11 @@
 
 <script>
     const labelData = {
-        "1": { topic: "Kitchen Tech" },
-        "2": { topic: "Animal Kingdom" },
-        "3": { topic: "Office HQ" },
-        "4": { topic: "Nature & Veggies" },
-        "5": { topic: "Medical Lab" },
-        "6": { topic: "Expedition Gear" },
-        "7": { topic: "Occupations" },
-        "8": { topic: "Transport" },
-        "9": { topic: "Fashion Specs" },
-        "10": { topic: "Music Studio" }
+        "1": { topic: "Kitchen Tech" }, "2": { topic: "Animal Kingdom" },
+        "3": { topic: "Office HQ" }, "4": { topic: "Nature & Veggies" },
+        "5": { topic: "Medical Lab" }, "6": { topic: "Expedition Gear" },
+        "7": { topic: "Occupations" }, "8": { topic: "Transport" },
+        "9": { topic: "Fashion Specs" }, "10": { topic: "Music Studio" }
     };
 
     const urlParams = new URLSearchParams(window.location.search);
@@ -154,14 +149,15 @@
         let html = '';
 
         for (let i = 0; i < 10; i++) {
-            // حساب رقم الصورة التسلسلي (1-100)
             const imgID = ((taskNum - 1) * 10) + (i + 1);
-            const imgSrc = `/eyclogs/${imgID}.png"`;
+            
+            // تصحيح المسار: حذف كلمة src من داخل النص وإضافة النقاط للرجوع للخلف
+            const imgSrc = `../eyclogs/${imgID}.png`;
 
             html += `
                 <div class="image-card" id="card-${i}" style="animation-delay: ${i * 0.08}s">
-                    <div class="img-container" onclick="openZoom('${imgSrc}')">
-                        <img src="${imgSrc}" onerror="this.src='https://via.placeholder.com/150/111/00f2ff?text=IMG_${imgID}'">
+                    <div class="img-container" onclick="openZoom(this.querySelector('img').src)">
+                        <img src="${imgSrc}" onerror="smartLoader(this, ${imgID})">
                     </div>
                     <input type="text" class="label-input" id="label-${i}" placeholder="IDENTIFY..." autocomplete="off">
                 </div>
@@ -170,7 +166,19 @@
         container.innerHTML = html;
     }
 
-    // وظائف التكبير
+    // دالة المعالجة الذكية للامتدادات (png, jpg, PNG)
+    function smartLoader(img, id) {
+        if (img.src.includes('.png')) {
+            img.src = `../eyclogs/${id}.jpg`;
+        } else if (img.src.includes('.jpg')) {
+            img.src = `../eyclogs/${id}.PNG`;
+        } else {
+            img.onerror = null;
+            // استخدام رابط بديل مستقر لا يعتمد على placeholder
+            img.src = "https://placehold.jp/24/00f2ff/000000/150x150.png?text=NOT_FOUND";
+        }
+    }
+
     function openZoom(src) {
         document.getElementById('zoomed-img').src = src;
         document.getElementById('zoom-overlay').style.display = 'flex';
@@ -183,7 +191,6 @@
     function collectData() {
         const studentAnswers = [];
         let missing = false;
-
         for(let i=0; i<10; i++) {
             const el = document.getElementById(`label-${i}`);
             const val = el.value.trim();
@@ -194,24 +201,20 @@
             }
             studentAnswers.push(val);
         }
-
         if(missing) {
             window.parent.postMessage({ type: 'MISSION_INCOMPLETE' }, '*');
             return;
         }
-        
         window.parent.postMessage({
             type: 'MISSION_ANSWERS',
-            activityCode: 'LB', // تم تعديله لـ LB ليتوافق مع السكريبت
-            answers: studentAnswers, // إرسال مصفوفة مباشرة
+            activityCode: 'LB',
+            answers: studentAnswers,
             task: taskNum.toString()
         }, '*');
     }
 
-    window.addEventListener('message', function(event) {
-        if (event.data.type === 'REQUEST_MISSION_DATA') {
-            collectData();
-        }
+    window.addEventListener('message', (e) => {
+        if (e.data.type === 'REQUEST_MISSION_DATA') collectData();
     });
 
     window.onload = loadLabelMission;
