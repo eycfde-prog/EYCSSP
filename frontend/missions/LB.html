@@ -153,26 +153,41 @@ function loadLabelMission() {
         const container = document.getElementById('label-zone');
         let html = '';
 
+        // استخدم الرابط الخام من GitHub لتجنب مشاكل الاستضافة
+        // استبدل USERNAME و REPO ببياناتك الحقيقية
+        const rawGithubPath = "https://raw.githubusercontent.com/USERNAME/REPO/main/frontend/eyclogs/";
+
         for (let i = 0; i < 10; i++) {
             const imgID = ((taskNum - 1) * 10) + (i + 1);
-            
-            // المسار الجديد: نخرج من missions وندخل eyclogs
-            const imgSrc = `../eyclogs/${imgID}.png`;
+            const imgSrc = `${rawGithubPath}${imgID}.png`;
 
             html += `
-                <div class="image-card" id="card-${i}" style="animation-delay: ${i * 0.08}s">
+                <div class="image-card" id="card-${i}">
                     <div class="img-container" onclick="openZoom(this.querySelector('img').src)">
                         <img src="${imgSrc}" 
-                             onload="console.log('✅ Loaded: ' + ${imgID})"
+                             onload="console.log('✅ GitHub FOUND: ' + ${imgID})"
                              onerror="smartLoader(this, ${imgID})">
                     </div>
-                    <input type="text" class="label-input" id="label-${i}" placeholder="IDENTIFY..." autocomplete="off">
+                    <input type="text" class="label-input" id="label-${i}" placeholder="IDENTIFY...">
                 </div>
             `;
         }
         container.innerHTML = html;
     }
 
+    function smartLoader(img, id) {
+        // إذا فشل الـ png، نجرب الـ jpg والـ PNG من GitHub أيضاً
+        const rawGithubPath = "https://raw.githubusercontent.com/eycfde-prog/EYCSSP/main/frontend/eyclogs/";
+        
+        if (img.src.includes('.png')) {
+            img.src = `${rawGithubPath}${id}.jpg`;
+        } else if (img.src.includes('.jpg')) {
+            img.src = `${rawGithubPath}${id}.PNG`;
+        } else {
+            img.onerror = null;
+            img.src = 'https://placehold.co/150x150/111/00f2ff?text=NOT+FOUND';
+        }
+    }
     // دالة المعالجة للامتدادات المختلفة داخل المجلد الجديد
     function smartLoader(img, id) {
         if (img.src.includes('.png')) {
