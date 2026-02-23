@@ -167,16 +167,23 @@
         return array;
     }
 
-    function initGE() {
+function initGE() {
         const audio = document.getElementById('mainAudio');
         const source = document.getElementById('audioSource');
         
-        const audioPath = `../../assets/gesaudio/GES${taskNum}.wav`;
+        // رابط المستودع بصيغة Raw
+        const baseUrl = "https://raw.githubusercontent.com/eycfde-prog/EYCSSP/08e4749c5bfdd307b0351390d711223a2ecff4ad/frontend/eyclgos/geaudio/";
+        
+        // المسار الكامل للملف الصوتي (مثلاً 1.wav, 2.wav...)
+        const audioPath = `${baseUrl}${taskNum}.wav`;
+        
         source.src = audioPath;
         audio.load();
 
+        // تحديث عنوان المهمة
         document.getElementById('task-title').innerText = `MISSION GES: PROTOCOL ${taskNum.padStart(2, '0')}`;
 
+        // بناء الأسئلة
         const mission = geMissions[taskNum] || geMissions["1"];
         const container = document.getElementById('quiz-container');
         
@@ -198,7 +205,6 @@
             `;
         }).join('');
     }
-
     function selectOption(qIdx, val, el) {
         const parent = document.getElementById(`q-${qIdx}`);
         parent.querySelectorAll('.option-item').forEach(item => item.classList.remove('selected'));
