@@ -156,22 +156,41 @@ function loadLabelMission() {
     for (let i = 0; i < 10; i++) {
         const imgID = ((taskNum - 1) * 10) + (i + 1);
         
-        // جرب المسار ده بالظبط (باعتبار إن assests في الـ root)
-        // شيلنا النقط وشيلنا الـ origin
-        const imgSrc = `/assests/lbpics/${imgID}.png`;
+        // الخروج من مجلد frontend ثم الدخول لـ assests
+        const imgSrc = `../assests/lbpics/${imgID}.png`;
 
         html += `
-            <div class="image-card" id="card-${i}">
+            <div class="image-card" id="card-${i}" style="animation-delay: ${i * 0.08}s">
                 <div class="img-container" onclick="openZoom(this.querySelector('img').src)">
                     <img src="${imgSrc}" 
-                         onload="console.log('YES! Loaded: ' + this.src)"
-                         onerror="smartLoader(this, ${imgID})">
+                         onload="console.log('MISSION ACCOMPLISHED: ' + this.src)"
+                         onerror="finalTrial(this, ${imgID})">
                 </div>
                 <input type="text" class="label-input" id="label-${i}" placeholder="IDENTIFY..." autocomplete="off">
             </div>
         `;
     }
     container.innerHTML = html;
+}
+
+function finalTrial(img, id) {
+    // المحاولة 2: تغيير الامتداد لـ jpg (عشان الصور 11-20)
+    if (img.src.includes('.png')) {
+        img.src = `../assests/lbpics/${id}.jpg`;
+    } 
+    // المحاولة 3: تغيير الامتداد لـ PNG كبير (عشان صورة رقم 1)
+    else if (img.src.includes('.jpg')) {
+        img.src = `../assests/lbpics/${id}.PNG`;
+    } 
+    // المحاولة الأخيرة: لو المجلد مش راضي يفتح من المسار النسبي، نجرب المسار المطلق
+    else if (!img.src.includes(window.location.origin)) {
+        img.src = window.location.origin + `/assests/lbpics/${id}.png`;
+    }
+    else {
+        img.onerror = null;
+        img.src = 'https://placehold.co/150x150/111/00f2ff?text=NOT+FOUND';
+        console.error('CRITICAL FAILURE: Image ' + id + ' not found in any path.');
+    }
 }
 
 function smartLoader(img, id) {
