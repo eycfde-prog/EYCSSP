@@ -156,15 +156,16 @@ function loadLabelMission() {
     for (let i = 0; i < 10; i++) {
         const imgID = ((taskNum - 1) * 10) + (i + 1);
         
-        // الخروج من مجلد frontend ثم الدخول لـ assests
-        const imgSrc = `../assests/lbpics/${imgID}.png`;
+        // المسار المطلق بيبدأ بـ / عشان يروح للجذر فوراً
+        // كتبنا assests بالسين الزيادة زي ما هي في المستودع
+        const imgSrc = `/assests/lbpics/${imgID}.png`;
 
         html += `
             <div class="image-card" id="card-${i}" style="animation-delay: ${i * 0.08}s">
                 <div class="img-container" onclick="openZoom(this.querySelector('img').src)">
                     <img src="${imgSrc}" 
-                         onload="console.log('MISSION ACCOMPLISHED: ' + this.src)"
-                         onerror="finalTrial(this, ${imgID})">
+                         onload="console.log('SUCCESS ✅: ' + this.src)"
+                         onerror="smartLoader(this, ${imgID})">
                 </div>
                 <input type="text" class="label-input" id="label-${i}" placeholder="IDENTIFY..." autocomplete="off">
             </div>
@@ -173,6 +174,23 @@ function loadLabelMission() {
     container.innerHTML = html;
 }
 
+function smartLoader(img, id) {
+    console.warn('🔄 Trying alternative for ID:', id);
+    
+    // محاولات ذكية بناءً على اللي شفناه في ملفاتك
+    if (img.src.includes('.png')) {
+        // المحاولة التانية: jpg (زي الصور من 11 لـ 20)
+        img.src = `/assests/lbpics/${id}.jpg`;
+    } else if (img.src.includes('.jpg')) {
+        // المحاولة التالتة: PNG كبيرة (زي صورة 1)
+        img.src = `/assests/lbpics/${id}.PNG`;
+    } else {
+        // لو كله باظ
+        img.onerror = null;
+        img.src = 'https://placehold.co/150x150/111/00f2ff?text=NOT+FOUND';
+        console.error('❌ Final Failure for ID:', id);
+    }
+}
 function finalTrial(img, id) {
     // المحاولة 2: تغيير الامتداد لـ jpg (عشان الصور 11-20)
     if (img.src.includes('.png')) {
