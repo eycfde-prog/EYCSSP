@@ -32,12 +32,6 @@
             max-width: 800px;
             margin: 0 auto;
             box-shadow: 0 20px 50px rgba(0,0,0,0.6);
-            animation: fadeIn 0.8s ease-out;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: scale(0.98); }
-            to { opacity: 1; transform: scale(1); }
         }
 
         .header-x h1 { 
@@ -49,168 +43,105 @@
             text-shadow: 0 0 15px var(--gold-glow);
         }
 
-        .principle-badge {
-            display: inline-block;
-            font-family: 'Orbitron'; font-size: 10px; color: var(--gold);
-            border: 1px solid var(--gold); padding: 4px 15px;
-            border-radius: 5px; margin-bottom: 25px;
-            letter-spacing: 2px;
-            background: rgba(212, 175, 55, 0.05);
+        /* تنسيق صورة المهمة */
+        .mission-blueprint {
+            width: 100%;
+            max-height: 250px;
+            object-fit: contain;
+            border-radius: 15px;
+            border: 1px solid var(--glass-border);
+            margin: 20px 0;
+            background: #000;
         }
 
         .audio-section {
             display: grid; 
             grid-template-columns: 1fr 1fr; 
             gap: 25px; 
-            margin: 35px 0;
+            margin: 25px 0;
         }
-
-        @media (max-width: 600px) { .audio-section { grid-template-columns: 1fr; } }
 
         .audio-card {
             background: rgba(255,255,255,0.03); 
             border: 1px solid var(--glass-border);
-            padding: 25px 15px; 
+            padding: 20px 15px; 
             border-radius: 15px; 
             position: relative;
-            transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .audio-card:hover:not(.locked) { 
-            border-color: var(--gold); 
-            box-shadow: 0 0 25px var(--gold-glow);
-            transform: translateY(-5px);
         }
 
         .warning-label {
-            display: block; 
-            font-family: 'Orbitron'; 
-            color: var(--error-red);
-            font-size: 9px; 
-            margin-bottom: 15px; 
-            letter-spacing: 1.5px;
-            text-transform: uppercase;
+            display: block; font-family: 'Orbitron'; color: var(--error-red);
+            font-size: 9px; margin-bottom: 10px; letter-spacing: 1.5px;
         }
 
-        .speed-label { 
-            font-family: 'Orbitron'; 
-            color: #fff; 
-            font-size: 11px; 
-            margin-bottom: 20px; 
-            opacity: 0.8;
-        }
-
-        audio { 
-            width: 100%; 
-            filter: invert(1) sepia(1) saturate(5) hue-rotate(-10deg); 
-            height: 40px; 
-            border-radius: 30px;
-        }
-
-        .upload-section {
-            border-top: 1px solid var(--glass-border); 
-            padding-top: 35px; 
-            margin-top: 20px;
-        }
+        audio { width: 100%; height: 35px; filter: invert(1); }
 
         .file-inputs-grid { 
-            display: grid; 
-            grid-template-columns: repeat(3, 1fr); 
-            gap: 20px; 
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-top: 20px;
         }
-
-        @media (max-width: 500px) { .file-inputs-grid { grid-template-columns: 1fr; } }
 
         .file-box {
-            background: rgba(0,0,0,0.3); 
-            border: 1px dashed var(--glass-border);
-            border-radius: 12px; 
-            padding: 20px 10px; 
-            transition: 0.3s;
-            position: relative;
-        }
-
-        .file-box:hover { border-color: var(--gold); }
-
-        .file-label { 
-            font-family: 'Orbitron'; 
-            font-size: 10px; 
-            color: var(--gold); 
-            display: block; 
-            margin-bottom: 12px; 
-        }
-
-        input[type="file"] { 
-            width: 100%; 
-            font-size: 10px; 
-            color: #666; 
-            cursor: pointer; 
+            background: rgba(0,0,0,0.3); border: 1px dashed var(--glass-border);
+            border-radius: 10px; padding: 15px 5px;
         }
 
         .preview-img {
-            width: 100%; 
-            height: 140px; 
-            object-fit: cover; 
-            border-radius: 8px;
-            margin-top: 15px; 
-            display: none; 
+            width: 100%; height: 100px; object-fit: cover;
+            border-radius: 5px; margin-top: 10px; display: none;
             border: 1px solid var(--gold);
-            box-shadow: 0 0 15px var(--gold-glow);
         }
 
         .expired-msg { 
             color: var(--error-red); font-family: 'Orbitron'; 
-            font-size: 10px; margin-top: 15px; font-weight: bold;
-            letter-spacing: 1px;
+            font-size: 10px; margin-top: 10px; font-weight: bold;
         }
         
-        .locked { opacity: 0.4; pointer-events: none; filter: grayscale(1); }
+        .locked { opacity: 0.5; pointer-events: none; }
     </style>
 </head>
 <body>
 
 <div class="dict-container">
     <div class="header-x">
-        <span class="principle-badge">PROTOCOL: DICTATION-X</span>
-        <h1 id="task-title">LOADING MISSION...</h1>
-        <p style="color: #888; font-size: 12px; margin-top: 10px;">Listen carefully. You have one attempt per frequency.</p>
+        <h1 id="task-title">MISSION DX-01</h1>
+        <p style="color: #888; font-size: 11px;">Analyze the blueprint, then transcribe the audio signal.</p>
     </div>
+
+    <img id="mission-img" src="" alt="Mission Blueprint" class="mission-blueprint">
 
     <div class="audio-section">
         <div class="audio-card" id="cardSlow">
-            <span class="warning-label"><i class="fas fa-exclamation-triangle"></i> SINGLE PLAYBACK</span>
-            <div class="speed-label">PHASE 01: ANALYTICAL (0.7x)</div>
+            <span class="warning-label">SINGLE PLAYBACK</span>
+            <div style="font-size: 10px; margin-bottom: 10px;">ANALYTICAL (0.7x)</div>
             <audio id="slowAudio" controls controlsList="nodownload noplaybackrate">
                 <source id="slowSource" src="" type="audio/wav">
             </audio>
         </div>
 
         <div class="audio-card" id="cardNormal">
-            <span class="warning-label"><i class="fas fa-exclamation-triangle"></i> SINGLE PLAYBACK</span>
-            <div class="speed-label">PHASE 02: REAL-TIME (1.0x)</div>
+            <span class="warning-label">SINGLE PLAYBACK</span>
+            <div style="font-size: 10px; margin-bottom: 10px;">REAL-TIME (1.0x)</div>
             <audio id="normalAudio" controls controlsList="nodownload noplaybackrate">
                 <source id="normalSource" src="" type="audio/wav">
             </audio>
         </div>
     </div>
 
-    <div class="upload-section">
-        <div class="file-inputs-grid">
-            <div class="file-box">
-                <span class="file-label">SCRIPT_PAGE_01</span>
-                <input type="file" id="img1" accept="image/*" onchange="preview(this, 'p1')">
-                <img id="p1" class="preview-img">
-            </div>
-            <div class="file-box">
-                <span class="file-label">SCRIPT_PAGE_02</span>
-                <input type="file" id="img2" accept="image/*" onchange="preview(this, 'p2')">
-                <img id="p2" class="preview-img">
-            </div>
-            <div class="file-box">
-                <span class="file-label">SCRIPT_PAGE_03</span>
-                <input type="file" id="img3" accept="image/*" onchange="preview(this, 'p3')">
-                <img id="p3" class="preview-img">
-            </div>
+    <div class="file-inputs-grid">
+        <div class="file-box">
+            <span style="color:var(--gold); font-size:9px; font-family:'Orbitron'">PAGE_01</span>
+            <input type="file" accept="image/*" onchange="preview(this, 'p1')" style="font-size: 9px;">
+            <img id="p1" class="preview-img">
+        </div>
+        <div class="file-box">
+            <span style="color:var(--gold); font-size:9px; font-family:'Orbitron'">PAGE_02</span>
+            <input type="file" accept="image/*" onchange="preview(this, 'p2')" style="font-size: 9px;">
+            <img id="p2" class="preview-img">
+        </div>
+        <div class="file-box">
+            <span style="color:var(--gold); font-size:9px; font-family:'Orbitron'">PAGE_03</span>
+            <input type="file" accept="image/*" onchange="preview(this, 'p3')" style="font-size: 9px;">
+            <img id="p3" class="preview-img">
         </div>
     </div>
 </div>
@@ -218,27 +149,30 @@
 <script>
     const urlParams = new URLSearchParams(window.location.search);
     const taskNum = urlParams.get('task') || "1";
-    const storageKeySlow = `DX_Task_${taskNum}_Slow_Played`;
-    const storageKeyNormal = `DX_Task_${taskNum}_Normal_Played`;
+    
+    // مفاتيح التخزين لكل مهمة بشكل منفصل
+    const storageKeySlow = `DX_V4_T${taskNum}_S`;
+    const storageKeyNormal = `DX_V4_T${taskNum}_N`;
 
     function initDictX() {
         document.getElementById('task-title').innerText = `MISSION DX-${taskNum.padStart(2, '0')}`;
         
-        const slowPath = `assets/dxaudio/DX${taskNum}S.wav`;
-        const normalPath = `assets/dxaudio/DX${taskNum}.wav`;
+        // ضبط المسارات بناءً على طلبك
+        const base = "https://raw.githubusercontent.com/eycfde-prog/EYCSSP/main/frontend/eyclogs/dxaudio/";
+        
+        document.getElementById('mission-img').src = `${base}${taskNum}.png`;
+        document.getElementById('slowSource').src = `${base}${taskNum}s.wav`;
+        document.getElementById('normalSource').src = `${base}${taskNum}n.wav`;
         
         const slowA = document.getElementById('slowAudio');
         const normalA = document.getElementById('normalAudio');
 
-        document.getElementById('slowSource').src = slowPath;
-        document.getElementById('normalSource').src = normalPath;
-        
         slowA.load();
         normalA.load();
         
         slowA.playbackRate = 0.7; 
-        normalA.playbackRate = 1.0;
 
+        // التحقق من حالة القفل عند التحميل
         if (localStorage.getItem(storageKeySlow)) lockAudio(slowA, 'cardSlow');
         if (localStorage.getItem(storageKeyNormal)) lockAudio(normalA, 'cardNormal');
 
@@ -248,7 +182,10 @@
 
     function setupAudioLogic(el, key, cardId) {
         el.onplay = () => {
+            // بمجرد الضغط على تشغيل، يتم القفل فوراً لضمان عدم المحاولة مرة أخرى
             localStorage.setItem(key, "true");
+            
+            // منع الطالب من تقديم الفيديو أو الرجوع
             el.ontimeupdate = () => {
                 if (el.seeking) {
                     el.currentTime = el.played.end(0);
@@ -262,6 +199,7 @@
     function lockAudio(el, cardId) {
         el.pause();
         el.controls = false;
+        el.style.display = "none"; // إخفاء المشغل تماماً بعد الانتهاء
         const card = document.getElementById(cardId);
         card.classList.add('locked');
         if (!card.querySelector('.expired-msg')) {
@@ -274,68 +212,31 @@
         if (file) {
             const reader = new FileReader();
             reader.onload = (e) => {
-                const img = new Image();
-                img.onload = () => {
-                    const canvas = document.createElement('canvas');
-                    let width = img.width;
-                    let height = img.height;
-
-                    const max_size = 1200;
-                    if (width > height) {
-                        if (width > max_size) {
-                            height *= max_size / width;
-                            width = max_size;
-                        }
-                    } else {
-                        if (height > max_size) {
-                            width *= max_size / height;
-                            height = max_size;
-                        }
-                    }
-
-                    canvas.width = width;
-                    canvas.height = height;
-                    const ctx = canvas.getContext('2d');
-                    ctx.drawImage(img, 0, 0, width, height);
-
-                    const compressedBase64 = canvas.toDataURL('image/jpeg', 0.7);
-                    
-                    const previewImg = document.getElementById(imgId);
-                    previewImg.src = compressedBase64;
-                    previewImg.style.display = "block";
-                };
+                const img = document.getElementById(imgId);
                 img.src = e.target.result;
+                img.style.display = "block";
             };
             reader.readAsDataURL(file);
         }
     }
 
-    window.addEventListener('message', function(event) {
-        if (event.data.type === 'REQUEST_MISSION_DATA') {
-            collectAndSubmit();
-        }
+    window.addEventListener('message', (e) => {
+        if (e.data.type === 'REQUEST_MISSION_DATA') collectAndSubmit();
     });
 
     function collectAndSubmit() {
-        const imgs = ['p1', 'p2', 'p3'];
-        let files = [];
-        
-        imgs.forEach(id => {
-            const displayImg = document.getElementById(id);
-            if(displayImg.src && displayImg.src.startsWith("data:image")) {
-                files.push(displayImg.src);
-            }
+        const files = [];
+        ['p1', 'p2', 'p3'].forEach(id => {
+            const src = document.getElementById(id).src;
+            if(src.startsWith("data:image")) files.push(src);
         });
 
         if (files.length === 0) {
-            alert("⚠️ PLEASE UPLOAD AT LEAST ONE SCRIPT PAGE");
+            alert("UPLOAD YOUR SCRIPT TO PROCEED");
             return;
         }
 
-        window.parent.postMessage({ 
-            type: 'MISSION_ANSWERS', 
-            answers: files 
-        }, '*');
+        window.parent.postMessage({ type: 'MISSION_ANSWERS', answers: files }, '*');
     }
 
     window.onload = initDictX;
