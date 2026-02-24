@@ -124,12 +124,17 @@
     </div>
 
 <script>
-    // إعدادات مستودع Gear
     const GITHUB_USER = 'eycfde-prog'; 
     const REPO_NAME = 'EYCSSP'; 
-    const COMMIT_HASH = '097a3b5406f82538b36c2b064b1281594d73c960'; // الهاش الخاص بملفاتك
+    const COMMIT_HASH = '097a3b5406f82538b36c2b064b1281594d73c960';
 
-
+    // تعريف البيانات المفقودة لضمان عمل الكود
+    const vividXScenarios = {
+        "1": { time: "CENTURY 21", desc: "Analyze the scene with historical accuracy..." },
+        "2": { time: "NEON ERA", desc: "Describe the cybernetic atmosphere..." },
+        "3": { time: "ANCIENT ECHO", desc: "Narrate the origin of these ruins..." }
+        // يمكنك إضافة باقي المهام هنا
+    };
 
     const urlParams = new URLSearchParams(window.location.search);
     const taskNum = urlParams.get('task') || "1";
@@ -138,12 +143,12 @@
         const scenario = vividXScenarios[taskNum] || vividXScenarios["1"];
         const imgElement = document.getElementById('target-image-x');
         
-        // المسار الجديد للمجلد vvxpic
-        const rawUrl = `https://raw.githubusercontent.com/${eycfde-prog}/${EYCSSP}/${COMMIT_HASH}/frontend/eyclgos/vvxpic/${taskNum}.png`;
+        // التصحيح: تم استخدام GITHUB_USER و REPO_NAME بدلاً من الأسماء المباشرة بشكل خاطئ
+        // وتم تعديل المجلد إلى vvxpics
+        const rawUrl = `https://raw.githubusercontent.com/${GITHUB_USER}/${REPO_NAME}/${COMMIT_HASH}/frontend/eyclgos/vvxpics/${taskNum}.png`;
         
         imgElement.src = rawUrl;
         imgElement.onerror = () => { 
-            // محاولة تحميل jpg إذا فشل png
             if(!imgElement.src.endsWith('.jpg')) {
                 imgElement.src = imgElement.src.replace('.png', '.jpg');
             } else {
@@ -161,8 +166,6 @@
         const words = text ? text.split(/\s+/).filter(w => w.length > 0).length : 0;
         const display = document.getElementById('wordCount');
         display.innerText = words;
-        
-        // تغيير اللون للأخضر عند الوصول لـ 150 كلمة
         display.classList.toggle('sync-active', words >= 150);
     }
 
