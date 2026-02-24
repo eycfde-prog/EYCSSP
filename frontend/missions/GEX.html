@@ -124,35 +124,35 @@
         <div class="sentence-box">
             <div class="line-marker"></div>
             <label>Neural Link - Part 01 Summary</label>
-            <input type="text" id="sent-1" class="x-input-field" placeholder="Decoding first 30 words...">
+            <input type="text" id="sent-1" class="x-input-field" placeholder="Decoding segment 1...">
         </div>
-
         <div class="sentence-box">
             <div class="line-marker"></div>
             <label>Neural Link - Part 02 Summary</label>
-            <input type="text" id="sent-2" class="x-input-field" placeholder="Decoding second segment...">
+            <input type="text" id="sent-2" class="x-input-field" placeholder="Decoding segment 2...">
         </div>
-
         <div class="sentence-box">
             <div class="line-marker"></div>
             <label>Neural Link - Part 03 Summary</label>
-            <input type="text" id="sent-3" class="x-input-field" placeholder="Capturing third insight...">
+            <input type="text" id="sent-3" class="x-input-field" placeholder="Decoding segment 3...">
         </div>
-
         <div class="sentence-box">
             <div class="line-marker"></div>
             <label>Neural Link - Part 04 Summary</label>
-            <input type="text" id="sent-4" class="x-input-field" placeholder="Processing fourth segment...">
+            <input type="text" id="sent-4" class="x-input-field" placeholder="Decoding segment 4...">
         </div>
-
         <div class="sentence-box">
             <div class="line-marker"></div>
             <label>Neural Link - Part 05 Summary</label>
-            <input type="text" id="sent-5" class="x-input-field" placeholder="Final segment synthesis...">
+            <input type="text" id="sent-5" class="x-input-field" placeholder="Decoding segment 5...">
         </div>
     </div>
 
 <script>
+    const GITHUB_USER = 'eycfde-prog'; 
+    const REPO_NAME = 'EYCSSP'; 
+    const BRANCH = 'main'; // أو الـ Hash إذا كنت تفضل تثبيت النسخة
+
     const urlParams = new URLSearchParams(window.location.search);
     const taskNum = urlParams.get('task') || "1";
 
@@ -160,9 +160,17 @@
         const audio = document.getElementById('xAudio');
         const source = document.getElementById('xSource');
         
-        const audioPath = `../../assets/gexaudio/GEX${taskNum}.wav`;
-        source.src = audioPath;
+        // بناء الرابط الخام بناءً على بنية المستودع التي أرسلتها
+        // المسار: frontend/eyclgos/gexaudio/{رقم المهمة}.wav
+        const rawAudioUrl = `https://raw.githubusercontent.com/${GITHUB_USER}/${REPO_NAME}/${BRANCH}/frontend/eyclgos/gexaudio/${taskNum}.wav`;
+        
+        source.src = rawAudioUrl;
         audio.load();
+
+        // التعامل مع خطأ التحميل
+        audio.onerror = function() {
+            console.error("Audio transmission lost at:", rawAudioUrl);
+        };
 
         document.getElementById('x-title').innerText = `GE-X: MISSION ${taskNum.padStart(2, '0')}`;
     }
@@ -173,32 +181,37 @@
         }
     });
 
-// ابحث عن دالة collectAndSend واستبدلها بهذا الجزء
-function collectAndSend() {
-    const answers = [];
-    let allFilled = true;
+    function collectAndSend() {
+        const answers = [];
+        let allFilled = true;
 
-    for (let i = 1; i <= 5; i++) {
-        const val = document.getElementById(`sent-${i}`).value.trim();
-        if (!val) {
-            allFilled = false;
-        } else {
-            answers.push(val);
+        for (let i = 1; i <= 5; i++) {
+            const input = document.getElementById(`sent-${i}`);
+            const val = input.value.trim();
+            if (!val) {
+                allFilled = false;
+                input.parentElement.style.borderColor = "red";
+            } else {
+                input.parentElement.style.borderColor = "rgba(188, 19, 254, 0.15)";
+                answers.push(val);
+            }
         }
-    }
 
-    if (!allFilled) {
-        window.parent.postMessage({ type: 'MISSION_INCOMPLETE' }, '*');
-        return; 
-    }
+        if (!allFilled) {
+            window.parent.postMessage({ 
+                type: 'MISSION_INCOMPLETE',
+                message: "All neural segments must be decoded." 
+            }, '*');
+            return; 
+        }
 
-    window.parent.postMessage({ 
-        type: 'MISSION_ANSWERS', 
-        activityCode: 'GEX',
-        answers: answers, // إرسال مصفوفة Array
-        task: taskNum
-    }, '*');
-}
+        window.parent.postMessage({ 
+            type: 'MISSION_ANSWERS', 
+            activityCode: 'GEX',
+            answers: answers, 
+            task: taskNum
+        }, '*');
+    }
 
     window.onload = initGEX;
 </script>
