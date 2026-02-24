@@ -43,7 +43,6 @@
             text-shadow: 0 0 15px var(--gold-glow);
         }
 
-        /* تنسيق صورة المهمة */
         .mission-blueprint {
             width: 100%;
             max-height: 250px;
@@ -150,15 +149,15 @@
     const urlParams = new URLSearchParams(window.location.search);
     const taskNum = urlParams.get('task') || "1";
     
-    // مفاتيح التخزين لكل مهمة بشكل منفصل
     const storageKeySlow = `DX_V4_T${taskNum}_S`;
     const storageKeyNormal = `DX_V4_T${taskNum}_N`;
 
     function initDictX() {
+        window.parent.postMessage({ type: 'CHECK_AUDIO_STATUS' }, '*');
+
         document.getElementById('task-title').innerText = `MISSION DX-${taskNum.padStart(2, '0')}`;
         
-        // ضبط المسارات بناءً على طلبك
-        const base = "https://raw.githubusercontent.com/eycfde-prog/EYCSSP/main/frontend/eyclgos/dxaudio/";
+        const base = "https://raw.githubusercontent.com/eycfde-prog/EYCSSP/main/frontend/eyclogs/dxaudio/";
         
         document.getElementById('mission-img').src = `${base}${taskNum}.png`;
         document.getElementById('slowSource').src = `${base}${taskNum}s.wav`;
@@ -172,7 +171,6 @@
         
         slowA.playbackRate = 1.0; 
 
-        // التحقق من حالة القفل عند التحميل
         if (localStorage.getItem(storageKeySlow)) lockAudio(slowA, 'cardSlow');
         if (localStorage.getItem(storageKeyNormal)) lockAudio(normalA, 'cardNormal');
 
@@ -180,26 +178,31 @@
         setupAudioLogic(normalA, storageKeyNormal, 'cardNormal');
     }
 
+    window.addEventListener('message', (e) => {
+        if (e.data.type === 'AUDIO_STATUS_DATA') {
+            if (e.data.audio1 === "DONE") lockAudio(document.getElementById('slowAudio'), 'cardSlow');
+            if (e.data.audio2 === "DONE") lockAudio(document.getElementById('normalAudio'), 'cardNormal');
+        }
+        if (e.data.type === 'REQUEST_MISSION_DATA') collectAndSubmit();
+    });
+
     function setupAudioLogic(el, key, cardId) {
         el.onplay = () => {
-            // بمجرد الضغط على تشغيل، يتم القفل فوراً لضمان عدم المحاولة مرة أخرى
+            const num = (cardId === 'cardSlow') ? "1" : "2";
             localStorage.setItem(key, "true");
+            window.parent.postMessage({ type: 'AUDIO_PLAYED', audioNum: num }, '*');
             
-            // منع الطالب من تقديم الفيديو أو الرجوع
             el.ontimeupdate = () => {
-                if (el.seeking) {
-                    el.currentTime = el.played.end(0);
-                }
+                if (el.seeking) el.currentTime = el.played.end(0);
             };
         };
-
         el.onended = () => lockAudio(el, cardId);
     }
 
     function lockAudio(el, cardId) {
         el.pause();
         el.controls = false;
-        el.style.display = "none"; // إخفاء المشغل تماماً بعد الانتهاء
+        el.style.display = "none";
         const card = document.getElementById(cardId);
         card.classList.add('locked');
         if (!card.querySelector('.expired-msg')) {
@@ -219,10 +222,6 @@
             reader.readAsDataURL(file);
         }
     }
-
-    window.addEventListener('message', (e) => {
-        if (e.data.type === 'REQUEST_MISSION_DATA') collectAndSubmit();
-    });
 
     function collectAndSubmit() {
         const files = [];
