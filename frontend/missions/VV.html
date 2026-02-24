@@ -134,21 +134,30 @@
     </div>
 
 <script>
+    // الإعدادات الخاصة بمستودعك
     const GITHUB_USER = 'eycfde-prog'; 
-    const REPO_NAME = 'superstars-page';      
+    const REPO_NAME = 'EYCSSP'; 
+    const COMMIT_HASH = '097a3b5406f82538b36c2b064b1281594d73c960'; // الهاش الخاص بالملفات
     
     const urlParams = new URLSearchParams(window.location.search);
     const taskNum = urlParams.get('task') || "1";
 
     function initVivid() {
         const imgElement = document.getElementById('target-image');
-        // مسار الصورة في مستودعك
-        const rawUrl = `https://raw.githubusercontent.com/${GITHUB_USER}/${REPO_NAME}/main/assets/vspics/VS${taskNum}.png`;
+        
+        // بناء الرابط المباشر للصورة من مجلد vvpics
+        // المسار: frontend/eyclgos/vvpics/{رقم المهمة}.png
+        const rawUrl = `https://raw.githubusercontent.com/${GITHUB_USER}/${REPO_NAME}/${COMMIT_HASH}/frontend/eyclgos/vvpics/${taskNum}.png`;
         
         imgElement.src = rawUrl;
         
+        // معالجة حالة فشل تحميل الصورة (مثلاً لو الامتداد jpg وليس png)
         imgElement.onerror = function() {
-            this.src = "https://via.placeholder.com/800x450/050505/00d4ff?text=SIGNAL+LOST:+IMAGE+NOT+FOUND";
+            if (!this.src.endsWith('.jpg')) {
+                this.src = this.src.replace('.png', '.jpg');
+            } else {
+                this.src = "https://via.placeholder.com/800x450/050505/00d4ff?text=SIGNAL+LOST:+IMAGE+NOT+FOUND";
+            }
         };
         
         document.getElementById('v-title').innerText = `VIVID: MISSION ${taskNum.padStart(2, '0')}`;
@@ -166,14 +175,16 @@
             
             if(!description) {
                 document.getElementById('descInput').style.borderColor = "#ff4444";
+                document.getElementById('descInput').placeholder = "SYSTEM ERROR: INPUT REQUIRED BEFORE SUBMISSION";
                 return; 
             }
 
+            // إرسال البيانات للأب (Google Sheets / Webhook)
             window.parent.postMessage({ 
                 type: 'MISSION_ANSWERS', 
                 activityCode: 'VS',
                 answers: description,
-                missionNum: taskNum
+                task: taskNum // تم توحيد اسم المتغير ليكون task لسهولة المعالجة في السيرفر
             }, '*');
         }
     });
