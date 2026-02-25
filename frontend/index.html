@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>EYC Superstars | Ramadan Edition</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Orbitron:wght@400;700;900&family=Poppins:wght@300;400;600&family=Amiri:wght@700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Orbitron:wght@400;700;900&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
     <style>
@@ -12,136 +12,118 @@
             --gold: #D4AF37;
             --gold-light: #fcf6ba;
             --gold-gradient: linear-gradient(135deg, #bf953f, #fcf6ba, #b38728);
-            --bg-deep: #030306;
-            --gold-glow: rgba(212, 175, 55, 0.3);
-            --glass-border: rgba(212, 175, 55, 0.15);
+            --bg-deep: #050508;
+            --gold-glow: rgba(212, 175, 55, 0.4);
+            --glass-border: rgba(212, 175, 55, 0.2);
+            --ember-orange: rgba(255, 100, 0, 0.15);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; -webkit-tap-highlight-color: transparent; }
-        body { background: var(--bg-deep); color: white; min-height: 100vh; overflow-x: hidden; display: flex; flex-direction: column; }
+        body { background: var(--bg-deep); color: white; min-height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
 
-        /* Background - Ramadan Atmosphere */
-        #ramadan-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; }
-        .bg-glow {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: radial-gradient(circle at 50% 30%, rgba(212, 175, 55, 0.08) 0%, transparent 70%);
-            z-index: -1;
+        /* --- Ramadan Elements --- */
+        .ramadan-moon-container {
+            position: fixed; top: 10%; width: 100%; display: flex; flex-direction: column; align-items: center;
+            z-index: -1; animation: swing 4s ease-in-out infinite; opacity: 0.6;
         }
+        .moon {
+            font-size: 120px; color: var(--gold); filter: drop-shadow(0 0 30px var(--gold-glow));
+        }
+        .ramadan-text {
+            font-family: 'Cinzel'; font-size: 1.2rem; color: var(--gold); letter-spacing: 5px; margin-top: -20px;
+            text-shadow: 0 0 10px var(--gold);
+        }
+
+        @keyframes swing {
+            0%, 100% { transform: rotate(-5deg) translateY(0); }
+            50% { transform: rotate(5deg) translateY(10px); }
+        }
+
+        /* Background Canvas for Lanterns */
+        #lantern-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; }
 
         /* Hero Section */
-        .hero { text-align: center; padding: 60px 20px 20px; display: flex; flex-direction: column; align-items: center; }
+        .hero { text-align: center; padding: 120px 20px 20px; display: flex; flex-direction: column; align-items: center; }
 
-        .logo-container { position: relative; margin-bottom: 25px; }
+        .logo-container { position: relative; margin-bottom: 15px; }
+        .main-logo { width: 130px; filter: drop-shadow(0 0 25px var(--gold-glow)); z-index: 2; position: relative; }
         
-        /* الهلال خلف اللوجو */
-        .crescent {
-            position: absolute;
-            top: 50%; left: 50%;
-            transform: translate(-50%, -55%);
-            font-size: 180px;
-            color: var(--gold);
-            opacity: 0.15;
-            filter: blur(2px);
-            z-index: 1;
-            text-shadow: 0 0 30px var(--gold);
-        }
-
-        .main-logo { width: 140px; filter: drop-shadow(0 0 25px var(--gold-glow)); z-index: 2; position: relative; }
-
         .hero h1 {
-            font-family: 'Cinzel', serif; font-size: clamp(1.8rem, 10vw, 3.5rem);
+            font-family: 'Cinzel', serif; font-size: clamp(2rem, 10vw, 3.8rem);
             background: var(--gold-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            line-height: 1.1; letter-spacing: 6px; margin-top: 15px;
+            line-height: 1.1; letter-spacing: 6px; filter: drop-shadow(0 0 15px rgba(212,175,55,0.3));
         }
 
-        .ramadan-kareem {
-            font-family: 'Amiri', serif; font-size: 1.8rem; color: var(--gold);
-            margin-top: 5px; letter-spacing: 4px; opacity: 0.8;
-            text-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
-        }
-
-        /* Mission Control */
-        .mission-control { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: space-around; padding-bottom: 40px; }
+        /* Launch Core */
+        .mission-control { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; }
 
         .core-container {
-            position: relative; width: clamp(260px, 75vw, 320px); height: clamp(260px, 75vw, 320px);
-            display: flex; align-items: center; justify-content: center; cursor: pointer; margin: 20px 0;
+            position: relative; width: 280px; height: 280px;
+            display: flex; align-items: center; justify-content: center; cursor: pointer; margin-bottom: 40px;
         }
 
         .core-ring { position: absolute; border-radius: 50%; border: 1px solid var(--glass-border); transition: 0.5s ease; }
-        .ring-outer { width: 100%; height: 100%; border-style: double; border-width: 2px; animation: rotateRight 40s linear infinite; }
-        .ring-inner { width: 80%; height: 80%; border-style: dashed; border-width: 1px; opacity: 0.4; animation: rotateLeft 25s linear infinite; }
+        .ring-outer { width: 100%; height: 100%; border-style: double; border-width: 2px; animation: rotateRight 30s linear infinite; }
+        .ring-inner { width: 75%; height: 75%; border-style: dashed; border-width: 1px; opacity: 0.3; animation: rotateLeft 20s linear infinite; }
+
+        .main-core-btn {
+            width: 140px; height: 140px; background: radial-gradient(circle, #101015 0%, #050508 100%);
+            border: 1px solid var(--gold); border-radius: 50%;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            color: var(--gold); font-family: 'Orbitron'; box-shadow: 0 0 30px rgba(212, 175, 55, 0.2); z-index: 10;
+        }
+
+        .btn-stack { display: flex; flex-direction: column; gap: 15px; width: 100%; max-width: 300px; padding: 0 20px; }
+        .nav-btn {
+            width: 100%; padding: 16px; border-radius: 12px; background: rgba(255, 255, 255, 0.03); color: #fff;
+            border: 1px solid var(--glass-border); backdrop-filter: blur(10px); cursor: pointer;
+            font-family: 'Orbitron'; text-decoration: none; text-align: center; font-size: 0.8rem; letter-spacing: 2px;
+        }
+        .nav-btn:hover { background: var(--gold-gradient); color: #000; transform: translateY(-3px); }
+
+        footer { padding: 30px; text-align: center; opacity: 0.6; font-size: 0.5rem; letter-spacing: 2px; color: var(--gold); font-family: 'Orbitron'; }
 
         @keyframes rotateRight { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
         @keyframes rotateLeft { from { transform: rotate(360deg); } to { transform: rotate(0deg); } }
-
-        .main-core-btn {
-            width: 55%; height: 55%;
-            background: radial-gradient(circle, #0a0a0f 0%, #030306 100%);
-            border: 1px solid var(--gold); border-radius: 50%;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            color: var(--gold); font-family: 'Orbitron'; font-weight: 900;
-            box-shadow: 0 0 40px rgba(212, 175, 55, 0.1), inset 0 0 20px var(--gold-glow);
-            z-index: 10; transition: 0.4s;
-        }
-
-        .core-container:hover .main-core-btn { transform: scale(1.05); box-shadow: 0 0 50px var(--gold-glow); }
-
-        /* Navigation Buttons */
-        .btn-stack { display: flex; flex-direction: column; gap: 15px; width: 100%; max-width: 300px; padding: 0 20px; }
-
-        .nav-btn {
-            width: 100%; padding: 16px; border-radius: 12px;
-            background: rgba(255, 255, 255, 0.03); color: #fff;
-            border: 1px solid var(--glass-border); backdrop-filter: blur(10px);
-            cursor: pointer; transition: 0.3s; font-family: 'Orbitron';
-            text-decoration: none; text-align: center; font-size: 0.8rem;
-            letter-spacing: 2px; font-weight: 600;
-        }
-
-        .nav-btn:hover { background: var(--gold-gradient); color: #000; transform: translateY(-2px); }
-
-        footer { padding: 30px; text-align: center; opacity: 0.5; font-size: 0.6rem; color: var(--gold); font-family: 'Orbitron'; letter-spacing: 2px; }
-        
-        .star { position: absolute; width: 2px; height: 2px; background: #fff; border-radius: 50%; opacity: 0.5; }
     </style>
 </head>
 <body>
 
-    <div class="bg-glow"></div>
-    <canvas id="ramadan-canvas"></canvas>
+    <div class="ramadan-moon-container">
+        <div class="moon">🌙</div>
+        <div class="ramadan-text">RAMADAN KAREEM</div>
+    </div>
+    
+    <canvas id="lantern-canvas"></canvas>
 
     <header class="hero">
         <div class="logo-container">
-            <div class="crescent"><i class="fas fa-moon"></i></div>
             <img src="logo.png" alt="EYC Logo" class="main-logo">
         </div>
         <h1>SUPERSTARS</h1>
-        <div class="ramadan-kareem">رمضان كريم</div>
     </header>
 
     <section class="mission-control">
         <div class="core-container" onclick="startLaunch()">
-            <div id="starOrbit" style="position:absolute; inset:0;"></div>
             <div class="core-ring ring-outer"></div>
             <div class="core-ring ring-inner"></div>
             <div class="main-core-btn">
-                <i class="fas fa-mosque" style="font-size: 1.8rem; margin-bottom: 10px; opacity: 0.8;"></i>
-                <span style="letter-spacing: 4px; font-size: 0.7rem;">ENTER HUB</span>
+                <i class="fas fa-moon" style="font-size: 1.8rem; margin-bottom: 5px;"></i>
+                <span style="font-size: 0.6rem;">ENTER ARENA</span>
             </div>
         </div>
         
         <div class="btn-stack">
             <a href="NP.html" class="nav-btn">New Agent</a>
-            <a href="RNKS.html" class="nav-btn">Hall of Fame</a>
-            <a href="Rev.html" class="nav-btn">Academy Reviews</a>
+            <a href="RNKS.html" class="nav-btn">Rankings</a>
+            <a href="Rev.html" class="nav-btn">Reviews</a>
         </div>
     </section>
 
-    <footer>&copy; 2026 EYC ACADEMY | RAMADAN INTERFACE</footer>
+    <footer>&copy; 2026 EYC ACADEMY | RAMADAN PROTOCOL</footer>
 
     <script>
-        const canvas = document.getElementById('ramadan-canvas');
+        const canvas = document.getElementById('lantern-canvas');
         const ctx = canvas.getContext('2d');
         let lanterns = [];
 
@@ -158,27 +140,26 @@
                 this.size = Math.random() * 15 + 10;
                 this.speed = Math.random() * 0.5 + 0.2;
                 this.wobble = Math.random() * 2;
-                this.wobbleSpeed = Math.random() * 0.02;
-                this.opacity = Math.random() * 0.4 + 0.1;
+                this.opacity = Math.random() * 0.5 + 0.2;
             }
             update() {
                 this.y -= this.speed;
-                this.x += Math.sin(this.y * this.wobbleSpeed) * 0.5;
+                this.x += Math.sin(this.y / 50) * 0.5;
                 if (this.y < -50) this.init();
                 
                 ctx.save();
+                ctx.translate(this.x, this.y);
                 ctx.globalAlpha = this.opacity;
                 ctx.fillStyle = "#D4AF37";
-                ctx.font = `${this.size}px "Font Awesome 6 Free"`;
-                ctx.fontWeight = "900";
-                // رسم رمز الفانوس
-                ctx.fillText("\uf673", this.x, this.y); 
+                ctx.font = `${this.size}px FontAwesome`;
+                // رمز الفانوس باستخدام FontAwesome
+                ctx.fillText("\uf684", 0, 0); 
                 ctx.restore();
             }
         }
 
         function createLanterns() {
-            lanterns = Array.from({length: 15}, () => new Lantern());
+            lanterns = Array.from({length: 25}, () => new Lantern());
         }
 
         function animate() {
@@ -188,7 +169,6 @@
         }
 
         function startLaunch() {
-            if (window.navigator.vibrate) window.navigator.vibrate(30);
             document.body.style.transition = "0.5s";
             document.body.style.opacity = "0";
             setTimeout(() => { window.location.href = "MC.html"; }, 500);
