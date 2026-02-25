@@ -14,12 +14,44 @@
             --gold-gradient: linear-gradient(135deg, #bf953f, #fcf6ba, #b38728);
             --bg-deep: #050508;
             --gold-glow: rgba(212, 175, 55, 0.4);
+            --gold-bright: #fff9d0;
             --glass-border: rgba(212, 175, 55, 0.2);
             --ember-orange: rgba(255, 100, 0, 0.15);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; -webkit-tap-highlight-color: transparent; }
         body { background: var(--bg-deep); color: white; min-height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
+
+        /* الهلال المتدلي */
+        .crescent-hanging {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 10px 0 -10px 0; /* تحكم في النزول لتحت هنا */
+            opacity: 0.7;
+            animation: gentleSwing 5s ease-in-out infinite;
+            pointer-events: none; /* عشان ميعطلش اللمس */
+        }
+        .crescent-hanging i {
+            font-size: 2.5rem;
+            color: var(--gold);
+            filter: drop-shadow(0 0 10px var(--gold-glow));
+        }
+        .crescent-hanging span {
+            font-family: 'Cinzel', serif;
+            font-size: 0.6rem;
+            color: var(--gold-bright);
+            letter-spacing: 3px;
+            margin-top: -5px;
+        }
+        @keyframes gentleSwing {
+            0%, 100% { transform: rotate(-3deg) translateY(0); }
+            50% { transform: rotate(3deg) translateY(5px); }
+        }
+        /* تحسين الهيدر ليتناسب مع الهلال */
+        .main-header {
+            padding-bottom: 10px;
+        }
 
         /* --- Ramadan Elements --- */
         .ramadan-moon-container {
@@ -99,6 +131,12 @@
         }
         .nav-btn:hover { background: var(--gold-gradient); color: #000; transform: translateY(-3px); }
 
+        .tabs { display: flex; width: 100%; max-width: 400px; margin: 20px auto; gap: 10px; padding: 0 10px; }
+        .tab-btn { flex: 1; padding: 12px; text-align: center; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); border-radius: 8px; cursor: pointer; font-family: 'Orbitron'; font-size: 0.7rem; transition: 0.3s; }
+        .tab-btn.active { background: var(--gold-gradient); color: black; }
+
+        .fairy-float { position: fixed; bottom: 20px; right: 20px; width: 50px; height: 50px; background: var(--gold-gradient); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 100; box-shadow: 0 0 15px var(--gold); }
+
         footer { padding: 30px; text-align: center; opacity: 0.6; font-size: 0.5rem; letter-spacing: 2px; color: var(--gold); font-family: 'Orbitron'; }
 
         @keyframes rotateRight { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
@@ -107,19 +145,24 @@
 </head>
 <body>
 
-    <div class="ramadan-moon-container">
-        <div class="moon">🌙</div>
-        <div class="ramadan-text">RAMADAN KAREEM</div>
+    <div class="fairy-float" onclick="alert('Fairytale Guide: System active! How can I help?')">
+        <i class="fas fa-wand-sparkles" style="color: #000; font-size: 1.5rem;"></i>
+    </div>
+
+    <header class="main-header" id="userHeader">
+        </header>
+
+    <div class="crescent-hanging">
+        <i class="fas fa-moon"></i>
+        <span>SUPERSTARS</span>
+    </div>
+
+    <div class="tabs">
+        <div class="tab-btn active" onclick="switchTab('season', this)">SEASON</div>
+        <div class="tab-btn" onclick="switchTab('royal', this)">ROYAL X</div>
     </div>
     
     <canvas id="lantern-canvas"></canvas>
-
-    <header class="hero">
-        <div class="logo-container">
-            <img src="logo.png" alt="EYC Logo" class="main-logo">
-        </div>
-        <h1>SUPERSTARS</h1>
-    </header>
 
     <section class="mission-control">
         <div class="core-container" onclick="startLaunch()">
@@ -150,45 +193,43 @@
             canvas.height = window.innerHeight;
         }
 
-class Lantern {
-    constructor() { this.init(); }
-    init() {
-        this.x = Math.random() * canvas.width;
-        this.y = canvas.height + 50;
-        this.size = Math.random() * 10 + 8; // حجم الفانوس
-        this.speed = Math.random() * 0.5 + 0.2;
-        this.opacity = Math.random() * 0.4 + 0.2;
-    }
-    update() {
-        this.y -= this.speed;
-        this.x += Math.sin(this.y / 50) * 0.3;
-        if (this.y < -50) this.init();
-        
-        ctx.save();
-        ctx.translate(this.x, this.y);
-        ctx.globalAlpha = this.opacity;
-        ctx.fillStyle = "#D4AF37"; // اللون الذهبي
+        class Lantern {
+            constructor() { this.init(); }
+            init() {
+                this.x = Math.random() * canvas.width;
+                this.y = canvas.height + 50;
+                this.size = Math.random() * 10 + 8;
+                this.speed = Math.random() * 0.5 + 0.2;
+                this.opacity = Math.random() * 0.4 + 0.2;
+            }
+            update() {
+                this.y -= this.speed;
+                this.x += Math.sin(this.y / 50) * 0.3;
+                if (this.y < -50) this.init();
+                
+                ctx.save();
+                ctx.translate(this.x, this.y);
+                ctx.globalAlpha = this.opacity;
+                ctx.fillStyle = "#D4AF37";
 
-        // رسم شكل فانوس هندسي بسيط لضمان الظهور
-        ctx.beginPath();
-        ctx.moveTo(0, -this.size); // القمة
-        ctx.lineTo(this.size/2, -this.size/2);
-        ctx.lineTo(this.size/2, this.size/2);
-        ctx.lineTo(0, this.size); // القاعدة
-        ctx.lineTo(-this.size/2, this.size/2);
-        ctx.lineTo(-this.size/2, -this.size/2);
-        ctx.closePath();
-        ctx.fill();
+                ctx.beginPath();
+                ctx.moveTo(0, -this.size);
+                ctx.lineTo(this.size/2, -this.size/2);
+                ctx.lineTo(this.size/2, this.size/2);
+                ctx.lineTo(0, this.size);
+                ctx.lineTo(-this.size/2, this.size/2);
+                ctx.lineTo(-this.size/2, -this.size/2);
+                ctx.closePath();
+                ctx.fill();
 
-        // إضافة لمعة صغيرة في نص الفانوس
-        ctx.fillStyle = "#fcf6ba";
-        ctx.beginPath();
-        ctx.arc(0, 0, this.size/4, 0, Math.PI * 2);
-        ctx.fill();
+                ctx.fillStyle = "#fcf6ba";
+                ctx.beginPath();
+                ctx.arc(0, 0, this.size/4, 0, Math.PI * 2);
+                ctx.fill();
 
-        ctx.restore();
-    }
-}
+                ctx.restore();
+            }
+        }
 
         function createLanterns() {
             lanterns = Array.from({length: 25}, () => new Lantern());
@@ -204,6 +245,12 @@ class Lantern {
             document.body.style.transition = "0.5s";
             document.body.style.opacity = "0";
             setTimeout(() => { window.location.href = "MC.html"; }, 500);
+        }
+
+        function switchTab(tab, btn) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            console.log('Switching to:', tab);
         }
 
         window.addEventListener('resize', initCanvas);
