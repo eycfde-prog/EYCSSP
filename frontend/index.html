@@ -12,38 +12,25 @@
             --gold: #D4AF37;
             --gold-light: #fcf6ba;
             --gold-gradient: linear-gradient(135deg, #bf953f, #fcf6ba, #b38728);
-            --emerald: #50C878; /* اللون الزمردي الأساسي */
-            --emerald-glow: rgba(80, 200, 120, 0.3);
-            --bg-deep: #020504; /* خلفية تميل للسواد المخضر قليلاً */
-            --gold-glow: rgba(212, 175, 55, 0.3);
+            --emerald: #50C878;
+            --emerald-glow: rgba(80, 200, 120, 0.6);
+            --bg-deep: #050508;
             --glass-border: rgba(212, 175, 55, 0.2);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; -webkit-tap-highlight-color: transparent; }
-        body { background: var(--bg-deep); color: white; min-height: 100vh; overflow-x: hidden; }
+        body { background: var(--bg-deep); color: white; min-height: 100vh; overflow-x: hidden; display: flex; flex-direction: column; justify-content: center; }
 
         /* Background Effects */
         #letter-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; opacity: 0.25; }
         .bg-glow {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: radial-gradient(circle at 50% 50%, var(--emerald-glow) 0%, transparent 80%);
+            background: radial-gradient(circle at 50% 50%, rgba(80, 200, 120, 0.03) 0%, transparent 75%);
             z-index: -1;
         }
 
-        /* Header / Navigation - Minimalist */
-        nav {
-            display: flex; justify-content: flex-end; align-items: center;
-            padding: 0 8%; height: 60px; position: sticky; top: 0; z-index: 1000;
-        }
-
-        .token-display {
-            display: flex; align-items: center; gap: 10px;
-            color: var(--emerald); font-family: 'Orbitron'; font-weight: 700;
-            filter: drop-shadow(0 0 5px var(--emerald-glow));
-        }
-
         /* Hero Section */
-        .hero { text-align: center; padding: 20px 20px 0px; }
+        .hero { text-align: center; padding: 20px 20px 10px; }
         .main-logo {
             width: clamp(80px, 15vw, 110px); margin-bottom: 10px;
             filter: drop-shadow(0 0 15px var(--gold-glow));
@@ -53,8 +40,8 @@
             font-family: 'Cinzel', serif; font-size: clamp(2.2rem, 12vw, 4.5rem);
             background: var(--gold-gradient);
             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            line-height: 1.1; letter-spacing: 6px; margin-bottom: 5px;
-            filter: drop-shadow(0 0 15px rgba(212,175,55,0.3));
+            line-height: 1.1; letter-spacing: 5px; margin-bottom: 5px;
+            filter: drop-shadow(0 0 10px rgba(212,175,55,0.2));
         }
 
         /* Mission Control */
@@ -65,32 +52,31 @@
 
         .core-container {
             position: relative; 
-            width: clamp(260px, 75vw, 340px);
-            height: clamp(260px, 75vw, 340px);
+            width: clamp(260px, 75vw, 380px);
+            height: clamp(260px, 75vw, 380px);
             display: flex; align-items: center; justify-content: center;
             cursor: pointer; transform-style: preserve-3d;
-            margin: 15px 0;
+            margin: 30px 0;
         }
 
         .core-ring {
             position: absolute; border-radius: 50%;
-            border: 1px solid var(--glass-border);
+            border: 2px solid var(--emerald); /* تعديل للزمردي */
             transition: 0.5s ease;
+            box-shadow: 0 0 15px var(--emerald-glow);
         }
 
         .ring-outer {
             width: 100%; height: 100%;
-            border-style: double; border-width: 2px;
-            border-color: var(--gold);
-            animation: rotateRight 30s linear infinite;
+            border-style: double; border-width: 3px;
+            animation: rotateRight 25s linear infinite;
         }
 
         .ring-inner {
-            width: 80%; height: 80%;
+            width: 78%; height: 78%;
             border-style: dashed; border-width: 1px;
-            border-color: var(--emerald);
-            opacity: 0.5;
-            animation: rotateLeft 20s linear infinite;
+            opacity: 0.6;
+            animation: rotateLeft 15s linear infinite;
         }
 
         @keyframes rotateRight { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
@@ -99,7 +85,7 @@
         /* Main Launch Button */
         .main-core-btn {
             width: 55%; height: 55%;
-            background: radial-gradient(circle, #0a1a10 0%, #050508 100%);
+            background: radial-gradient(circle, #0a1a0f 0%, #050508 100%);
             border: 1px solid var(--emerald);
             border-radius: 50%;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -110,24 +96,24 @@
         }
 
         .core-container:hover .main-core-btn {
-            transform: scale(1.08);
+            transform: scale(1.05);
             box-shadow: 0 0 50px var(--emerald-glow);
-            border-color: var(--gold);
-            color: var(--gold);
+            color: #fff;
         }
 
         /* Button Stack */
         .btn-stack {
             display: flex; flex-direction: column;
-            gap: 15px; width: 100%; max-width: 300px; padding: 10px 20px;
+            gap: 15px; width: 100%; max-width: 300px; padding: 0 20px;
+            margin-top: 10px;
         }
 
         .nav-btn {
-            width: 100%; padding: 14px; border-radius: 10px;
-            background: rgba(212, 175, 55, 0.02); color: #fff;
+            width: 100%; padding: 14px; border-radius: 12px;
+            background: rgba(212, 175, 55, 0.03); color: #fff;
             border: 1px solid var(--glass-border);
-            backdrop-filter: blur(10px);
-            cursor: pointer; transition: all 0.4s ease; 
+            backdrop-filter: blur(15px);
+            cursor: pointer; transition: 0.4s; 
             font-family: 'Orbitron'; text-decoration: none; text-align: center; 
             font-size: 0.75rem; font-weight: 700; letter-spacing: 2px;
             text-transform: uppercase;
@@ -138,24 +124,23 @@
             color: #000;
             transform: translateY(-2px);
             box-shadow: 0 8px 20px rgba(212, 175, 55, 0.2);
-            border-color: transparent;
         }
 
-        /* Flash Effect */
+        /* Flash Effect - Emerald */
         #lightning-flash {
-            position: fixed; inset: 0; background: radial-gradient(circle, var(--gold-light), var(--emerald)); z-index: 9999;
+            position: fixed; inset: 0; background: var(--emerald); z-index: 9999;
             opacity: 0; pointer-events: none;
         }
         @keyframes flashEffect {
             0% { opacity: 0; } 30% { opacity: 0.7; } 100% { opacity: 0; }
         }
 
-        footer { padding: 20px; text-align: center; opacity: 0.6; }
+        footer { padding: 20px; text-align: center; margin-top: auto; }
 
         .star {
-            position: absolute; width: 2px; height: 2px;
+            position: absolute; width: 4px; height: 4px;
             background: var(--emerald); border-radius: 50%;
-            box-shadow: 0 0 5px var(--emerald); pointer-events: none;
+            box-shadow: 0 0 10px var(--emerald); pointer-events: none;
         }
     </style>
 </head>
@@ -164,13 +149,6 @@
     <div id="lightning-flash"></div>
     <div class="bg-glow"></div>
     <canvas id="letter-canvas"></canvas>
-
-    <nav>
-        <div class="token-display">
-            <i class="fas fa-coins"></i>
-            <span>TOKENS</span>
-        </div>
-    </nav>
 
     <header class="hero">
         <img src="logo.png" alt="EYC Logo" class="main-logo">
@@ -183,7 +161,7 @@
             <div class="core-ring ring-outer"></div>
             <div class="core-ring ring-inner"></div>
             <div class="main-core-btn">
-                <i class="fas fa-bolt-lightning" style="font-size: 2.2rem; margin-bottom: 8px;"></i>
+                <i class="fas fa-bolt-lightning" style="font-size: 2.2rem; margin-bottom: 8px; filter: drop-shadow(0 0 10px var(--emerald));"></i>
                 <span style="letter-spacing: 3px; font-size: 0.75rem;">LAUNCH</span>
             </div>
         </div>
@@ -196,12 +174,13 @@
     </section>
 
     <footer>
-        <div style="color: var(--gold); font-family: 'Orbitron'; font-size: 0.6rem; letter-spacing: 2px;">
-            &copy; 2026 EYC ACADEMY | ROYAL EMERALD INTERFACE
+        <div style="color: var(--gold); font-family: 'Orbitron'; font-size: 0.6rem; letter-spacing: 2px; opacity: 0.6;">
+            &copy; 2026 EYC ACADEMY | EMERALD INTERFACE
         </div>
     </footer>
 
     <script>
+        // --- Canvas Background ---
         const canvas = document.getElementById('letter-canvas');
         const ctx = canvas.getContext('2d');
         let particles = [];
@@ -216,22 +195,22 @@
             init() {
                 this.x = Math.random() * canvas.width;
                 this.y = Math.random() * canvas.height;
-                this.char = ["E", "Y", "C", "T"][Math.floor(Math.random()*4)];
-                this.fontSize = Math.random() * 10 + 6;
+                this.char = ["E", "Y", "C", "A", "Z"][Math.floor(Math.random()*5)];
+                this.fontSize = Math.random() * 10 + 8;
                 this.speed = Math.random() * 0.3 + 0.1;
                 this.opacity = Math.random() * 0.2;
             }
             update() {
                 this.y -= this.speed;
                 if (this.y < -20) this.y = canvas.height + 20;
-                ctx.fillStyle = Math.random() > 0.5 ? `rgba(212, 175, 55, ${this.opacity})` : `rgba(80, 200, 120, ${this.opacity})`;
+                ctx.fillStyle = `rgba(212, 175, 55, ${this.opacity})`;
                 ctx.font = `900 ${this.fontSize}px Orbitron`;
                 ctx.fillText(this.char, this.x, this.y);
             }
         }
 
         function createParticles() {
-            particles = Array.from({length: 40}, () => new LetterParticle());
+            particles = Array.from({length: 30}, () => new LetterParticle());
         }
 
         function animate() {
@@ -240,22 +219,26 @@
             requestAnimationFrame(animate);
         }
 
+        // --- Emerald Star Orbit ---
         function createStars() {
             const orbit = document.getElementById('starOrbit');
-            const count = 10;
+            const count = 10; // عدد النجوم بين الدائرتين
             const containerSize = orbit.offsetWidth / 2;
+            
             for (let i = 0; i < count; i++) {
                 const star = document.createElement('div');
                 star.className = 'star';
                 const angle = (i / count) * Math.PI * 2;
-                const radius = containerSize * 0.82; 
+                const radius = containerSize * 0.88; // موضع النجوم بين الحلقتين
                 let currentAngle = angle;
+                
                 function moveStar() {
                     currentAngle += 0.006;
                     const x = Math.cos(currentAngle) * radius + containerSize;
                     const y = Math.sin(currentAngle) * radius + containerSize;
                     star.style.left = x + 'px';
                     star.style.top = y + 'px';
+                    star.style.opacity = Math.sin(currentAngle * 3) * 0.5 + 0.5;
                     requestAnimationFrame(moveStar);
                 }
                 orbit.appendChild(star);
@@ -265,9 +248,15 @@
 
         function startLaunch() {
             const flash = document.getElementById('lightning-flash');
+            flash.style.animation = "none";
+            void flash.offsetWidth; 
             flash.style.animation = "flashEffect 0.6s ease-out forwards";
-            if (window.navigator.vibrate) window.navigator.vibrate([40, 20, 40]);
-            setTimeout(() => { window.location.href = "MC.html"; }, 500);
+            
+            if (window.navigator.vibrate) window.navigator.vibrate([40, 40, 40]);
+            
+            setTimeout(() => {
+                window.location.href = "MC.html"; 
+            }, 500);
         }
 
         window.addEventListener('resize', () => { initCanvas(); createParticles(); });
