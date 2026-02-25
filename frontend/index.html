@@ -1,221 +1,236 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>EYC Superstars | Ramadan Edition</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Orbitron:wght@400;700;900&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    
-    <style>
-        :root {
-            --gold: #D4AF37;
-            --gold-light: #fcf6ba;
-            --gold-gradient: linear-gradient(135deg, #bf953f, #fcf6ba, #b38728);
-            --bg-deep: #050508;
-            --gold-glow: rgba(212, 175, 55, 0.4);
-            --gold-bright: #fff9d0;
-            --glass-border: rgba(212, 175, 55, 0.2);
-            --ember-orange: rgba(255, 100, 0, 0.15);
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>EYC Superstars | Ramadan Edition</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Orbitron:wght@400;700;900&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<style>
+:root {
+--gold: #D4AF37;
+--gold-light: #fcf6ba;
+--gold-gradient: linear-gradient(135deg, #bf953f, #fcf6ba, #b38728);
+--bg-deep: #050508;
+--gold-glow: rgba(212, 175, 55, 0.4);
+--gold-bright: #fff9d0;
+--glass-border: rgba(212, 175, 55, 0.2);
+--ember-orange: rgba(255, 100, 0, 0.15);
+}
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; -webkit-tap-highlight-color: transparent; }
-        body { background: var(--bg-deep); color: white; min-height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; -webkit-tap-highlight-color: transparent; }
+body { background: var(--bg-deep); color: white; min-height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
 
-        /* --- الهلال المتدلي (Hanging Crescent) --- */
-        .crescent-hanging {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            /* تم زيادة الـ margin العلوي لينسدل للأسفل في المساحة الفاضية */
-            margin: 40px 0 20px 0; 
-            opacity: 0.9;
-            animation: gentleSwing 5s ease-in-out infinite;
-            pointer-events: none;
-            position: relative;
-        }
+.crescent-hanging {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: -15px;
+    opacity: 0.8;
+    animation: gentleSwing 5s ease-in-out infinite;
+    pointer-events: none;
+    z-index: 5;
+}
+.crescent-hanging i {
+    font-size: 2.2rem;
+    color: var(--gold);
+    filter: drop-shadow(0 0 15px var(--gold-glow));
+}
+.crescent-hanging span {
+    font-family: 'Cinzel', serif;
+    font-size: 0.5rem;
+    color: var(--gold-bright);
+    letter-spacing: 2px;
+    margin-top: -3px;
+    text-transform: uppercase;
+}
 
-        /* حبل التعليق الافتراضي */
-        .crescent-hanging::before {
-            content: '';
-            position: absolute;
-            top: -40px;
-            width: 1px;
-            height: 40px;
-            background: linear-gradient(to bottom, transparent, var(--gold));
-            opacity: 0.5;
-        }
+@keyframes gentleSwing {
+0%, 100% { transform: rotate(-3deg) translateY(0); }
+50% { transform: rotate(3deg) translateY(5px); }
+}
 
-        .crescent-hanging i {
-            font-size: 3rem; /* تكبير بسيط للهلال */
-            color: var(--gold);
-            filter: drop-shadow(0 0 15px var(--gold-glow));
-            transform: rotate(-15deg); /* إمالة الهلال ليعطي إيحاء التعليق */
-        }
+.hero { 
+    text-align: center; 
+    padding: 60px 20px 40px; 
+    display: flex; 
+    flex-direction: column; 
+    align-items: center; 
+}
 
-        .crescent-hanging span {
-            font-family: 'Cinzel', serif;
-            font-size: 0.7rem;
-            color: var(--gold-bright);
-            letter-spacing: 5px;
-            margin-top: 5px;
-            text-shadow: 0 0 10px var(--gold);
-        }
+.logo-container { position: relative; margin-bottom: 15px; }
+.main-logo { width: 130px; filter: drop-shadow(0 0 25px var(--gold-glow)); z-index: 2; position: relative; }
+.hero h1 {
+    font-family: 'Cinzel', serif; font-size: clamp(2rem, 10vw, 3.8rem);
+    background: var(--gold-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    line-height: 1.1; letter-spacing: 6px; filter: drop-shadow(0 0 15px rgba(212,175,55,0.3));
+}
 
-        @keyframes gentleSwing {
-            0%, 100% { transform: rotate(-4deg) translateY(0); }
-            50% { transform: rotate(4deg) translateY(10px); }
-        }
+#lantern-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; }
 
-        /* تحسين الهيدر */
-        .main-header { padding-bottom: 0px; }
+.mission-control {
+flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+min-height: 200px;
+}
 
-        /* Background Canvas */
-        #lantern-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; }
+.core-container {
+position: relative; width: 280px; height: 280px;
+display: flex; align-items: center; justify-content: center; cursor: pointer; margin-bottom: 40px;
+}
 
-        /* Launch Core */
-        .mission-control { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 200px; }
+.core-ring { position: absolute; border-radius: 50%; border: 1px solid var(--glass-border); transition: 0.5s ease; }
+.ring-outer { width: 100%; height: 100%; border-style: double; border-width: 2px; animation: rotateRight 30s linear infinite; }
+.ring-inner { width: 75%; height: 75%; border-style: dashed; border-width: 1px; opacity: 0.3; animation: rotateLeft 20s linear infinite; }
 
-        .core-container {
-            position: relative; width: 260px; height: 260px;
-            display: flex; align-items: center; justify-content: center; cursor: pointer; margin-bottom: 30px;
-        }
+@keyframes corePulse {
+0% { box-shadow: 0 0 20px var(--gold-glow); }
+50% { box-shadow: 0 0 50px var(--gold); }
+100% { box-shadow: 0 0 20px var(--gold-glow); }
+}
 
-        .core-ring { position: absolute; border-radius: 50%; border: 1px solid var(--glass-border); transition: 0.5s ease; }
-        .ring-outer { width: 100%; height: 100%; border-style: double; border-width: 2px; animation: rotateRight 30s linear infinite; }
-        .ring-inner { width: 75%; height: 75%; border-style: dashed; border-width: 1px; opacity: 0.3; animation: rotateLeft 20s linear infinite; }
+.main-core-btn {
+width: 140px; height: 140px; background: radial-gradient(circle, #101015 0%, #050508 100%);
+border: 1px solid var(--gold); border-radius: 50%;
+display: flex; flex-direction: column; align-items: center; justify-content: center;
+color: var(--gold); font-family: 'Orbitron';
+z-index: 10;
+animation: corePulse 3s infinite ease-in-out;
+}
 
-        @keyframes corePulse {
-            0%, 100% { box-shadow: 0 0 20px var(--gold-glow); }
-            50% { box-shadow: 0 0 50px var(--gold); }
-        }
+.btn-stack { display: flex; flex-direction: column; gap: 15px; width: 100%; max-width: 300px; padding: 0 20px; }
+.nav-btn {
+width: 100%; padding: 16px; border-radius: 12px; background: rgba(255, 255, 255, 0.03); color: #fff;
+border: 1px solid var(--glass-border); backdrop-filter: blur(10px); cursor: pointer;
+font-family: 'Orbitron'; text-decoration: none; text-align: center; font-size: 0.8rem; letter-spacing: 2px;
+}
+.nav-btn:hover { background: var(--gold-gradient); color: #000; transform: translateY(-3px); }
 
-        .main-core-btn {
-            width: 130px; height: 130px; background: radial-gradient(circle, #101015 0%, #050508 100%);
-            border: 1px solid var(--gold); border-radius: 50%;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            color: var(--gold); font-family: 'Orbitron'; z-index: 10;
-            animation: corePulse 3s infinite ease-in-out;
-        }
+.tabs { display: flex; width: 100%; max-width: 400px; margin: 20px auto; gap: 10px; padding: 0 10px; }
+.tab-btn { flex: 1; padding: 12px; text-align: center; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); border-radius: 8px; cursor: pointer; font-family: 'Orbitron'; font-size: 0.7rem; transition: 0.3s; }
+.tab-btn.active { background: var(--gold-gradient); color: black; }
 
-        .btn-stack { display: flex; flex-direction: column; gap: 12px; width: 100%; max-width: 280px; padding: 0 20px; }
-        .nav-btn {
-            width: 100%; padding: 14px; border-radius: 12px; background: rgba(255, 255, 255, 0.03); color: #fff;
-            border: 1px solid var(--glass-border); backdrop-filter: blur(10px); cursor: pointer;
-            font-family: 'Orbitron'; text-decoration: none; text-align: center; font-size: 0.75rem; letter-spacing: 2px;
-        }
-        .nav-btn:hover { background: var(--gold-gradient); color: #000; transform: translateY(-3px); }
+.fairy-float { position: fixed; bottom: 20px; right: 20px; width: 50px; height: 50px; background: var(--gold-gradient); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 100; box-shadow: 0 0 15px var(--gold); }
 
-        .tabs { display: flex; width: 100%; max-width: 350px; margin: 10px auto; gap: 10px; padding: 0 10px; }
-        .tab-btn { flex: 1; padding: 10px; text-align: center; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); border-radius: 8px; cursor: pointer; font-family: 'Orbitron'; font-size: 0.65rem; color: #aaa; transition: 0.3s; }
-        .tab-btn.active { background: var(--gold-gradient); color: black; font-weight: bold; }
+footer { padding: 30px; text-align: center; opacity: 0.6; font-size: 0.5rem; letter-spacing: 2px; color: var(--gold); font-family: 'Orbitron'; }
 
-        .fairy-float { position: fixed; bottom: 20px; right: 20px; width: 45px; height: 45px; background: var(--gold-gradient); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 100; box-shadow: 0 0 15px var(--gold); }
-
-        footer { padding: 20px; text-align: center; opacity: 0.6; font-size: 0.5rem; letter-spacing: 2px; color: var(--gold); font-family: 'Orbitron'; }
-
-        @keyframes rotateRight { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-        @keyframes rotateLeft { from { transform: rotate(360deg); } to { transform: rotate(0deg); } }
-    </style>
+@keyframes rotateRight { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+@keyframes rotateLeft { from { transform: rotate(360deg); } to { transform: rotate(0deg); } }
+</style>
 </head>
 <body>
 
-    <div class="fairy-float" onclick="alert('Fairytale Guide: System active!')">
-        <i class="fas fa-wand-sparkles" style="color: #000; font-size: 1.2rem;"></i>
+<div class="fairy-float" onclick="alert('Fairytale Guide: System active! How can I help?')">
+<i class="fas fa-wand-sparkles" style="color: #000; font-size: 1.5rem;"></i>
+</div>
+
+<header class="hero">
+    <div class="logo-container">
+        <img src="logo.png" alt="EYC Logo" class="main-logo">
     </div>
+    
+    <h1>SUPERSTARS</h1>
 
     <div class="crescent-hanging">
         <i class="fas fa-moon"></i>
-        <span>SUPERSTARS</span>
+        <span>Ramadan Edition</span>
     </div>
+</header>
 
-    <div class="tabs">
-        <div class="tab-btn active" onclick="switchTab('season', this)">SEASON</div>
-        <div class="tab-btn" onclick="switchTab('royal', this)">ROYAL X</div>
-    </div>
-    
-    <canvas id="lantern-canvas"></canvas>
+<div class="tabs">
+<div class="tab-btn active" onclick="switchTab('season', this)">SEASON</div>
+<div class="tab-btn" onclick="switchTab('royal', this)">ROYAL X</div>
+</div>
+<canvas id="lantern-canvas"></canvas>
 
-    <section class="mission-control">
-        <div class="core-container" onclick="startLaunch()">
-            <div class="core-ring ring-outer"></div>
-            <div class="core-ring ring-inner"></div>
-            <div class="main-core-btn">
-                <i class="fa-solid fa-lantern" style="font-size: 1.8rem; margin-bottom: 5px;"></i>
-                <span style="font-size: 0.6rem;">ENTER ARENA</span>
-            </div>
-        </div>
-        
-        <div class="btn-stack">
-            <a href="NP.html" class="nav-btn">New Agent</a>
-            <a href="RNKS.html" class="nav-btn">Rankings</a>
-            <a href="Rev.html" class="nav-btn">Reviews</a>
-        </div>
-    </section>
+<section class="mission-control">
+<div class="core-container" onclick="startLaunch()">
+<div class="core-ring ring-outer"></div>
+<div class="core-ring ring-inner"></div>
+<div class="main-core-btn">
+<i class="fa-solid fa-lantern" style="font-size: 1.8rem; margin-bottom: 5px;"></i>
+<span style="font-size: 0.6rem;">ENTER ARENA</span>
+</div>
+</div>
+<div class="btn-stack">
+<a href="NP.html" class="nav-btn">New Agent</a>
+<a href="RNKS.html" class="nav-btn">Rankings</a>
+<a href="Rev.html" class="nav-btn">Reviews</a>
+</div>
+</section>
 
-    <footer>&copy; 2026 EYC ACADEMY | RAMADAN PROTOCOL</footer>
+<footer>&copy; 2026 EYC ACADEMY | RAMADAN PROTOCOL</footer>
 
-    <script>
-        const canvas = document.getElementById('lantern-canvas');
-        const ctx = canvas.getContext('2d');
-        let lanterns = [];
+<script>
+const canvas = document.getElementById('lantern-canvas');
+const ctx = canvas.getContext('2d');
+let lanterns = [];
 
-        function initCanvas() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-        }
+function initCanvas() {
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+}
 
-        class Lantern {
-            constructor() { this.init(); }
-            init() {
-                this.x = Math.random() * canvas.width;
-                this.y = canvas.height + 50;
-                this.size = Math.random() * 8 + 6;
-                this.speed = Math.random() * 0.4 + 0.2;
-                this.opacity = Math.random() * 0.4 + 0.1;
-            }
-            update() {
-                this.y -= this.speed;
-                this.x += Math.sin(this.y / 50) * 0.3;
-                if (this.y < -50) this.init();
-                ctx.save();
-                ctx.translate(this.x, this.y);
-                ctx.globalAlpha = this.opacity;
-                ctx.fillStyle = "#D4AF37";
-                ctx.beginPath();
-                ctx.moveTo(0, -this.size);
-                ctx.lineTo(this.size/2, 0);
-                ctx.lineTo(0, this.size);
-                ctx.lineTo(-this.size/2, 0);
-                ctx.closePath();
-                ctx.fill();
-                ctx.restore();
-            }
-        }
+class Lantern {
+constructor() { this.init(); }
+init() {
+this.x = Math.random() * canvas.width;
+this.y = canvas.height + 50;
+this.size = Math.random() * 10 + 8;
+this.speed = Math.random() * 0.5 + 0.2;
+this.opacity = Math.random() * 0.4 + 0.2;
+}
+update() {
+this.y -= this.speed;
+this.x += Math.sin(this.y / 50) * 0.3;
+if (this.y < -50) this.init();
+ctx.save();
+ctx.translate(this.x, this.y);
+ctx.globalAlpha = this.opacity;
+ctx.fillStyle = "#D4AF37";
 
-        function createLanterns() {
-            lanterns = Array.from({length: 20}, () => new Lantern());
-        }
+ctx.beginPath();
+ctx.moveTo(0, -this.size);
+ctx.lineTo(this.size/2, -this.size/2);
+ctx.lineTo(this.size/2, this.size/2);
+ctx.lineTo(0, this.size);
+ctx.lineTo(-this.size/2, this.size/2);
+ctx.lineTo(-this.size/2, -this.size/2);
+ctx.closePath();
+ctx.fill();
 
-        function animate() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            lanterns.forEach(l => l.update());
-            requestAnimationFrame(animate);
-        }
+ctx.fillStyle = "#fcf6ba";
+ctx.beginPath();
+ctx.arc(0, 0, this.size/4, 0, Math.PI * 2);
+ctx.fill();
 
-        function startLaunch() {
-            document.body.style.transition = "0.5s";
-            document.body.style.opacity = "0";
-            setTimeout(() => { window.location.href = "MC.html"; }, 500);
-        }
+ctx.restore();
+}
+}
 
-        function switchTab(tab, btn) {
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-        }
+function createLanterns() {
+lanterns = Array.from({length: 25}, () => new Lantern());
+}
 
-        window.addEventListener('resize', initCanvas);
-        initCanvas(); createLanterns(); animate();
-    </script>
+function animate() {
+ctx.clearRect(0, 0, canvas.width, canvas.height);
+lanterns.forEach(l => l.update());
+requestAnimationFrame(animate);
+}
+
+function startLaunch() {
+document.body.style.transition = "0.5s";
+document.body.style.opacity = "0";
+setTimeout(() => { window.location.href = "MC.html"; }, 500);
+}
+
+function switchTab(tab, btn) {
+document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+btn.classList.add('active');
+console.log('Switching to:', tab);
+}
+
+window.addEventListener('resize', initCanvas);
+initCanvas(); createLanterns(); animate();
+</script>
 </body>
 </html>
