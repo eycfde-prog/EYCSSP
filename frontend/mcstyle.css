@@ -1,0 +1,187 @@
+:root {
+    --gold: #D4AF37;
+    --gold-glow: rgba(212, 175, 55, 0.5);
+    --gold-gradient: linear-gradient(135deg, #bf953f, #fcf6ba, #b38728);
+    --bg-deep: #020205;
+    --glass: rgba(255, 255, 255, 0.02);
+    --glass-border: rgba(212, 175, 55, 0.2);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+
+body {
+    background: var(--bg-deep);
+    color: white;
+    height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    font-family: 'Poppins', sans-serif;
+}
+
+#star-container {
+    position: fixed;
+    inset: 0;
+    z-index: -2;
+    background: radial-gradient(circle at center, #0a0c14 0%, #020205 100%);
+}
+
+.star {
+    position: absolute;
+    background: white;
+    border-radius: 50%;
+    opacity: 0.3;
+}
+
+header {
+    padding: 12px 20px;
+    background: rgba(0,0,0,0.8);
+    border-bottom: 1px solid var(--glass-border);
+    z-index: 10;
+}
+
+.battle-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+.info-box {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--glass);
+    padding: 5px 10px;
+    border-radius: 10px;
+    border: 1px solid var(--glass-border);
+}
+
+.student-photo {
+    width: 35px;
+    height: 35px;
+    border-radius: 5px;
+    border: 1px solid var(--gold);
+    object-fit: cover;
+}
+
+.name {
+    font-family: 'Cinzel';
+    font-size: 0.75rem;
+    color: var(--gold);
+    font-weight: 700;
+}
+
+.rank-tag {
+    font-family: 'Orbitron';
+    font-size: 0.5rem;
+    color: #888;
+}
+
+.arena-container {
+    flex: 1;
+    padding: 10px;
+    position: relative;
+}
+
+.glass-iframe-wrapper {
+    width: 100%;
+    height: 100%;
+    background: #000;
+    border: 1px solid var(--glass-border);
+    border-radius: 10px;
+    overflow: hidden;
+    position: relative;
+}
+
+iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+}
+
+#arena-loader {
+    position: absolute;
+    inset: 0;
+    background: var(--bg-deep);
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.gear {
+    color: var(--gold);
+    animation: spin 4s linear infinite;
+    font-size: 30px;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+footer {
+    padding: 10px 20px;
+    display: flex;
+    gap: 10px;
+    max-width: 1200px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+.btn {
+    flex: 1;
+    padding: 12px;
+    border-radius: 8px;
+    border: none;
+    font-family: 'Orbitron';
+    font-size: 0.7rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+}
+
+.btn-submit {
+    background: var(--gold-gradient);
+    color: #000;
+    font-weight: 900;
+}
+
+.btn-side {
+    background: rgba(255,255,255,0.05);
+    color: #fff;
+    border: 1px solid #333;
+}
+
+#sync-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.95);
+    z-index: 2000;
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    backdrop-filter: blur(15px);
+}
+
+.result-card {
+    text-align: center;
+    padding: 30px;
+    border-radius: 20px;
+    border: 1px solid var(--gold);
+    background: #050508;
+    width: 85%;
+    max-width: 400px;
+}
