@@ -1,273 +1,202 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>EYC Super Stars | Elite Dashboard</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Orbitron:wght@400;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <title>EYC Superstars | Ramadan Edition</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Orbitron:wght@400;700;900&family=Poppins:wght@300;400;600&family=Amiri:wght@700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" href="mcstyle.css">
+    
+    <style>
+        :root {
+            --gold: #D4AF37;
+            --gold-light: #fcf6ba;
+            --gold-gradient: linear-gradient(135deg, #bf953f, #fcf6ba, #b38728);
+            --bg-deep: #030306;
+            --gold-glow: rgba(212, 175, 55, 0.3);
+            --glass-border: rgba(212, 175, 55, 0.15);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { background: var(--bg-deep); color: white; min-height: 100vh; overflow-x: hidden; display: flex; flex-direction: column; }
+
+        /* Background - Ramadan Atmosphere */
+        #ramadan-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; }
+        .bg-glow {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle at 50% 30%, rgba(212, 175, 55, 0.08) 0%, transparent 70%);
+            z-index: -1;
+        }
+
+        /* Hero Section */
+        .hero { text-align: center; padding: 60px 20px 20px; display: flex; flex-direction: column; align-items: center; }
+
+        .logo-container { position: relative; margin-bottom: 25px; }
+        
+        /* الهلال خلف اللوجو */
+        .crescent {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -55%);
+            font-size: 180px;
+            color: var(--gold);
+            opacity: 0.15;
+            filter: blur(2px);
+            z-index: 1;
+            text-shadow: 0 0 30px var(--gold);
+        }
+
+        .main-logo { width: 140px; filter: drop-shadow(0 0 25px var(--gold-glow)); z-index: 2; position: relative; }
+
+        .hero h1 {
+            font-family: 'Cinzel', serif; font-size: clamp(1.8rem, 10vw, 3.5rem);
+            background: var(--gold-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            line-height: 1.1; letter-spacing: 6px; margin-top: 15px;
+        }
+
+        .ramadan-kareem {
+            font-family: 'Amiri', serif; font-size: 1.8rem; color: var(--gold);
+            margin-top: 5px; letter-spacing: 4px; opacity: 0.8;
+            text-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
+        }
+
+        /* Mission Control */
+        .mission-control { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: space-around; padding-bottom: 40px; }
+
+        .core-container {
+            position: relative; width: clamp(260px, 75vw, 320px); height: clamp(260px, 75vw, 320px);
+            display: flex; align-items: center; justify-content: center; cursor: pointer; margin: 20px 0;
+        }
+
+        .core-ring { position: absolute; border-radius: 50%; border: 1px solid var(--glass-border); transition: 0.5s ease; }
+        .ring-outer { width: 100%; height: 100%; border-style: double; border-width: 2px; animation: rotateRight 40s linear infinite; }
+        .ring-inner { width: 80%; height: 80%; border-style: dashed; border-width: 1px; opacity: 0.4; animation: rotateLeft 25s linear infinite; }
+
+        @keyframes rotateRight { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        @keyframes rotateLeft { from { transform: rotate(360deg); } to { transform: rotate(0deg); } }
+
+        .main-core-btn {
+            width: 55%; height: 55%;
+            background: radial-gradient(circle, #0a0a0f 0%, #030306 100%);
+            border: 1px solid var(--gold); border-radius: 50%;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            color: var(--gold); font-family: 'Orbitron'; font-weight: 900;
+            box-shadow: 0 0 40px rgba(212, 175, 55, 0.1), inset 0 0 20px var(--gold-glow);
+            z-index: 10; transition: 0.4s;
+        }
+
+        .core-container:hover .main-core-btn { transform: scale(1.05); box-shadow: 0 0 50px var(--gold-glow); }
+
+        /* Navigation Buttons */
+        .btn-stack { display: flex; flex-direction: column; gap: 15px; width: 100%; max-width: 300px; padding: 0 20px; }
+
+        .nav-btn {
+            width: 100%; padding: 16px; border-radius: 12px;
+            background: rgba(255, 255, 255, 0.03); color: #fff;
+            border: 1px solid var(--glass-border); backdrop-filter: blur(10px);
+            cursor: pointer; transition: 0.3s; font-family: 'Orbitron';
+            text-decoration: none; text-align: center; font-size: 0.8rem;
+            letter-spacing: 2px; font-weight: 600;
+        }
+
+        .nav-btn:hover { background: var(--gold-gradient); color: #000; transform: translateY(-2px); }
+
+        footer { padding: 30px; text-align: center; opacity: 0.5; font-size: 0.6rem; color: var(--gold); font-family: 'Orbitron'; letter-spacing: 2px; }
+        
+        .star { position: absolute; width: 2px; height: 2px; background: #fff; border-radius: 50%; opacity: 0.5; }
+    </style>
 </head>
 <body>
 
-    <div id="star-container"></div>
+    <div class="bg-glow"></div>
+    <canvas id="ramadan-canvas"></canvas>
 
-    <nav class="top-nav">
-        <i class="fas fa-arrow-left nav-icon" onclick="window.location.href='index.html'"></i>
+    <header class="hero">
+        <div class="logo-container">
+            <div class="crescent"><i class="fas fa-moon"></i></div>
+            <img src="logo.png" alt="EYC Logo" class="main-logo">
+        </div>
+        <h1>SUPERSTARS</h1>
+        <div class="ramadan-kareem">رمضان كريم</div>
+    </header>
+
+    <section class="mission-control">
+        <div class="core-container" onclick="startLaunch()">
+            <div id="starOrbit" style="position:absolute; inset:0;"></div>
+            <div class="core-ring ring-outer"></div>
+            <div class="core-ring ring-inner"></div>
+            <div class="main-core-btn">
+                <i class="fas fa-mosque" style="font-size: 1.8rem; margin-bottom: 10px; opacity: 0.8;"></i>
+                <span style="letter-spacing: 4px; font-size: 0.7rem;">ENTER HUB</span>
+            </div>
+        </div>
         
-        <div style="position: relative; display: flex; align-items: center; gap: 15px;">
-            <div id="notifBell" class="nav-icon" onclick="openMailbox()" style="position: relative;">
-                <i class="fas fa-bell"></i>
-                <span id="notifDot" style="display:none; position: absolute; top: -5px; right: -5px; width: 10px; height: 10px; background: red; border-radius: 50%; border: 2px solid var(--bg-deep);"></span>
-            </div>
-            <i class="fas fa-power-off nav-icon" id="logoutBtn" style="display:none;" onclick="handleLogout()"></i>
+        <div class="btn-stack">
+            <a href="NP.html" class="nav-btn">New Agent</a>
+            <a href="RNKS.html" class="nav-btn">Hall of Fame</a>
+            <a href="Rev.html" class="nav-btn">Academy Reviews</a>
         </div>
-    </nav>
+    </section>
 
-    <header class="hero-banner" id="heroBanner"></header>
-
-    <div class="tab-switcher">
-        <button class="tab-btn active" onclick="switchType('season', this)">SEASON</button>
-        <button class="tab-btn" onclick="switchType('royal', this)">ROYAL</button>
-        <button class="tab-btn" onclick="switchType('titanium', this)">TITANIUM</button>
-    </div>
-
-    <main><div class="grid-container" id="cardsGrid"></div></main>
-
-    <div class="modal" id="mailModal">
-        <div class="modal-content" style="max-width: 450px; padding: 25px;">
-            <div id="mailboxView">
-                <h2 style="font-family:'Orbitron'; color:var(--gold); font-size: 1.2rem; margin-bottom: 20px;">
-                    <i class="fas fa-envelope-open-text"></i> COMMS CENTER
-                </h2>
-                <div id="mailList" style="max-height: 350px; overflow-y: auto; margin-bottom: 20px;"></div>
-                <button class="btn-exit" onclick="closeModal('mailModal')">CLOSE</button>
-            </div>
-            <div id="mailDetailView" style="display: none;">
-                <button class="btn-exit" onclick="backToMailbox()" style="width: auto; padding: 5px 15px; margin-bottom: 15px;">
-                    <i class="fas fa-chevron-left"></i> BACK
-                </button>
-                <div id="fullMessageContent" style="color: #eee; line-height: 1.6; font-size: 0.9rem; background: rgba(255,255,255,0.05); padding: 20px; border-radius: 15px; border: 1px solid var(--glass-border);"></div>
-            </div>
-        </div>
-    </div>
-
-    <div class="modal" id="taskModal">
-        <div class="modal-content">
-            <h2 id="mTitle" style="text-align:center; font-family:'Cinzel'; color:#fff; margin-bottom:20px;">MISSION</h2>
-            <div class="tasks-grid" id="tGrid"></div>
-            <button class="btn-exit" onclick="closeModal('taskModal')">CLOSE</button>
-        </div>
-    </div>
-
-    <div class="modal" id="loginModal">
-        <div class="modal-content">
-            <h2 style="font-family:'Cinzel'; color:var(--gold); text-align:center; margin-bottom:20px;">AUTHENTICATION</h2>
-            <input type="email" id="loginEmail" style="width:100%; padding:15px; margin:8px 0; border-radius:12px; background:rgba(255,255,255,0.05); border:1px solid #333; color:#fff;" placeholder="EMAIL">
-            <input type="password" id="loginCode" style="width:100%; padding:15px; margin:8px 0; border-radius:12px; background:rgba(255,255,255,0.05); border:1px solid #333; color:#fff;" placeholder="CODE">
-            <button onclick="handleLogin()" id="loginSubmitBtn" style="width:100%; margin-top:15px; padding:15px; border-radius:12px; background:var(--gold-gradient); border:none; font-weight:900; cursor:pointer;">SIGN IN</button>
-            <button class="btn-exit" style="margin-top:10px;" onclick="closeModal('loginModal')">CANCEL</button>
-        </div>
-    </div>
+    <footer>&copy; 2026 EYC ACADEMY | RAMADAN INTERFACE</footer>
 
     <script>
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwCGnW1crqrjMSxFxPP0D7p6hghDO9og63yZW5qvF17WvaqBM_IrsAHU3fVID5qRVl7/exec";
-        let currentUser = null;
-        let isLoggedIn = false;
+        const canvas = document.getElementById('ramadan-canvas');
+        const ctx = canvas.getContext('2d');
+        let lanterns = [];
 
-        function getLocalMails() { return JSON.parse(localStorage.getItem('eyc_mails') || '[]'); }
-        function saveLocalMails(mails) { localStorage.setItem('eyc_mails', JSON.stringify(mails)); }
+        function initCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
 
-        function checkNewNotification(serverMsg) {
-            if (!serverMsg || serverMsg.trim() === "" || serverMsg === "NO ACTIVE LOGS") return;
-            let localMails = getLocalMails();
-            const exists = localMails.some(m => m.text === serverMsg);
-            if (!exists) {
-                localMails.unshift({ text: serverMsg, date: new Date().toLocaleString(), read: false });
-                saveLocalMails(localMails);
-                document.getElementById('notifDot').style.display = 'block';
-                document.getElementById('notifBell').classList.add('fa-shake');
+        class Lantern {
+            constructor() { this.init(); }
+            init() {
+                this.x = Math.random() * canvas.width;
+                this.y = canvas.height + 50;
+                this.size = Math.random() * 15 + 10;
+                this.speed = Math.random() * 0.5 + 0.2;
+                this.wobble = Math.random() * 2;
+                this.wobbleSpeed = Math.random() * 0.02;
+                this.opacity = Math.random() * 0.4 + 0.1;
+            }
+            update() {
+                this.y -= this.speed;
+                this.x += Math.sin(this.y * this.wobbleSpeed) * 0.5;
+                if (this.y < -50) this.init();
+                
+                ctx.save();
+                ctx.globalAlpha = this.opacity;
+                ctx.fillStyle = "#D4AF37";
+                ctx.font = `${this.size}px "Font Awesome 6 Free"`;
+                ctx.fontWeight = "900";
+                // رسم رمز الفانوس
+                ctx.fillText("\uf673", this.x, this.y); 
+                ctx.restore();
             }
         }
 
-        function openMailbox() {
-            document.getElementById('notifDot').style.display = 'none';
-            document.getElementById('notifBell').classList.remove('fa-shake');
-            document.getElementById('mailModal').style.display = 'flex';
-            backToMailbox();
-            renderMailList();
+        function createLanterns() {
+            lanterns = Array.from({length: 15}, () => new Lantern());
         }
 
-        function renderMailList() {
-            const list = document.getElementById('mailList');
-            const mails = getLocalMails();
-            list.innerHTML = mails.length === 0 ? '<p style="color:#666; text-align:center; padding:20px;">No messages found.</p>' : '';
-            mails.forEach((mail, index) => {
-                const item = document.createElement('div');
-                item.style = `padding: 15px; margin-bottom: 10px; border-radius: 12px; cursor: pointer; transition: 0.3s;
-                              background: ${mail.read ? 'rgba(255,255,255,0.02)' : 'rgba(212,175,55,0.1)'};
-                              border-left: 4px solid ${mail.read ? '#333' : 'var(--gold)'};`;
-                item.innerHTML = `<div style="font-size: 0.6rem; color: #888; margin-bottom: 5px;">${mail.date}</div><div style="font-size: 0.8rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${mail.text}</div>`;
-                item.onclick = () => readMail(index);
-                list.appendChild(item);
-            });
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            lanterns.forEach(l => l.update());
+            requestAnimationFrame(animate);
         }
 
-        function readMail(index) {
-            let mails = getLocalMails();
-            mails[index].read = true;
-            saveLocalMails(mails);
-            document.getElementById('mailboxView').style.display = 'none';
-            document.getElementById('mailDetailView').style.display = 'block';
-            document.getElementById('fullMessageContent').innerText = mails[index].text;
+        function startLaunch() {
+            if (window.navigator.vibrate) window.navigator.vibrate(30);
+            document.body.style.transition = "0.5s";
+            document.body.style.opacity = "0";
+            setTimeout(() => { window.location.href = "MC.html"; }, 500);
         }
 
-        function backToMailbox() {
-            document.getElementById('mailDetailView').style.display = 'none';
-            document.getElementById('mailboxView').style.display = 'block';
-            renderMailList();
-        }
-
-        function renderHeader() {
-            const header = document.getElementById('heroBanner');
-            const logoutBtn = document.getElementById('logoutBtn');
-            if (isLoggedIn) {
-                logoutBtn.style.display = "block";
-                header.innerHTML = `
-                    <div class="profile-card">
-                        <div class="avatar-wrapper">
-                            <div class="avatar-main" style="background-image: url('${currentUser.avatar || ''}')"></div>
-                            <div class="rank-tag">RANK #${currentUser.rank}</div>                       
-                        </div>
-                        <h1 class="student-name">${currentUser.name}</h1>
-                        <p class="student-title">${currentUser.title}</p>
-                        <div class="stats-row">
-                            <div class="stat-item">🪙 <span>${currentUser.tokens || 0}</span></div>
-                            <div class="stat-item">⭐ <span>${currentUser.stars || 0}</span></div>
-                            <div class="stat-item">🎟️ <span style="color:#FFD700">${currentUser.goldTickets || 0}</span></div>
-                            <i class="fas fa-sync-alt stat-item" style="cursor:pointer; font-size:0.7rem;" onclick="refreshUserData()"></i>
-                        </div>
-                    </div>`;
-                checkNewNotification(currentUser.lastNotification);
-            } else {
-                logoutBtn.style.display = "none";
-                header.innerHTML = `<h1 class="student-name">ARENA ACCESS</h1><div style="margin-top:20px;"><button class="btn-exit" style="width:auto;" onclick="openLogin()">AUTHORIZE LOGIN</button></div>`;
-            }
-        }
-
-        const activities = {
-            season: [
-                { name: "Alike", icon: "fa-clone", code: "AS" },
-                { name: "Vivid", icon: "fa-wand-magic-sparkles", code: "VV" },
-                { name: "Label", icon: "fa-tag", code: "LB" },
-                { name: "Grammar", icon: "fa-spell-check", code: "GR" },
-                { name: "Golden Ear", icon: "fa-ear-listen", code: "GE" },
-                { name: "Seeds", icon: "fa-seedling", code: "SD" }
-            ],
-            royal: [
-                { name: "AlikeX", icon: "fa-star", code: "ASX" },
-                { name: "VividX", icon: "fa-wand-magic", code: "VVX" },
-                { name: "LabelX", icon: "fa-tags", code: "LBX" },
-                { name: "SeedsX", icon: "fa-tree", code: "SDX" },
-                { name: "Golden EarX", icon: "fa-ear-deaf", code: "GEX" },
-                { name: "GrammarX", icon: "fa-pen-fancy", code: "GRX" }
-            ],
-            titanium: [
-                { name: "DictationX", icon: "fa-microphone-lines", code: "DTX" },
-                { name: "Sing Sang Sung", icon: "fa-music", code: "SSSX" },
-                { name: "ElmagazineX", icon: "fa-book-open", code: "EMX" },
-                { name: "FigurativeX", icon: "fa-mask", code: "FGX" }
-            ]
-        };
-
-        function generateCards() {
-            const grid = document.getElementById('cardsGrid'); grid.innerHTML = '';
-            const type = document.querySelector('.tab-btn.active').innerText.toLowerCase();
-            activities[type].forEach(act => {
-                const card = document.createElement('div');
-                card.className = 'activity-card';
-                card.innerHTML = `<i class="fa-solid ${act.icon} card-icon"></i><h3>${act.name}</h3>`;
-                card.onclick = () => openTasks(act.name, act.code);
-                grid.appendChild(card);
-            });
-        }
-
-        function switchType(type, btn) {
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            generateCards();
-        }
-
-        function openTasks(name, code) {
-            if (!isLoggedIn) return openLogin();
-            document.getElementById('mTitle').innerText = name;
-            const tGrid = document.getElementById('tGrid'); tGrid.innerHTML = '';
-            const tasksCount = (document.querySelector('.tab-btn.active').innerText === 'TITANIUM') ? 5 : 10;
-            for (let i = 1; i <= tasksCount; i++) {
-                const node = document.createElement('div');
-                node.className = 'task-node';
-                node.innerText = i;
-                node.onclick = () => {
-                    const params = new URLSearchParams({ email: currentUser.email, name: currentUser.name, act: code, task: i });
-                    window.location.href = `EYCArena.html?${params.toString()}`;
-                };
-                tGrid.appendChild(node);
-            }
-            document.getElementById('taskModal').style.display = 'flex';
-        }
-
-        function handleLogin() {
-            const email = document.getElementById('loginEmail').value.trim();
-            const code = document.getElementById('loginCode').value.trim();
-            const btn = document.getElementById('loginSubmitBtn');
-            btn.innerText = "AUTHENTICATING...";
-            fetch(`${SCRIPT_URL}?action=getProfile&email=${email}&code=${code}`)
-                .then(res => res.json())
-                .then(res => {
-                    if (res.status === "success") {
-                        currentUser = res; currentUser.email = email; isLoggedIn = true;
-                        localStorage.setItem('eyc_user', JSON.stringify(currentUser));
-                        localStorage.setItem('eyc_user_code', code);
-                        closeModal('loginModal'); renderHeader(); generateCards();
-                    } else alert(res.message);
-                    btn.innerText = "SIGN IN";
-                });
-        }
-
-        function refreshUserData() {
-            if (!currentUser) return;
-            const code = localStorage.getItem('eyc_user_code');
-            fetch(`${SCRIPT_URL}?action=getProfile&email=${currentUser.email}&code=${code}`)
-                .then(res => res.json())
-                .then(res => {
-                    if (res.status === "success") { currentUser = res; renderHeader(); }
-                });
-        }
-
-        function handleLogout() { if(confirm("Terminate Session?")) { localStorage.clear(); location.reload(); } }
-        function openLogin() { document.getElementById('loginModal').style.display = 'flex'; }
-        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
-
-        function createStars() {
-            const container = document.getElementById('star-container');
-            for (let i = 0; i < 60; i++) {
-                const star = document.createElement('div');
-                star.className = 'star';
-                star.style.width = '2px'; star.style.height = '2px';
-                star.style.left = Math.random() * 100 + '%'; star.style.top = Math.random() * 100 + '%';
-                star.style.setProperty('--duration', (Math.random() * 3 + 2) + 's');
-                container.appendChild(star);
-            }
-        }
-
-        setInterval(() => { if (isLoggedIn) refreshUserData(); }, 30000);
-
-        window.onload = () => {
-            createStars();
-            const saved = localStorage.getItem('eyc_user');
-            if(saved) { currentUser = JSON.parse(saved); isLoggedIn = true; }
-            renderHeader(); generateCards();
-        };
+        window.addEventListener('resize', initCanvas);
+        initCanvas(); createLanterns(); animate();
     </script>
 </body>
 </html>
