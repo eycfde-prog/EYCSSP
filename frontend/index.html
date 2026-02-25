@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>EYC Superstars | Emerald Command</title>
+    <title>EYC Superstars | Royal Command</title>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Orbitron:wght@400;700;900&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
@@ -12,136 +12,144 @@
             --gold: #D4AF37;
             --gold-light: #fcf6ba;
             --gold-gradient: linear-gradient(135deg, #bf953f, #fcf6ba, #b38728);
-            --emerald: #50C878;
-            --emerald-glow: rgba(80, 200, 120, 0.6);
             --bg-deep: #050508;
+            --gold-glow: rgba(212, 175, 55, 0.4);
             --glass-border: rgba(212, 175, 55, 0.2);
+            --ember-orange: rgba(255, 100, 0, 0.15);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; -webkit-tap-highlight-color: transparent; }
-        body { background: var(--bg-deep); color: white; min-height: 100vh; overflow-x: hidden; display: flex; flex-direction: column; justify-content: center; }
+        body { background: var(--bg-deep); color: white; min-height: 100vh; overflow-x: hidden; display: flex; flex-direction: column; }
 
         /* Background Effects */
-        #letter-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; opacity: 0.25; }
+        #letter-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; opacity: 0.3; }
         .bg-glow {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: radial-gradient(circle at 50% 50%, rgba(80, 200, 120, 0.03) 0%, transparent 75%);
+            background: radial-gradient(circle at 50% 50%, rgba(212, 175, 55, 0.03) 0%, transparent 80%);
             z-index: -1;
         }
 
-        /* Hero Section */
-        .hero { text-align: center; padding: 20px 20px 10px; }
+        /* Hero Section - Refined Spacing */
+        .hero { 
+            text-align: center; 
+            padding: 60px 20px 20px; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center;
+        }
+
+        /* Royal Logo with Fire/Ember Effect */
+        .logo-container {
+            position: relative;
+            margin-bottom: 25px;
+        }
         .main-logo {
-            width: clamp(80px, 15vw, 110px); margin-bottom: 10px;
-            filter: drop-shadow(0 0 15px var(--gold-glow));
+            width: 140px; /* كبرنا الحجم كما طلبت */
+            filter: drop-shadow(0 0 20px var(--gold-glow));
+            z-index: 2;
+            position: relative;
+        }
+        .fire-glow {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 120%; height: 120%;
+            background: radial-gradient(circle, var(--ember-orange) 0%, transparent 70%);
+            filter: blur(15px);
+            animation: flicker 3s infinite alternate;
+            z-index: 1;
+        }
+
+        @keyframes flicker {
+            0% { opacity: 0.4; transform: translate(-50%, -50%) scale(1); }
+            50% { opacity: 0.7; transform: translate(-50%, -52%) scale(1.05); }
+            100% { opacity: 0.5; transform: translate(-50%, -49%) scale(0.95); }
         }
 
         .hero h1 {
             font-family: 'Cinzel', serif; font-size: clamp(2.2rem, 12vw, 4.5rem);
             background: var(--gold-gradient);
             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            line-height: 1.1; letter-spacing: 5px; margin-bottom: 5px;
-            filter: drop-shadow(0 0 10px rgba(212,175,55,0.2));
+            line-height: 1.1; letter-spacing: 8px; margin-top: 10px;
+            filter: drop-shadow(0 0 15px rgba(212,175,55,0.3));
         }
 
-        /* Mission Control */
+        /* Mission Control - Balanced Spacing */
         .mission-control {
-            display: flex; flex-direction: column; align-items: center;
+            flex: 1;
+            display: flex; flex-direction: column; align-items: center; justify-content: space-around;
             padding-bottom: 40px;
         }
 
         .core-container {
             position: relative; 
-            width: clamp(260px, 75vw, 380px);
-            height: clamp(260px, 75vw, 380px);
+            width: clamp(260px, 75vw, 340px);
+            height: clamp(260px, 75vw, 340px);
             display: flex; align-items: center; justify-content: center;
             cursor: pointer; transform-style: preserve-3d;
-            margin: 30px 0;
+            margin: 30px 0; /* مساحة تنفس بين اللوجو والأزرار */
         }
 
         .core-ring {
             position: absolute; border-radius: 50%;
-            border: 2px solid var(--emerald); /* تعديل للزمردي */
+            border: 1px solid var(--glass-border);
             transition: 0.5s ease;
-            box-shadow: 0 0 15px var(--emerald-glow);
         }
-
-        .ring-outer {
-            width: 100%; height: 100%;
-            border-style: double; border-width: 3px;
-            animation: rotateRight 25s linear infinite;
-        }
-
-        .ring-inner {
-            width: 78%; height: 78%;
-            border-style: dashed; border-width: 1px;
-            opacity: 0.6;
-            animation: rotateLeft 15s linear infinite;
-        }
+        .ring-outer { width: 100%; height: 100%; border-style: double; border-width: 2px; animation: rotateRight 30s linear infinite; }
+        .ring-inner { width: 75%; height: 75%; border-style: dashed; border-width: 1px; opacity: 0.3; animation: rotateLeft 20s linear infinite; }
 
         @keyframes rotateRight { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
         @keyframes rotateLeft { from { transform: rotate(360deg); } to { transform: rotate(0deg); } }
 
-        /* Main Launch Button */
         .main-core-btn {
-            width: 55%; height: 55%;
-            background: radial-gradient(circle, #0a1a0f 0%, #050508 100%);
-            border: 1px solid var(--emerald);
+            width: 50%; height: 50%;
+            background: radial-gradient(circle, rgba(20, 20, 25, 0.98) 0%, #050508 100%);
+            border: 1px solid var(--gold);
             border-radius: 50%;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
-            color: var(--emerald); font-family: 'Orbitron'; font-weight: 900;
-            box-shadow: 0 0 30px var(--emerald-glow), inset 0 0 15px var(--emerald-glow);
+            color: var(--gold); font-family: 'Orbitron'; font-weight: 900;
+            box-shadow: 0 0 40px rgba(212, 175, 55, 0.2), inset 0 0 15px var(--gold-glow);
             transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
             z-index: 10;
         }
 
         .core-container:hover .main-core-btn {
-            transform: scale(1.05);
-            box-shadow: 0 0 50px var(--emerald-glow);
+            transform: scale(1.08);
+            box-shadow: 0 0 60px var(--gold-glow);
             color: #fff;
         }
 
-        /* Button Stack */
+        /* Button Stack - Optimized Legibility */
         .btn-stack {
             display: flex; flex-direction: column;
-            gap: 15px; width: 100%; max-width: 300px; padding: 0 20px;
+            gap: 20px; width: 100%; max-width: 320px; padding: 0 25px;
             margin-top: 10px;
         }
 
         .nav-btn {
-            width: 100%; padding: 14px; border-radius: 12px;
-            background: rgba(212, 175, 55, 0.03); color: #fff;
+            width: 100%; padding: 18px; border-radius: 14px;
+            background: rgba(255, 255, 255, 0.02); color: #fff;
             border: 1px solid var(--glass-border);
             backdrop-filter: blur(15px);
-            cursor: pointer; transition: 0.4s; 
+            cursor: pointer; transition: all 0.4s ease; 
             font-family: 'Orbitron'; text-decoration: none; text-align: center; 
-            font-size: 0.75rem; font-weight: 700; letter-spacing: 2px;
+            font-size: 0.85rem; font-weight: 700; letter-spacing: 2px;
             text-transform: uppercase;
         }
 
         .nav-btn:hover { 
             background: var(--gold-gradient);
             color: #000;
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(212, 175, 55, 0.2);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(212, 175, 55, 0.2);
         }
 
-        /* Flash Effect - Emerald */
-        #lightning-flash {
-            position: fixed; inset: 0; background: var(--emerald); z-index: 9999;
-            opacity: 0; pointer-events: none;
-        }
-        @keyframes flashEffect {
-            0% { opacity: 0; } 30% { opacity: 0.7; } 100% { opacity: 0; }
-        }
+        /* Utility */
+        #lightning-flash { position: fixed; inset: 0; background: #fff; z-index: 9999; opacity: 0; pointer-events: none; }
+        @keyframes flashEffect { 0% { opacity: 0; } 20% { opacity: 0.8; } 100% { opacity: 0; } }
 
-        footer { padding: 20px; text-align: center; margin-top: auto; }
-
-        .star {
-            position: absolute; width: 4px; height: 4px;
-            background: var(--emerald); border-radius: 50%;
-            box-shadow: 0 0 10px var(--emerald); pointer-events: none;
-        }
+        footer { padding: 40px 20px; text-align: center; opacity: 0.6; }
+        .star { position: absolute; width: 2px; height: 2px; background: var(--gold); border-radius: 50%; pointer-events: none; }
     </style>
 </head>
 <body>
@@ -151,7 +159,10 @@
     <canvas id="letter-canvas"></canvas>
 
     <header class="hero">
-        <img src="logo.png" alt="EYC Logo" class="main-logo">
+        <div class="logo-container">
+            <div class="fire-glow"></div>
+            <img src="logo.png" alt="EYC Logo" class="main-logo">
+        </div>
         <h1>SUPERSTARS</h1>
     </header>
 
@@ -161,7 +172,7 @@
             <div class="core-ring ring-outer"></div>
             <div class="core-ring ring-inner"></div>
             <div class="main-core-btn">
-                <i class="fas fa-bolt-lightning" style="font-size: 2.2rem; margin-bottom: 8px; filter: drop-shadow(0 0 10px var(--emerald));"></i>
+                <i class="fas fa-bolt-lightning" style="font-size: 2.2rem; margin-bottom: 8px;"></i>
                 <span style="letter-spacing: 3px; font-size: 0.75rem;">LAUNCH</span>
             </div>
         </div>
@@ -174,13 +185,12 @@
     </section>
 
     <footer>
-        <div style="color: var(--gold); font-family: 'Orbitron'; font-size: 0.6rem; letter-spacing: 2px; opacity: 0.6;">
-            &copy; 2026 EYC ACADEMY | EMERALD INTERFACE
+        <div style="color: var(--gold); font-family: 'Orbitron'; font-size: 0.6rem; letter-spacing: 2px;">
+            &copy; 2026 EYC ACADEMY | CORE INTERFACE
         </div>
     </footer>
 
     <script>
-        // --- Canvas Background ---
         const canvas = document.getElementById('letter-canvas');
         const ctx = canvas.getContext('2d');
         let particles = [];
@@ -195,8 +205,8 @@
             init() {
                 this.x = Math.random() * canvas.width;
                 this.y = Math.random() * canvas.height;
-                this.char = ["E", "Y", "C", "A", "Z"][Math.floor(Math.random()*5)];
-                this.fontSize = Math.random() * 10 + 8;
+                this.char = ["E", "Y", "C"][Math.floor(Math.random()*3)];
+                this.fontSize = Math.random() * 10 + 6;
                 this.speed = Math.random() * 0.3 + 0.1;
                 this.opacity = Math.random() * 0.2;
             }
@@ -210,7 +220,7 @@
         }
 
         function createParticles() {
-            particles = Array.from({length: 30}, () => new LetterParticle());
+            particles = Array.from({length: 40}, () => new LetterParticle());
         }
 
         function animate() {
@@ -219,26 +229,22 @@
             requestAnimationFrame(animate);
         }
 
-        // --- Emerald Star Orbit ---
         function createStars() {
             const orbit = document.getElementById('starOrbit');
-            const count = 10; // عدد النجوم بين الدائرتين
+            const count = 10;
             const containerSize = orbit.offsetWidth / 2;
-            
             for (let i = 0; i < count; i++) {
                 const star = document.createElement('div');
                 star.className = 'star';
                 const angle = (i / count) * Math.PI * 2;
-                const radius = containerSize * 0.88; // موضع النجوم بين الحلقتين
+                const radius = containerSize * 0.9; 
                 let currentAngle = angle;
-                
                 function moveStar() {
                     currentAngle += 0.006;
                     const x = Math.cos(currentAngle) * radius + containerSize;
                     const y = Math.sin(currentAngle) * radius + containerSize;
                     star.style.left = x + 'px';
                     star.style.top = y + 'px';
-                    star.style.opacity = Math.sin(currentAngle * 3) * 0.5 + 0.5;
                     requestAnimationFrame(moveStar);
                 }
                 orbit.appendChild(star);
@@ -248,15 +254,9 @@
 
         function startLaunch() {
             const flash = document.getElementById('lightning-flash');
-            flash.style.animation = "none";
-            void flash.offsetWidth; 
-            flash.style.animation = "flashEffect 0.6s ease-out forwards";
-            
-            if (window.navigator.vibrate) window.navigator.vibrate([40, 40, 40]);
-            
-            setTimeout(() => {
-                window.location.href = "MC.html"; 
-            }, 500);
+            flash.style.animation = "flashEffect 0.4s ease-out forwards";
+            if (window.navigator.vibrate) window.navigator.vibrate(50);
+            setTimeout(() => { window.location.href = "MC.html"; }, 350);
         }
 
         window.addEventListener('resize', () => { initCanvas(); createParticles(); });
