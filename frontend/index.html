@@ -3,260 +3,219 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>EYC Superstars | Mission Control</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Orbitron:wght@400;700;900&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <title>EYC Superstars | Ramadan Edition</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Orbitron:wght@400;700;900&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
     <style>
         :root {
-            --gold: #b38728;
-            --gold-bright: #fcf6ba;
-            --gold-gradient: linear-gradient(135deg, #a67c00, #ffdc73, #8b6914);
+            --gold: #D4AF37;
+            --gold-light: #fcf6ba;
+            --gold-gradient: linear-gradient(135deg, #bf953f, #fcf6ba, #b38728);
             --bg-deep: #050508;
-            --glass: rgba(255, 255, 255, 0.03);
+            --gold-glow: rgba(212, 175, 55, 0.4);
+            --gold-bright: #fff9d0;
             --glass-border: rgba(212, 175, 55, 0.2);
-            --gold-glow: rgba(212, 175, 55, 0.3);
+            --ember-orange: rgba(255, 100, 0, 0.15);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; -webkit-tap-highlight-color: transparent; }
-        body { background: var(--bg-deep); color: white; min-height: 100vh; overflow-x: hidden; }
+        body { background: var(--bg-deep); color: white; min-height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
 
-        /* --- Ramadan Hanging Moon --- */
-        .hanging-moon {
-            position: absolute;
-            top: 60px; /* مكان التعليق تحت Superstars */
-            left: 50%;
-            transform: translateX(-50%);
+        /* --- الهلال المتدلي (Hanging Crescent) --- */
+        .crescent-hanging {
             display: flex;
             flex-direction: column;
             align-items: center;
-            z-index: 50;
+            /* تم زيادة الـ margin العلوي لينسدل للأسفل في المساحة الفاضية */
+            margin: 40px 0 20px 0; 
+            opacity: 0.9;
+            animation: gentleSwing 5s ease-in-out infinite;
             pointer-events: none;
-            animation: moonSwing 4s ease-in-out infinite;
+            position: relative;
         }
-        .moon-line {
+
+        /* حبل التعليق الافتراضي */
+        .crescent-hanging::before {
+            content: '';
+            position: absolute;
+            top: -40px;
             width: 1px;
             height: 40px;
-            background: var(--gold-gradient);
-            opacity: 0.6;
+            background: linear-gradient(to bottom, transparent, var(--gold));
+            opacity: 0.5;
         }
-        .moon-icon {
-            font-size: 1.5rem;
+
+        .crescent-hanging i {
+            font-size: 3rem; /* تكبير بسيط للهلال */
+            color: var(--gold);
+            filter: drop-shadow(0 0 15px var(--gold-glow));
+            transform: rotate(-15deg); /* إمالة الهلال ليعطي إيحاء التعليق */
+        }
+
+        .crescent-hanging span {
+            font-family: 'Cinzel', serif;
+            font-size: 0.7rem;
             color: var(--gold-bright);
-            filter: drop-shadow(0 0 10px var(--gold));
-            margin-top: -5px;
+            letter-spacing: 5px;
+            margin-top: 5px;
+            text-shadow: 0 0 10px var(--gold);
         }
 
-        @keyframes moonSwing {
-            0%, 100% { transform: translateX(-50%) rotate(-3deg); }
-            50% { transform: translateX(-50%) rotate(3deg); }
+        @keyframes gentleSwing {
+            0%, 100% { transform: rotate(-4deg) translateY(0); }
+            50% { transform: rotate(4deg) translateY(10px); }
         }
 
-        /* Header & Stats */
-        .main-header { 
-            padding: 20px; 
-            background: rgba(0,0,0,0.8); 
-            border-bottom: 1px solid var(--glass-border); 
-            position: sticky; top: 0; z-index: 100;
-            display: flex;
-            flex-direction: column;
-            align-items: center; /* لجعل النص في المنتصف ليتناسب مع الهلال */
-        }
-        
-        .header-title {
-            font-family: 'Cinzel';
-            font-size: 1.2rem;
-            background: var(--gold-gradient);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            letter-spacing: 4px;
-            margin-bottom: 50px; /* مساحة للهلال */
+        /* تحسين الهيدر */
+        .main-header { padding-bottom: 0px; }
+
+        /* Background Canvas */
+        #lantern-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; }
+
+        /* Launch Core */
+        .mission-control { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 200px; }
+
+        .core-container {
+            position: relative; width: 260px; height: 260px;
+            display: flex; align-items: center; justify-content: center; cursor: pointer; margin-bottom: 30px;
         }
 
-        .user-profile { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; width: 100%; }
-        .avatar { width: 55px; height: 55px; border-radius: 50%; border: 2px solid var(--gold); padding: 2px; }
-        
-        .stats-row { display: flex; justify-content: space-around; background: var(--glass); border-radius: 12px; padding: 10px; border: 1px solid var(--glass-border); width: 100%; }
-        .stat-item { display: flex; flex-direction: column; align-items: center; gap: 5px; }
-        .stat-img { width: 22px; height: 22px; object-fit: contain; }
-        .stat-val { font-family: 'Orbitron'; font-size: 0.8rem; color: var(--gold-bright); }
+        .core-ring { position: absolute; border-radius: 50%; border: 1px solid var(--glass-border); transition: 0.5s ease; }
+        .ring-outer { width: 100%; height: 100%; border-style: double; border-width: 2px; animation: rotateRight 30s linear infinite; }
+        .ring-inner { width: 75%; height: 75%; border-style: dashed; border-width: 1px; opacity: 0.3; animation: rotateLeft 20s linear infinite; }
 
-        /* Remaining styles stay the same... */
-        .tabs { display: flex; justify-content: center; gap: 10px; padding: 20px; }
-        .tab-btn { padding: 10px 25px; border-radius: 8px; background: var(--glass); border: 1px solid var(--glass-border); color: #888; font-family: 'Orbitron'; cursor: pointer; transition: 0.3s; font-size: 0.75rem; }
-        .tab-btn.active { background: var(--gold-gradient); color: #000; font-weight: 900; box-shadow: 0 0 15px var(--gold-glow); }
-        .activity-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 15px; padding: 15px; max-width: 1000px; margin: 0 auto; }
-        @media (max-width: 480px) { .activity-grid { grid-template-columns: repeat(2, 1fr); } }
-        .activity-card { background: var(--glass); border: 1px solid var(--glass-border); border-radius: 15px; padding: 20px; text-align: center; position: relative; cursor: pointer; transition: 0.3s; overflow: hidden; }
-        .activity-card:hover { transform: translateY(-5px); border-color: var(--gold); }
-        .activity-card i { font-size: 1.8rem; color: var(--gold); margin-bottom: 10px; display: block; }
-        .activity-card span { font-family: 'Orbitron'; font-size: 0.7rem; letter-spacing: 1px; }
-        .tk-badge { position: absolute; top: 8px; right: 8px; background: rgba(0,0,0,0.6); padding: 2px 6px; border-radius: 5px; font-size: 0.6rem; color: var(--gold-bright); border: 0.5px solid var(--gold); font-family: 'Orbitron'; }
-        .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.9); display: none; align-items: center; justify-content: center; z-index: 2000; padding: 20px; }
-        .modal-content { background: #0a0a0f; border: 1px solid var(--gold); border-radius: 20px; width: 100%; max-width: 400px; padding: 25px; }
-        .task-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-top: 20px; }
-        .task-node { aspect-ratio: 1; background: var(--glass); border: 1px solid var(--glass-border); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-family: 'Orbitron'; font-size: 0.9rem; position: relative; cursor: pointer; }
-        .lock-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.7); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: var(--gold); }
-        .release-pop { position: absolute; bottom: 110%; left: 50%; transform: translateX(-50%); background: #000; color: var(--gold); padding: 5px 10px; border-radius: 5px; font-size: 0.6rem; border: 1px solid var(--gold); white-space: nowrap; z-index: 10; }
-        .fairy-float { position: fixed; bottom: 25px; left: 20px; width: 55px; height: 55px; background: var(--gold-gradient); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 20px var(--gold-glow); cursor: pointer; z-index: 1500; animation: float 3s ease-in-out infinite; }
-        @keyframes float { 0%, 100% { transform: translateY(0) rotate(0); } 50% { transform: translateY(-12px) rotate(10deg); } }
-        .mail-btn { position: absolute; top: 20px; right: 20px; font-size: 1.4rem; color: var(--gold); cursor: pointer; }
+        @keyframes corePulse {
+            0%, 100% { box-shadow: 0 0 20px var(--gold-glow); }
+            50% { box-shadow: 0 0 50px var(--gold); }
+        }
+
+        .main-core-btn {
+            width: 130px; height: 130px; background: radial-gradient(circle, #101015 0%, #050508 100%);
+            border: 1px solid var(--gold); border-radius: 50%;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            color: var(--gold); font-family: 'Orbitron'; z-index: 10;
+            animation: corePulse 3s infinite ease-in-out;
+        }
+
+        .btn-stack { display: flex; flex-direction: column; gap: 12px; width: 100%; max-width: 280px; padding: 0 20px; }
+        .nav-btn {
+            width: 100%; padding: 14px; border-radius: 12px; background: rgba(255, 255, 255, 0.03); color: #fff;
+            border: 1px solid var(--glass-border); backdrop-filter: blur(10px); cursor: pointer;
+            font-family: 'Orbitron'; text-decoration: none; text-align: center; font-size: 0.75rem; letter-spacing: 2px;
+        }
+        .nav-btn:hover { background: var(--gold-gradient); color: #000; transform: translateY(-3px); }
+
+        .tabs { display: flex; width: 100%; max-width: 350px; margin: 10px auto; gap: 10px; padding: 0 10px; }
+        .tab-btn { flex: 1; padding: 10px; text-align: center; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); border-radius: 8px; cursor: pointer; font-family: 'Orbitron'; font-size: 0.65rem; color: #aaa; transition: 0.3s; }
+        .tab-btn.active { background: var(--gold-gradient); color: black; font-weight: bold; }
+
+        .fairy-float { position: fixed; bottom: 20px; right: 20px; width: 45px; height: 45px; background: var(--gold-gradient); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 100; box-shadow: 0 0 15px var(--gold); }
+
+        footer { padding: 20px; text-align: center; opacity: 0.6; font-size: 0.5rem; letter-spacing: 2px; color: var(--gold); font-family: 'Orbitron'; }
+
+        @keyframes rotateRight { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        @keyframes rotateLeft { from { transform: rotate(360deg); } to { transform: rotate(0deg); } }
     </style>
 </head>
 <body>
 
-    <div class="fairy-float" onclick="alert('Fairytale Guide: System active! How can I help?')">
-        <i class="fas fa-wand-sparkles" style="color: #000; font-size: 1.5rem;"></i>
+    <div class="fairy-float" onclick="alert('Fairytale Guide: System active!')">
+        <i class="fas fa-wand-sparkles" style="color: #000; font-size: 1.2rem;"></i>
     </div>
 
-    <header class="main-header">
-        <div class="header-title">SUPERSTARS</div>
-        <div class="hanging-moon">
-            <div class="moon-line"></div>
-            <i class="fas fa-moon moon-icon"></i>
-        </div>
-
-        <div id="userHeader" style="width: 100%;"></div>
-    </header>
+    <div class="crescent-hanging">
+        <i class="fas fa-moon"></i>
+        <span>SUPERSTARS</span>
+    </div>
 
     <div class="tabs">
         <div class="tab-btn active" onclick="switchTab('season', this)">SEASON</div>
         <div class="tab-btn" onclick="switchTab('royal', this)">ROYAL X</div>
     </div>
+    
+    <canvas id="lantern-canvas"></canvas>
 
-    <section class="activity-grid" id="actGrid"></section>
-
-    <div id="taskModal" class="modal">
-        <div class="modal-content">
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-                <h3 id="mTitle" style="font-family:'Cinzel'; color:var(--gold);">ACTIVITY</h3>
-                <i class="fas fa-times" onclick="closeModal()" style="cursor:pointer;"></i>
+    <section class="mission-control">
+        <div class="core-container" onclick="startLaunch()">
+            <div class="core-ring ring-outer"></div>
+            <div class="core-ring ring-inner"></div>
+            <div class="main-core-btn">
+                <i class="fa-solid fa-lantern" style="font-size: 1.8rem; margin-bottom: 5px;"></i>
+                <span style="font-size: 0.6rem;">ENTER ARENA</span>
             </div>
-            <div class="task-grid" id="tGrid"></div>
         </div>
-    </div>
+        
+        <div class="btn-stack">
+            <a href="NP.html" class="nav-btn">New Agent</a>
+            <a href="RNKS.html" class="nav-btn">Rankings</a>
+            <a href="Rev.html" class="nav-btn">Reviews</a>
+        </div>
+    </section>
+
+    <footer>&copy; 2026 EYC ACADEMY | RAMADAN PROTOCOL</footer>
 
     <script>
-        const IMG_URLS = {
-            tk: "https://raw.githubusercontent.com/eycfde-prog/EYCSSP/main/frontend/eyclgos/Token.png",
-            star: "https://raw.githubusercontent.com/eycfde-prog/EYCSSP/main/frontend/eyclgos/Star.png",
-            gt: "https://raw.githubusercontent.com/eycfde-prog/EYCSSP/main/frontend/eyclgos/GT.png"
-        };
+        const canvas = document.getElementById('lantern-canvas');
+        const ctx = canvas.getContext('2d');
+        let lanterns = [];
 
-        const activities = {
-            season: [
-                { name: "Alike", icon: "fa-clone", code: "AS", tk: 50 },
-                { name: "Vivid", icon: "fa-wand-magic-sparkles", code: "VV", tk: 50 },
-                { name: "Label", icon: "fa-tag", code: "LB", tk: 50 },
-                { name: "Grammar", icon: "fa-spell-check", code: "GR", tk: 50 },
-                { name: "Golden Ear", icon: "fa-ear-listen", code: "GE", tk: 50 },
-                { name: "Seeds", icon: "fa-seedling", code: "SD", tk: 50 }
-            ],
-            royal: [
-                { name: "Alike X", icon: "fa-star", code: "ASX", tk: 50 },
-                { name: "Vivid X", icon: "fa-wand-magic", code: "VVX", tk: 50 },
-                { name: "Label X", icon: "fa-tags", code: "LBX", tk: 50 },
-                { name: "Seeds X", icon: "fa-tree", code: "SDX", tk: 50 },
-                { name: "Golden Ear X", icon: "fa-ear-deaf", code: "GEX", tk: 50 },
-                { name: "Grammar X", icon: "fa-pen-fancy", code: "GRX", tk: 50 },
-                { name: "Figurative X", icon: "fa-mask", code: "FGX", tk: 50 },
-                { name: "Dictation X", icon: "fa-microphone-lines", code: "DTX", tk: 100 },
-                { name: "Sing Sang Sung X", icon: "fa-music", code: "SSSX", tk: 100 },
-                { name: "Elmagazine X", icon: "fa-book-open", code: "EMX", tk: 100 }
-            ]
-        };
-
-        let currentUser = JSON.parse(localStorage.getItem('studentData')) || { name: "Guest", tokens: 0, stars: 0, goldTickets: 0, avatar: "https://via.placeholder.com/100" };
-        let isLoggedIn = !!localStorage.getItem('studentData');
-
-        function renderHeader() {
-            document.getElementById('userHeader').innerHTML = `
-                <div class="user-profile">
-                    <img src="${currentUser.avatar}" class="avatar">
-                    <div>
-                        <h4 style="font-family:'Orbitron'; font-size:0.9rem;">${currentUser.name}</h4>
-                        <p style="font-size:0.6rem; color:var(--gold);">RANK: AGENT</p>
-                    </div>
-                    <i class="fas fa-envelope mail-btn" onclick="openMailbox()"></i>
-                </div>
-                <div class="stats-row">
-                    <div class="stat-item"><img src="${IMG_URLS.tk}" class="stat-img"><span class="stat-val">${currentUser.tokens}</span></div>
-                    <div class="stat-item"><img src="${IMG_URLS.star}" class="stat-img"><span class="stat-val">${currentUser.stars}</span></div>
-                    <div class="stat-item"><img src="${IMG_URLS.gt}" class="stat-img"><span class="stat-val">${currentUser.goldTickets}</span></div>
-                </div>
-            `;
+        function initCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
         }
 
-        function switchTab(type, btn) {
+        class Lantern {
+            constructor() { this.init(); }
+            init() {
+                this.x = Math.random() * canvas.width;
+                this.y = canvas.height + 50;
+                this.size = Math.random() * 8 + 6;
+                this.speed = Math.random() * 0.4 + 0.2;
+                this.opacity = Math.random() * 0.4 + 0.1;
+            }
+            update() {
+                this.y -= this.speed;
+                this.x += Math.sin(this.y / 50) * 0.3;
+                if (this.y < -50) this.init();
+                ctx.save();
+                ctx.translate(this.x, this.y);
+                ctx.globalAlpha = this.opacity;
+                ctx.fillStyle = "#D4AF37";
+                ctx.beginPath();
+                ctx.moveTo(0, -this.size);
+                ctx.lineTo(this.size/2, 0);
+                ctx.lineTo(0, this.size);
+                ctx.lineTo(-this.size/2, 0);
+                ctx.closePath();
+                ctx.fill();
+                ctx.restore();
+            }
+        }
+
+        function createLanterns() {
+            lanterns = Array.from({length: 20}, () => new Lantern());
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            lanterns.forEach(l => l.update());
+            requestAnimationFrame(animate);
+        }
+
+        function startLaunch() {
+            document.body.style.transition = "0.5s";
+            document.body.style.opacity = "0";
+            setTimeout(() => { window.location.href = "MC.html"; }, 500);
+        }
+
+        function switchTab(tab, btn) {
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
-            const grid = document.getElementById('actGrid');
-            grid.innerHTML = '';
-            activities[type].forEach(act => {
-                grid.innerHTML += `
-                    <div class="activity-card" onclick="openTasks('${act.name}', '${act.code}', '${act.tk}', '${type}')">
-                        <div class="tk-badge">${act.tk} TK</div>
-                        <i class="fas ${act.icon}"></i>
-                        <span>${act.name}</span>
-                    </div>
-                `;
-            });
         }
 
-        function getReleaseDate(type, index) {
-            const start = new Date("2026-02-28T00:00:00");
-            if (index === 0) return new Date("2026-02-26T00:00:00");
-            let d = new Date(start);
-            if (type === 'season') {
-                let daysToAdd = 0;
-                for(let i=1; i<=index; i++) { daysToAdd += (2 + i); }
-                d.setDate(d.getDate() + daysToAdd);
-            } else {
-                d.setDate(d.getDate() + (index * 3));
-            }
-            return d;
-        }
-
-        function openTasks(name, code, tk, type) {
-            const now = new Date();
-            document.getElementById('mTitle').innerText = name;
-            const tGrid = document.getElementById('tGrid');
-            tGrid.innerHTML = '';
-            for (let i = 0; i < 10; i++) {
-                const node = document.createElement('div');
-                node.className = 'task-node';
-                node.innerText = i + 1;
-                const releaseDate = getReleaseDate(type, i);
-                const isLocked = now < releaseDate;
-                if (isLocked) {
-                    node.innerHTML += `<div class="lock-overlay"><i class="fas fa-lock"></i></div>`;
-                    node.onclick = () => showPop(node, releaseDate);
-                } else {
-                    node.onclick = () => {
-                        if (!isLoggedIn) { alert("Please login to access missions!"); return; }
-                        window.location.href = `Arena.html?act=${code}&t=${i+1}`;
-                    };
-                }
-                tGrid.appendChild(node);
-            }
-            document.getElementById('taskModal').style.display = 'flex';
-        }
-
-        function showPop(parent, date) {
-            const old = parent.querySelector('.release-pop'); if(old) old.remove();
-            const p = document.createElement('div');
-            p.className = 'release-pop';
-            p.innerText = `Starts: ${date.toLocaleDateString('en-GB', {day:'2-digit', month:'short'})}`;
-            parent.appendChild(p);
-            setTimeout(() => p.remove(), 2500);
-        }
-
-        function closeModal() { document.getElementById('taskModal').style.display = 'none'; }
-        
-        window.onload = () => {
-            renderHeader();
-            switchTab('season', document.querySelector('.tab-btn'));
-        };
+        window.addEventListener('resize', initCanvas);
+        initCanvas(); createLanterns(); animate();
     </script>
 </body>
 </html>
