@@ -3,192 +3,198 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>EYC Super Stars | Elite Dashboard</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Orbitron:wght@400;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <title>EYC Superstars | Ramadan Edition</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Orbitron:wght@400;700;900&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
     <style>
         :root {
             --gold: #D4AF37;
+            --gold-light: #fcf6ba;
             --gold-gradient: linear-gradient(135deg, #bf953f, #fcf6ba, #b38728);
-            --bg-deep: #030306; 
-            --glass: rgba(255, 255, 255, 0.03);
-            --glass-border: rgba(212, 175, 55, 0.15);
-            --gold-glow: rgba(212, 175, 55, 0.3);
-            --titanium-gradient: linear-gradient(135deg, #71706e, #e5e4e2, #b8b8b8);
+            --bg-deep: #050508;
+            --gold-glow: rgba(212, 175, 55, 0.4);
+            --glass-border: rgba(212, 175, 55, 0.2);
+            --ember-orange: rgba(255, 100, 0, 0.15);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; -webkit-tap-highlight-color: transparent; }
-        body { background: var(--bg-deep); color: white; min-height: 100vh; overflow-x: hidden; }
+        body { background: var(--bg-deep); color: white; min-height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
 
-        #star-container { position: fixed; inset: 0; z-index: -1; background: radial-gradient(circle at top, #0a0b14 0%, #030306 100%); }
-        .star { position: absolute; background: #fff; border-radius: 50%; opacity: 0.3; animation: pulse var(--duration) infinite ease-in-out; }
-        @keyframes pulse { 0%, 100% { opacity: 0.2; transform: scale(1); } 50% { opacity: 0.7; transform: scale(1.5); } }
+        /* --- Ramadan Elements --- */
+        .ramadan-moon-container {
+            position: fixed; 
+            top: 15%; /* Adjusted for Logo Alignment */
+            width: 100%; display: flex; flex-direction: column; align-items: center;
+            z-index: -1; animation: swing 4s ease-in-out infinite; opacity: 0.6;
+        }
+        .moon {
+            font-size: 120px; color: var(--gold); filter: drop-shadow(0 0 30px var(--gold-glow));
+        }
+        .ramadan-text {
+            font-family: 'Cinzel'; font-size: 1.2rem; color: var(--gold); letter-spacing: 5px; margin-top: -20px;
+            text-shadow: 0 0 10px var(--gold);
+        }
 
-        /* --- Animations --- */
+        @keyframes swing {
+            0%, 100% { transform: rotate(-5deg) translateY(0); }
+            50% { transform: rotate(5deg) translateY(10px); }
+        }
+
+        /* Background Canvas for Lanterns */
+        #lantern-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; }
+
+        /* Hero Section */
+        .hero { 
+            text-align: center; 
+            padding: 120px 20px 180px; /* Increased padding-bottom for visual space */
+            display: flex; flex-direction: column; align-items: center; 
+        }
+
+        .logo-container { position: relative; margin-bottom: 15px; }
+        .main-logo { width: 130px; filter: drop-shadow(0 0 25px var(--gold-glow)); z-index: 2; position: relative; }
+        
+        .hero h1 {
+            font-family: 'Cinzel', serif; font-size: clamp(2rem, 10vw, 3.8rem);
+            background: var(--gold-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            line-height: 1.1; letter-spacing: 6px; filter: drop-shadow(0 0 15px rgba(212,175,55,0.3));
+        }
+
+        /* Launch Core */
+        .mission-control { 
+            flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; 
+            min-height: 200px; /* Responsiveness Gap */
+        }
+
+        .core-container {
+            position: relative; width: 280px; height: 280px;
+            display: flex; align-items: center; justify-content: center; cursor: pointer; margin-bottom: 40px;
+        }
+
+        .core-ring { position: absolute; border-radius: 50%; border: 1px solid var(--glass-border); transition: 0.5s ease; }
+        .ring-outer { width: 100%; height: 100%; border-style: double; border-width: 2px; animation: rotateRight 30s linear infinite; }
+        .ring-inner { width: 75%; height: 75%; border-style: dashed; border-width: 1px; opacity: 0.3; animation: rotateLeft 20s linear infinite; }
+
+        /* Breathing Glow Animation */
         @keyframes corePulse {
             0% { box-shadow: 0 0 20px var(--gold-glow); }
             50% { box-shadow: 0 0 50px var(--gold); }
             100% { box-shadow: 0 0 20px var(--gold-glow); }
         }
 
-        .fa-shake { animation: shake 0.5s infinite; }
-        @keyframes shake {
-            0% { transform: rotate(0deg); }
-            25% { transform: rotate(10deg); }
-            50% { transform: rotate(0deg); }
-            75% { transform: rotate(-10deg); }
-            100% { transform: rotate(0deg); }
+        .main-core-btn {
+            width: 140px; height: 140px; background: radial-gradient(circle, #101015 0%, #050508 100%);
+            border: 1px solid var(--gold); border-radius: 50%;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            color: var(--gold); font-family: 'Orbitron'; 
+            z-index: 10;
+            animation: corePulse 3s infinite ease-in-out; /* Applied Breathing Glow */
         }
 
-        /* --- Top Navigation --- */
-        .top-nav { position: fixed; top: 0; width: 100%; padding: 20px 6%; display: flex; justify-content: space-between; align-items: center; z-index: 1000; backdrop-filter: blur(10px); border-bottom: 1px solid rgba(255,255,255,0.05); }
-        .nav-icon { font-size: 1.2rem; color: var(--gold); cursor: pointer; transition: 0.3s; opacity: 0.8; }
-        .nav-icon:hover { opacity: 1; transform: scale(1.1); filter: drop-shadow(0 0 8px var(--gold)); }
-
-        /* --- Profile Section --- */
-        /* Task 1: Increase padding-bottom to 180px for moon swing space */
-        .hero-banner { width: 100%; padding: 100px 20px 180px; text-align: center; }
-        .profile-card { position: relative; display: inline-flex; flex-direction: column; align-items: center; }
-        
-        /* Task 1 & 4: Ensure responsiveness and alignment */
-        .ramadan-moon-container { position: absolute; top: 15%; z-index: 0; pointer-events: none; }
-
-        .avatar-wrapper { position: relative; width: 120px; height: 120px; padding: 4px; background: var(--gold-gradient); border-radius: 50%; box-shadow: 0 0 30px var(--gold-glow); margin-bottom: 15px; z-index: 2; }
-        
-        /* Task 3: Breathing Glow Effect */
-        .main-core-btn { 
-            animation: corePulse 3s infinite ease-in-out;
-            cursor: pointer;
-            border-radius: 50%;
-            transition: 0.3s;
+        .btn-stack { display: flex; flex-direction: column; gap: 15px; width: 100%; max-width: 300px; padding: 0 20px; }
+        .nav-btn {
+            width: 100%; padding: 16px; border-radius: 12px; background: rgba(255, 255, 255, 0.03); color: #fff;
+            border: 1px solid var(--glass-border); backdrop-filter: blur(10px); cursor: pointer;
+            font-family: 'Orbitron'; text-decoration: none; text-align: center; font-size: 0.8rem; letter-spacing: 2px;
         }
+        .nav-btn:hover { background: var(--gold-gradient); color: #000; transform: translateY(-3px); }
 
-        .avatar-main { width: 100%; height: 100%; border-radius: 50%; border: 4px solid #050508; background-size: cover; background-position: center; }
-        .rank-tag { position: absolute; bottom: -5px; background: #000; border: 1px solid var(--gold); padding: 2px 12px; border-radius: 10px; font-family: 'Orbitron'; font-size: 0.65rem; color: var(--gold); letter-spacing: 1px; z-index: 3; }
+        footer { padding: 30px; text-align: center; opacity: 0.6; font-size: 0.5rem; letter-spacing: 2px; color: var(--gold); font-family: 'Orbitron'; }
 
-        .student-name { font-family: 'Cinzel', serif; font-size: clamp(1.4rem, 5vw, 2rem); letter-spacing: 3px; background: var(--gold-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-top: 10px; }
-        .student-title { font-size: 0.7rem; color: #888; text-transform: uppercase; letter-spacing: 3px; margin-top: 5px; }
-
-        .stats-row { display: flex; gap: 20px; margin-top: 20px; background: rgba(255,255,255,0.03); padding: 10px 25px; border-radius: 30px; border: 1px solid var(--glass-border); position: relative; z-index: 2; }
-        .stat-item { font-family: 'Orbitron'; font-size: 0.85rem; display: flex; align-items: center; gap: 8px; }
-        .stat-item span { color: var(--gold); }
-
-        /* --- Grid (Luxury Cards) --- */
-        .grid-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 20px; padding: 0 6% 100px; }
-        .activity-card { background: linear-gradient(145deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.01) 100%); border: 1px solid rgba(255,255,255,0.08); border-radius: 20px; padding: 35px 15px; text-align: center; transition: 0.5s; cursor: pointer; position: relative; overflow: hidden; }
-        .activity-card:hover { transform: translateY(-10px); border-color: var(--gold); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        .card-icon { position: relative; z-index: 1; font-size: 2.2rem; margin-bottom: 15px; background: var(--gold-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-
-        /* Mobile Responsive Gap */
-        @media (max-width: 768px) {
-            .hero-banner { padding-bottom: 200px; min-height: 450px; }
-        }
-
-        /* --- Modals --- */
-        .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.9); display: none; justify-content: center; align-items: center; z-index: 2000; backdrop-filter: blur(20px); }
-        .modal-content { background: #050508; border-radius: 25px; padding: 40px; width: 90%; max-width: 400px; border: 1px solid var(--glass-border); position: relative; }
-        
-        .btn-exit { background: transparent; border: 1px solid #444; color: #888; padding: 12px 30px; border-radius: 12px; cursor: pointer; font-family: 'Orbitron'; font-size: 0.7rem; transition: 0.3s; width: 100%; }
-        .btn-exit:hover { border-color: var(--gold); color: var(--gold); }
-
-        .tab-switcher { background: #000; padding: 4px; border-radius: 15px; display: flex; border: 1px solid var(--glass-border); width: 90%; max-width: 400px; margin: 20px auto; }
-        .tab-btn { flex: 1; padding: 12px; border: none; background: transparent; color: #666; border-radius: 12px; cursor: pointer; font-weight: 700; font-size: 0.65rem; letter-spacing: 2px; }
-        .tab-btn.active { color: #000; background: var(--gold-gradient); }
-
-        .tasks-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin: 30px 0; }
-        .task-node { aspect-ratio: 1; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-family: 'Orbitron'; font-size: 0.8rem; }
-        .task-node:hover { background: var(--gold-gradient); color: #000; }
+        @keyframes rotateRight { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        @keyframes rotateLeft { from { transform: rotate(360deg); } to { transform: rotate(0deg); } }
     </style>
 </head>
 <body>
 
-    <div id="star-container"></div>
-
-    <nav class="top-nav">
-        <i class="fas fa-arrow-left nav-icon" onclick="window.location.href='index.html'"></i>
-        <div style="position: relative; display: flex; align-items: center; gap: 15px;">
-            <div id="notifBell" class="nav-icon" onclick="openMailbox()" style="position: relative;">
-                <i class="fas fa-bell"></i>
-                <span id="notifDot" style="display:none; position: absolute; top: -5px; right: -5px; width: 10px; height: 10px; background: red; border-radius: 50%; border: 2px solid var(--bg-deep);"></span>
-            </div>
-            <i class="fas fa-power-off nav-icon" id="logoutBtn" style="display:none;" onclick="handleLogout()"></i>
-        </div>
-    </nav>
-
-    <header class="hero-banner" id="heroBanner"></header>
-
-    <div class="tab-switcher">
-        <button class="tab-btn active" onclick="switchType('season', this)">SEASON</button>
-        <button class="tab-btn" onclick="switchType('royal', this)">ROYAL</button>
-        <button class="tab-btn" onclick="switchType('titanium', this)">TITANIUM</button>
+    <div class="ramadan-moon-container">
+        <div class="moon">🌙</div>
+        <div class="ramadan-text">RAMADAN KAREEM</div>
     </div>
+    
+    <canvas id="lantern-canvas"></canvas>
 
-    <main><div class="grid-container" id="cardsGrid"></div></main>
+    <header class="hero">
+        <div class="logo-container">
+            <img src="logo.png" alt="EYC Logo" class="main-logo">
+        </div>
+        <h1>SUPERSTARS</h1>
+    </header>
 
-    <div class="modal" id="mailModal">...</div>
-    <div class="modal" id="taskModal">...</div>
-    <div class="modal" id="loginModal">...</div>
+    <section class="mission-control">
+        <div class="core-container" onclick="startLaunch()">
+            <div class="core-ring ring-outer"></div>
+            <div class="core-ring ring-inner"></div>
+            <div class="main-core-btn">
+                <i class="fa-solid fa-lantern" style="font-size: 1.8rem; margin-bottom: 5px;"></i>
+                <span style="font-size: 0.6rem;">ENTER ARENA</span>
+            </div>
+        </div>
+        
+        <div class="btn-stack">
+            <a href="NP.html" class="nav-btn">New Agent</a>
+            <a href="RNKS.html" class="nav-btn">Rankings</a>
+            <a href="Rev.html" class="nav-btn">Reviews</a>
+        </div>
+    </section>
+
+    <footer>&copy; 2026 EYC ACADEMY | RAMADAN PROTOCOL</footer>
 
     <script>
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwCGnW1crqrjMSxFxPP0D7p6hghDO9og63yZW5qvF17WvaqBM_IrsAHU3fVID5qRVl7/exec";
-        let currentUser = null;
-        let isLoggedIn = false;
+        const canvas = document.getElementById('lantern-canvas');
+        const ctx = canvas.getContext('2d');
+        let lanterns = [];
 
-        function renderHeader() {
-            const header = document.getElementById('heroBanner');
-            const logoutBtn = document.getElementById('logoutBtn');
-            if (isLoggedIn) {
-                logoutBtn.style.display = "block";
-                header.innerHTML = `
-                    <div class="profile-card">
-                        <div class="ramadan-moon-container">
-                           <i class="fa-solid fa-lantern" style="color: var(--gold); font-size: 2rem; opacity: 0.6;"></i>
-                        </div>
-                        
-                        <div class="avatar-wrapper main-core-btn">
-                            <div class="avatar-main" style="background-image: url('${currentUser.avatar || ''}')"></div>
-                            <div class="rank-tag">RANK #${currentUser.rank}</div>                       
-                        </div>
-                        <h1 class="student-name">${currentUser.name}</h1>
-                        <p class="student-title">${currentUser.title}</p>
-                        <div class="stats-row">
-                            <div class="stat-item">🪙 <span>${currentUser.tokens || 0}</span></div>
-                            <div class="stat-item">⭐ <span>${currentUser.stars || 0}</span></div>
-                            <div class="stat-item">🎟️ <span style="color:#FFD700">${currentUser.goldTickets || 0}</span></div>
-                            <i class="fas fa-sync-alt stat-item" style="cursor:pointer; font-size:0.7rem;" onclick="refreshUserData()"></i>
-                        </div>
-                    </div>`;
-                checkNewNotification(currentUser.lastNotification);
-            } else {
-                logoutBtn.style.display = "none";
-                header.innerHTML = `<h1 class="student-name">ARENA ACCESS</h1><div style="margin-top:20px;"><button class="btn-exit" style="width:auto;" onclick="openLogin()">AUTHORIZE LOGIN</button></div>`;
+        function initCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+
+        class Lantern {
+            constructor() { this.init(); }
+            init() {
+                this.x = Math.random() * canvas.width;
+                this.y = canvas.height + 50;
+                this.size = Math.random() * 15 + 10;
+                this.speed = Math.random() * 0.5 + 0.2;
+                this.wobble = Math.random() * 2;
+                this.opacity = Math.random() * 0.5 + 0.2;
+            }
+            update() {
+                this.y -= this.speed;
+                this.x += Math.sin(this.y / 50) * 0.5;
+                if (this.y < -50) this.init();
+                
+                ctx.save();
+                ctx.translate(this.x, this.y);
+                ctx.globalAlpha = this.opacity;
+                ctx.fillStyle = "#D4AF37";
+                ctx.font = `${this.size}px "Font Awesome 6 Free"`; /* Updated for V6 Compatibility */
+                ctx.fontWeight = "900";
+                // Lantern Glyph: \uf684 (FontAwesome 6 Solid)
+                ctx.fillText("\uf684", 0, 0); 
+                ctx.restore();
             }
         }
 
-        // FontAwesome Unicode Update (If Canvas is used)
-        // Previous: \uf684 (Hands) -> New: \uf672 (Lantern/Lightbulb logic)
-        
-        // Rest of the logic remains intact to ensure system stability
-        const activities = { /* ... as provided ... */ };
-        function generateCards() { /* ... as provided ... */ }
-        function switchType(type, btn) { /* ... as provided ... */ }
-        function openTasks(name, code) { /* ... as provided ... */ }
-        function handleLogin() { /* ... as provided ... */ }
-        function refreshUserData() { /* ... as provided ... */ }
-        function handleLogout() { /* ... as provided ... */ }
-        function openLogin() { /* ... as provided ... */ }
-        function closeModal(id) { /* ... as provided ... */ }
-        function createStars() { /* ... as provided ... */ }
+        function createLanterns() {
+            lanterns = Array.from({length: 25}, () => new Lantern());
+        }
 
-        window.onload = () => {
-            createStars();
-            const saved = localStorage.getItem('eyc_user');
-            if(saved) { currentUser = JSON.parse(saved); isLoggedIn = true; }
-            renderHeader(); 
-            // Manual generate call if logged in
-            const activeTab = document.querySelector('.tab-btn.active');
-            if(activeTab) generateCards();
-        };
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            lanterns.forEach(l => l.update());
+            requestAnimationFrame(animate);
+        }
+
+        function startLaunch() {
+            document.body.style.transition = "0.5s";
+            document.body.style.opacity = "0";
+            setTimeout(() => { window.location.href = "MC.html"; }, 500);
+        }
+
+        window.addEventListener('resize', initCanvas);
+        initCanvas(); createLanterns(); animate();
     </script>
 </body>
 </html>
