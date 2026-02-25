@@ -3,98 +3,124 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>EYC | Mission Control</title>
+    <title>EYC Superstars | Mission Control</title>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Orbitron:wght@400;700;900&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
     <style>
         :root {
-            --gold: #b38728; /* لون ذهبي مطفأ للأناقة */
-            --gold-bright: #D4AF37;
-            --bg-deep: #030306;
+            --gold: #b38728;
+            --gold-bright: #fcf6ba;
+            --gold-gradient: linear-gradient(135deg, #a67c00, #ffdc73, #8b6914);
+            --bg-deep: #050508;
             --glass: rgba(255, 255, 255, 0.03);
-            --glass-border: rgba(212, 175, 55, 0.15);
+            --glass-border: rgba(212, 175, 55, 0.2);
+            --gold-glow: rgba(212, 175, 55, 0.3);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; -webkit-tap-highlight-color: transparent; }
         body { background: var(--bg-deep); color: white; min-height: 100vh; overflow-x: hidden; }
 
-        /* --- Floating Fairytale Aide --- */
-        .fairytale-float {
-            position: fixed; bottom: 20px; right: 20px; width: 60px; height: 60px;
+        /* Header & Stats */
+        .main-header { padding: 20px; background: rgba(0,0,0,0.8); border-bottom: 1px solid var(--glass-border); sticky: top; z-index: 100; }
+        .user-profile { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; }
+        .avatar { width: 55px; height: 55px; border-radius: 50%; border: 2px solid var(--gold); padding: 2px; }
+        
+        .stats-row { display: flex; justify-content: space-around; background: var(--glass); border-radius: 12px; padding: 10px; border: 1px solid var(--glass-border); }
+        .stat-item { display: flex; flex-direction: column; align-items: center; gap: 5px; }
+        .stat-img { width: 22px; height: 22px; object-fit: contain; }
+        .stat-val { font-family: 'Orbitron'; font-size: 0.8rem; color: var(--gold-bright); }
+
+        /* Tabs */
+        .tabs { display: flex; justify-content: center; gap: 10px; padding: 20px; }
+        .tab-btn { 
+            padding: 10px 25px; border-radius: 8px; background: var(--glass); border: 1px solid var(--glass-border);
+            color: #888; font-family: 'Orbitron'; cursor: pointer; transition: 0.3s; font-size: 0.75rem;
+        }
+        .tab-btn.active { background: var(--gold-gradient); color: #000; font-weight: 900; box-shadow: 0 0 15px var(--gold-glow); }
+
+        /* Activity Grid */
+        .activity-grid { 
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); 
+            gap: 15px; padding: 15px; max-width: 1000px; margin: 0 auto;
+        }
+        @media (max-width: 480px) { .activity-grid { grid-template-columns: repeat(2, 1fr); } }
+
+        .activity-card {
+            background: var(--glass); border: 1px solid var(--glass-border); border-radius: 15px;
+            padding: 20px; text-align: center; position: relative; cursor: pointer; transition: 0.3s;
+            overflow: hidden;
+        }
+        .activity-card:hover { transform: translateY(-5px); border-color: var(--gold); }
+        .activity-card i { font-size: 1.8rem; color: var(--gold); margin-bottom: 10px; display: block; }
+        .activity-card span { font-family: 'Orbitron'; font-size: 0.7rem; letter-spacing: 1px; }
+        
+        .tk-badge { 
+            position: absolute; top: 8px; right: 8px; background: rgba(0,0,0,0.6); 
+            padding: 2px 6px; border-radius: 5px; font-size: 0.6rem; color: var(--gold-bright);
+            border: 0.5px solid var(--gold); font-family: 'Orbitron';
+        }
+
+        /* Task Modal & Locks */
+        .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.9); display: none; align-items: center; justify-content: center; z-index: 2000; padding: 20px; }
+        .modal-content { background: #0a0a0f; border: 1px solid var(--gold); border-radius: 20px; width: 100%; max-width: 400px; padding: 25px; }
+        .task-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-top: 20px; }
+        .task-node { 
+            aspect-ratio: 1; background: var(--glass); border: 1px solid var(--glass-border);
+            border-radius: 8px; display: flex; align-items: center; justify-content: center;
+            font-family: 'Orbitron'; font-size: 0.9rem; position: relative; cursor: pointer;
+        }
+        .lock-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.7); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: var(--gold); }
+        .release-pop { 
+            position: absolute; bottom: 110%; left: 50%; transform: translateX(-50%);
+            background: #000; color: var(--gold); padding: 5px 10px; border-radius: 5px;
+            font-size: 0.6rem; border: 1px solid var(--gold); white-space: nowrap; z-index: 10;
+        }
+
+        /* Floating Fairy */
+        .fairy-float {
+            position: fixed; bottom: 25px; left: 20px; width: 55px; height: 55px;
             background: var(--gold-gradient); border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
-            box-shadow: 0 0 20px var(--gold-glow); z-index: 9999; cursor: pointer;
+            box-shadow: 0 0 20px var(--gold-glow); cursor: pointer; z-index: 1500;
             animation: float 3s ease-in-out infinite;
         }
-        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+        @keyframes float { 0%, 100% { transform: translateY(0) rotate(0); } 50% { transform: translateY(-12px) rotate(10deg); } }
 
-        /* --- Header & Stats --- */
-        .stats-row { display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; margin-top: 15px; }
-        .stat-item { background: rgba(255,255,255,0.05); padding: 5px 12px; border-radius: 20px; display: flex; align-items: center; gap: 6px; font-size: 0.8rem; border: 1px solid var(--glass-border); }
-        .stat-img { width: 18px; height: 18px; object-fit: contain; }
-
-        /* --- Grid & Cards --- */
-        .grid-container { 
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); 
-            gap: 15px; padding: 20px; max-width: 1200px; margin: 0 auto;
-        }
-        .activity-card {
-            background: rgba(255,255,255,0.02); border: 1px solid var(--glass-border);
-            border-radius: 15px; padding: 25px 10px; text-align: center; position: relative;
-        }
-        .tk-badge {
-            position: absolute; top: 10px; right: 10px; background: rgba(212, 175, 55, 0.2);
-            color: var(--gold-bright); font-size: 0.6rem; padding: 2px 8px; border-radius: 10px; font-family: 'Orbitron';
-        }
-
-        /* --- Task Nodes & Locks --- */
-        .tasks-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; }
-        .task-node { 
-            aspect-ratio: 1; background: rgba(255,255,255,0.05); border-radius: 8px;
-            display: flex; align-items: center; justify-content: center; position: relative;
-            font-family: 'Orbitron'; font-size: 0.7rem; cursor: pointer;
-        }
-        .lock-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.7); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: var(--gold); font-size: 0.8rem; }
-        .date-toast {
-            position: absolute; top: -35px; left: 50%; transform: translateX(-50%);
-            background: #000; color: var(--gold); padding: 4px 8px; border-radius: 4px;
-            font-size: 0.6rem; white-space: nowrap; display: none; border: 1px solid var(--gold); z-index: 10;
-        }
-
-        /* --- Mailbox UI Refined --- */
-        .mail-card {
-            background: #0a0a0f; border: 1px solid var(--glass-border); border-radius: 12px;
-            padding: 15px; margin-bottom: 12px; cursor: pointer; transition: 0.3s;
-        }
-        .mail-card:hover { border-color: var(--gold-bright); background: rgba(212, 175, 55, 0.05); }
-        .mail-header { display: flex; justify-content: space-between; font-size: 0.65rem; color: #777; margin-bottom: 8px; }
-
-        @media (max-width: 600px) {
-            .grid-container { grid-template-columns: repeat(2, 1fr); }
-            .hero-banner { padding-top: 80px; }
-        }
+        /* Mailbox Styles */
+        .mail-btn { position: absolute; top: 20px; right: 20px; font-size: 1.4rem; color: var(--gold); cursor: pointer; }
+        .badge { position: absolute; top: -5px; right: -5px; background: red; color: white; border-radius: 50%; padding: 2px 6px; font-size: 0.6rem; }
     </style>
 </head>
 <body>
 
-    <div class="fairytale-float" onclick="openChat()"><i class="fas fa-magic"></i></div>
+    <div class="fairy-float" onclick="alert('Fairytale Guide: System active! How can I help?')">
+        <i class="fas fa-wand-sparkles" style="color: #000; font-size: 1.5rem;"></i>
+    </div>
 
-    <header class="hero-banner" id="heroBanner"></header>
+    <header class="main-header" id="userHeader">
+        </header>
 
-    <nav class="nav-container">
-        <div class="tab-switcher" style="margin: 0 auto;">
-            <button class="tab-btn active" onclick="switchType('season', this)">SEASON</button>
-            <button class="tab-btn" onclick="switchType('royal', this)">ROYAL X</button>
+    <div class="tabs">
+        <div class="tab-btn active" onclick="switchTab('season', this)">SEASON</div>
+        <div class="tab-btn" onclick="switchTab('royal', this)">ROYAL X</div>
+    </div>
+
+    <section class="activity-grid" id="actGrid"></section>
+
+    <div id="taskModal" class="modal">
+        <div class="modal-content">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <h3 id="mTitle" style="font-family:'Cinzel'; color:var(--gold);">ACTIVITY</h3>
+                <i class="fas fa-times" onclick="closeModal()" style="cursor:pointer;"></i>
+            </div>
+            <div class="task-grid" id="tGrid"></div>
         </div>
-    </nav>
-
-    <main><div class="grid-container" id="cardsGrid"></div></main>
-
-    <div class="modal" id="taskModal"><div class="modal-content">...</div></div>
+    </div>
 
     <script>
-        const IMG_ASSETS = {
-            token: "https://raw.githubusercontent.com/eycfde-prog/EYCSSP/main/frontend/eyclgos/Token.png",
+        const IMG_URLS = {
+            tk: "https://raw.githubusercontent.com/eycfde-prog/EYCSSP/main/frontend/eyclgos/Token.png",
             star: "https://raw.githubusercontent.com/eycfde-prog/EYCSSP/main/frontend/eyclgos/Star.png",
             gt: "https://raw.githubusercontent.com/eycfde-prog/EYCSSP/main/frontend/eyclgos/GT.png"
         };
@@ -102,19 +128,19 @@
         const activities = {
             season: [
                 { name: "Alike", icon: "fa-clone", code: "AS", tk: 50 },
-                { name: "Label", icon: "fa-tag", code: "LB", tk: 50 },
-                { name: "Golden Ear", icon: "fa-ear-listen", code: "GE", tk: 50 },
-                { name: "Grammar", icon: "fa-spell-check", code: "GR", tk: 50 },
                 { name: "Vivid", icon: "fa-wand-magic-sparkles", code: "VV", tk: 50 },
+                { name: "Label", icon: "fa-tag", code: "LB", tk: 50 },
+                { name: "Grammar", icon: "fa-spell-check", code: "GR", tk: 50 },
+                { name: "Golden Ear", icon: "fa-ear-listen", code: "GE", tk: 50 },
                 { name: "Seeds", icon: "fa-seedling", code: "SD", tk: 50 }
             ],
             royal: [
                 { name: "Alike X", icon: "fa-star", code: "ASX", tk: 50 },
+                { name: "Vivid X", icon: "fa-wand-magic", code: "VVX", tk: 50 },
                 { name: "Label X", icon: "fa-tags", code: "LBX", tk: 50 },
+                { name: "Seeds X", icon: "fa-tree", code: "SDX", tk: 50 },
                 { name: "Golden Ear X", icon: "fa-ear-deaf", code: "GEX", tk: 50 },
                 { name: "Grammar X", icon: "fa-pen-fancy", code: "GRX", tk: 50 },
-                { name: "Vivid X", icon: "fa-wand-magic", code: "VVX", tk: 50 },
-                { name: "Seeds X", icon: "fa-tree", code: "SDX", tk: 50 },
                 { name: "Figurative X", icon: "fa-mask", code: "FGX", tk: 50 },
                 { name: "Dictation X", icon: "fa-microphone-lines", code: "DTX", tk: 100 },
                 { name: "Sing Sang Sung X", icon: "fa-music", code: "SSSX", tk: 100 },
@@ -122,67 +148,79 @@
             ]
         };
 
-        function getTaskUnlockDate(type, taskIndex) {
-            if (taskIndex === 1) return null; // أول مهمة مفتوحة دائماً
-            
-            let date = new Date(2026, 1, 28); // السبت 28 فبراير
-            if (type === 'season') {
-                // S: +4, +5, +6...
-                let extraDays = 0;
-                for(let i=2; i<taskIndex; i++) { extraDays += (i + 2); }
-                date.setDate(date.getDate() + extraDays);
-            } else {
-                // R: ثابت +3 أيام
-                date.setDate(date.getDate() + (taskIndex - 2) * 3);
-            }
-            return date;
+        let currentUser = JSON.parse(localStorage.getItem('studentData')) || { name: "Guest", tokens: 0, stars: 0, goldTickets: 0, avatar: "https://via.placeholder.com/100" };
+        let isLoggedIn = !!localStorage.getItem('studentData');
+
+        function renderHeader() {
+            document.getElementById('userHeader').innerHTML = `
+                <div class="user-profile">
+                    <img src="${currentUser.avatar}" class="avatar">
+                    <div>
+                        <h4 style="font-family:'Orbitron'; font-size:0.9rem;">${currentUser.name}</h4>
+                        <p style="font-size:0.6rem; color:var(--gold);">RANK: AGENT</p>
+                    </div>
+                    <i class="fas fa-envelope mail-btn" onclick="openMailbox()"></i>
+                </div>
+                <div class="stats-row">
+                    <div class="stat-item"><img src="${IMG_URLS.tk}" class="stat-img"><span class="stat-val">${currentUser.tokens}</span></div>
+                    <div class="stat-item"><img src="${IMG_URLS.star}" class="stat-img"><span class="stat-val">${currentUser.stars}</span></div>
+                    <div class="stat-item"><img src="${IMG_URLS.gt}" class="stat-img"><span class="stat-val">${currentUser.goldTickets}</span></div>
+                </div>
+            `;
         }
 
-        function generateCards() {
-            const grid = document.getElementById('cardsGrid'); grid.innerHTML = '';
-            const type = document.querySelector('.tab-btn.active').innerText.toLowerCase().includes('royal') ? 'royal' : 'season';
-            
+        function switchTab(type, btn) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            const grid = document.getElementById('actGrid');
+            grid.innerHTML = '';
             activities[type].forEach(act => {
-                const card = document.createElement('div');
-                card.className = 'activity-card';
-                card.innerHTML = `
-                    <div class="tk-badge">${act.tk} TK</div>
-                    <i class="fa-solid ${act.icon} card-icon" style="font-size: 2rem; color:var(--gold); margin-bottom:10px;"></i>
-                    <h3 style="font-size:0.75rem; letter-spacing:1px;">${act.name}</h3>
+                grid.innerHTML += `
+                    <div class="activity-card" onclick="openTasks('${act.name}', '${act.code}', '${act.tk}', '${type}')">
+                        <div class="tk-badge">${act.tk} TK</div>
+                        <i class="fas ${act.icon}"></i>
+                        <span>${act.name}</span>
+                    </div>
                 `;
-                card.onclick = () => openTasks(act, type);
-                grid.appendChild(card);
             });
         }
 
-        function openTasks(act, type) {
-            document.getElementById('mTitle').innerText = act.name;
-            const tGrid = document.getElementById('tGrid'); tGrid.innerHTML = '';
+        function getReleaseDate(type, index) {
+            const start = new Date("2026-02-28T00:00:00"); // السبت (بداية نزول المهمة الثانية)
+            if (index === 0) return new Date("2026-02-26T00:00:00"); // المهمة الأولى متاحة من الخميس
             
-            for (let i = 1; i <= 10; i++) {
+            let d = new Date(start);
+            if (type === 'season') {
+                let daysToAdd = 0;
+                for(let i=1; i<=index; i++) { daysToAdd += (2 + i); } // سيكوينس: +3، +4، +5...
+                d.setDate(d.getDate() + daysToAdd);
+            } else {
+                d.setDate(d.getDate() + (index * 3)); // رويال: كل 3 أيام ثابتة
+            }
+            return d;
+        }
+
+        function openTasks(name, code, tk, type) {
+            const now = new Date();
+            document.getElementById('mTitle').innerText = name;
+            const tGrid = document.getElementById('tGrid');
+            tGrid.innerHTML = '';
+
+            for (let i = 0; i < 10; i++) {
                 const node = document.createElement('div');
                 node.className = 'task-node';
-                node.innerHTML = `<span>${i}</span>`;
+                node.innerText = i + 1;
                 
-                const unlockDate = getTaskUnlockDate(type, i);
-                const isLocked = unlockDate && unlockDate > new Date();
+                const releaseDate = getReleaseDate(type, i);
+                const isLocked = now < releaseDate;
 
                 if (isLocked) {
                     node.innerHTML += `<div class="lock-overlay"><i class="fas fa-lock"></i></div>`;
-                    const toast = document.createElement('div');
-                    toast.className = 'date-toast';
-                    toast.innerText = `Available: ${unlockDate.toDateString()}`;
-                    node.appendChild(toast);
-                    
-                    node.onclick = (e) => {
-                        e.stopPropagation();
-                        toast.style.display = 'block';
-                        setTimeout(() => toast.style.display = 'none', 2000);
-                    };
+                    node.onclick = () => showPop(node, releaseDate);
                 } else {
                     node.onclick = () => {
-                        if (!isLoggedIn) return openLogin();
-                        // انتقل لصفحة المهمة
+                        if (!isLoggedIn) { alert("Please login to access missions!"); return; }
+                        window.location.href = `Arena.html?act=${code}&t=${i+1}`;
                     };
                 }
                 tGrid.appendChild(node);
@@ -190,19 +228,20 @@
             document.getElementById('taskModal').style.display = 'flex';
         }
 
-        // تحديث عرض الصور في الهيدر
-        function renderHeader() {
-            // ... (نفس المنطق السابق مع استبدال الأيقونات بالصور من IMG_ASSETS)
-            // مثال: <img src="${IMG_ASSETS.token}" class="stat-img"> <span>${currentUser.tokens}</span>
+        function showPop(parent, date) {
+            const old = parent.querySelector('.release-pop'); if(old) old.remove();
+            const p = document.createElement('div');
+            p.className = 'release-pop';
+            p.innerText = `Starts: ${date.toLocaleDateString('en-GB', {day:'2-digit', month:'short'})}`;
+            parent.appendChild(p);
+            setTimeout(() => p.remove(), 2500);
         }
 
-        function openChat() {
-            alert("EYC Guide: FairyTale Chat System coming soon! 🧚✨");
-        }
-
+        function closeModal() { document.getElementById('taskModal').style.display = 'none'; }
+        
         window.onload = () => {
-            generateCards();
-            // ... بقية دوال التشغيل
+            renderHeader();
+            switchTab('season', document.querySelector('.tab-btn'));
         };
     </script>
 </body>
