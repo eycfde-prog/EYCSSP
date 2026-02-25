@@ -8,13 +8,11 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root {
-            --gold: #D4AF37;
-            --gold-gradient: linear-gradient(135deg, #bf953f, #fcf6ba, #b38728);
+            --gold: #C5A028; /* ذهبي مطفي قليلاً لراحة العين */
+            --gold-gradient: linear-gradient(135deg, #b38728, #fcf6ba, #bf953f);
             --bg-deep: #030306; 
-            --glass: rgba(255, 255, 255, 0.03);
-            --glass-border: rgba(212, 175, 55, 0.15);
-            --gold-glow: rgba(212, 175, 55, 0.3);
-            --titanium-gradient: linear-gradient(135deg, #71706e, #e5e4e2, #b8b8b8);
+            --glass-border: rgba(212, 175, 55, 0.12);
+            --black-card: rgba(5, 5, 8, 0.9);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; -webkit-tap-highlight-color: transparent; }
@@ -24,71 +22,66 @@
         .star { position: absolute; background: #fff; border-radius: 50%; opacity: 0.3; animation: pulse var(--duration) infinite ease-in-out; }
         @keyframes pulse { 0%, 100% { opacity: 0.2; transform: scale(1); } 50% { opacity: 0.7; transform: scale(1.5); } }
 
-        /* --- Mailbox Special Animations --- */
-        .fa-shake { animation: shake 0.5s infinite; }
-        @keyframes shake {
-            0% { transform: rotate(0deg); }
-            25% { transform: rotate(10deg); }
-            50% { transform: rotate(0deg); }
-            75% { transform: rotate(-10deg); }
-            100% { transform: rotate(0deg); }
-        }
-
         /* --- Top Navigation --- */
-        .top-nav { position: fixed; top: 0; width: 100%; padding: 20px 6%; display: flex; justify-content: space-between; align-items: center; z-index: 1000; backdrop-filter: blur(10px); border-bottom: 1px solid rgba(255,255,255,0.05); }
-        .nav-icon { font-size: 1.2rem; color: var(--gold); cursor: pointer; transition: 0.3s; opacity: 0.8; }
-        .nav-icon:hover { opacity: 1; transform: scale(1.1); filter: drop-shadow(0 0 8px var(--gold)); }
+        .top-nav { position: fixed; top: 0; width: 100%; padding: 15px 6%; display: flex; justify-content: space-between; align-items: center; z-index: 1000; backdrop-filter: blur(15px); border-bottom: 1px solid var(--glass-border); }
+        .nav-icon { font-size: 1.1rem; color: var(--gold); cursor: pointer; transition: 0.3s; opacity: 0.8; }
 
         /* --- Profile Section --- */
-        .hero-banner { width: 100%; padding: 100px 20px 40px; text-align: center; }
-        .profile-card { position: relative; display: inline-flex; flex-direction: column; align-items: center; }
-        .avatar-wrapper { position: relative; width: 120px; height: 120px; padding: 4px; background: var(--gold-gradient); border-radius: 50%; box-shadow: 0 0 30px var(--gold-glow); margin-bottom: 15px; }
-        .avatar-main { width: 100%; height: 100%; border-radius: 50%; border: 4px solid #050508; background-size: cover; background-position: center; }
-        .rank-tag { position: absolute; bottom: -5px; background: #000; border: 1px solid var(--gold); padding: 2px 12px; border-radius: 10px; font-family: 'Orbitron'; font-size: 0.65rem; color: var(--gold); letter-spacing: 1px; }
+        .hero-banner { width: 100%; padding: 110px 20px 30px; text-align: center; }
+        .avatar-wrapper { position: relative; width: 110px; height: 110px; padding: 3px; background: var(--gold-gradient); border-radius: 50%; margin: 0 auto 15px; }
+        .avatar-main { width: 100%; height: 100%; border-radius: 50%; border: 3px solid #050508; background-size: cover; background-position: center; }
+        
+        .student-name { font-family: 'Cinzel', serif; font-size: 1.8rem; letter-spacing: 2px; color: #eee; margin-top: 10px; }
+        
+        .stats-row { display: flex; justify-content: center; gap: 15px; margin-top: 15px; }
+        .stat-badge { background: rgba(255,255,255,0.03); padding: 5px 12px; border-radius: 20px; border: 1px solid var(--glass-border); display: flex; align-items: center; gap: 6px; font-family: 'Orbitron'; font-size: 0.75rem; }
+        .stat-icon { width: 18px; height: 18px; object-fit: contain; }
 
-        .student-name { font-family: 'Cinzel', serif; font-size: clamp(1.4rem, 5vw, 2rem); letter-spacing: 3px; background: var(--gold-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-top: 10px; }
-        .student-title { font-size: 0.7rem; color: #888; text-transform: uppercase; letter-spacing: 3px; margin-top: 5px; }
-
-        .stats-row { display: flex; gap: 20px; margin-top: 20px; background: rgba(255,255,255,0.03); padding: 10px 25px; border-radius: 30px; border: 1px solid var(--glass-border); }
-        .stat-item { font-family: 'Orbitron'; font-size: 0.85rem; display: flex; align-items: center; gap: 8px; }
-        .stat-item span { color: var(--gold); }
-
-        /* --- Grid (Luxury Cards) --- */
-        .grid-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 20px; padding: 0 6% 100px; }
-        .activity-card { background: linear-gradient(145deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.01) 100%); border: 1px solid rgba(255,255,255,0.08); border-radius: 20px; padding: 35px 15px; text-align: center; transition: 0.5s; cursor: pointer; position: relative; overflow: hidden; }
-        .activity-card:hover { transform: translateY(-10px); border-color: var(--gold); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        .card-icon { position: relative; z-index: 1; font-size: 2.2rem; margin-bottom: 15px; background: var(--gold-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-
-        /* --- Modals & Mailbox --- */
-        .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.9); display: none; justify-content: center; align-items: center; z-index: 2000; backdrop-filter: blur(20px); }
-        .modal-content { background: #050508; border-radius: 25px; padding: 40px; width: 90%; max-width: 400px; border: 1px solid var(--glass-border); position: relative; }
-        #mailList::-webkit-scrollbar { width: 5px; }
-        #mailList::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 10px; }
-
-        .btn-exit { background: transparent; border: 1px solid #444; color: #888; padding: 12px 30px; border-radius: 12px; cursor: pointer; font-family: 'Orbitron'; font-size: 0.7rem; transition: 0.3s; width: 100%; }
-        .btn-exit:hover { border-color: var(--gold); color: var(--gold); }
-
-        .tab-switcher { background: #000; padding: 4px; border-radius: 15px; display: flex; border: 1px solid var(--glass-border); width: 90%; max-width: 400px; margin: 20px auto; }
-        .tab-btn { flex: 1; padding: 12px; border: none; background: transparent; color: #666; border-radius: 12px; cursor: pointer; font-weight: 700; font-size: 0.65rem; letter-spacing: 2px; }
+        /* --- Tabs --- */
+        .tab-switcher { background: #000; padding: 5px; border-radius: 50px; display: flex; border: 1px solid var(--glass-border); width: 90%; max-width: 450px; margin: 20px auto; }
+        .tab-btn { flex: 1; padding: 10px; border: none; background: transparent; color: #555; border-radius: 40px; cursor: pointer; font-weight: 700; font-size: 0.65rem; letter-spacing: 1px; transition: 0.4s; }
         .tab-btn.active { color: #000; background: var(--gold-gradient); }
 
-        .tasks-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin: 30px 0; }
-        .task-node { aspect-ratio: 1; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-family: 'Orbitron'; font-size: 0.8rem; }
-        .task-node:hover { background: var(--gold-gradient); color: #000; }
+        /* --- Grid & Cards --- */
+        .grid-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 20px; padding: 0 8% 100px; justify-content: center; }
+        .activity-card { background: var(--black-card); border: 1px solid var(--glass-border); border-radius: 20px; padding: 30px 15px; text-align: center; transition: 0.4s; cursor: pointer; position: relative; }
+        .activity-card:hover { border-color: var(--gold); transform: translateY(-5px); }
+        .card-icon { font-size: 2rem; margin-bottom: 12px; color: var(--gold); }
+        .tk-badge { position: absolute; top: 10px; right: 10px; font-family: 'Orbitron'; font-size: 0.6rem; color: var(--gold); opacity: 0.8; }
+
+        /* --- Tasks & Locks --- */
+        .tasks-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin: 25px 0; }
+        .task-node { position: relative; aspect-ratio: 1; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-family: 'Orbitron'; font-size: 0.8rem; transition: 0.3s; }
+        .lock-icon { position: absolute; font-size: 0.6rem; bottom: -5px; color: var(--gold); filter: drop-shadow(0 0 5px #000); }
+        .date-toast { position: absolute; top: -35px; left: 50%; transform: translateX(-50%); background: #000; color: var(--gold); padding: 4px 8px; border-radius: 5px; font-size: 0.6rem; border: 1px solid var(--gold); display: none; white-space: nowrap; z-index: 10; }
+
+        /* --- Fairytale Guide --- */
+        .guide-floating { position: fixed; bottom: 30px; right: 30px; width: 60px; height: 60px; background: var(--gold-gradient); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 0 20px var(--gold-glow); animation: float 3s infinite ease-in-out; z-index: 5000; }
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
+
+        /* --- Mailbox Premium Style --- */
+        .mail-item { background: #08080c; border: 1px solid #1a1a1a; padding: 20px; border-radius: 15px; margin-bottom: 15px; position: relative; border-left: 3px solid var(--gold); }
+        .mail-header { display: flex; justify-content: space-between; font-size: 0.65rem; color: #555; margin-bottom: 10px; font-family: 'Orbitron'; }
+        
+        .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.92); display: none; justify-content: center; align-items: center; z-index: 2000; backdrop-filter: blur(15px); }
+        .modal-content { background: #050508; border-radius: 30px; padding: 30px; width: 90%; max-width: 450px; border: 1px solid var(--glass-border); }
+
+        input { width: 100%; padding: 15px; margin: 10px 0; border-radius: 15px; background: rgba(255,255,255,0.03); border: 1px solid #222; color: #fff; }
+        .btn-gold { width: 100%; padding: 15px; border-radius: 15px; background: var(--gold-gradient); border: none; font-weight: 900; font-family: 'Orbitron'; cursor: pointer; color: #000; }
     </style>
 </head>
 <body>
 
     <div id="star-container"></div>
 
+    <div class="guide-floating" onclick="alert('Welcome to EYC Guide! Chat coming soon...')">
+        <i class="fas fa-hat-wizard" style="font-size: 1.5rem; color: #000;"></i>
+    </div>
+
     <nav class="top-nav">
         <i class="fas fa-arrow-left nav-icon" onclick="window.location.href='index.html'"></i>
-        
-        <div style="position: relative; display: flex; align-items: center; gap: 15px;">
-            <div id="notifBell" class="nav-icon" onclick="openMailbox()" style="position: relative;">
-                <i class="fas fa-bell"></i>
-                <span id="notifDot" style="display:none; position: absolute; top: -5px; right: -5px; width: 10px; height: 10px; background: red; border-radius: 50%; border: 2px solid var(--bg-deep);"></span>
-            </div>
+        <div style="display: flex; gap: 20px; align-items: center;">
+            <div id="notifBell" class="nav-icon" onclick="openMailbox()"><i class="fas fa-comment-alt"></i></div>
             <i class="fas fa-power-off nav-icon" id="logoutBtn" style="display:none;" onclick="handleLogout()"></i>
         </div>
     </nav>
@@ -97,169 +90,99 @@
 
     <div class="tab-switcher">
         <button class="tab-btn active" onclick="switchType('season', this)">SEASON</button>
-        <button class="tab-btn" onclick="switchType('royal', this)">ROYAL</button>
-        <button class="tab-btn" onclick="switchType('titanium', this)">TITANIUM</button>
+        <button class="tab-btn" onclick="switchType('royal', this)">ROYAL X</button>
     </div>
 
     <main><div class="grid-container" id="cardsGrid"></div></main>
 
-    <div class="modal" id="mailModal">
-        <div class="modal-content" style="max-width: 450px; padding: 25px;">
-            <div id="mailboxView">
-                <h2 style="font-family:'Orbitron'; color:var(--gold); font-size: 1.2rem; margin-bottom: 20px;">
-                    <i class="fas fa-envelope-open-text"></i> COMMS CENTER
-                </h2>
-                <div id="mailList" style="max-height: 350px; overflow-y: auto; margin-bottom: 20px;"></div>
-                <button class="btn-exit" onclick="closeModal('mailModal')">CLOSE</button>
-            </div>
-            <div id="mailDetailView" style="display: none;">
-                <button class="btn-exit" onclick="backToMailbox()" style="width: auto; padding: 5px 15px; margin-bottom: 15px;">
-                    <i class="fas fa-chevron-left"></i> BACK
-                </button>
-                <div id="fullMessageContent" style="color: #eee; line-height: 1.6; font-size: 0.9rem; background: rgba(255,255,255,0.05); padding: 20px; border-radius: 15px; border: 1px solid var(--glass-border);"></div>
-            </div>
-        </div>
-    </div>
-
     <div class="modal" id="taskModal">
         <div class="modal-content">
-            <h2 id="mTitle" style="text-align:center; font-family:'Cinzel'; color:#fff; margin-bottom:20px;">MISSION</h2>
+            <h2 id="mTitle" style="text-align:center; font-family:'Cinzel'; color:var(--gold);">MISSION</h2>
             <div class="tasks-grid" id="tGrid"></div>
-            <button class="btn-exit" onclick="closeModal('taskModal')">CLOSE</button>
+            <button class="btn-gold" style="background:transparent; border:1px solid #333; color:#555;" onclick="closeModal('taskModal')">CLOSE</button>
         </div>
     </div>
 
-    <div class="modal" id="loginModal">
+    <div class="modal" id="mailModal">
         <div class="modal-content">
-            <h2 style="font-family:'Cinzel'; color:var(--gold); text-align:center; margin-bottom:20px;">AUTHENTICATION</h2>
-            <input type="email" id="loginEmail" style="width:100%; padding:15px; margin:8px 0; border-radius:12px; background:rgba(255,255,255,0.05); border:1px solid #333; color:#fff;" placeholder="EMAIL">
-            <input type="password" id="loginCode" style="width:100%; padding:15px; margin:8px 0; border-radius:12px; background:rgba(255,255,255,0.05); border:1px solid #333; color:#fff;" placeholder="CODE">
-            <button onclick="handleLogin()" id="loginSubmitBtn" style="width:100%; margin-top:15px; padding:15px; border-radius:12px; background:var(--gold-gradient); border:none; font-weight:900; cursor:pointer;">SIGN IN</button>
-            <button class="btn-exit" style="margin-top:10px;" onclick="closeModal('loginModal')">CANCEL</button>
+            <h2 style="font-family:'Orbitron'; color:var(--gold); font-size: 1rem; margin-bottom: 20px;">COMMUNICATION LOGS</h2>
+            <div id="mailList" style="max-height: 400px; overflow-y: auto;"></div>
+            <button class="btn-gold" style="margin-top:20px;" onclick="closeModal('mailModal')">DISMISS</button>
         </div>
     </div>
 
     <script>
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwCGnW1crqrjMSxFxPP0D7p6hghDO9og63yZW5qvF17WvaqBM_IrsAHU3fVID5qRVl7/exec";
+        const IMG_TOKEN = "https://raw.githubusercontent.com/eycfde-prog/EYCSSP/047aeca8ef0fa0d95627552cfb62fd8300531134/frontend/eyclgos/Token.png";
+        const IMG_STAR = "https://raw.githubusercontent.com/eycfde-prog/EYCSSP/047aeca8ef0fa0d95627552cfb62fd8300531134/frontend/eyclgos/Star.png";
+        const IMG_GT = "https://raw.githubusercontent.com/eycfde-prog/EYCSSP/047aeca8ef0fa0d95627552cfb62fd8300531134/frontend/eyclgos/GT.png";
+
         let currentUser = null;
         let isLoggedIn = false;
 
-        // 1. Mailbox Logic
-        function getLocalMails() { return JSON.parse(localStorage.getItem('eyc_mails') || '[]'); }
-        function saveLocalMails(mails) { localStorage.setItem('eyc_mails', JSON.stringify(mails)); }
-
-        function checkNewNotification(serverMsg) {
-            if (!serverMsg || serverMsg.trim() === "" || serverMsg === "NO ACTIVE LOGS") return;
-            let localMails = getLocalMails();
-            const exists = localMails.some(m => m.text === serverMsg);
-            if (!exists) {
-                localMails.unshift({ text: serverMsg, date: new Date().toLocaleString(), read: false });
-                saveLocalMails(localMails);
-                document.getElementById('notifDot').style.display = 'block';
-                document.getElementById('notifBell').classList.add('fa-shake');
-            }
-        }
-
-        function openMailbox() {
-            document.getElementById('notifDot').style.display = 'none';
-            document.getElementById('notifBell').classList.remove('fa-shake');
-            document.getElementById('mailModal').style.display = 'flex';
-            backToMailbox();
-            renderMailList();
-        }
-
-        function renderMailList() {
-            const list = document.getElementById('mailList');
-            const mails = getLocalMails();
-            list.innerHTML = mails.length === 0 ? '<p style="color:#666; text-align:center; padding:20px;">No messages found.</p>' : '';
-            mails.forEach((mail, index) => {
-                const item = document.createElement('div');
-                item.style = `padding: 15px; margin-bottom: 10px; border-radius: 12px; cursor: pointer; transition: 0.3s;
-                              background: ${mail.read ? 'rgba(255,255,255,0.02)' : 'rgba(212,175,55,0.1)'};
-                              border-left: 4px solid ${mail.read ? '#333' : 'var(--gold)'};`;
-                item.innerHTML = `<div style="font-size: 0.6rem; color: #888; margin-bottom: 5px;">${mail.date}</div><div style="font-size: 0.8rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${mail.text}</div>`;
-                item.onclick = () => readMail(index);
-                list.appendChild(item);
-            });
-        }
-
-        function readMail(index) {
-            let mails = getLocalMails();
-            mails[index].read = true;
-            saveLocalMails(mails);
-            document.getElementById('mailboxView').style.display = 'none';
-            document.getElementById('mailDetailView').style.display = 'block';
-            document.getElementById('fullMessageContent').innerText = mails[index].text;
-        }
-
-        function backToMailbox() {
-            document.getElementById('mailDetailView').style.display = 'none';
-            document.getElementById('mailboxView').style.display = 'block';
-            renderMailList();
-        }
-
-        // 2. Profile & Dashboard Logic
-        function renderHeader() {
-            const header = document.getElementById('heroBanner');
-            const logoutBtn = document.getElementById('logoutBtn');
-            if (isLoggedIn) {
-                logoutBtn.style.display = "block";
-                header.innerHTML = `
-                    <div class="profile-card">
-                        <div class="avatar-wrapper">
-                            <div class="avatar-main" style="background-image: url('${currentUser.avatar || ''}')"></div>
-                            <div class="rank-tag">RANK #${currentUser.rank}</div>                       
-                        </div>
-                        <h1 class="student-name">${currentUser.name}</h1>
-                        <p class="student-title">${currentUser.title}</p>
-                        <div class="stats-row">
-                            <div class="stat-item">🪙 <span>${currentUser.tokens || 0}</span></div>
-                            <div class="stat-item">⭐ <span>${currentUser.stars || 0}</span></div>
-                            <div class="stat-item">🎟️ <span style="color:#FFD700">${currentUser.goldTickets || 0}</span></div>
-                            <i class="fas fa-sync-alt stat-item" style="cursor:pointer; font-size:0.7rem;" onclick="refreshUserData()"></i>
-                        </div>
-                    </div>`;
-                checkNewNotification(currentUser.lastNotification);
-            } else {
-                logoutBtn.style.display = "none";
-                header.innerHTML = `<h1 class="student-name">ARENA ACCESS</h1><div style="margin-top:20px;"><button class="btn-exit" style="width:auto;" onclick="openLogin()">AUTHORIZE LOGIN</button></div>`;
-            }
-        }
-
-        // Activities Data
         const activities = {
             season: [
-                { name: "Alike", icon: "fa-clone", code: "AS" },
-                { name: "Vivid", icon: "fa-wand-magic-sparkles", code: "VV" },
-                { name: "Label", icon: "fa-tag", code: "LB" },
-                { name: "Grammar", icon: "fa-spell-check", code: "GR" },
-                { name: "Golden Ear", icon: "fa-ear-listen", code: "GE" },
-                { name: "Seeds", icon: "fa-seedling", code: "SD" }
+                { name: "Alike", icon: "fa-clone", code: "AS", tk: 50 },
+                { name: "Vivid", icon: "fa-wand-magic-sparkles", code: "VV", tk: 50 },
+                { name: "Label", icon: "fa-tag", code: "LB", tk: 50 },
+                { name: "Grammar", icon: "fa-spell-check", code: "GR", tk: 50 },
+                { name: "Golden Ear", icon: "fa-ear-listen", code: "GE", tk: 50 },
+                { name: "Seeds", icon: "fa-seedling", code: "SD", tk: 50 }
             ],
             royal: [
-                { name: "AlikeX", icon: "fa-star", code: "ASX" },
-                { name: "VividX", icon: "fa-wand-magic", code: "VVX" },
-                { name: "LabelX", icon: "fa-tags", code: "LBX" },
-                { name: "SeedsX", icon: "fa-tree", code: "SDX" },
-                { name: "Golden EarX", icon: "fa-ear-deaf", code: "GEX" },
-                { name: "GrammarX", icon: "fa-pen-fancy", code: "GRX" }
-            ],
-            titanium: [
-                { name: "DictationX", icon: "fa-microphone-lines", code: "DTX" },
-                { name: "Sing Sang Sung", icon: "fa-music", code: "SSSX" },
-                { name: "ElmagazineX", icon: "fa-book-open", code: "EMX" },
-                { name: "FigurativeX", icon: "fa-mask", code: "FGX" }
+                { name: "Alike X", icon: "fa-star", code: "ASX", tk: 50 },
+                { name: "Label X", icon: "fa-tags", code: "LBX", tk: 50 },
+                { name: "Golden Ear X", icon: "fa-ear-deaf", code: "GEX", tk: 50 },
+                { name: "Grammar X", icon: "fa-pen-fancy", code: "GRX", tk: 50 },
+                { name: "Vivid X", icon: "fa-wand-magic", code: "VVX", tk: 50 },
+                { name: "Seeds X", icon: "fa-tree", code: "SDX", tk: 50 },
+                { name: "Figurative X", icon: "fa-mask", code: "FGX", tk: 50 },
+                { name: "Dictation X", icon: "fa-microphone-lines", code: "DTX", tk: 100 },
+                { name: "Sing Sang Sung X", icon: "fa-music", code: "SSSX", tk: 100 },
+                { name: "Elmagazine X", icon: "fa-book-open", code: "EMX", tk: 100 }
             ]
         };
 
+        function getTaskDate(type, taskIndex) {
+            const startSeason = new Date("2026-02-26");
+            const startRoyal = new Date("2026-02-28");
+            let d = new Date(type === 'season' ? startSeason : startRoyal);
+            
+            if (type === 'season') {
+                let daysToAdd = 0;
+                for(let i=1; i<taskIndex; i++) daysToAdd += (i + 3);
+                d.setDate(d.getDate() + daysToAdd);
+            } else {
+                d.setDate(d.getDate() + (taskIndex - 1) * 3);
+            }
+            return d;
+        }
+
+        function renderHeader() {
+            const header = document.getElementById('heroBanner');
+            if (isLoggedIn) {
+                document.getElementById('logoutBtn').style.display = "block";
+                header.innerHTML = `
+                    <div class="avatar-wrapper"><div class="avatar-main" style="background-image: url('${currentUser.avatar}')"></div></div>
+                    <h1 class="student-name">${currentUser.name}</h1>
+                    <div class="stats-row">
+                        <div class="stat-badge"><img src="${IMG_TOKEN}" class="stat-icon"><span>${currentUser.tokens}</span></div>
+                        <div class="stat-badge"><img src="${IMG_STAR}" class="stat-icon"><span>${currentUser.stars}</span></div>
+                        <div class="stat-badge"><img src="${IMG_GT}" class="stat-icon"><span>${currentUser.goldTickets}</span></div>
+                    </div>`;
+            } else {
+                header.innerHTML = `<h1 class="student-name">ARENA COMMAND</h1><button class="btn-gold" style="width:auto; margin-top:20px; padding:10px 30px;" onclick="alert('Please Login from Main Page')">GUEST VIEW</button>`;
+            }
+        }
+
         function generateCards() {
             const grid = document.getElementById('cardsGrid'); grid.innerHTML = '';
-            const type = document.querySelector('.tab-btn.active').innerText.toLowerCase();
+            const type = document.querySelector('.tab-btn.active').innerText.includes('ROYAL') ? 'royal' : 'season';
             activities[type].forEach(act => {
                 const card = document.createElement('div');
                 card.className = 'activity-card';
-                card.innerHTML = `<i class="fa-solid ${act.icon} card-icon"></i><h3>${act.name}</h3>`;
-                card.onclick = () => openTasks(act.name, act.code);
+                card.innerHTML = `<span class="tk-badge">${act.tk} TK</span><i class="fa-solid ${act.icon} card-icon"></i><h3 style="font-size:0.8rem; font-family:'Orbitron'; color:#aaa;">${act.name}</h3>`;
+                card.onclick = () => openTasks(act.name, act.code, type);
                 grid.appendChild(card);
             });
         }
@@ -270,59 +193,35 @@
             generateCards();
         }
 
-        function openTasks(name, code) {
-            if (!isLoggedIn) return openLogin();
+        function openTasks(name, code, type) {
             document.getElementById('mTitle').innerText = name;
             const tGrid = document.getElementById('tGrid'); tGrid.innerHTML = '';
-            const tasksCount = (document.querySelector('.tab-btn.active').innerText === 'TITANIUM') ? 5 : 10;
-            for (let i = 1; i <= tasksCount; i++) {
+            for (let i = 1; i <= 10; i++) {
                 const node = document.createElement('div');
                 node.className = 'task-node';
-                node.innerText = i;
+                node.innerHTML = `${i} <i class="fas fa-lock lock-icon"></i><div class="date-toast" id="toast-${i}">${getTaskDate(type, i).toDateString()}</div>`;
                 node.onclick = () => {
-                    const params = new URLSearchParams({ email: currentUser.email, name: currentUser.name, act: code, task: i });
-                    window.location.href = `EYCArena.html?${params.toString()}`;
+                    if (!isLoggedIn) return alert("System Authorization Required. Please Login.");
+                    const toast = document.getElementById(`toast-${i}`);
+                    toast.style.display = 'block';
+                    setTimeout(() => toast.style.display = 'none', 2000);
                 };
                 tGrid.appendChild(node);
             }
             document.getElementById('taskModal').style.display = 'flex';
         }
 
-        function handleLogin() {
-            const email = document.getElementById('loginEmail').value.trim();
-            const code = document.getElementById('loginCode').value.trim();
-            const btn = document.getElementById('loginSubmitBtn');
-            btn.innerText = "AUTHENTICATING...";
-            fetch(`${SCRIPT_URL}?action=getProfile&email=${email}&code=${code}`)
-                .then(res => res.json())
-                .then(res => {
-                    if (res.status === "success") {
-                        currentUser = res; currentUser.email = email; isLoggedIn = true;
-                        localStorage.setItem('eyc_user', JSON.stringify(currentUser));
-                        localStorage.setItem('eyc_user_code', code);
-                        closeModal('loginModal'); renderHeader(); generateCards();
-                    } else alert(res.message);
-                    btn.innerText = "SIGN IN";
-                });
+        function openMailbox() {
+            const list = document.getElementById('mailList');
+            list.innerHTML = `<div class="mail-item"><div class="mail-header"><span>SYSTEM</span><span>NOW</span></div><div style="font-size:0.8rem;">Welcome to the Elite Command Center. All missions are currently under lockdown until Feb 26.</div></div>`;
+            document.getElementById('mailModal').style.display = 'flex';
         }
 
-        function refreshUserData() {
-            if (!currentUser) return;
-            const code = localStorage.getItem('eyc_user_code');
-            fetch(`${SCRIPT_URL}?action=getProfile&email=${currentUser.email}&code=${code}`)
-                .then(res => res.json())
-                .then(res => {
-                    if (res.status === "success") { currentUser = res; renderHeader(); }
-                });
-        }
-
-        function handleLogout() { if(confirm("Terminate Session?")) { localStorage.clear(); location.reload(); } }
-        function openLogin() { document.getElementById('loginModal').style.display = 'flex'; }
         function closeModal(id) { document.getElementById(id).style.display = 'none'; }
 
         function createStars() {
             const container = document.getElementById('star-container');
-            for (let i = 0; i < 60; i++) {
+            for (let i = 0; i < 50; i++) {
                 const star = document.createElement('div');
                 star.className = 'star';
                 star.style.width = '2px'; star.style.height = '2px';
@@ -331,8 +230,6 @@
                 container.appendChild(star);
             }
         }
-
-        setInterval(() => { if (isLoggedIn) refreshUserData(); }, 30000);
 
         window.onload = () => {
             createStars();
