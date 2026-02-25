@@ -3,159 +3,171 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>EYC Superstars | Royal Beacon Interface</title>
+    <title>EYC Superstars | Emerald Command</title>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Orbitron:wght@400;700;900&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
     <style>
         :root {
-            --gold: #D4AF37;
-            --gold-light: #fcf6ba;
-            --gold-gradient: linear-gradient(135deg, #bf953f, #fcf6ba, #b38728);
-            --royal-green: #043927;
-            --green-glow: rgba(4, 57, 39, 0.6);
-            --bg-deep: #050508;
-            --gold-glow: rgba(212, 175, 55, 0.4);
-            --glass-border: rgba(212, 175, 55, 0.2);
+            /* التحول للزمردي الملكي */
+            --emerald: #50C878;
+            --emerald-light: #99EDC3;
+            --emerald-gradient: linear-gradient(135deg, #046307, #50C878, #2E8B57);
+            --bg-deep: #020a05; /* أسود بلمحة خضراء عميقة */
+            --emerald-glow: rgba(80, 200, 120, 0.4);
+            --glass-border: rgba(80, 200, 120, 0.2);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; -webkit-tap-highlight-color: transparent; }
         body { background: var(--bg-deep); color: white; min-height: 100vh; overflow-x: hidden; }
 
-        /* Background & Canvas */
+        /* Background Effects */
         #letter-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; opacity: 0.25; }
         .bg-glow {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: radial-gradient(circle at 50% 50%, rgba(212, 175, 55, 0.03) 0%, transparent 70%);
+            background: radial-gradient(circle at 50% 50%, rgba(80, 200, 120, 0.08) 0%, transparent 70%);
             z-index: -1;
         }
 
         nav {
             display: flex; justify-content: space-between; align-items: center;
             padding: 0 6%; height: 75px; position: sticky; top: 0; z-index: 1000;
-            background: rgba(5, 5, 8, 0.85); backdrop-filter: blur(20px);
+            background: rgba(2, 10, 5, 0.85); backdrop-filter: blur(20px);
             border-bottom: 1px solid var(--glass-border);
         }
 
-        .logo-text { font-family: 'Orbitron'; color: var(--gold); font-weight: 900; letter-spacing: 2px; font-size: 0.85rem; }
+        .logo-text { font-family: 'Orbitron'; color: var(--emerald); font-weight: 900; letter-spacing: 3px; font-size: 0.9rem; }
 
-        /* Beacon (Hero) Section */
-        .beacon-section { text-align: center; padding: 60px 20px 20px; position: relative; }
-        
-        .beacon-container { position: relative; display: inline-block; }
-        
-        /* تأثير النار الهادئة خلف اللوجو */
-        .fire-embers {
-            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            width: 200px; height: 200px; background: radial-gradient(circle, var(--gold-glow) 0%, transparent 70%);
-            z-index: -1; filter: blur(20px); animation: pulseFire 4s ease-in-out infinite;
-        }
-
+        /* Hero Section */
+        .hero { text-align: center; padding: 40px 20px 0px; }
         .main-logo {
-            width: 140px; /* تم تكبيره */
-            filter: drop-shadow(0 0 25px var(--gold-glow));
-            transition: transform 1s ease;
+            width: 85px; margin-bottom: 15px;
+            filter: drop-shadow(0 0 15px var(--emerald-glow));
+            transition: transform 0.8s ease;
         }
 
-        .beacon-section h1 {
-            font-family: 'Cinzel', serif; 
-            font-size: clamp(1.8rem, 8vw, 3.5rem);
-            background: var(--gold-gradient);
+        .hero h1 {
+            font-family: 'Cinzel', serif; font-size: clamp(2.2rem, 10vw, 4.2rem);
+            background: var(--emerald-gradient);
             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            line-height: 1.2; 
-            letter-spacing: clamp(2px, 1vw, 5px); /* مرونة المسافات للموبايل */
-            margin-top: 15px;
-            filter: drop-shadow(0 0 10px rgba(212,175,55,0.2));
+            line-height: 1.1; letter-spacing: 6px; margin-bottom: 5px;
+            filter: drop-shadow(0 0 12px rgba(80, 200, 120, 0.3));
         }
 
         /* Mission Control */
         .mission-control {
             display: flex; flex-direction: column; align-items: center;
-            padding-bottom: 80px; /* زيادة التباعد السفلي للموبايل */
+            padding-bottom: 80px;
         }
 
         .core-container {
             position: relative; 
-            width: clamp(260px, 75vw, 340px);
+            width: clamp(260px, 75vw, 340px); /* تقليل الحجم قليلاً للموبايل لترك مساحة */
             height: clamp(260px, 75vw, 340px);
             display: flex; align-items: center; justify-content: center;
             cursor: pointer; transform-style: preserve-3d;
-            margin: 40px 0;
+            margin: 30px 0; /* زيادة الهامش */
         }
 
-        .core-ring { position: absolute; border-radius: 50%; border: 1px solid var(--glass-border); transition: 0.5s ease; }
-        .ring-outer { width: 100%; height: 100%; border-style: double; border-width: 2px; animation: rotateRight 30s linear infinite; }
-        .ring-inner { width: 75%; height: 75%; border-style: dashed; border-width: 1px; opacity: 0.4; animation: rotateLeft 20s linear infinite; }
-
-        .main-core-btn {
-            width: 55%; height: 55%;
-            background: radial-gradient(circle, #0a0a0f 0%, #000 100%);
-            border: 1px solid var(--gold); border-radius: 50%;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            color: var(--gold); font-family: 'Orbitron'; font-weight: 900;
-            box-shadow: 0 0 30px rgba(212, 175, 55, 0.15);
-            transition: all 0.8s cubic-bezier(0.2, 1, 0.2, 1); z-index: 10;
-        }
-
-        /* Hover Effect: Royal Green */
-        .core-container:hover .main-core-btn {
-            transform: scale(1.08);
-            box-shadow: 0 0 50px var(--green-glow);
-            border-color: #2ecc71;
-            color: #fff;
-        }
-
-        .btn-stack {
-            display: flex; flex-direction: column;
-            gap: 20px; width: 100%; max-width: 300px; padding: 20px;
-            margin-top: 30px; /* زيادة التباعد عن الـ Core */
-        }
-
-        .nav-btn {
-            width: 100%; padding: 18px; border-radius: 15px;
-            background: rgba(255, 255, 255, 0.02); color: #ccc;
+        .core-ring {
+            position: absolute; border-radius: 50%;
             border: 1px solid var(--glass-border);
-            backdrop-filter: blur(10px);
-            cursor: pointer; transition: 0.4s; 
-            font-family: 'Orbitron'; text-decoration: none; text-align: center; 
-            font-size: 0.75rem; font-weight: 700; letter-spacing: 2px;
+            transition: 0.5s ease;
         }
 
-        .nav-btn:hover { 
-            background: var(--gold-gradient); color: #000;
-            transform: translateY(-5px); border-color: transparent;
+        .ring-outer {
+            width: 100%; height: 100%;
+            border-style: double; border-width: 2px;
+            animation: rotateRight 30s linear infinite;
         }
 
-        @keyframes pulseFire {
-            0%, 100% { opacity: 0.4; transform: translate(-50%, -50%) scale(1); }
-            50% { opacity: 0.7; transform: translate(-50%, -50%) scale(1.1); }
+        .ring-inner {
+            width: 75%; height: 75%;
+            border-style: dashed; border-width: 1px;
+            opacity: 0.4;
+            animation: rotateLeft 20s linear infinite;
         }
+
         @keyframes rotateRight { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
         @keyframes rotateLeft { from { transform: rotate(360deg); } to { transform: rotate(0deg); } }
 
-        footer { padding: 40px; text-align: center; border-top: 1px solid var(--glass-border); opacity: 0.6; }
+        .main-core-btn {
+            width: 50%; height: 50%;
+            background: radial-gradient(circle, rgba(10, 30, 15, 0.95) 0%, #020a05 100%);
+            border: 1px solid var(--emerald);
+            border-radius: 50%;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            color: var(--emerald); font-family: 'Orbitron'; font-weight: 900;
+            box-shadow: 0 0 40px rgba(80, 200, 120, 0.2), inset 0 0 15px var(--emerald-glow);
+            transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+            z-index: 10;
+        }
 
-        .star { position: absolute; width: 2px; height: 2px; background: var(--gold); border-radius: 50%; pointer-events: none; }
+        .core-container:hover .main-core-btn {
+            transform: scale(1.05);
+            box-shadow: 0 0 60px var(--emerald-glow);
+            border-color: var(--emerald-light);
+            color: #fff;
+        }
+
+        /* Button Stack */
+        .btn-stack {
+            display: flex; flex-direction: column;
+            gap: 20px; width: 100%; max-width: 320px; padding: 0 25px;
+            margin-top: 10px; /* فصل واضح عن الدائرة */
+        }
+
+        .nav-btn {
+            width: 100%; padding: 18px; border-radius: 14px;
+            background: rgba(80, 200, 120, 0.05); color: #e0e0e0;
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(15px);
+            cursor: pointer; transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1); 
+            font-family: 'Orbitron'; text-decoration: none; text-align: center; 
+            font-size: 0.85rem; font-weight: 700; letter-spacing: 2px;
+            text-transform: uppercase; position: relative; overflow: hidden;
+        }
+
+        .nav-btn:hover { 
+            background: var(--emerald-gradient);
+            color: #fff;
+            letter-spacing: 3px;
+            transform: translateY(-3px);
+            box-shadow: 0 12px 25px rgba(80, 200, 120, 0.25);
+            border-color: transparent;
+        }
+
+        /* Utility */
+        #lightning-flash {
+            position: fixed; inset: 0; background: var(--emerald-light); z-index: 9999;
+            opacity: 0; pointer-events: none;
+        }
+        @keyframes flashEffect {
+            0% { opacity: 0; } 20% { opacity: 0.7; } 100% { opacity: 0; }
+        }
+
+        footer { padding: 30px; text-align: center; border-top: 1px solid var(--glass-border); }
+
+        .star {
+            position: absolute; width: 3px; height: 3px;
+            background: var(--emerald); border-radius: 50%;
+            box-shadow: 0 0 8px var(--emerald); pointer-events: none;
+        }
     </style>
 </head>
 <body>
 
-    <div id="lightning-flash" style="position:fixed; inset:0; background:#fff; z-index:9999; opacity:0; pointer-events:none;"></div>
+    <div id="lightning-flash"></div>
     <div class="bg-glow"></div>
     <canvas id="letter-canvas"></canvas>
 
     <nav>
-        <div class="logo-text">EYC_PROTOCOL_v2.6</div>
-        <div style="color: var(--gold); cursor: pointer; animation: pulseFire 2s infinite;">
-            <i class="fas fa-layer-group fa-lg"></i>
-        </div>
+        <div class="logo-text">EYC SYSTEM_v2.6</div>
+        <div style="color: var(--emerald); cursor: pointer;"><i class="fas fa-layer-group fa-lg"></i></div>
     </nav>
 
-    <header class="beacon-section">
-        <div class="beacon-container">
-            <div class="fire-embers"></div>
-            <img src="logo.png" alt="EYC Beacon" class="main-logo">
-        </div>
+    <header class="hero">
+        <img src="logo.png" alt="EYC Logo" class="main-logo">
         <h1>SUPERSTARS</h1>
     </header>
 
@@ -165,26 +177,25 @@
             <div class="core-ring ring-outer"></div>
             <div class="core-ring ring-inner"></div>
             <div class="main-core-btn">
-                <i class="fas fa-bolt-lightning" style="font-size: 2.2rem; margin-bottom: 12px;"></i>
-                <span style="letter-spacing: 4px; font-size: 0.75rem;">LAUNCH</span>
+                <i class="fas fa-bolt-lightning" style="font-size: 2.5rem; margin-bottom: 10px; filter: drop-shadow(0 0 10px var(--emerald));"></i>
+                <span style="letter-spacing: 4px; font-size: 0.8rem;">LAUNCH</span>
             </div>
         </div>
         
         <div class="btn-stack">
-            <a href="NP.html" class="nav-btn">Establish Profile</a>
+            <a href="NP.html" class="nav-btn">New Player</a>
             <a href="RNKS.html" class="nav-btn">Hall of Fame</a>
             <a href="Rev.html" class="nav-btn">Elite Reviews</a>
         </div>
     </section>
 
     <footer>
-        <div style="font-family: 'Orbitron'; font-size: 0.6rem; letter-spacing: 2px;">
-            &copy; 2026 EYC ACADEMY | THE ROYAL COMMAND
+        <div style="color: var(--emerald); font-family: 'Orbitron'; font-size: 0.65rem; letter-spacing: 2px; opacity: 0.7;">
+            &copy; 2026 EYC ACADEMY | EMERALD INTERFACE
         </div>
     </footer>
 
     <script>
-        // --- Beacon Fire Particles (Simple implementation inside canvas) ---
         const canvas = document.getElementById('letter-canvas');
         const ctx = canvas.getContext('2d');
         let particles = [];
@@ -199,22 +210,22 @@
             init() {
                 this.x = Math.random() * canvas.width;
                 this.y = Math.random() * canvas.height;
-                this.char = ["E", "Y", "C", "★"][Math.floor(Math.random()*4)];
-                this.fontSize = Math.random() * 10 + 6;
-                this.speed = Math.random() * 0.3 + 0.1;
+                this.char = ["E", "Y", "C", "0", "1"][Math.floor(Math.random()*5)];
+                this.fontSize = Math.random() * 12 + 8;
+                this.speed = Math.random() * 0.4 + 0.1;
                 this.opacity = Math.random() * 0.2;
             }
             update() {
                 this.y -= this.speed;
                 if (this.y < -20) this.y = canvas.height + 20;
-                ctx.fillStyle = `rgba(212, 175, 55, ${this.opacity})`;
-                ctx.font = `${this.fontSize}px Orbitron`;
+                ctx.fillStyle = `rgba(80, 200, 120, ${this.opacity})`;
+                ctx.font = `900 ${this.fontSize}px Orbitron`;
                 ctx.fillText(this.char, this.x, this.y);
             }
         }
 
         function createParticles() {
-            particles = Array.from({length: 40}, () => new LetterParticle());
+            particles = Array.from({length: 35}, () => new LetterParticle());
         }
 
         function animate() {
@@ -223,39 +234,51 @@
             requestAnimationFrame(animate);
         }
 
-        function startLaunch() {
-            const flash = document.getElementById('lightning-flash');
-            flash.style.transition = "opacity 0.1s";
-            flash.style.opacity = "1";
+        function createStars() {
+            const orbit = document.getElementById('starOrbit');
+            orbit.innerHTML = '';
+            const count = 12;
+            const containerSize = orbit.offsetWidth / 2;
             
-            if (window.navigator.vibrate) window.navigator.vibrate([40, 40, 40]);
-            
-            setTimeout(() => {
-                flash.style.transition = "opacity 0.6s";
-                flash.style.opacity = "0";
-                setTimeout(() => { window.location.href = "MC.html"; }, 300);
-            }, 100);
+            for (let i = 0; i < count; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                const angle = (i / count) * Math.PI * 2;
+                const radius = containerSize * 0.85; 
+                let currentAngle = angle;
+                
+                function moveStar() {
+                    currentAngle += 0.008;
+                    const x = Math.cos(currentAngle) * radius + containerSize;
+                    const y = Math.sin(currentAngle) * radius + containerSize;
+                    star.style.left = x + 'px';
+                    star.style.top = y + 'px';
+                    star.style.opacity = Math.sin(currentAngle * 2) * 0.4 + 0.6;
+                    requestAnimationFrame(moveStar);
+                }
+                orbit.appendChild(star);
+                moveStar();
+            }
         }
 
-        window.addEventListener('resize', () => { initCanvas(); createParticles(); });
-        initCanvas(); createParticles(); animate();
-        
-        // Star Orbit
-        const orbit = document.getElementById('starOrbit');
-        for (let i = 0; i < 10; i++) {
-            const star = document.createElement('div');
-            star.className = 'star';
-            orbit.appendChild(star);
-            let angle = (i / 10) * Math.PI * 2;
-            function move() {
-                angle += 0.005;
-                const r = orbit.offsetWidth / 2 * 0.9;
-                star.style.left = (Math.cos(angle) * r + orbit.offsetWidth/2) + 'px';
-                star.style.top = (Math.sin(angle) * r + orbit.offsetHeight/2) + 'px';
-                requestAnimationFrame(move);
+        function startLaunch() {
+            const flash = document.getElementById('lightning-flash');
+            flash.style.animation = "flashEffect 0.5s ease-out forwards";
+            
+            if (window.navigator.vibrate) {
+                window.navigator.vibrate([50, 30, 50]);
             }
-            move();
+            
+            setTimeout(() => {
+                window.location.href = "MC.html"; 
+            }, 450);
         }
+
+        window.addEventListener('resize', () => { initCanvas(); createParticles(); createStars(); });
+        initCanvas();
+        createParticles();
+        animate();
+        createStars();
     </script>
 </body>
 </html>
