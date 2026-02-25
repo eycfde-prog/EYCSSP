@@ -3,244 +3,271 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>EYC Arena | Titanium Mode</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Orbitron:wght@400;500;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <title>EYC Super Stars | Elite Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Orbitron:wght@400;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="mcstyle.css">
 </head>
 <body>
 
-    <div id="sync-overlay">
-        <div id="loader-content" style="text-align: center;">
-            <i class="fas fa-sync fa-spin" style="font-size: 3rem; color: var(--gold);"></i>
-            <p style="margin-top:20px; font-family:'Orbitron'; color:var(--gold);">ANALYZING MISSION DATA...</p>
-        </div>
-        <div id="result-display" style="display: none;" class="result-card"></div>
-    </div>
-
     <div id="star-container"></div>
 
-    <header>
-        <div class="battle-header">
-            <div class="info-box">
-                <img id="student-img" class="student-photo" src="" alt="">
-                <div><div class="name" id="student-name">AGENT</div><div class="rank-tag" id="student-title">RANKING...</div></div>
+    <nav class="top-nav">
+        <i class="fas fa-arrow-left nav-icon" onclick="window.location.href='index.html'"></i>
+        
+        <div style="position: relative; display: flex; align-items: center; gap: 15px;">
+            <div id="notifBell" class="nav-icon" onclick="openMailbox()" style="position: relative;">
+                <i class="fas fa-bell"></i>
+                <span id="notifDot" style="display:none; position: absolute; top: -5px; right: -5px; width: 10px; height: 10px; background: red; border-radius: 50%; border: 2px solid var(--bg-deep);"></span>
             </div>
-            <div class="info-box">
-                <div style="text-align: right;"><div class="name" id="activity-title">ACTIVITY</div><div id="mission-sub" class="rank-tag">TASK 01</div></div>
-                <img id="activity-img" class="student-photo" style="border-radius:50%" src="frontend/assets/logo.png" alt="">
+            <i class="fas fa-power-off nav-icon" id="logoutBtn" style="display:none;" onclick="handleLogout()"></i>
+        </div>
+    </nav>
+
+    <header class="hero-banner" id="heroBanner"></header>
+
+    <div class="tab-switcher">
+        <button class="tab-btn active" onclick="switchType('season', this)">SEASON</button>
+        <button class="tab-btn" onclick="switchType('royal', this)">ROYAL</button>
+        <button class="tab-btn" onclick="switchType('titanium', this)">TITANIUM</button>
+    </div>
+
+    <main><div class="grid-container" id="cardsGrid"></div></main>
+
+    <div class="modal" id="mailModal">
+        <div class="modal-content" style="max-width: 450px; padding: 25px;">
+            <div id="mailboxView">
+                <h2 style="font-family:'Orbitron'; color:var(--gold); font-size: 1.2rem; margin-bottom: 20px;">
+                    <i class="fas fa-envelope-open-text"></i> COMMS CENTER
+                </h2>
+                <div id="mailList" style="max-height: 350px; overflow-y: auto; margin-bottom: 20px;"></div>
+                <button class="btn-exit" onclick="closeModal('mailModal')">CLOSE</button>
+            </div>
+            <div id="mailDetailView" style="display: none;">
+                <button class="btn-exit" onclick="backToMailbox()" style="width: auto; padding: 5px 15px; margin-bottom: 15px;">
+                    <i class="fas fa-chevron-left"></i> BACK
+                </button>
+                <div id="fullMessageContent" style="color: #eee; line-height: 1.6; font-size: 0.9rem; background: rgba(255,255,255,0.05); padding: 20px; border-radius: 15px; border: 1px solid var(--glass-border);"></div>
             </div>
         </div>
-    </header>
+    </div>
 
-    <main class="arena-container">
-        <div class="glass-iframe-wrapper">
-            <div id="arena-loader"><i class="fas fa-cog gear"></i><p style="color:var(--gold); margin-top:10px; font-size:0.6rem;">LOADING MISSION...</p></div>
-            <iframe id="contentFrame"></iframe>
+    <div class="modal" id="taskModal">
+        <div class="modal-content">
+            <h2 id="mTitle" style="text-align:center; font-family:'Cinzel'; color:#fff; margin-bottom:20px;">MISSION</h2>
+            <div class="tasks-grid" id="tGrid"></div>
+            <button class="btn-exit" onclick="closeModal('taskModal')">CLOSE</button>
         </div>
-    </main>
+    </div>
 
-    <footer>
-        <button class="btn btn-side" onclick="exitArena()"><i class="fas fa-arrow-left"></i> BACK</button>
-        <button id="submitBtn" class="btn btn-submit" onclick="startSubmission()"><i class="fas fa-upload"></i> SUBMIT MISSION</button>
-    </footer>
+    <div class="modal" id="loginModal">
+        <div class="modal-content">
+            <h2 style="font-family:'Cinzel'; color:var(--gold); text-align:center; margin-bottom:20px;">AUTHENTICATION</h2>
+            <input type="email" id="loginEmail" style="width:100%; padding:15px; margin:8px 0; border-radius:12px; background:rgba(255,255,255,0.05); border:1px solid #333; color:#fff;" placeholder="EMAIL">
+            <input type="password" id="loginCode" style="width:100%; padding:15px; margin:8px 0; border-radius:12px; background:rgba(255,255,255,0.05); border:1px solid #333; color:#fff;" placeholder="CODE">
+            <button onclick="handleLogin()" id="loginSubmitBtn" style="width:100%; margin-top:15px; padding:15px; border-radius:12px; background:var(--gold-gradient); border:none; font-weight:900; cursor:pointer;">SIGN IN</button>
+            <button class="btn-exit" style="margin-top:10px;" onclick="closeModal('loginModal')">CANCEL</button>
+        </div>
+    </div>
 
-<script>
-    const CORE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz1D8BkAHFH0mwiw_n_2yL6jvQ04rrOb3mwiqKuxmHVTrynxzYzzF7XwIJQ-QnrrfQb/exec"; 
-    const MISSIONS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwncAAcaszJ3K9K3hpMQtf1RkDce1r4_8UVnMYW9lmV232vk1DBhrZnxpx_etRaExOFGQ/exec"; 
+    <script>
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwCGnW1crqrjMSxFxPP0D7p6hghDO9og63yZW5qvF17WvaqBM_IrsAHU3fVID5qRVl7/exec";
+        let currentUser = null;
+        let isLoggedIn = false;
 
-    let userEmail, currentActivity, currentTask;
+        function getLocalMails() { return JSON.parse(localStorage.getItem('eyc_mails') || '[]'); }
+        function saveLocalMails(mails) { localStorage.setItem('eyc_mails', JSON.stringify(mails)); }
 
-    window.onload = function() {
-        createStars();
-        const user = JSON.parse(localStorage.getItem('eyc_user'));
-        if (!user) return exitArena();
-
-        const params = new URLSearchParams(window.location.search);
-        userEmail = user.email;
-        currentActivity = params.get('act'); 
-        currentTask = params.get('task') || "1";
-
-        document.getElementById('student-name').innerText = user.name;
-        document.getElementById('student-title').innerText = user.title;
-        document.getElementById('student-img').src = user.avatar;
-        document.getElementById('activity-title').innerText = currentActivity;
-        document.getElementById('mission-sub').innerText = `TASK ${currentTask}`;
-
-        checkMissionPresence();
-    };
-
-    function checkMissionPresence() {
-        fetch(`${CORE_SCRIPT_URL}?action=checkMission&email=${userEmail}&activity=${currentActivity}&task=${currentTask}`)
-        .then(res => res.json())
-        .then(data => {
-            if (data.status === "completed") {
-                document.getElementById('sync-overlay').style.display = 'flex';
-                renderResult({
-                    status: "success",
-                    grade: data.grade,
-                    analysis: data.analysis,
-                    isManual: data.isManual,
-                    alreadyDone: true 
-                });
-            } else {
-                document.getElementById('contentFrame').src = `missions/${currentActivity}.html?task=${currentTask}`;
+        function checkNewNotification(serverMsg) {
+            if (!serverMsg || serverMsg.trim() === "" || serverMsg === "NO ACTIVE LOGS") return;
+            let localMails = getLocalMails();
+            const exists = localMails.some(m => m.text === serverMsg);
+            if (!exists) {
+                localMails.unshift({ text: serverMsg, date: new Date().toLocaleString(), read: false });
+                saveLocalMails(localMails);
+                document.getElementById('notifDot').style.display = 'block';
+                document.getElementById('notifBell').classList.add('fa-shake');
             }
-        })
-        .catch(() => {
-            document.getElementById('contentFrame').src = `missions/${currentActivity}.html?task=${currentTask}`;
-        });
-    }
-
-    function startSubmission() {
-        const frame = document.getElementById('contentFrame').contentWindow;
-        frame.postMessage({ type: 'REQUEST_MISSION_DATA' }, '*');
-    }
-
-    window.addEventListener('message', function(event) {
-        if (event.data.type === 'MISSION_ANSWERS') {
-            submitToHQ(event.data.answers);
         }
 
-        const userObj = JSON.parse(localStorage.getItem('eyc_user'));
-        
-        if (event.data.type === 'AUDIO_PLAYED') {
-            const url = `${MISSIONS_SCRIPT_URL}?action=markAudio&name=${encodeURIComponent(userObj.name)}&task=${currentTask}&audioNum=${event.data.audioNum}`;
-            fetch(url);
+        function openMailbox() {
+            document.getElementById('notifDot').style.display = 'none';
+            document.getElementById('notifBell').classList.remove('fa-shake');
+            document.getElementById('mailModal').style.display = 'flex';
+            backToMailbox();
+            renderMailList();
         }
-        
-        if (event.data.type === 'CHECK_AUDIO_STATUS') {
-            fetch(`${MISSIONS_SCRIPT_URL}?action=checkAudio&name=${encodeURIComponent(userObj.name)}&task=${currentTask}`)
-            .then(res => res.json())
-            .then(status => {
-                document.getElementById('contentFrame').contentWindow.postMessage({
-                    type: 'AUDIO_STATUS_DATA',
-                    audio1: status.audio1,
-                    audio2: status.audio2
-                }, '*');
+
+        function renderMailList() {
+            const list = document.getElementById('mailList');
+            const mails = getLocalMails();
+            list.innerHTML = mails.length === 0 ? '<p style="color:#666; text-align:center; padding:20px;">No messages found.</p>' : '';
+            mails.forEach((mail, index) => {
+                const item = document.createElement('div');
+                item.style = `padding: 15px; margin-bottom: 10px; border-radius: 12px; cursor: pointer; transition: 0.3s;
+                              background: ${mail.read ? 'rgba(255,255,255,0.02)' : 'rgba(212,175,55,0.1)'};
+                              border-left: 4px solid ${mail.read ? '#333' : 'var(--gold)'};`;
+                item.innerHTML = `<div style="font-size: 0.6rem; color: #888; margin-bottom: 5px;">${mail.date}</div><div style="font-size: 0.8rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${mail.text}</div>`;
+                item.onclick = () => readMail(index);
+                list.appendChild(item);
             });
         }
-    });
 
-    function submitToHQ(answers) {
-        document.getElementById('sync-overlay').style.display = 'flex';
-        const userObj = JSON.parse(localStorage.getItem('eyc_user'));
+        function readMail(index) {
+            let mails = getLocalMails();
+            mails[index].read = true;
+            saveLocalMails(mails);
+            document.getElementById('mailboxView').style.display = 'none';
+            document.getElementById('mailDetailView').style.display = 'block';
+            document.getElementById('fullMessageContent').innerText = mails[index].text;
+        }
 
-        const gradingPayload = {
-            activity: currentActivity,
-            task: currentTask,
-            email: userEmail,
-            name: userObj ? userObj.name : "Unknown",
-            studentData: answers 
+        function backToMailbox() {
+            document.getElementById('mailDetailView').style.display = 'none';
+            document.getElementById('mailboxView').style.display = 'block';
+            renderMailList();
+        }
+
+        function renderHeader() {
+            const header = document.getElementById('heroBanner');
+            const logoutBtn = document.getElementById('logoutBtn');
+            if (isLoggedIn) {
+                logoutBtn.style.display = "block";
+                header.innerHTML = `
+                    <div class="profile-card">
+                        <div class="avatar-wrapper">
+                            <div class="avatar-main" style="background-image: url('${currentUser.avatar || ''}')"></div>
+                            <div class="rank-tag">RANK #${currentUser.rank}</div>                       
+                        </div>
+                        <h1 class="student-name">${currentUser.name}</h1>
+                        <p class="student-title">${currentUser.title}</p>
+                        <div class="stats-row">
+                            <div class="stat-item">🪙 <span>${currentUser.tokens || 0}</span></div>
+                            <div class="stat-item">⭐ <span>${currentUser.stars || 0}</span></div>
+                            <div class="stat-item">🎟️ <span style="color:#FFD700">${currentUser.goldTickets || 0}</span></div>
+                            <i class="fas fa-sync-alt stat-item" style="cursor:pointer; font-size:0.7rem;" onclick="refreshUserData()"></i>
+                        </div>
+                    </div>`;
+                checkNewNotification(currentUser.lastNotification);
+            } else {
+                logoutBtn.style.display = "none";
+                header.innerHTML = `<h1 class="student-name">ARENA ACCESS</h1><div style="margin-top:20px;"><button class="btn-exit" style="width:auto;" onclick="openLogin()">AUTHORIZE LOGIN</button></div>`;
+            }
+        }
+
+        const activities = {
+            season: [
+                { name: "Alike", icon: "fa-clone", code: "AS" },
+                { name: "Vivid", icon: "fa-wand-magic-sparkles", code: "VV" },
+                { name: "Label", icon: "fa-tag", code: "LB" },
+                { name: "Grammar", icon: "fa-spell-check", code: "GR" },
+                { name: "Golden Ear", icon: "fa-ear-listen", code: "GE" },
+                { name: "Seeds", icon: "fa-seedling", code: "SD" }
+            ],
+            royal: [
+                { name: "AlikeX", icon: "fa-star", code: "ASX" },
+                { name: "VividX", icon: "fa-wand-magic", code: "VVX" },
+                { name: "LabelX", icon: "fa-tags", code: "LBX" },
+                { name: "SeedsX", icon: "fa-tree", code: "SDX" },
+                { name: "Golden EarX", icon: "fa-ear-deaf", code: "GEX" },
+                { name: "GrammarX", icon: "fa-pen-fancy", code: "GRX" }
+            ],
+            titanium: [
+                { name: "DictationX", icon: "fa-microphone-lines", code: "DTX" },
+                { name: "Sing Sang Sung", icon: "fa-music", code: "SSSX" },
+                { name: "ElmagazineX", icon: "fa-book-open", code: "EMX" },
+                { name: "FigurativeX", icon: "fa-mask", code: "FGX" }
+            ]
         };
 
-        fetch(MISSIONS_SCRIPT_URL, {
-            method: "POST",
-            mode: "cors",
-            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-            body: JSON.stringify(gradingPayload)
-        })
-        .then(res => res.json())
-        .then(gradingRes => {
-            if (gradingRes.status === "success") {
-                saveGradeToStudents(gradingRes);
-            } else {
-                renderResult(gradingRes);
-            }
-        })
-        .catch(err => renderResult({ status: "error", message: "Grading Failed" }));
-    }
-
-    function saveGradeToStudents(res) {
-        const saveUrl = `${CORE_SCRIPT_URL}?action=submitMission&email=${userEmail}&activity=${currentActivity}&task=${currentTask}&grade=${res.grade}&answers=${encodeURIComponent(res.answers)}&analysis=${encodeURIComponent(res.analysis)}`;
-
-        fetch(saveUrl)
-        .then(res => res.json())
-        .then(finalRes => {
-            renderResult(finalRes);
-        })
-        .catch(err => renderResult({ status: "error", message: "Failed to record grade" }));
-    }
-
-    function requestReview() {
-        const btn = document.getElementById('appealBtn');
-        btn.innerText = "SENDING...";
-        btn.disabled = true;
-
-        fetch(`${CORE_SCRIPT_URL}?action=requestAppeal&email=${userEmail}&activity=${currentActivity}&task=${currentTask}`)
-        .then(res => res.json())
-        .then(data => {
-            if(data.status === "success") {
-                btn.innerHTML = "<i class='fas fa-check'></i> REQUESTED";
-                btn.style.borderColor = "var(--gold)";
-            }
-        });
-    }
-
-    function renderResult(res) {
-        const display = document.getElementById('result-display');
-        document.getElementById('loader-content').style.display = 'none';
-        document.getElementById('sync-overlay').style.display = 'flex'; 
-        display.style.display = 'block';
-
-        if (res.status === "success") {
-            const isManual = (res.grade === "PENDING" || res.isManual === true);
-            let icon, title, gradeDisplay, subText, appealBtnHtml;
-
-            if (isManual) {
-                icon = "fa-cloud-upload-alt";
-                title = res.alreadyDone ? "MISSION RECORDED" : "MISSION RECEIVED";
-                gradeDisplay = "PENDING";
-                subText = `Your answer is under revision at HQ.`;
-                appealBtnHtml = "";
-            } else {
-                icon = "fa-check-circle";
-                title = res.alreadyDone ? "PREVIOUS SCORE" : "MISSION COMPLETE";
-                gradeDisplay = `${res.grade} / 50`;
-                subText = res.alreadyDone ? "You have already passed this mission." : "Data synchronized with HQ Command.";
-                
-                appealBtnHtml = `<button id="appealBtn" class="btn btn-side" style="margin-top:10px; width:100%; border-color:rgba(255,0,0,0.3)" onclick="requestReview()">
-                                    <i class="fas fa-circle-exclamation"></i> REQUEST REVIEW (RR)
-                                 </button>`;
-            }
-
-            display.innerHTML = `
-                <i class="fas ${icon}" style="font-size:3rem; color:var(--gold);"></i>
-                <h2 style="font-family:'Orbitron'; color:#fff; margin:15px 0;">${title}</h2>
-                <div style="font-size:2.5rem; color:var(--gold); font-weight:bold;">${gradeDisplay}</div>
-                <p style="color:#888; font-size:0.9rem; margin-top:10px; line-height:1.5;">${subText}</p>
-                <button class="btn btn-submit" style="margin-top:20px; width:100%" onclick="exitArena()">RETURN TO BASE</button>
-                ${appealBtnHtml}
-            `;
-        } else {
-            display.innerHTML = `
-                <i class="fas fa-exclamation-triangle" style="font-size:3rem; color:red;"></i>
-                <h2 style="font-family:'Orbitron'; color:#fff; margin:15px 0;">MISSION ERROR</h2>
-                <p style="color:#888;">${res.message || "Execution Failed"}</p>
-                <button class="btn btn-side" style="margin-top:20px; width:100%" onclick="location.reload()">RETRY</button>
-            `;
+        function generateCards() {
+            const grid = document.getElementById('cardsGrid'); grid.innerHTML = '';
+            const type = document.querySelector('.tab-btn.active').innerText.toLowerCase();
+            activities[type].forEach(act => {
+                const card = document.createElement('div');
+                card.className = 'activity-card';
+                card.innerHTML = `<i class="fa-solid ${act.icon} card-icon"></i><h3>${act.name}</h3>`;
+                card.onclick = () => openTasks(act.name, act.code);
+                grid.appendChild(card);
+            });
         }
-    }
 
-    function exitArena() { window.location.href = 'MC.html'; }
-
-    function createStars() {
-        const container = document.getElementById('star-container');
-        if(!container) return;
-        for (let i = 0; i < 50; i++) {
-            const star = document.createElement('div');
-            star.className = 'star';
-            star.style.width = star.style.height = Math.random() * 2 + 'px';
-            star.style.top = Math.random() * 100 + '%';
-            star.style.left = Math.random() * 100 + '%';
-            container.appendChild(star);
+        function switchType(type, btn) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            generateCards();
         }
-    }
 
-    document.getElementById('contentFrame').onload = () => {
-        const loader = document.getElementById('arena-loader');
-        if(loader) loader.style.display = 'none';
-    };
-</script>
+        function openTasks(name, code) {
+            if (!isLoggedIn) return openLogin();
+            document.getElementById('mTitle').innerText = name;
+            const tGrid = document.getElementById('tGrid'); tGrid.innerHTML = '';
+            const tasksCount = (document.querySelector('.tab-btn.active').innerText === 'TITANIUM') ? 5 : 10;
+            for (let i = 1; i <= tasksCount; i++) {
+                const node = document.createElement('div');
+                node.className = 'task-node';
+                node.innerText = i;
+                node.onclick = () => {
+                    const params = new URLSearchParams({ email: currentUser.email, name: currentUser.name, act: code, task: i });
+                    window.location.href = `EYCArena.html?${params.toString()}`;
+                };
+                tGrid.appendChild(node);
+            }
+            document.getElementById('taskModal').style.display = 'flex';
+        }
+
+        function handleLogin() {
+            const email = document.getElementById('loginEmail').value.trim();
+            const code = document.getElementById('loginCode').value.trim();
+            const btn = document.getElementById('loginSubmitBtn');
+            btn.innerText = "AUTHENTICATING...";
+            fetch(`${SCRIPT_URL}?action=getProfile&email=${email}&code=${code}`)
+                .then(res => res.json())
+                .then(res => {
+                    if (res.status === "success") {
+                        currentUser = res; currentUser.email = email; isLoggedIn = true;
+                        localStorage.setItem('eyc_user', JSON.stringify(currentUser));
+                        localStorage.setItem('eyc_user_code', code);
+                        closeModal('loginModal'); renderHeader(); generateCards();
+                    } else alert(res.message);
+                    btn.innerText = "SIGN IN";
+                });
+        }
+
+        function refreshUserData() {
+            if (!currentUser) return;
+            const code = localStorage.getItem('eyc_user_code');
+            fetch(`${SCRIPT_URL}?action=getProfile&email=${currentUser.email}&code=${code}`)
+                .then(res => res.json())
+                .then(res => {
+                    if (res.status === "success") { currentUser = res; renderHeader(); }
+                });
+        }
+
+        function handleLogout() { if(confirm("Terminate Session?")) { localStorage.clear(); location.reload(); } }
+        function openLogin() { document.getElementById('loginModal').style.display = 'flex'; }
+        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+
+        function createStars() {
+            const container = document.getElementById('star-container');
+            for (let i = 0; i < 60; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.style.width = '2px'; star.style.height = '2px';
+                star.style.left = Math.random() * 100 + '%'; star.style.top = Math.random() * 100 + '%';
+                star.style.setProperty('--duration', (Math.random() * 3 + 2) + 's');
+                container.appendChild(star);
+            }
+        }
+
+        setInterval(() => { if (isLoggedIn) refreshUserData(); }, 30000);
+
+        window.onload = () => {
+            createStars();
+            const saved = localStorage.getItem('eyc_user');
+            if(saved) { currentUser = JSON.parse(saved); isLoggedIn = true; }
+            renderHeader(); generateCards();
+        };
+    </script>
 </body>
 </html>
