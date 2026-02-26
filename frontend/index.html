@@ -19,7 +19,17 @@
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; -webkit-tap-highlight-color: transparent; }
-body { background: var(--bg-deep); color: white; min-height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
+
+/* Fixed Scrolling: Changed overflow:hidden to auto to allow scrolling if content overflows on smaller screens */
+body { 
+    background: var(--bg-deep); 
+    color: white; 
+    min-height: 100vh; 
+    overflow-x: hidden; 
+    overflow-y: auto; 
+    display: flex; 
+    flex-direction: column; 
+}
 
 .crescent-hanging {
     display: flex;
@@ -52,7 +62,7 @@ body { background: var(--bg-deep); color: white; min-height: 100vh; overflow: hi
 
 .hero { 
     text-align: center; 
-    padding: 60px 20px 40px; 
+    padding: 40px 20px 20px; 
     display: flex; 
     flex-direction: column; 
     align-items: center; 
@@ -70,7 +80,7 @@ body { background: var(--bg-deep); color: white; min-height: 100vh; overflow: hi
 
 .mission-control {
 flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
-min-height: 200px;
+padding: 20px 0;
 }
 
 .core-container {
@@ -97,17 +107,13 @@ z-index: 10;
 animation: corePulse 3s infinite ease-in-out;
 }
 
-.btn-stack { display: flex; flex-direction: column; gap: 15px; width: 100%; max-width: 300px; padding: 0 20px; }
+.btn-stack { display: flex; flex-direction: column; gap: 15px; width: 100%; max-width: 300px; padding: 0 20px; margin-bottom: 20px; }
 .nav-btn {
 width: 100%; padding: 16px; border-radius: 12px; background: rgba(255, 255, 255, 0.03); color: #fff;
 border: 1px solid var(--glass-border); backdrop-filter: blur(10px); cursor: pointer;
 font-family: 'Orbitron'; text-decoration: none; text-align: center; font-size: 0.8rem; letter-spacing: 2px;
 }
 .nav-btn:hover { background: var(--gold-gradient); color: #000; transform: translateY(-3px); }
-
-.tabs { display: flex; width: 100%; max-width: 400px; margin: 20px auto; gap: 10px; padding: 0 10px; }
-.tab-btn { flex: 1; padding: 12px; text-align: center; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); border-radius: 8px; cursor: pointer; font-family: 'Orbitron'; font-size: 0.7rem; transition: 0.3s; }
-.tab-btn.active { background: var(--gold-gradient); color: black; }
 
 .fairy-float { position: fixed; bottom: 20px; right: 20px; width: 50px; height: 50px; background: var(--gold-gradient); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 100; box-shadow: 0 0 15px var(--gold); }
 
@@ -218,12 +224,6 @@ function startLaunch() {
 document.body.style.transition = "0.5s";
 document.body.style.opacity = "0";
 setTimeout(() => { window.location.href = "MC.html"; }, 500);
-}
-
-function switchTab(tab, btn) {
-document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-btn.classList.add('active');
-console.log('Switching to:', tab);
 }
 
 window.addEventListener('resize', initCanvas);
