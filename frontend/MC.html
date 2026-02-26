@@ -49,7 +49,6 @@
         .card-icon { position: relative; z-index: 1; font-size: 2.2rem; margin-bottom: 10px; background: var(--gold-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .tk-activity-badge { font-family: 'Orbitron'; font-size: 0.6rem; color: var(--gold); border: 1px solid var(--gold); padding: 2px 8px; border-radius: 5px; margin-top: 10px; display: inline-block; }
 
-        /* Mailbox Drawer */
         #mailDrawer { position: fixed; top: 0; right: -100%; width: 350px; height: 100%; background: rgba(5, 5, 8, 0.95); backdrop-filter: blur(25px); border-left: 1px solid var(--glass-border); z-index: 3000; transition: 0.5s cubic-bezier(0.7, 0, 0.3, 1); padding: 30px; }
         #mailDrawer.active { right: 0; }
         .msg-bubble { background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border); padding: 15px; border-radius: 12px; margin-bottom: 10px; cursor: pointer; }
@@ -129,10 +128,11 @@
 
     <script>
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxe3gYkhNIN4cMqpY2RAglBYWp-m9XHxMiVGXLR7-7j-gPo9Cc0zdg1ALQmT2i-griu/exec";
+        
         const IMG = {
-            tk: "https://github.com/YousofAzam/EYC-Superstars-Activities/raw/refs/heads/main/6947571.png",
-            star: "https://github.com/YousofAzam/EYC-Superstars-Activities/raw/refs/heads/main/star.png",
-            gt: "https://github.com/YousofAzam/EYC-Superstars-Activities/raw/refs/heads/main/gold-card.png"
+            tk: "https://raw.githubusercontent.com/eycfde-prog/EYCSSP/047aeca8ef0fa0d95627552cfb62fd8300531134/frontend/eyclgos/Token.png",
+            star: "https://raw.githubusercontent.com/eycfde-prog/EYCSSP/047aeca8ef0fa0d95627552cfb62fd8300531134/frontend/eyclgos/Star.png",
+            gt: "https://raw.githubusercontent.com/eycfde-prog/EYCSSP/047aeca8ef0fa0d95627552cfb62fd8300531134/frontend/eyclgos/GT.png"
         };
 
         let currentUser = null;
@@ -161,7 +161,6 @@
             ]
         };
 
-        // --- Scheduling Logic ---
         function getTaskDate(program, taskIndex) {
             const seasonStart = new Date("2026-02-26T00:00:00");
             const royalStart = new Date("2026-02-28T00:00:00");
@@ -169,14 +168,12 @@
 
             if (taskIndex > 1) {
                 if (program === 'season') {
-                    // Task 2 (+4), Task 3 (+5), Task 4 (+6)...
                     let daysToAdd = 0;
                     for (let j = 2; j <= taskIndex; j++) {
                         daysToAdd += (j + 2); 
                     }
                     targetDate.setDate(targetDate.getDate() + daysToAdd);
                 } else {
-                    // Royal X: Fixed 3 days gap
                     targetDate.setDate(targetDate.getDate() + ((taskIndex - 1) * 3));
                 }
             }
@@ -219,7 +216,6 @@
             document.getElementById('taskModal').style.display = 'flex';
         }
 
-        // --- UI Handlers ---
         function openMailbox() {
             document.getElementById('mailDrawer').classList.add('active');
             document.getElementById('notifDot').style.display = 'none';
@@ -243,14 +239,6 @@
             });
         }
 
-// 1. تحديث مسارات الصور للروابط المباشرة (Raw Links)
-        const IMG = {
-            tk: "https://raw.githubusercontent.com/eycfde-prog/EYCSSP/047aeca8ef0fa0d95627552cfb62fd8300531134/frontend/eyclgos/Token.png",
-            star: "https://raw.githubusercontent.com/eycfde-prog/EYCSSP/047aeca8ef0fa0d95627552cfb62fd8300531134/frontend/eyclgos/Star.png",
-            gt: "https://raw.githubusercontent.com/eycfde-prog/EYCSSP/047aeca8ef0fa0d95627552cfb62fd8300531134/frontend/eyclgos/GT.png"
-        };
-
-        // 2. دالة عرض الهيدر مع الأيقونات الجديدة
         function renderHeader() {
             const header = document.getElementById('heroBanner');
             if (isLoggedIn) {
@@ -335,7 +323,6 @@
             const saved = localStorage.getItem('eyc_user');
             if(saved) { currentUser = JSON.parse(saved); isLoggedIn = true; }
             renderHeader(); generateCards();
-            // Star bg
             const container = document.getElementById('star-container');
             for (let i = 0; i < 50; i++) {
                 const s = document.createElement('div'); s.className = 'star';
