@@ -113,16 +113,53 @@
         document.getElementById('vx-title').innerText = `VIVID X | MISSION ${taskNum.padStart(2, '0')}`;
     }
 
-    // وظائف الزووم
     function activateZoom() {
         const zoomBox = document.getElementById('zoom-box');
-        document.getElementById('zoomed-img').src = imgUrl;
+        const zoomedImg = document.getElementById('zoomed-img');
+        
+        zoomedImg.src = imgUrl;
         zoomBox.style.display = 'flex';
+
+        if (zoomBox.requestFullscreen) {
+            zoomBox.requestFullscreen();
+        } else if (zoomBox.webkitRequestFullscreen) {
+            zoomBox.webkitRequestFullscreen();
+        } else if (zoomBox.msRequestFullscreen) {
+            zoomBox.msRequestFullscreen();
+        }
+
+        if (/Mobi|Android/i.test(navigator.userAgent)) {
+            if (screen.orientation && screen.orientation.lock) {
+                screen.orientation.lock('landscape').catch(() => {});
+            }
+        }
     }
 
     function closeZoom() {
+        if (document.exitFullscreen) {
+            document.exitFullscreen().catch(() => {});
+        } else if (document.webkitExitFullscreen) {
+            document.webkitExitFullscreen().catch(() => {});
+        }
+        
         document.getElementById('zoom-box').style.display = 'none';
+
+        if (screen.orientation && screen.orientation.unlock) {
+            screen.orientation.unlock();
+        }
     }
+
+    document.addEventListener('fullscreenchange', () => {
+        if (!document.fullscreenElement) {
+            document.getElementById('zoom-box').style.display = 'none';
+        }
+    });
+    
+    document.addEventListener('webkitfullscreenchange', () => {
+        if (!document.webkitFullscreenElement) {
+            document.getElementById('zoom-box').style.display = 'none';
+        }
+    });
 
     function updateCount() {
         const text = document.getElementById('storyInput').value.trim();
