@@ -9,6 +9,7 @@
         :root {
             --neon-blue: #00f2ff;
             --neon-purple: #bc13fe;
+            --neon-green: #00ff88;
             --odd-red: #ff003c;
             --glass-deep: rgba(10, 10, 20, 0.95);
             --border-glow: rgba(188, 19, 254, 0.3);
@@ -50,13 +51,29 @@
             font-family: 'Orbitron'; font-size: 0.7rem;
             color: var(--neon-blue); border-radius: 10px;
             box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            transition: 0.3s;
         }
 
+        /* 1. Dynamic Highlighting Class */
+        .word-card.used {
+            border-color: var(--neon-green);
+            color: var(--neon-green);
+            box-shadow: 0 0 15px rgba(0, 255, 136, 0.3);
+            background: rgba(0, 255, 136, 0.05);
+        }
+
+        /* 2. Corrupted Seed Pulse */
         .word-card.odd { 
             border-color: var(--odd-red); 
             color: var(--odd-red);
             background: rgba(255, 0, 60, 0.05);
             position: relative;
+            animation: redPulse 2s infinite ease-in-out;
+        }
+
+        @keyframes redPulse {
+            0%, 100% { box-shadow: 0 0 5px var(--odd-red); opacity: 1; }
+            50% { box-shadow: 0 0 20px var(--odd-red); opacity: 0.8; }
         }
         
         .word-card.odd::after {
@@ -65,8 +82,6 @@
             color: white; padding: 1px 5px; border-radius: 3px; font-size: 5px;
             white-space: nowrap;
         }
-
-        .story-zone { position: relative; }
 
         textarea {
             width: 100%; height: 350px;
@@ -84,7 +99,6 @@
             box-shadow: inset 0 0 20px rgba(0, 242, 255, 0.05), 0 0 15px rgba(0, 242, 255, 0.1);
         }
 
-        /* العداد العائم المطور */
         .floating-counter {
             position: fixed; bottom: 25px; right: 25px;
             width: 70px; height: 70px;
@@ -105,13 +119,13 @@
         .floating-counter .label { font-size: 0.6rem; color: #666; text-transform: uppercase; }
 
         .floating-counter.ready {
-            border-color: #00ff88;
+            border-color: var(--neon-green);
             background: rgba(0, 255, 136, 0.05);
             box-shadow: 0 0 30px rgba(0, 255, 136, 0.4);
             transform: scale(1.1);
         }
         
-        .floating-counter.ready .num { color: #00ff88; }
+        .floating-counter.ready .num { color: var(--neon-green); }
     </style>
 </head>
 <body>
@@ -123,7 +137,7 @@
     <div class="words-grid" id="words-container"></div>
 
     <div class="story-zone">
-        <textarea id="story-input" oninput="updateCount()" placeholder="Initiate writing sequence... Use all 6 data seeds. Target: 120+ words."></textarea>
+        <textarea id="story-input" oninput="processInput()" placeholder="Initiate writing sequence... Use all 6 data seeds. Target: 120+ words."></textarea>
     </div>
 
     <div class="floating-counter" id="counter-circle">
@@ -147,20 +161,46 @@
 
     const urlParams = new URLSearchParams(window.location.search);
     const task = urlParams.get('task') || "1";
+    let activeWords = [];
 
     function loadSeeds() {
-        const words = seedGroups[task] || seedGroups["1"];
+        activeWords = seedGroups[task] || seedGroups["1"];
         document.getElementById('mission-title').innerText = `STORY SEEDS | MISSION ${task.padStart(2, '0')}`;
         const container = document.getElementById('words-container');
-        container.innerHTML = words.map((w, i) => `
-            <div class="word-card ${i === 5 ? 'odd' : ''}">${w}</div>
+        container.innerHTML = activeWords.map((w, i) => `
+            <div class="word-card ${i === 5 ? 'odd' : ''}" id="seed-${i}">${w}</div>
         `).join('');
+
+        // 3. UI Enhancement: Load Auto-save
+        const savedData = localStorage.getItem(`story_seed_${task}`);
+        if(savedData) {
+            document.getElementById('story-input').value = savedData;
+            processInput();
+        }
     }
 
-    function updateCount() {
-        const text = document.getElementById('story-input').value.trim();
-        const words = text ? text.split(/\s+/).filter(w => w.length > 0).length : 0;
+    function processInput() {
+        const text = document.getElementById('story-input').value;
+        const lowerText = text.toLowerCase();
         
+        // 1. Dynamic Highlighting Logic
+        activeWords.forEach((word, index) => {
+            const card = document.getElementById(`seed-${index}`);
+            if(lowerText.includes(word.toLowerCase())) {
+                card.classList.add('used');
+            } else {
+                card.classList.remove('used');
+            }
+        });
+
+        // 3. Auto-save Trigger
+        localStorage.setItem(`story_seed_${task}`, text);
+
+        updateCount(text);
+    }
+
+    function updateCount(text) {
+        const words = text.trim() ? text.trim().split(/\s+/).filter(w => w.length > 0).length : 0;
         document.getElementById('count-num').innerText = words;
         const circle = document.getElementById('counter-circle');
         
@@ -174,17 +214,19 @@
             const wordCount = text ? text.split(/\s+/).filter(w => w.length > 0).length : 0;
 
             if (wordCount < 120) {
-                // إرسال تنبيه للأب بأن المهمة لم تكتمل
                 window.parent.postMessage({ type: 'MISSION_INCOMPLETE', message: "Minimum 120 words required." }, '*');
                 return;
             }
 
-window.parent.postMessage({
-    type: 'MISSION_ANSWERS',
-    activityCode: 'SD', // توحيد الرمز
-    answers: [text],    // وضع النص داخل مصفوفة
-    missionNum: task
-}, '*');
+            // Clear autosave on submission
+            localStorage.removeItem(`story_seed_${task}`);
+
+            window.parent.postMessage({
+                type: 'MISSION_ANSWERS',
+                activityCode: 'SD',
+                answers: [text],
+                missionNum: task
+            }, '*');
         }
     });
 
