@@ -12,7 +12,7 @@
             --gold-glow: rgba(212, 175, 55, 0.4);
             --dark-bg: #0a0a0c;
             --card-bg: rgba(255, 255, 255, 0.03);
-            --accent: #1a1a1f;
+            --error-red: #ff4444;
         }
 
         body { 
@@ -21,6 +21,7 @@
             color: #eee; 
             margin: 0; padding: 20px; 
             direction: ltr;
+            scroll-behavior: smooth;
         }
 
         body::-webkit-scrollbar { width: 5px; }
@@ -34,11 +35,15 @@
             padding: 35px; 
             text-align: center; 
             margin-bottom: 40px;
-            box-shadow: 0 25px 50px rgba(0,0,0,0.7), inset 0 0 20px rgba(212, 175, 55, 0.03);
-            animation: slideDown 0.7s ease-out;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.7);
+            transition: 0.5s ease;
         }
 
-        @keyframes slideDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+        /* Golden Pulse during playback */
+        .audio-playing {
+            box-shadow: 0 0 25px var(--gold-glow), inset 0 0 20px rgba(212, 175, 55, 0.1);
+            border-color: var(--gold);
+        }
 
         .audio-player-container h2 { 
             font-family: 'Orbitron'; 
@@ -56,26 +61,31 @@
             opacity: 0.8;
             transition: 0.3s;
         }
-        audio:hover { opacity: 1; }
 
-        .questions-grid { display: flex; flex-direction: column; gap: 25px; }
+        .questions-grid { display: flex; flex-direction: column; gap: 25px; padding-bottom: 50px; }
 
         .question-card {
             background: var(--card-bg); 
             border: 1px solid rgba(255, 255, 255, 0.04);
             border-radius: 20px; 
             padding: 30px; 
-            transition: 0.3s;
+            transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
             overflow: hidden;
         }
 
-        .question-card::before {
-            content: '';
-            position: absolute; left: 0; top: 0; width: 4px; height: 100%;
-            background: var(--gold);
-            opacity: 0.3;
+        /* Finished Question State */
+        .question-card.completed {
+            border: 1px solid var(--gold);
+            background: rgba(212, 175, 55, 0.05);
         }
+
+        /* Error Flash Animation */
+        @keyframes errorFlash {
+            0%, 100% { border-color: rgba(255, 255, 255, 0.04); box-shadow: none; }
+            50% { border-color: var(--error-red); box-shadow: 0 0 20px rgba(255, 68, 68, 0.4); }
+        }
+        .flash-error { animation: errorFlash 0.4s ease 3; }
 
         .question-text { 
             font-family: 'Orbitron'; 
@@ -94,7 +104,7 @@
             padding: 16px 22px; 
             border-radius: 12px; 
             cursor: pointer; 
-            transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transition: 0.3s;
             font-size: 1.05rem; 
             display: flex; 
             align-items: center; 
@@ -121,7 +131,6 @@
             width: 12px; height: 12px;
             border: 2px solid var(--gold);
             border-radius: 50%;
-            transition: 0.3s;
         }
 
         .option-item.selected .radio-dot {
@@ -132,9 +141,9 @@
 </head>
 <body>
 
-    <div class="audio-player-container">
+    <div class="audio-player-container" id="playerBox">
         <h2><span id="task-title">GOLDEN EAR MISSION</span></h2>
-        <audio id="mainAudio" controls>
+        <audio id="mainAudio" controls controlsList="nodownload">
             <source id="audioSource" src="" type="audio/wav">
         </audio>
     </div>
@@ -146,7 +155,7 @@
         "1": { questions: [ { q: "What is the core definition of critical thinking?", options: ["The ability to analyze information objectively and make a reasoned judgment.", "The ability to memorize large amounts of data quickly.", "The process of accepting information without question.", "The act of forming conclusions based solely on emotion."] }, { q: "What is one thing critical thinking helps individuals avoid?", options: ["Logical fallacies.", "Basic conversation.", "Routine physical exercise.", "Reading books."] }, { q: "What two qualities are required to develop critical thinking?", options: ["Curiosity and a willingness to question assumptions.", "Ignoring all external opinions.", "Speed reading and perfect recall.", "Strict adherence to tradition."] }, { q: "Where is critical thinking considered a vital skill?", options: ["In everyday decision-making and academic settings.", "Only in highly specialized scientific fields.", "Only when dealing with political issues.", "Exclusively in historical research."] }, { q: "What is the foundation of scientific inquiry?", options: ["Critical thinking.", "Simple belief.", "Emotional response.", "Random guesswork."] } ] },
         "2": { questions: [ { q: "What primary challenge does the internet present, despite offering information?", options: ["It hosts vast amounts of misinformation.", "It requires expensive equipment.", "It is only available during the day.", "It forces people to read slower."] }, { q: "What does the concept of digital citizenship require users to be?", options: ["Responsible, respectful, and safe online.", "Completely anonymous at all times.", "Experts in coding and software design.", "Always agreeing with others online."] }, { q: "What specific skill is described as no longer optional?", options: ["Learning to evaluate online sources for credibility.", "Learning a new foreign language.", "Starting a professional blog.", "Building a personal website."] }, { q: "What must users protect as part of being a responsible digital citizen?", options: ["Personal data.", "Their computer's physical location.", "The history of the internet.", "Old printed books."] }, { q: "What is the goal of conscious effort in using the internet?", options: ["Harnessing its power while minimizing its potential for harm.", "To completely avoid using all social media platforms.", "To only use it for professional work tasks.", "To spend the maximum amount of time online possible."] } ] },
         "3": { questions: [ { q: "What is sleep described as being crucial for?", options: ["Repair and consolidation for the body and brain.", "Wasting excess time.", "Increasing screen time.", "Reducing physical movement during the day."] }, { q: "What cognitive function is severely affected by chronic sleep deprivation?", options: ["Concentration, mood, and judgment.", "The ability to stand up straight.", "The memory of childhood songs.", "The speed of reading simple text."] }, { q: "What does the brain primarily do with memories during sleep?", options: ["Turns short-term memories into long-term ones.", "Forgets all unnecessary information.", "Creates entirely new memories.", "Stops processing all information."] }, { q: "What is the key to overall well-being according to the text?", options: ["Treating sleep as a non-negotiable part of our health routine.", "Drinking caffeine throughout the evening.", "Working continuously without breaks.", "Only sleeping when absolutely necessary."] }, { q: "What the body repair during the sleep cycle?", options: ["Muscle tissue.", "Shoes and clothing.", "Broken electronic devices.", "Damaged furniture."] } ] },
-        "4": { questions: [ { q: "How does innovation primarily differ from invention?", options: ["Innovation focuses on improving or effectively utilizing existing ideas.", "Innovation only occurs in technology companies.", "Invention is always less useful than innovation.", "Invention is the introduction of something new."] }, { q: "What is the driving force behind market competitiveness?", options: ["Innovation.", "Stagnation.", "Strict adherence to old methods.", "Reducing product quality."] }, { q: "What type of culture is required to encourage innovation?", options: ["A culture that accepts risk and views failure as a learning opportunity.", "A culture that punishes any type of experimentation.", "A culture that adheres rigidly to hierarchy.", "A culture that avoids all new processes."] }, { q: "What happens to companies that stagnate and resist change?", options: ["They are quickly surpassed by competitors.", "They become more profitable instantly.", "They become monopolies in their field.", "They invent many new products."] }, { q: "Innovation is described as the continuous process of turning what into reality?", options: ["Potential.", "Defeat.", "Stagnation.", "The past."] } ] },
+        "4": { questions: [ { q: "How does innovation primarily differ from invention?", options: ["Innovation focuses on improving or effectively utilizing existing ideas.", "Innovation only occurs in technology companies.", "Invention is always less useful than innovation.", "Invention is the introduction of something new."] }, { q: "What is the driving force behind market competitiveness?", options: ["Innovation.", "Stagnation.", "Strict adherence to old methods.", "Reducing product quality."] }, { q: "What type of culture is required to encourage innovation?", options: ["A culture that accepts risk and views failure as a learning opportunity.", "A culture that adheres rigidly to hierarchy.", "A culture that avoids all new processes."] }, { q: "What happens to companies that stagnate and resist change?", options: ["They are quickly surpassed by competitors.", "They become more profitable instantly.", "They become monopolies in their field.", "They invent many new products."] }, { q: "Innovation is described as the continuous process of turning what into reality?", options: ["Potential.", "Defeat.", "Stagnation.", "The past."] } ] },
         "5": { questions: [ { q: "What is public speaking considered one of the most powerful tools for?", options: ["Influence.", "Creating unnecessary noise.", "Avoiding all future challenges.", "Decreasing social interaction."] }, { q: "What is required to overcome the fear of public speaking?", options: ["Practice, preparation, and shifting focus to the message.", "Memorizing the entire audience list.", "Avoiding eye contact completely.", "Speaking as fast as possible."] }, { q: "What is the core difference between a speaker who only informs and a good speaker?", options: ["A good speaker connects emotionally with the audience.", "A good speaker is always taller than the audience.", "A good speaker wears louder clothes.", "A good speaker reads directly from a paper."] }, { q: "What is an essential component of professional communication?", options: ["The ability to articulate ideas clearly and persuasively.", "The ability to remain silent during meetings.", "The ability to draw complex charts quickly.", "The ability to type quickly on a keyboard."] }, { q: "What can significantly boost career prospects and confidence?", options: ["Mastering the skill of public speaking.", "Having very few meetings.", "Always working in isolation.", "Never expressing an opinion publicly."] } ] },
         "6": { questions: [ { q: "What does Emotional intelligence (EQ) help individuals recognize and influence?", options: ["The emotions of others.", "The weather patterns.", "The stock market fluctuations.", "The speed of light."] }, { q: "What is often considered a better predictor of success than traditional intelligence (IQ)?", options: ["High Emotional Intelligence (EQ).", "The number of books read annually.", "Physical strength and endurance.", "Knowledge of obscure facts."] }, { q: "What specific skill facilitates better teamwork and conflict resolution?", options: ["Strong emotional skills.", "Avoiding all meetings.", "Never speaking in groups.", "Ignoring all personal feelings."] }, { q: "What is the definition of empathy in the context of EQ?", options: ["Seeing situations from another person's perspective.", "Strictly adhering to one's own viewpoint.", "Feeling no emotion whatsoever.", "Memorizing large philosophical texts."] }, { q: "Developing EQ involves self-awareness, which is understanding what?", options: ["Your triggers and tendencies.", "The history of your home country.", "Complex mathematical formulas.", "The rules of a board game."] } ] },
         "7": { questions: [ { q: "What is the primary goal of recycling regarding waste?", options: ["To divert waste from landfills and conserve natural resources.", "To simply burn the trash quickly.", "To increase the volume of raw material extraction.", "To make all products disposable immediately."] }, { q: "What does the practice of recycling reduce the need for?", options: ["Raw material extraction.", "Using electricity in homes.", "Buying all new consumer goods.", "Drinking clean water."] }, { q: "What must individuals do for recycling to be effective?", options: ["Proper sorting of used materials.", "Burying all materials in the garden.", "Ignoring all sorting instructions.", "Throwing everything into one bin."] }, { q: "What significant environmental issues are often caused by raw material extraction?", options: ["Significant pollution and high energy consumption.", "Increased plant growth worldwide.", "Improved air quality in cities.", "A decrease in global temperatures."] }, { q: "What does active participation in the recycling cycle promote?", options: ["A sustainable economy.", "Increased consumption of resources.", "The immediate obsolescence of all products.", "A completely waste-free society."] } ] },
@@ -167,31 +176,29 @@
         return array;
     }
 
-function initGE() {
+    function initGE() {
         const audio = document.getElementById('mainAudio');
+        const playerBox = document.getElementById('playerBox');
         const source = document.getElementById('audioSource');
-        
-        // رابط المستودع بصيغة Raw
         const baseUrl = "https://raw.githubusercontent.com/eycfde-prog/EYCSSP/08e4749c5bfdd307b0351390d711223a2ecff4ad/frontend/eyclgos/geaudio/";
         
-        // المسار الكامل للملف الصوتي (مثلاً 1.wav, 2.wav...)
-        const audioPath = `${baseUrl}${taskNum}.wav`;
-        
-        source.src = audioPath;
+        source.src = `${baseUrl}${taskNum}.wav`;
         audio.load();
 
-        // تحديث عنوان المهمة
+        // Audio Visual Feedback Logic
+        audio.onplaying = () => playerBox.classList.add('audio-playing');
+        audio.onpause = () => playerBox.classList.remove('audio-playing');
+        audio.onended = () => playerBox.classList.remove('audio-playing');
+
         document.getElementById('task-title').innerText = `MISSION GES: PROTOCOL ${taskNum.padStart(2, '0')}`;
 
-        // بناء الأسئلة
         const mission = geMissions[taskNum] || geMissions["1"];
         const container = document.getElementById('quiz-container');
         
         container.innerHTML = mission.questions.map((qObj, qIdx) => {
             const shuffledOptions = shuffleArray([...qObj.options]);
-            
             return `
-                <div class="question-card">
+                <div class="question-card" id="card-${qIdx}">
                     <div class="question-text">${qIdx + 1}. ${qObj.q}</div>
                     <div class="options-list" id="q-${qIdx}">
                         ${shuffledOptions.map(opt => `
@@ -205,10 +212,16 @@ function initGE() {
             `;
         }).join('');
     }
+
     function selectOption(qIdx, val, el) {
         const parent = document.getElementById(`q-${qIdx}`);
+        const card = document.getElementById(`card-${qIdx}`);
+        
         parent.querySelectorAll('.option-item').forEach(item => item.classList.remove('selected'));
         el.classList.add('selected');
+        card.classList.add('completed'); // Continuous Gold Border Logic
+        card.classList.remove('flash-error'); // Remove error if fixed
+        
         selectedAnswers[qIdx] = val;
     }
 
@@ -220,14 +233,22 @@ function initGE() {
 
     function collectAndSubmit() {
         const answersArray = [];
-        let missing = false;
+        let firstMissingIdx = -1;
 
         for(let i=0; i<5; i++) {
-            if(!selectedAnswers[i]) missing = true;
+            if(!selectedAnswers[i]) {
+                if(firstMissingIdx === -1) firstMissingIdx = i;
+            }
             answersArray.push(selectedAnswers[i] || "");
         }
 
-        if(missing) {
+        // Anti-Frustration Code
+        if(firstMissingIdx !== -1) {
+            const errorCard = document.getElementById(`card-${firstMissingIdx}`);
+            errorCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            errorCard.classList.add('flash-error');
+            setTimeout(() => errorCard.classList.remove('flash-error'), 1200);
+            
             window.parent.postMessage({ type: 'MISSION_INCOMPLETE' }, '*');
             return;
         }
