@@ -8,15 +8,16 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root { 
-            --gold: #D4AF37; 
-            --gold-glow: rgba(212, 175, 55, 0.4);
+            --gold: #C5A028; 
+            --gold-glow: rgba(197, 160, 40, 0.4);
             --glass: rgba(255, 255, 255, 0.03); 
-            --glass-border: rgba(212, 175, 55, 0.15);
+            --glass-border: rgba(197, 160, 40, 0.15);
+            --cyan: #00f2ff;
         }
         
         body { 
             font-family: 'Poppins', sans-serif; 
-            background: transparent; /* خلفية شفافة للاندماج مع الأرينا */
+            background: transparent; 
             color: white; 
             margin: 0; 
             padding: 20px 10px; 
@@ -25,7 +26,6 @@
             direction: ltr;
         }
 
-        /* تخصيص السكرول بار ليكون غير مرئي تقريباً */
         body::-webkit-scrollbar { width: 3px; }
         body::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 10px; }
 
@@ -88,16 +88,17 @@
             font-size: 10px; padding: 2px 10px; 
             border-radius: 4px; font-weight: 900;
             letter-spacing: 1px;
+            box-shadow: 0 0 10px var(--gold-glow); /* Titanium Glow */
         }
 
         .input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
         
         label { 
             font-family: 'Noto Sans Arabic', sans-serif;
-            font-size: 15px; 
-            color: #fff; 
+            font-size: 14px; 
+            color: #aaa; 
             font-weight: 700; 
-            margin-bottom: 10px;
+            margin-bottom: 8px;
             text-align: center; 
             display: block; 
         }
@@ -108,28 +109,29 @@
             align-items: center; 
         }
 
-        input {
+        .alike-input {
             width: 100%; 
-            background: rgba(0, 0, 0, 0.4); 
+            background: rgba(0, 0, 0, 0.6); 
             border: 1px solid var(--glass-border);
             border-radius: 8px; 
             padding: 12px; 
             color: var(--gold); 
             text-align: center;
-            font-family: 'Poppins', sans-serif; 
-            font-size: 14px; 
+            font-family: 'Orbitron', sans-serif; 
+            font-size: 13px; 
             font-weight: 600;
             outline: none; 
             transition: 0.3s;
+            text-transform: uppercase; /* Input Refinement */
         }
 
-        input:focus { 
+        .alike-input:focus { 
             border-color: var(--gold); 
-            background: rgba(212, 175, 55, 0.05);
-            box-shadow: 0 0 10px var(--gold-glow);
+            background: rgba(212, 175, 55, 0.1);
+            box-shadow: 0 0 15px var(--gold-glow);
         }
 
-        input.error { border-color: #ff4444 !important; animation: shake 0.4s; }
+        .alike-input.error { border-color: #ff4444 !important; animation: shake 0.4s; }
         
         @keyframes shake {
             0%, 100% { transform: translateX(0); }
@@ -137,10 +139,11 @@
             75% { transform: translateX(4px); }
         }
 
-        /* مؤشر التحميل البصري الصغير */
         .sync-indicator {
-            font-size: 8px; font-family: 'Orbitron'; color: #555;
-            margin-top: 5px; text-transform: uppercase;
+            font-size: 8px; font-family: 'Orbitron'; color: #444;
+            margin-top: 10px; text-transform: uppercase;
+            text-align: center; letter-spacing: 1px;
+            transition: 0.3s;
         }
     </style>
 </head>
@@ -148,10 +151,10 @@
 
     <div class="mission-container">
         <div class="secret-header">
-            <div class="principle-tag"><i class="fas fa-fingerprint"></i> SECURE SESSION</div>
+            <div class="principle-tag"><i class="fas fa-microchip"></i> FREQUENCY DECODER</div>
             <div style="display: flex; gap: 5px;">
-                <span class="principle-tag">NLR</span>
-                <span class="principle-tag">ITS</span>
+                <span class="principle-tag">TITANIUM</span>
+                <span class="principle-tag" id="task-id">AS-01</span>
             </div>
         </div>
 
@@ -172,9 +175,12 @@
         "10": [ {a:"صباح", b:"حداد"}, {a:"أنف", b:"يعرف (للمفرد)"}, {a:"باهت", b:"دلو"}, {a:"وردة", b:"صفوف"}, {a:"رمى", b:"خلال"} ]
     };
 
+    let typingTimer;
+
     function renderActiveMission() {
         const urlParams = new URLSearchParams(window.location.search);
         const taskNum = urlParams.get('task') || "1"; 
+        document.getElementById('task-id').innerText = `AS-${taskNum.padStart(2, '0')}`;
         const pairs = missionsData[taskNum] || missionsData["1"];
         
         const wrapper = document.getElementById('mission-wrapper');
@@ -186,54 +192,101 @@
                         <div class="input-row">
                             <div class="word-box">
                                 <label>${p.a}</label>
-                                <input type="text" class="alike-input" data-pair="${i}" data-word="a" placeholder="[ _ ]" autocomplete="off">
+                                <input type="text" class="alike-input" data-id="p${i}a" placeholder="...">
                             </div>
                             <div class="word-box">
                                 <label>${p.b}</label>
-                                <input type="text" class="alike-input" data-pair="${i}" data-word="b" placeholder="[ _ ]" autocomplete="off">
+                                <input type="text" class="alike-input" data-id="p${i}b" placeholder="...">
                             </div>
                         </div>
-                        <div class="sync-indicator">Input Status: Ready</div>
+                        <div class="sync-indicator">SIGNAL STATUS: WAITING</div>
                     </div>
                 `).join('')}
             </div>
         `;
+
+        attachEventListeners();
+        loadPersistedData();
     }
 
-    // الاستماع لرسائل الأرينا
+    function attachEventListeners() {
+        const inputs = document.querySelectorAll('.alike-input');
+        inputs.forEach(input => {
+            // 1. Input Refinement & Analysis Logic
+            input.addEventListener('input', function() {
+                const indicator = this.closest('.pair-card').querySelector('.sync-indicator');
+                indicator.innerText = "ANALYZING FREQUENCY...";
+                indicator.style.color = "var(--gold)";
+
+                clearTimeout(typingTimer);
+                typingTimer = setTimeout(() => {
+                    if(this.value.trim() !== "") {
+                        indicator.innerText = "FREQUENCY LOCKED";
+                        indicator.style.color = "#00f2ff";
+                    } else {
+                        indicator.innerText = "SIGNAL STATUS: WAITING";
+                        indicator.style.color = "#444";
+                    }
+                }, 500);
+            });
+
+            // 2. Auto-Persistence on Change
+            input.addEventListener('change', function() {
+                const taskNum = new URLSearchParams(window.location.search).get('task') || "1";
+                const storageKey = `as_mission_t${taskNum}`;
+                let currentData = JSON.parse(sessionStorage.getItem(storageKey) || "{}");
+                currentData[this.dataset.id] = this.value;
+                sessionStorage.setItem(storageKey, JSON.stringify(currentData));
+            });
+        });
+    }
+
+    function loadPersistedData() {
+        const taskNum = new URLSearchParams(window.location.search).get('task') || "1";
+        const savedData = JSON.parse(sessionStorage.getItem(`as_mission_t${taskNum}`) || "{}");
+        Object.keys(savedData).forEach(id => {
+            const input = document.querySelector(`[data-id="${id}"]`);
+            if(input) {
+                input.value = savedData[id];
+                const indicator = input.closest('.pair-card').querySelector('.sync-indicator');
+                indicator.innerText = "FREQUENCY LOCKED";
+                indicator.style.color = "#00f2ff";
+            }
+        });
+    }
+
     window.addEventListener('message', function(event) {
-        if (event.data.type === 'REQUEST_MISSION_DATA') {
-            collectAndSend();
-        }
+        if (event.data.type === 'REQUEST_MISSION_DATA') collectAndSend();
     });
 
-function collectAndSend() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const taskNum = urlParams.get('task') || "1"; // جلب رقم المهمة
-    const inputs = document.querySelectorAll('.alike-input');
-    let answersArray = [];
-    let hasError = false;
+    function collectAndSend() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const taskNum = urlParams.get('task') || "1";
+        const inputs = document.querySelectorAll('.alike-input');
+        let answersArray = [];
+        let hasError = false;
 
-    inputs.forEach(input => {
-        const val = input.value.trim();
-        if(!val) {
-            hasError = true;
-            input.classList.add('error');
-            setTimeout(() => input.classList.remove('error'), 1000);
-        } else {
-            answersArray.push(val);
-        }
-    });
+        inputs.forEach(input => {
+            const val = input.value.trim().toUpperCase(); // Data Sanitization
+            if(!val) {
+                hasError = true;
+                input.classList.add('error');
+                setTimeout(() => input.classList.remove('error'), 1000);
+            } else {
+                answersArray.push(val);
+            }
+        });
 
-    if(hasError) return;
+        if(hasError) return;
 
-    window.parent.postMessage({
-        type: 'MISSION_ANSWERS', 
-        activityCode: 'AS', // الكود المتفق عليه
-        task: taskNum, 
-        answers: answersArray 
-    }, '*');
-}
+        // Final Protocol Transmission
+        window.parent.postMessage({
+            type: 'MISSION_ANSWERS', 
+            activityCode: 'AS', 
+            task: taskNum, 
+            answers: answersArray 
+        }, '*');
+    }
 
     window.onload = renderActiveMission;
 </script>
