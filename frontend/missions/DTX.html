@@ -28,7 +28,6 @@
             padding: 20px; border-radius: 15px; position: relative; transition: 0.3s;
         }
 
-        /* زر التشغيل المخصص */
         .play-btn {
             background: var(--gold); border: none; color: black;
             padding: 12px 25px; border-radius: 50px; font-family: 'Orbitron';
@@ -37,7 +36,6 @@
         }
         .play-btn:hover { transform: scale(1.05); }
 
-        /* نافذة التحذير */
         .modal-overlay {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.9); z-index: 10000; justify-content: center; align-items: center;
@@ -57,7 +55,6 @@
         .locked { opacity: 0.4; pointer-events: none; filter: grayscale(1); }
         .expired-msg { color: var(--error-red); font-family: 'Orbitron'; font-size: 9px; margin-top: 10px; font-weight: bold; }
         
-        /* إخفاء عنصر الأوديو الأصلي */
         audio { display: none; }
 
         .mission-blueprint { width: 100%; max-height: 200px; object-fit: contain; border-radius: 15px; margin-bottom: 20px; background: #000; border: 1px solid var(--glass-border); }
@@ -76,17 +73,13 @@
         <div class="audio-card" id="cardSlow">
             <div style="font-size: 10px; margin-bottom: 15px; font-family: 'Orbitron'; color: var(--gold);">ANALYTICAL (Slow)</div>
             <button id="btnSlow" class="play-btn" onclick="confirmPlay('slow')">▶ START SIGNAL</button>
-            <audio id="slowAudio" onended="onAudioEnded('slow')">
-                <source id="slowSource" src="" type="audio/wav">
-            </audio>
+            <audio id="slowAudio" onended="onAudioEnded('slow')"></audio>
         </div>
 
         <div class="audio-card" id="cardNormal">
             <div style="font-size: 10px; margin-bottom: 15px; font-family: 'Orbitron'; color: var(--gold);">REAL-TIME (Normal)</div>
             <button id="btnNormal" class="play-btn" onclick="confirmPlay('normal')">▶ START SIGNAL</button>
-            <audio id="normalAudio" onended="onAudioEnded('normal')">
-                <source id="normalSource" src="" type="audio/wav">
-            </audio>
+            <audio id="normalAudio" onended="onAudioEnded('normal')"></audio>
         </div>
     </div>
 </div>
@@ -110,9 +103,19 @@
     function initDictX() {
         document.getElementById('task-title').innerText = `MISSION DX-${taskNum.padStart(2, '0')}`;
         const base = "https://raw.githubusercontent.com/eycfde-prog/EYCSSP/main/frontend/eyclgos/dxaudio/";
+        
+        // تحديث الصورة
         document.getElementById('mission-img').src = `${base}${taskNum}.png`;
-        document.getElementById('slowSource').src = `${base}${taskNum}s.wav`;
-        document.getElementById('normalSource').src = `${base}${taskNum}n.wav`;
+
+        // تحديث مصادر الصوت واستدعاء التحميل (Fix)
+        const slowAud = document.getElementById('slowAudio');
+        const normAud = document.getElementById('normalAudio');
+
+        slowAud.src = `${base}${taskNum}s.wav`;
+        normAud.src = `${base}${taskNum}n.wav`;
+
+        slowAud.load();
+        normAud.load();
         
         // التحقق من حالة القفل السابقة
         if(localStorage.getItem(`DX_${taskNum}_slow`)) lockCard('slow');
@@ -133,14 +136,19 @@
         const audio = document.getElementById(currentTarget + 'Audio');
         const btn = document.getElementById('btn' + (currentTarget.charAt(0).toUpperCase() + currentTarget.slice(1)));
         
-        // إخفاء الزر فوراً لمنع التكرار
-        btn.style.display = 'none';
-        
-        // تشغيل الصوت وتخزينه كـ "مستعمل"
-        audio.play();
-        localStorage.setItem(`DX_${taskNum}_${currentTarget}`, "played");
-        
-        window.parent.postMessage({ type: 'AUDIO_PLAYED', audioType: currentTarget }, '*');
+        if (audio) {
+            // إخفاء الزر فوراً لمنع التكرار
+            btn.style.display = 'none';
+            
+            // تشغيل الصوت وتخزينه كـ "مستعمل"
+            audio.play().catch(e => {
+                console.error("Audio Playback Error:", e);
+                btn.style.display = 'block'; // إعادة إظهار الزر في حال فشل التشغيل التقني
+            });
+
+            localStorage.setItem(`DX_${taskNum}_${currentTarget}`, "played");
+            window.parent.postMessage({ type: 'AUDIO_PLAYED', audioType: currentTarget }, '*');
+        }
     }
 
     function onAudioEnded(type) {
