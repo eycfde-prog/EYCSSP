@@ -49,11 +49,6 @@
         .card-icon { position: relative; z-index: 1; font-size: 2.2rem; margin-bottom: 10px; background: var(--gold-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .tk-activity-badge { font-family: 'Orbitron'; font-size: 0.6rem; color: var(--gold); border: 1px solid var(--gold); padding: 2px 8px; border-radius: 5px; margin-top: 10px; display: inline-block; }
 
-        #mailDrawer { position: fixed; top: 0; right: -100%; width: 350px; height: 100%; background: rgba(5, 5, 8, 0.95); backdrop-filter: blur(25px); border-left: 1px solid var(--glass-border); z-index: 3000; transition: 0.5s cubic-bezier(0.7, 0, 0.3, 1); padding: 30px; }
-        #mailDrawer.active { right: 0; }
-        .msg-bubble { background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border); padding: 15px; border-radius: 12px; margin-bottom: 10px; cursor: pointer; }
-        .msg-content { font-size: 0.8rem; color: #ccc; margin-top: 10px; display: none; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.1); }
-
         .tab-switcher { background: #000; padding: 4px; border-radius: 15px; display: flex; border: 1px solid var(--glass-border); width: 90%; max-width: 300px; margin: 20px auto; }
         .tab-btn { flex: 1; padding: 12px; border: none; background: transparent; color: #666; border-radius: 12px; cursor: pointer; font-weight: 700; font-size: 0.65rem; letter-spacing: 2px; }
         .tab-btn.active { color: #000; background: var(--gold-gradient); }
@@ -62,15 +57,11 @@
         .modal-content { background: #050508; border-radius: 25px; padding: 40px; width: 90%; max-width: 400px; border: 1px solid var(--glass-border); position: relative; }
 
         .tasks-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin: 30px 0; }
-        .task-node { position: relative; aspect-ratio: 1; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-family: 'Orbitron'; font-size: 0.8rem; overflow: hidden; }
-        .lock-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.85); display: flex; align-items: center; justify-content: center; color: var(--gold); z-index: 5; }
-        .lock-tooltip { position: absolute; bottom: 110%; background: #000; color: #fff; padding: 5px 10px; border-radius: 5px; font-size: 0.6rem; white-space: nowrap; border: 1px solid var(--gold); z-index: 100; pointer-events: none; }
+        .task-node { position: relative; aspect-ratio: 1; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-family: 'Orbitron'; font-size: 0.8rem; overflow: hidden; transition: 0.3s; }
+        .task-node:hover { background: rgba(197, 160, 40, 0.1); border-color: var(--gold); }
 
         .btn-exit { background: transparent; border: 1px solid #444; color: #888; padding: 12px 30px; border-radius: 12px; cursor: pointer; font-family: 'Orbitron'; font-size: 0.7rem; transition: 0.3s; width: 100%; }
         .btn-exit:hover { border-color: var(--gold); color: var(--gold); }
-
-        .fairytale-float { position: fixed; bottom: 20px; right: 20px; width: 60px; height: 60px; background: var(--gold-gradient); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; box-shadow: var(--neon-gold); cursor: pointer; z-index: 1000; animation: float 3s infinite ease-in-out; color: #000; }
-        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
     </style>
 </head>
 <body>
@@ -78,13 +69,7 @@
     <div id="star-container"></div>
     <nav class="top-nav">
         <i class="fas fa-arrow-left nav-icon" onclick="window.location.href='index.html'"></i>
-        <div style="display: flex; align-items: center; gap: 15px;">
-            <div id="notifBell" class="nav-icon" onclick="openMailbox()" style="position: relative;">
-                <i class="fas fa-bell"></i>
-                <span id="notifDot" style="display:none; position: absolute; top: -5px; right: -5px; width: 10px; height: 10px; background: red; border-radius: 50%; border: 2px solid var(--bg-deep);"></span>
-            </div>
-            <i class="fas fa-power-off nav-icon" id="logoutBtn" style="display:none;" onclick="handleLogout()"></i>
-        </div>
+        <i class="fas fa-power-off nav-icon" id="logoutBtn" style="display:none;" onclick="handleLogout()"></i>
     </nav>
 
     <header class="hero-banner" id="heroBanner"></header>
@@ -95,14 +80,6 @@
     </div>
 
     <main><div class="grid-container" id="cardsGrid"></div></main>
-
-    <div id="mailDrawer">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px;">
-            <h2 style="font-family:'Orbitron'; color:var(--gold); font-size:1.1rem;">Your MailBox</h2>
-            <i class="fas fa-times" onclick="closeMailbox()" style="cursor:pointer; color:var(--gold);"></i>
-        </div>
-        <div id="mailList"></div>
-    </div>
 
     <div class="modal" id="taskModal">
         <div class="modal-content">
@@ -122,13 +99,8 @@
         </div>
     </div>
 
-    <div class="fairytale-float" onclick="alert('Fairytale Guide: Master your tasks to rank up!')">
-        <i class="fas fa-wand-sparkles"></i>
-    </div>
-
     <script>
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxe3gYkhNIN4cMqpY2RAglBYWp-m9XHxMiVGXLR7-7j-gPo9Cc0zdg1ALQmT2i-griu/exec";
-        
         const IMG = {
             tk: "https://raw.githubusercontent.com/eycfde-prog/EYCSSP/047aeca8ef0fa0d95627552cfb62fd8300531134/frontend/eyclgos/Token.png",
             star: "https://raw.githubusercontent.com/eycfde-prog/EYCSSP/047aeca8ef0fa0d95627552cfb62fd8300531134/frontend/eyclgos/Star.png",
@@ -161,84 +133,22 @@
             ]
         };
 
-        const MISSION_SCHEDULE = {
-            getUnlockDate: (program, taskIndex) => {
-                const seasonStart = new Date("2026-02-26T00:00:00");
-                const royalStart = new Date("2026-02-28T00:00:00");
-                let targetDate = new Date(program === 'season' ? seasonStart : royalStart);
-
-                if (taskIndex > 1) {
-                    if (program === 'season') {
-                        let daysToAdd = 0;
-                        for (let j = 2; j <= taskIndex; j++) {
-                            daysToAdd += (j + 2); 
-                        }
-                        targetDate.setDate(targetDate.getDate() + daysToAdd);
-                    } else {
-                        targetDate.setDate(targetDate.getDate() + ((taskIndex - 1) * 3));
-                    }
-                }
-                return targetDate;
-            }
-        };
-
+        // Wolf: Time Protocol Disabled
         function openTasks(name, code) {
             document.getElementById('mTitle').innerText = name;
             const tGrid = document.getElementById('tGrid'); tGrid.innerHTML = '';
-            const type = document.querySelector('.tab-btn.active').innerText.toLowerCase().includes('royal') ? 'royal' : 'season';
             
             for (let i = 1; i <= 10; i++) {
                 const node = document.createElement('div');
                 node.className = 'task-node';
                 node.innerText = i;
-
-                const openDate = MISSION_SCHEDULE.getUnlockDate(type, i);
-                const isLocked = new Date() < openDate;
-
-                if (isLocked) {
-                    node.innerHTML += '<div class="lock-overlay"><i class="fas fa-lock"></i></div>';
-                    node.onclick = (e) => {
-                        if (!isLoggedIn) return openLogin();
-                        const existing = node.querySelector('.lock-tooltip');
-                        if (existing) existing.remove();
-                        const tt = document.createElement('div');
-                        tt.className = 'lock-tooltip';
-                        tt.innerText = `Available on: ${openDate.toDateString()}`;
-                        node.appendChild(tt);
-                        setTimeout(() => tt.remove(), 3000);
-                    };
-                } else {
-                    node.onclick = () => {
-                        if (!isLoggedIn) return openLogin();
-                        window.location.href = `EYCArena.html?email=${currentUser.email}&act=${code}&task=${i}`;
-                    };
-                }
+                node.onclick = () => {
+                    if (!isLoggedIn) return openLogin();
+                    window.location.href = `EYCArena.html?email=${currentUser.email}&act=${code}&task=${i}`;
+                };
                 tGrid.appendChild(node);
             }
             document.getElementById('taskModal').style.display = 'flex';
-        }
-
-        function openMailbox() {
-            document.getElementById('mailDrawer').classList.add('active');
-            document.getElementById('notifDot').style.display = 'none';
-            renderMails();
-        }
-        function closeMailbox() { document.getElementById('mailDrawer').classList.remove('active'); }
-
-        function renderMails() {
-            const list = document.getElementById('mailList');
-            const mails = JSON.parse(localStorage.getItem('eyc_mails') || '[]');
-            list.innerHTML = mails.length ? '' : '<p style="text-align:center; opacity:0.5;">No Comms</p>';
-            mails.forEach((m, i) => {
-                const bubble = document.createElement('div');
-                bubble.className = 'msg-bubble';
-                bubble.innerHTML = `<div style="font-size:0.6rem; color:var(--gold);">${m.date}</div><div style="font-weight:600; margin-top:5px;">Mission Update</div><div class="msg-content" id="msg-${i}">${m.text}</div>`;
-                bubble.onclick = () => {
-                    const content = document.getElementById(`msg-${i}`);
-                    content.style.display = content.style.display === 'block' ? 'none' : 'block';
-                };
-                list.appendChild(bubble);
-            });
         }
 
         function renderHeader() {
@@ -254,21 +164,11 @@
                         <h1 class="student-name">${currentUser.name}</h1>
                         <p class="student-title">${currentUser.title}</p>
                         <div class="stats-row">
-                            <div class="stat-item">
-                                <img src="${IMG.tk}" class="stat-icon" title="Tokens"> 
-                                <span>${currentUser.tokens}</span>
-                            </div>
-                            <div class="stat-item">
-                                <img src="${IMG.star}" class="stat-icon" title="Stars"> 
-                                <span>${currentUser.stars}</span>
-                            </div>
-                            <div class="stat-item">
-                                <img src="${IMG.gt}" class="stat-icon" title="Gold Tickets"> 
-                                <span>${currentUser.goldTickets}</span>
-                            </div>
+                            <div class="stat-item"><img src="${IMG.tk}" class="stat-icon"> <span>${currentUser.tokens}</span></div>
+                            <div class="stat-item"><img src="${IMG.star}" class="stat-icon"> <span>${currentUser.stars}</span></div>
+                            <div class="stat-item"><img src="${IMG.gt}" class="stat-icon"> <span>${currentUser.goldTickets}</span></div>
                         </div>
                     </div>`;
-                if(currentUser.lastNotification) checkNotif(currentUser.lastNotification);
             } else {
                 header.innerHTML = `<h1 class="student-name">ARENA ACCESS</h1><button class="btn-exit" style="width:auto; margin-top:20px;" onclick="openLogin()">AUTHORIZE LOGIN</button>`;
             }
@@ -284,15 +184,6 @@
                 card.onclick = () => openTasks(act.name, act.code);
                 grid.appendChild(card);
             });
-        }
-
-        function checkNotif(msg) {
-            let mails = JSON.parse(localStorage.getItem('eyc_mails') || '[]');
-            if(!mails.some(m => m.text === msg)) {
-                mails.unshift({text: msg, date: new Date().toLocaleString()});
-                localStorage.setItem('eyc_mails', JSON.stringify(mails));
-                document.getElementById('notifDot').style.display = 'block';
-            }
         }
 
         function switchType(type, btn) {
@@ -321,69 +212,9 @@
         function openLogin() { document.getElementById('loginModal').style.display = 'flex'; }
         function closeModal(id) { document.getElementById(id).style.display = 'none'; }
 
-        function renderResult(res) {
-            const isManual = (res.grade === "PENDING" || res.isManual === true);
-            const manualCodes = ["DTX", "EMX", "SSSX"];
-            const isTransmission = manualCodes.includes(currentActivity);
-
-            let subText = "";
-            if (isTransmission) {
-                subText = "TRANSMISSION SECURED: HQ is reviewing your frequency";
-            } else if (isManual) {
-                subText = "Your answer is under revision at HQ.";
-            } else {
-                subText = "Data synchronized with HQ Command.";
-            }
-
-            let appealBtnHtml = "";
-            if (!isManual && parseInt(res.grade) < 40) {
-                appealBtnHtml = `<button id="appealBtn" class="btn btn-guide" style="margin-top:10px; width:100%; border-color:rgba(255,0,0,0.3)" onclick="requestReview()">REQUEST REVIEW (RR)</button>`;
-            }
-        }
-
-        function runRoyalLoader() {
-            const fill = document.getElementById('loader-fill');
-            const text = document.getElementById('loader-perc');
-            let progress = 0;
-            
-            let timer = setInterval(() => {
-                progress += Math.floor(Math.random() * 20);
-                if (progress >= 100) {
-                    progress = 100;
-                    clearInterval(timer);
-                    setTimeout(() => document.getElementById('arena-loader').style.fadeOut(), 400);
-                }
-                if(fill) fill.style.width = progress + '%';
-                if(text) text.innerText = `Getting the Arena Ready... ${progress}%`;
-            }, 150);
-        }
-
         window.onload = () => {
             const saved = localStorage.getItem('eyc_user');
             if(saved) { currentUser = JSON.parse(saved); isLoggedIn = true; }
-            
-            const params = new URLSearchParams(window.location.search);
-            const currentActivity = params.get('act'); 
-            const currentTask = parseInt(params.get('task') || "1");
-
-            if (currentActivity) {
-                const royalCodes = ["ASX","VVX","LBX","SDX","GEX","GRX","DTX","SSSX","EMX","FGX"];
-                const activityType = royalCodes.includes(currentActivity) ? 'royal' : 'season';
-                const unlockDate = MISSION_SCHEDULE.getUnlockDate(activityType, currentTask);
-
-                if (new Date() < unlockDate) {
-                    document.body.innerHTML = `
-                        <div style="height:100vh; background:#000; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; font-family:'Orbitron';">
-                            <i class="fas fa-shield-alt" style="font-size:5rem; color:#C5A028; margin-bottom:20px;"></i>
-                            <h1 style="color:#C5A028;">ENTRY DENIED</h1>
-                            <p style="color:#888; margin-top:10px;">Mission signals will clear on:</p>
-                            <p style="color:#fff; margin-top:5px;">${unlockDate.toLocaleString()}</p>
-                            <button onclick="location.href='index.html'" style="margin-top:30px; padding:12px 25px; background:transparent; border:1px solid #C5A028; color:#C5A028; cursor:pointer;">RETURN TO BASE</button>
-                        </div>`;
-                    return;
-                }
-            }
-
             renderHeader(); 
             generateCards();
             
