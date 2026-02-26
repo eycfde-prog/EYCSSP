@@ -243,6 +243,14 @@
             });
         }
 
+// 1. تحديث مسارات الصور للروابط المباشرة (Raw Links)
+        const IMG = {
+            tk: "https://raw.githubusercontent.com/eycfde-prog/EYCSSP/047aeca8ef0fa0d95627552cfb62fd8300531134/frontend/eyclgos/Token.png",
+            star: "https://raw.githubusercontent.com/eycfde-prog/EYCSSP/047aeca8ef0fa0d95627552cfb62fd8300531134/frontend/eyclgos/Star.png",
+            gt: "https://raw.githubusercontent.com/eycfde-prog/EYCSSP/047aeca8ef0fa0d95627552cfb62fd8300531134/frontend/eyclgos/GT.png"
+        };
+
+        // 2. دالة عرض الهيدر مع الأيقونات الجديدة
         function renderHeader() {
             const header = document.getElementById('heroBanner');
             if (isLoggedIn) {
@@ -256,9 +264,18 @@
                         <h1 class="student-name">${currentUser.name}</h1>
                         <p class="student-title">${currentUser.title}</p>
                         <div class="stats-row">
-                            <div class="stat-item"><img src="${IMG.tk}" class="stat-icon"> <span>${currentUser.tokens}</span></div>
-                            <div class="stat-item"><img src="${IMG.star}" class="stat-icon"> <span>${currentUser.stars}</span></div>
-                            <div class="stat-item"><img src="${IMG.gt}" class="stat-icon"> <span>${currentUser.goldTickets}</span></div>
+                            <div class="stat-item">
+                                <img src="${IMG.tk}" class="stat-icon" title="Tokens"> 
+                                <span>${currentUser.tokens}</span>
+                            </div>
+                            <div class="stat-item">
+                                <img src="${IMG.star}" class="stat-icon" title="Stars"> 
+                                <span>${currentUser.stars}</span>
+                            </div>
+                            <div class="stat-item">
+                                <img src="${IMG.gt}" class="stat-icon" title="Gold Tickets"> 
+                                <span>${currentUser.goldTickets}</span>
+                            </div>
                         </div>
                     </div>`;
                 if(currentUser.lastNotification) checkNotif(currentUser.lastNotification);
