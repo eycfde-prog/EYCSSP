@@ -3,202 +3,167 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>EYC Arena | Titanium Mode</title>
+    <title>EYC Arena | Royal Command</title>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Orbitron:wght@400;500;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root { --gold: #D4AF37; --gold-glow: rgba(212, 175, 55, 0.5); --gold-gradient: linear-gradient(135deg, #bf953f, #fcf6ba, #b38728); --bg-deep: #020205; --glass: rgba(255, 255, 255, 0.02); --glass-border: rgba(212, 175, 55, 0.2); }
+        :root { 
+            --gold: #C5A028; /* Muted Gold */
+            --gold-glow: rgba(197, 160, 40, 0.4); 
+            --gold-gradient: linear-gradient(135deg, #bf953f, #fcf6ba, #b38728); 
+            --bg-deep: #020205; 
+            --glass: rgba(255, 255, 255, 0.02); 
+            --glass-border: rgba(197, 160, 40, 0.2); 
+        }
+
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { background: var(--bg-deep); color: white; height: 100dvh; display: flex; flex-direction: column; overflow: hidden; font-family: 'Poppins', sans-serif; }
+
+        /* Star Background from MC */
         #star-container { position: fixed; inset: 0; z-index: -2; background: radial-gradient(circle at center, #0a0c14 0%, #020205 100%); }
         .star { position: absolute; background: white; border-radius: 50%; opacity: 0.3; }
-        header { padding: 12px 20px; background: rgba(0,0,0,0.8); border-bottom: 1px solid var(--glass-border); z-index: 10; }
-        .battle-header { display: flex; justify-content: space-between; align-items: center; max-width: 1200px; margin: 0 auto; width: 100%; }
-        .info-box { display: flex; align-items: center; gap: 10px; background: var(--glass); padding: 5px 10px; border-radius: 10px; border: 1px solid var(--glass-border); }
-        .student-photo { width: 35px; height: 35px; border-radius: 5px; border: 1px solid var(--gold); object-fit: cover; }
-        .name { font-family: 'Cinzel'; font-size: 0.75rem; color: var(--gold); font-weight: 700; }
-        .rank-tag { font-family: 'Orbitron'; font-size: 0.5rem; color: #888; }
-        .arena-container { flex: 1; padding: 10px; position: relative; }
-        .glass-iframe-wrapper { width: 100%; height: 100%; background: #000; border: 1px solid var(--glass-border); border-radius: 10px; overflow: hidden; position: relative; }
+
+        /* Royal Header - Centered Identity */
+        header { padding: 15px 20px; background: rgba(0,0,0,0.85); border-bottom: 1px solid var(--glass-border); z-index: 10; backdrop-filter: blur(10px); }
+        .battle-header { display: flex; justify-content: center; align-items: center; max-width: 1200px; margin: 0 auto; width: 100%; }
+        .student-hub { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+        .student-photo { width: 50px; height: 50px; border-radius: 12px; border: 2px solid var(--gold); object-fit: cover; box-shadow: 0 0 15px var(--gold-glow); }
+        .name { font-family: 'Cinzel'; font-size: 0.9rem; color: var(--gold); font-weight: 900; letter-spacing: 2px; text-transform: uppercase; }
+        .rank-tag { font-family: 'Orbitron'; font-size: 0.6rem; color: #888; letter-spacing: 1px; }
+
+        /* Task Info Bar (Above Footer) */
+        .task-status-bar { background: rgba(0,0,0,0.7); border-top: 1px solid var(--glass-border); padding: 8px 20px; display: flex; justify-content: space-between; align-items: center; font-family: 'Orbitron'; font-size: 0.65rem; color: var(--gold); }
+
+        .arena-container { flex: 1; padding: 0; position: relative; }
+        .glass-iframe-wrapper { width: 100%; height: 100%; background: #000; position: relative; }
         iframe { width: 100%; height: 100%; border: none; }
+
+        /* Royal Loader */
         #arena-loader { position: absolute; inset: 0; background: var(--bg-deep); z-index: 100; display: flex; flex-direction: column; justify-content: center; align-items: center; }
-        .gear { color: var(--gold); animation: spin 4s linear infinite; font-size: 30px; }
-        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-        footer { padding: 10px 20px; display: flex; gap: 10px; max-width: 1200px; margin: 0 auto; width: 100%; }
-        .btn { flex: 1; padding: 12px; border-radius: 8px; border: none; font-family: 'Orbitron'; font-size: 0.7rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; }
+        .loader-bar-container { width: 200px; height: 4px; background: rgba(255,255,255,0.1); border-radius: 10px; margin-top: 20px; overflow: hidden; }
+        .loader-fill { width: 0%; height: 100%; background: var(--gold-gradient); transition: width 0.3s; }
+        .loader-text { font-family: 'Orbitron'; color: var(--gold); font-size: 0.7rem; margin-top: 10px; letter-spacing: 1px; }
+
+        footer { padding: 12px 20px; display: flex; gap: 10px; max-width: 1200px; margin: 0 auto; width: 100%; background: rgba(0,0,0,0.9); }
+        .btn { flex: 1; padding: 14px; border-radius: 10px; border: none; font-family: 'Orbitron'; font-size: 0.75rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: 0.3s; }
         .btn-submit { background: var(--gold-gradient); color: #000; font-weight: 900; }
         .btn-side { background: rgba(255,255,255,0.05); color: #fff; border: 1px solid #333; }
-        #sync-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 2000; display: none; flex-direction: column; justify-content: center; align-items: center; backdrop-filter: blur(15px); }
-        .result-card { text-align: center; padding: 30px; border-radius: 20px; border: 1px solid var(--gold); background: #050508; width: 85%; max-width: 400px; }
+        .btn-guide { background: rgba(197, 160, 40, 0.1); color: var(--gold); border: 1px solid var(--gold); }
+
+        /* Result Glitch Effect */
+        #sync-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.98); z-index: 2000; display: none; flex-direction: column; justify-content: center; align-items: center; backdrop-filter: blur(20px); }
+        .result-card { text-align: center; padding: 40px; border-radius: 25px; border: 1px solid var(--gold); background: #050508; width: 90%; max-width: 420px; animation: glitchIn 0.4s ease-out; }
+        @keyframes glitchIn { 0% { transform: scale(0.9) skew(5deg); opacity: 0; } 100% { transform: scale(1) skew(0); opacity: 1; } }
     </style>
 </head>
 <body>
 
+    <div id="star-container"></div>
+
     <div id="sync-overlay">
         <div id="loader-content" style="text-align: center;">
-            <i class="fas fa-sync fa-spin" style="font-size: 3rem; color: var(--gold);"></i>
-            <p style="margin-top:20px; font-family:'Orbitron'; color:var(--gold);">ANALYZING MISSION DATA...</p>
+            <i class="fas fa-shield-alt fa-pulse" style="font-size: 3rem; color: var(--gold);"></i>
+            <p style="margin-top:20px; font-family:'Orbitron'; color:var(--gold);">SYNCHRONIZING WITH HQ...</p>
         </div>
         <div id="result-display" style="display: none;" class="result-card"></div>
     </div>
 
-    <div id="star-container"></div>
-
     <header>
         <div class="battle-header">
-            <div class="info-box">
-                <img id="student-img" class="student-photo" src="" alt="">
-                <div><div class="name" id="student-name">AGENT</div><div class="rank-tag" id="student-title">RANKING...</div></div>
-            </div>
-            <div class="info-box">
-                <div style="text-align: right;"><div class="name" id="activity-title">ACTIVITY</div><div id="mission-sub" class="rank-tag">TASK 01</div></div>
-                <img id="activity-img" class="student-photo" style="border-radius:50%" src="frontend/assets/logo.png" alt="">
+            <div class="student-hub">
+                <img id="student-img" class="student-photo" src="" alt="Agent">
+                <div class="name" id="student-name">LOADING AGENT...</div>
+                <div class="rank-tag" id="student-title">RANKING...</div>
             </div>
         </div>
     </header>
 
     <main class="arena-container">
         <div class="glass-iframe-wrapper">
-            <div id="arena-loader"><i class="fas fa-cog gear"></i><p style="color:var(--gold); margin-top:10px; font-size:0.6rem;">LOADING MISSION...</p></div>
+            <div id="arena-loader">
+                <div class="loader-text" id="load-status">Getting the Arena Ready...</div>
+                <div class="loader-bar-container"><div class="loader-fill" id="load-fill"></div></div>
+                <div class="loader-text" style="font-size: 0.5rem; margin-top: 5px;" id="perc">0%</div>
+            </div>
             <iframe id="contentFrame"></iframe>
         </div>
     </main>
 
+    <div class="task-status-bar">
+        <span id="activity-title">ACTIVITY_NULL</span>
+        <span id="mission-sub">TASK_00</span>
+    </div>
+
     <footer>
-        <button class="btn btn-side" onclick="exitArena()"><i class="fas fa-arrow-left"></i> BACK</button>
-        <button id="submitBtn" class="btn btn-submit" onclick="startSubmission()"><i class="fas fa-upload"></i> SUBMIT MISSION</button>
+        <button class="btn btn-side" onclick="exitArena()"><i class="fas fa-home"></i> BASE</button>
+        <button id="submitBtn" class="btn btn-submit" onclick="startSubmission()"><i class="fas fa-bolt"></i> SUBMIT</button>
+        <button class="btn btn-guide" onclick="openGuide()"><i class="fas fa-book-open"></i> GUIDE</button>
     </footer>
 
 <script>
-    const CORE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz1D8BkAHFH0mwiw_n_2yL6jvQ04rrOb3mwiqKuxmHVTrynxzYzzF7XwIJQ-QnrrfQb/exec"; 
-    const MISSIONS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz7KoJjI0VqYPBhJJfspL2RdAE8R5x8wdiRVrqvYL7cAdsisuyw-lE6IoAQsWWI-voRzw/exec"; 
+    const CORE_SCRIPT_URL = "YOUR_CORE_URL_HERE"; 
+    const MISSIONS_SCRIPT_URL = "YOUR_MISSIONS_URL_HERE"; 
 
     let userEmail, currentActivity, currentTask;
 
     window.onload = function() {
         createStars();
         const user = JSON.parse(localStorage.getItem('eyc_user'));
-        if (!user) return exitArena();
-
         const params = new URLSearchParams(window.location.search);
-        userEmail = user.email;
-        currentActivity = params.get('act'); 
-        currentTask = params.get('task') || "1";
+        
+        currentActivity = params.get('act');
+        currentTask = parseInt(params.get('task') || "1");
 
+        // --- Security Shield Logic ---
+        if (!user || !checkSecurity(currentActivity, currentTask)) {
+            document.body.innerHTML = `<div style="height:100vh; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; padding:20px; background:#000;">
+                <i class="fas fa-user-lock" style="font-size:4rem; color:red; margin-bottom:20px;"></i>
+                <h1 style="font-family:'Orbitron'; color:#fff;">ENCRYPTED ACCESS</h1>
+                <p style="color:#888; margin-top:10px;">This mission is locked or requires authorization.</p>
+                <button onclick="window.location.href='MC.html'" style="margin-top:20px; padding:10px 25px; background:var(--gold); border:none; border-radius:5px; font-family:'Orbitron';">RETURN</button>
+            </div>`;
+            return;
+        }
+
+        userEmail = user.email;
         document.getElementById('student-name').innerText = user.name;
         document.getElementById('student-title').innerText = user.title;
         document.getElementById('student-img').src = user.avatar;
         document.getElementById('activity-title').innerText = currentActivity;
-        document.getElementById('mission-sub').innerText = `TASK ${currentTask}`;
+        document.getElementById('mission-sub').innerText = `MISSION ${currentTask}`;
 
+        runRoyalLoader();
         checkMissionPresence();
     };
 
-    function checkMissionPresence() {
-        fetch(`${CORE_SCRIPT_URL}?action=checkMission&email=${userEmail}&activity=${currentActivity}&task=${currentTask}`)
-        .then(res => res.json())
-        .then(data => {
-            if (data.status === "completed") {
-                document.getElementById('sync-overlay').style.display = 'flex';
-                renderResult({
-                    status: "success",
-                    grade: data.grade,
-                    analysis: data.analysis,
-                    isManual: data.isManual,
-                    alreadyDone: true 
-                });
-            } else {
-                document.getElementById('contentFrame').src = `missions/${currentActivity}.html?task=${currentTask}`;
-            }
-        })
-        .catch(() => {
-            document.getElementById('contentFrame').src = `missions/${currentActivity}.html?task=${currentTask}`;
-        });
-    }
-
-    function startSubmission() {
-        const frame = document.getElementById('contentFrame').contentWindow;
-        frame.postMessage({ type: 'REQUEST_MISSION_DATA' }, '*');
-    }
-
-    window.addEventListener('message', function(event) {
-        const userObj = JSON.parse(localStorage.getItem('eyc_user'));
+    function checkSecurity(act, task) {
+        if (task === 1) return true;
+        const now = new Date();
+        // Simplified Logic: Matches your MC protocol
+        const startSeason = new Date("2026-02-26T10:00:00");
+        const startRoyal = new Date("2026-02-28T10:00:00");
         
-        if (event.data.type === 'MISSION_ANSWERS') {
-            submitToHQ(event.data.answers);
+        let unlockDate;
+        if (["AS","VV","LB","GR","GE","SD"].includes(act)) {
+            let daysToAdd = 0;
+            for(let i=2; i<=task; i++) daysToAdd += (i+2); 
+            unlockDate = new Date(startSeason.getTime() + daysToAdd * 86400000);
+        } else {
+            unlockDate = new Date(startRoyal.getTime() + (task-1) * 3 * 86400000);
         }
-
-        if (event.data.type === 'AUDIO_PLAYED') {
-            const url = `${MISSIONS_SCRIPT_URL}?action=markAudio&name=${encodeURIComponent(userObj.name)}&task=${currentTask}&audioNum=${event.data.audioNum}`;
-            fetch(url);
-        }
-        
-        if (event.data.type === 'CHECK_AUDIO_STATUS') {
-            fetch(`${MISSIONS_SCRIPT_URL}?action=checkAudio&name=${encodeURIComponent(userObj.name)}&task=${currentTask}`)
-            .then(res => res.json())
-            .then(status => {
-                document.getElementById('contentFrame').contentWindow.postMessage({
-                    type: 'AUDIO_STATUS_DATA',
-                    audio1: status.audio1,
-                    audio2: status.audio2
-                }, '*');
-            });
-        }
-    });
-
-    function submitToHQ(answers) {
-        document.getElementById('sync-overlay').style.display = 'flex';
-        const userObj = JSON.parse(localStorage.getItem('eyc_user'));
-
-        const gradingPayload = {
-            activity: currentActivity,
-            task: currentTask,
-            email: userEmail,
-            name: userObj ? userObj.name : "Unknown",
-            studentData: answers
-        };
-
-        fetch(MISSIONS_SCRIPT_URL, {
-            method: "POST",
-            mode: "cors",
-            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-            body: JSON.stringify(gradingPayload)
-        })
-        .then(res => res.json())
-        .then(gradingRes => {
-            if (gradingRes.status === "success") {
-                saveGradeToStudents(gradingRes);
-            } else {
-                renderResult(gradingRes);
-            }
-        })
-        .catch(err => renderResult({ status: "error", message: "Grading Failed" }));
+        return now >= unlockDate;
     }
 
-    function saveGradeToStudents(res) {
-        const saveUrl = `${CORE_SCRIPT_URL}?action=submitMission&email=${userEmail}&activity=${currentActivity}&task=${currentTask}&grade=${res.grade}&answers=${encodeURIComponent(res.answers)}&analysis=${encodeURIComponent(res.analysis)}`;
-
-        fetch(saveUrl)
-        .then(res => res.json())
-        .then(finalRes => {
-            renderResult(finalRes);
-        })
-        .catch(err => renderResult({ status: "error", message: "Failed to record grade" }));
-    }
-
-    function requestReview() {
-        const btn = document.getElementById('appealBtn');
-        btn.innerText = "SENDING...";
-        btn.disabled = true;
-
-        fetch(`${CORE_SCRIPT_URL}?action=requestAppeal&email=${userEmail}&activity=${currentActivity}&task=${currentTask}`)
-        .then(res => res.json())
-        .then(data => {
-            if(data.status === "success") {
-                btn.innerHTML = "<i class='fas fa-check'></i> REQUESTED";
-                btn.style.borderColor = "var(--gold)";
-            }
-        });
+    function runRoyalLoader() {
+        let p = 0;
+        const fill = document.getElementById('load-fill');
+        const perc = document.getElementById('perc');
+        const interval = setInterval(() => {
+            p += Math.floor(Math.random() * 15);
+            if (p >= 100) { p = 100; clearInterval(interval); }
+            fill.style.width = p + '%';
+            perc.innerText = p + '%';
+        }, 150);
     }
 
     function renderResult(res) {
@@ -207,50 +172,28 @@
         document.getElementById('sync-overlay').style.display = 'flex'; 
         display.style.display = 'block';
 
+        const isManual = (res.grade === "PENDING" || res.isManual === true);
+        const canAppeal = (!isManual && res.grade < 40 && res.status === "success");
+
         if (res.status === "success") {
-            const isManual = (res.grade === "PENDING" || res.isManual === true);
-            let icon, title, gradeDisplay, subText, appealBtnHtml;
-
-            if (isManual) {
-                icon = "fa-cloud-upload-alt";
-                title = res.alreadyDone ? "MISSION RECORDED" : "MISSION RECEIVED";
-                gradeDisplay = "PENDING";
-                subText = `Your answer is under revision at HQ.`;
-                appealBtnHtml = "";
-            } else {
-                icon = "fa-check-circle";
-                title = res.alreadyDone ? "PREVIOUS SCORE" : "MISSION COMPLETE";
-                gradeDisplay = `${res.grade} / 50`;
-                subText = res.alreadyDone ? "You have already passed this mission." : "Data synchronized with HQ Command.";
-                
-                appealBtnHtml = `<button id="appealBtn" class="btn btn-side" style="margin-top:10px; width:100%; border-color:rgba(255,0,0,0.3)" onclick="requestReview()">
-                                    <i class="fas fa-circle-exclamation"></i> REQUEST REVIEW (RR)
-                                 </button>`;
-            }
-
             display.innerHTML = `
-                <i class="fas ${icon}" style="font-size:3rem; color:var(--gold);"></i>
-                <h2 style="font-family:'Orbitron'; color:#fff; margin:15px 0;">${title}</h2>
-                <div style="font-size:2.5rem; color:var(--gold); font-weight:bold;">${gradeDisplay}</div>
-                <p style="color:#888; font-size:0.9rem; margin-top:10px; line-height:1.5;">${subText}</p>
-                <button class="btn btn-submit" style="margin-top:20px; width:100%" onclick="exitArena()">RETURN TO BASE</button>
-                ${appealBtnHtml}
+                <i class="fas ${isManual ? 'fa-cloud-upload-alt' : 'fa-check-double'}" style="font-size:3.5rem; color:var(--gold);"></i>
+                <h2 style="font-family:'Orbitron'; color:#fff; margin:20px 0;">${isManual ? 'TRANSMISSION SECURED' : 'MISSION DATA SYNCED'}</h2>
+                <div style="font-size:3rem; color:var(--gold); font-weight:900;">${isManual ? 'PENDING' : res.grade + '/50'}</div>
+                <p style="color:#888; font-size:0.85rem; margin:15px 0;">${isManual ? 'HQ is reviewing your frequency.' : 'Base record updated successfully.'}</p>
+                <button class="btn btn-submit" style="width:100%" onclick="exitArena()">RETURN TO BASE</button>
+                ${canAppeal ? '<button id="appealBtn" class="btn btn-side" style="margin-top:10px; width:100%; font-size:0.6rem; border-color:red;" onclick="requestReview()">REQUEST REVIEW (RR)</button>' : ''}
             `;
         } else {
-            display.innerHTML = `
-                <i class="fas fa-exclamation-triangle" style="font-size:3rem; color:red;"></i>
-                <h2 style="font-family:'Orbitron'; color:#fff; margin:15px 0;">MISSION ERROR</h2>
-                <p style="color:#888;">${res.message || "Execution Failed"}</p>
-                <button class="btn btn-side" style="margin-top:20px; width:100%" onclick="location.reload()">RETRY</button>
-            `;
+            // Error handling...
         }
     }
 
     function exitArena() { window.location.href = 'MC.html'; }
-
+    function openGuide() { alert("Guide for " + currentActivity + " Task " + currentTask + " is being fetched..."); }
+    
     function createStars() {
         const container = document.getElementById('star-container');
-        if(!container) return;
         for (let i = 0; i < 50; i++) {
             const star = document.createElement('div');
             star.className = 'star';
@@ -262,8 +205,7 @@
     }
 
     document.getElementById('contentFrame').onload = () => {
-        const loader = document.getElementById('arena-loader');
-        if(loader) loader.style.display = 'none';
+        setTimeout(() => { document.getElementById('arena-loader').style.display = 'none'; }, 1000);
     };
 </script>
 </body>
