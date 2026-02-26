@@ -3,275 +3,399 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>EYC Arena | Royal Command</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Orbitron:wght@400;500;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <title>EYC Super Stars | Elite Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Orbitron:wght@400;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root { 
-            --gold: #C5A028; 
+        :root {
+            --gold: #C5A028;
             --gold-light: #E5D291;
             --gold-gradient: linear-gradient(135deg, #a6841c, #E5D291, #8e6d15);
             --bg-deep: #030306; 
-            --glass: rgba(255, 255, 255, 0.03); 
-            --glass-border: rgba(197, 160, 40, 0.2); 
+            --glass: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(197, 160, 40, 0.2);
+            --neon-gold: 0 0 15px rgba(197, 160, 40, 0.4);
+            --gold-glow: rgba(212, 175, 55, 0.3);
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { background: var(--bg-deep); color: white; height: 100dvh; display: flex; flex-direction: column; overflow: hidden; font-family: 'Poppins', sans-serif; }
-        
-        /* Star Background */
-        #star-container { position: fixed; inset: 0; z-index: -2; background: radial-gradient(circle at top, #0a0b14 0%, #030306 100%); }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { background: var(--bg-deep); color: white; min-height: 100vh; overflow-x: hidden; }
+
+        #star-container { position: fixed; inset: 0; z-index: -1; background: radial-gradient(circle at top, #0a0b14 0%, #030306 100%); }
         .star { position: absolute; background: #fff; border-radius: 50%; opacity: 0.3; animation: pulse var(--duration) infinite ease-in-out; }
         @keyframes pulse { 0%, 100% { opacity: 0.2; transform: scale(1); } 50% { opacity: 0.7; transform: scale(1.5); } }
 
-        /* UI Header - Profile Centered */
-        header { padding: 15px; background: rgba(0,0,0,0.6); backdrop-filter: blur(10px); border-bottom: 1px solid var(--glass-border); z-index: 10; display: flex; justify-content: center; }
-        .profile-center { display: flex; flex-direction: column; align-items: center; gap: 5px; }
-        .student-photo { width: 50px; height: 50px; border-radius: 50%; border: 2px solid var(--gold); padding: 2px; object-fit: cover; box-shadow: 0 0 15px var(--glass-border); }
-        .name { font-family: 'Cinzel'; font-size: 0.9rem; color: var(--gold); letter-spacing: 1px; }
-        .rank-tag { font-family: 'Orbitron'; font-size: 0.6rem; color: #888; text-transform: uppercase; }
+        .top-nav { position: fixed; top: 0; width: 100%; padding: 20px 6%; display: flex; justify-content: space-between; align-items: center; z-index: 1000; backdrop-filter: blur(10px); border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .nav-icon { font-size: 1.2rem; color: var(--gold); cursor: pointer; transition: 0.3s; opacity: 0.8; }
+        .nav-icon:hover { opacity: 1; transform: scale(1.1); filter: drop-shadow(0 0 8px var(--gold)); }
 
-        /* Arena Layout */
-        .arena-container { flex: 1; padding: 10px; position: relative; display: flex; flex-direction: column; }
-        .glass-iframe-wrapper { flex: 1; background: #000; border: 1px solid var(--glass-border); border-radius: 15px; overflow: hidden; position: relative; box-shadow: inset 0 0 30px rgba(0,0,0,1); }
-        iframe { width: 100%; height: 100%; border: none; }
+        .hero-banner { width: 100%; padding: 100px 20px 40px; text-align: center; }
+        .profile-card { position: relative; display: inline-flex; flex-direction: column; align-items: center; }
+        .avatar-wrapper { position: relative; width: 120px; height: 120px; padding: 4px; background: var(--gold-gradient); border-radius: 50%; box-shadow: 0 0 30px var(--gold-glow); margin-bottom: 15px; }
+        .avatar-main { width: 100%; height: 100%; border-radius: 50%; border: 4px solid #050508; background-size: cover; background-position: center; }
+        .rank-tag { position: absolute; bottom: -5px; background: #000; border: 1px solid var(--gold); padding: 2px 12px; border-radius: 10px; font-family: 'Orbitron'; font-size: 0.65rem; color: var(--gold); letter-spacing: 1px; }
 
-        /* Task Info Bar (Floating above footer) */
-        .task-info-bar { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.8); padding: 8px 25px; border-radius: 20px; border: 1px solid var(--gold); display: flex; gap: 15px; align-items: center; backdrop-filter: blur(5px); z-index: 5; }
-        .info-segment { font-family: 'Orbitron'; font-size: 0.7rem; color: var(--gold-light); display: flex; align-items: center; gap: 8px; }
+        .student-name { font-family: 'Cinzel', serif; font-size: clamp(1.4rem, 5vw, 2rem); letter-spacing: 3px; background: var(--gold-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-top: 10px; }
+        .student-title { font-size: 0.7rem; color: #888; text-transform: uppercase; letter-spacing: 3px; margin-top: 5px; }
 
-        /* Royal Loader */
-        #arena-loader { position: absolute; inset: 0; background: var(--bg-deep); z-index: 100; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 40px; text-align: center; }
-        .loader-bar-container { width: 100%; max-width: 300px; height: 4px; background: rgba(255,255,255,0.05); border-radius: 2px; margin-top: 20px; overflow: hidden; }
-        .loader-bar-fill { height: 100%; width: 0%; background: var(--gold-gradient); transition: width 0.4s ease; box-shadow: 0 0 10px var(--gold); }
-        .loader-text { font-family: 'Orbitron'; font-size: 0.7rem; color: var(--gold); margin-top: 15px; letter-spacing: 2px; }
+        .stats-row { display: flex; gap: 20px; margin-top: 20px; background: rgba(255,255,255,0.03); padding: 10px 25px; border-radius: 30px; border: 1px solid var(--glass-border); align-items: center; }
+        .stat-icon { height: 18px; object-fit: contain; }
+        .stat-item { font-family: 'Orbitron'; font-size: 0.85rem; display: flex; align-items: center; gap: 8px; }
+        .stat-item span { color: var(--gold); }
 
-        /* Footer Buttons */
-        footer { padding: 15px 20px; display: flex; gap: 10px; background: rgba(0,0,0,0.8); border-top: 1px solid var(--glass-border); }
-        .btn { flex: 1; padding: 14px; border-radius: 10px; border: none; font-family: 'Orbitron'; font-size: 0.7rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: 0.3s; }
-        .btn-submit { background: var(--gold-gradient); color: #000; font-weight: 900; }
-        .btn-guide { background: rgba(197, 160, 40, 0.1); color: var(--gold); border: 1px solid var(--gold); }
-        .btn-back { background: transparent; color: #666; border: 1px solid #333; }
+        .grid-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 20px; padding: 0 6% 100px; }
+        .activity-card { background: linear-gradient(145deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.01) 100%); border: 1px solid rgba(255,255,255,0.08); border-radius: 20px; padding: 35px 15px; text-align: center; transition: 0.5s; cursor: pointer; position: relative; overflow: hidden; }
+        .activity-card:hover { transform: translateY(-10px); border-color: var(--gold); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .card-icon { position: relative; z-index: 1; font-size: 2.2rem; margin-bottom: 10px; background: var(--gold-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .tk-activity-badge { font-family: 'Orbitron'; font-size: 0.6rem; color: var(--gold); border: 1px solid var(--gold); padding: 2px 8px; border-radius: 5px; margin-top: 10px; display: inline-block; }
 
-        /* Result & Glitch Effect */
-        #sync-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 2000; display: none; flex-direction: column; justify-content: center; align-items: center; backdrop-filter: blur(15px); }
-        .result-card { text-align: center; padding: 30px; border-radius: 25px; border: 1px solid var(--gold); background: #050508; width: 85%; max-width: 400px; animation: glitch 0.3s ease; }
-        @keyframes glitch {
-            0% { transform: translate(2px, 2px); opacity: 0; }
-            20% { transform: translate(-2px, -2px); }
-            40% { transform: translate(2px, -2px); }
-            100% { transform: translate(0); opacity: 1; }
-        }
+        #mailDrawer { position: fixed; top: 0; right: -100%; width: 350px; height: 100%; background: rgba(5, 5, 8, 0.95); backdrop-filter: blur(25px); border-left: 1px solid var(--glass-border); z-index: 3000; transition: 0.5s cubic-bezier(0.7, 0, 0.3, 1); padding: 30px; }
+        #mailDrawer.active { right: 0; }
+        .msg-bubble { background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border); padding: 15px; border-radius: 12px; margin-bottom: 10px; cursor: pointer; }
+        .msg-content { font-size: 0.8rem; color: #ccc; margin-top: 10px; display: none; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.1); }
 
-        .lock-screen { position: fixed; inset: 0; background: #000; z-index: 9999; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px; }
-        .lock-icon { font-size: 4rem; color: var(--gold); margin-bottom: 20px; }
+        .tab-switcher { background: #000; padding: 4px; border-radius: 15px; display: flex; border: 1px solid var(--glass-border); width: 90%; max-width: 300px; margin: 20px auto; }
+        .tab-btn { flex: 1; padding: 12px; border: none; background: transparent; color: #666; border-radius: 12px; cursor: pointer; font-weight: 700; font-size: 0.65rem; letter-spacing: 2px; }
+        .tab-btn.active { color: #000; background: var(--gold-gradient); }
+
+        .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.9); display: none; justify-content: center; align-items: center; z-index: 2000; backdrop-filter: blur(20px); }
+        .modal-content { background: #050508; border-radius: 25px; padding: 40px; width: 90%; max-width: 400px; border: 1px solid var(--glass-border); position: relative; }
+
+        .tasks-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin: 30px 0; }
+        .task-node { position: relative; aspect-ratio: 1; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-family: 'Orbitron'; font-size: 0.8rem; overflow: hidden; }
+        .lock-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.85); display: flex; align-items: center; justify-content: center; color: var(--gold); z-index: 5; }
+        .lock-tooltip { position: absolute; bottom: 110%; background: #000; color: #fff; padding: 5px 10px; border-radius: 5px; font-size: 0.6rem; white-space: nowrap; border: 1px solid var(--gold); z-index: 100; pointer-events: none; }
+
+        .btn-exit { background: transparent; border: 1px solid #444; color: #888; padding: 12px 30px; border-radius: 12px; cursor: pointer; font-family: 'Orbitron'; font-size: 0.7rem; transition: 0.3s; width: 100%; }
+        .btn-exit:hover { border-color: var(--gold); color: var(--gold); }
+
+        .fairytale-float { position: fixed; bottom: 20px; right: 20px; width: 60px; height: 60px; background: var(--gold-gradient); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; box-shadow: var(--neon-gold); cursor: pointer; z-index: 1000; animation: float 3s infinite ease-in-out; color: #000; }
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
     </style>
 </head>
 <body>
 
     <div id="star-container"></div>
-    <div id="sync-overlay">
-        <div id="loader-content" style="text-align: center;">
-            <i class="fas fa-shield-halved fa-beat" style="font-size: 3rem; color: var(--gold);"></i>
-            <p style="margin-top:20px; font-family:'Orbitron'; color:var(--gold);">ENCRYPTING RESULTS...</p>
+    <nav class="top-nav">
+        <i class="fas fa-arrow-left nav-icon" onclick="window.location.href='index.html'"></i>
+        <div style="display: flex; align-items: center; gap: 15px;">
+            <div id="notifBell" class="nav-icon" onclick="openMailbox()" style="position: relative;">
+                <i class="fas fa-bell"></i>
+                <span id="notifDot" style="display:none; position: absolute; top: -5px; right: -5px; width: 10px; height: 10px; background: red; border-radius: 50%; border: 2px solid var(--bg-deep);"></span>
+            </div>
+            <i class="fas fa-power-off nav-icon" id="logoutBtn" style="display:none;" onclick="handleLogout()"></i>
         </div>
-        <div id="result-display" style="display: none;" class="result-card"></div>
+    </nav>
+
+    <header class="hero-banner" id="heroBanner"></header>
+
+    <div class="tab-switcher">
+        <button class="tab-btn active" onclick="switchType('season', this)">SEASON</button>
+        <button class="tab-btn" onclick="switchType('royal', this)">ROYAL X</button>
     </div>
 
-    <header>
-        <div class="profile-center">
-            <img id="student-img" class="student-photo" src="" alt="">
-            <div class="name" id="student-name">AGENT</div>
-            <div class="rank-tag" id="student-title">RANKING...</div>
+    <main><div class="grid-container" id="cardsGrid"></div></main>
+
+    <div id="mailDrawer">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px;">
+            <h2 style="font-family:'Orbitron'; color:var(--gold); font-size:1.1rem;">Your MailBox</h2>
+            <i class="fas fa-times" onclick="closeMailbox()" style="cursor:pointer; color:var(--gold);"></i>
         </div>
-    </header>
+        <div id="mailList"></div>
+    </div>
 
-    <main class="arena-container">
-        <div class="glass-iframe-wrapper">
-            <div id="arena-loader">
-                <div class="loader-text" id="loader-perc">Getting the Arena Ready... 0%</div>
-                <div class="loader-bar-container"><div class="loader-bar-fill" id="loader-fill"></div></div>
-            </div>
-            <iframe id="contentFrame"></iframe>
-            
-            <div class="task-info-bar">
-                <div class="info-segment"><i class="fas fa-bolt"></i> <span id="activity-title">ACTIVITY</span></div>
-                <div style="width:1px; height:15px; background:var(--gold); opacity:0.3;"></div>
-                <div class="info-segment"><i class="fas fa-crosshairs"></i> <span id="mission-sub">TASK 01</span></div>
-            </div>
+    <div class="modal" id="taskModal">
+        <div class="modal-content">
+            <h2 id="mTitle" style="text-align:center; font-family:'Cinzel'; color:#fff; margin-bottom:20px;">MISSION</h2>
+            <div class="tasks-grid" id="tGrid"></div>
+            <button class="btn-exit" onclick="closeModal('taskModal')">CLOSE</button>
         </div>
-    </main>
+    </div>
 
-    <footer>
-        <button class="btn btn-back" onclick="exitArena()"><i class="fas fa-chevron-left"></i></button>
-        <button id="submitBtn" class="btn btn-submit" onclick="startSubmission()"><i class="fas fa-upload"></i> SUBMIT MISSION</button>
-        <button class="btn btn-guide" onclick="alert('Wolf Guide: Read carefully and submit once.')">GUIDE</button>
-    </footer>
+    <div class="modal" id="loginModal">
+        <div class="modal-content">
+            <h2 style="font-family:'Cinzel'; color:var(--gold); text-align:center; margin-bottom:20px;">AUTHENTICATION</h2>
+            <input type="email" id="loginEmail" style="width:100%; padding:15px; margin:8px 0; border-radius:12px; background:rgba(255,255,255,0.05); border:1px solid #333; color:#fff;" placeholder="EMAIL">
+            <input type="password" id="loginCode" style="width:100%; padding:15px; margin:8px 0; border-radius:12px; background:rgba(255,255,255,0.05); border:1px solid #333; color:#fff;" placeholder="CODE">
+            <button onclick="handleLogin()" id="loginSubmitBtn" style="width:100%; margin-top:15px; padding:15px; border-radius:12px; background:var(--gold-gradient); border:none; font-weight:900; cursor:pointer;">SIGN IN</button>
+            <button class="btn-exit" style="margin-top:10px;" onclick="closeModal('loginModal')">CANCEL</button>
+        </div>
+    </div>
 
-<script>
-    const CORE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz1D8BkAHFH0mwiw_n_2yL6jvQ04rrOb3mwiqKuxmHVTrynxzYzzF7XwIJQ-QnrrfQb/exec"; 
-    const MISSIONS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz7KoJjI0VqYPBhJJfspL2RdAE8R5x8wdiRVrqvYL7cAdsisuyw-lE6IoAQsWWI-voRzw/exec"; 
+    <div class="fairytale-float" onclick="alert('Fairytale Guide: Master your tasks to rank up!')">
+        <i class="fas fa-wand-sparkles"></i>
+    </div>
 
-    // --- MISSION SCHEDULE PROTOCOL (Wolf Edition) ---
-    const MISSION_SCHEDULE = {
-        seasonStart: new Date("2026-02-26T10:00:00"),
-        royalStart: new Date("2026-02-28T10:00:00"),
-        getUnlockDate: function(type, taskNum) {
-            let date = new Date(type === 'royal' ? this.royalStart : this.seasonStart);
-            if (taskNum > 1) {
-                if (type === 'season') {
-                    let totalGap = 0;
-                    for (let i = 2; i <= taskNum; i++) { totalGap += (i + 2); }
-                    date.setDate(date.getDate() + totalGap);
-                } else {
-                    date.setDate(date.getDate() + ((taskNum - 1) * 3));
-                }
-            }
-            return date;
-        }
-    };
-
-    let userEmail, currentActivity, currentTask, activityType;
-
-    window.onload = function() {
-        createStars();
-        const user = JSON.parse(localStorage.getItem('eyc_user'));
-        if (!user) return exitArena();
-
-        const params = new URLSearchParams(window.location.search);
-        userEmail = user.email;
-        currentActivity = params.get('act'); 
-        currentTask = parseInt(params.get('task') || "1");
+    <script>
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxe3gYkhNIN4cMqpY2RAglBYWp-m9XHxMiVGXLR7-7j-gPo9Cc0zdg1ALQmT2i-griu/exec";
         
-        const royalCodes = ["ASX","VVX","LBX","SDX","GEX","GRX","DTX","SSSX","EMX","FGX"];
-        activityType = royalCodes.includes(currentActivity) ? 'royal' : 'season';
+        const IMG = {
+            tk: "https://raw.githubusercontent.com/eycfde-prog/EYCSSP/047aeca8ef0fa0d95627552cfb62fd8300531134/frontend/eyclgos/Token.png",
+            star: "https://raw.githubusercontent.com/eycfde-prog/EYCSSP/047aeca8ef0fa0d95627552cfb62fd8300531134/frontend/eyclgos/Star.png",
+            gt: "https://raw.githubusercontent.com/eycfde-prog/EYCSSP/047aeca8ef0fa0d95627552cfb62fd8300531134/frontend/eyclgos/GT.png"
+        };
 
-        // --- THE SHIELD PROTOCOL CHECK ---
-        const unlockDate = MISSION_SCHEDULE.getUnlockDate(activityType, currentTask);
-        if (new Date() < unlockDate) {
-            document.body.innerHTML = `
-                <div class="lock-screen">
-                    <i class="fas fa-user-shield lock-icon"></i>
-                    <h2 style="font-family:'Orbitron'; color:var(--gold);">ENTRY DENIED</h2>
-                    <p style="color:#888; margin-top:10px;">Mission signals will clear on:</p>
-                    <p style="color:#fff; font-family:'Orbitron'; margin-top:5px;">${unlockDate.toLocaleString()}</p>
-                    <button class="btn btn-guide" style="margin-top:30px; width:200px;" onclick="location.href='MC.html'">RETURN TO BASE</button>
-                </div>`;
-            return;
+        let currentUser = null;
+        let isLoggedIn = false;
+
+        const activities = {
+            season: [
+                { name: "Alike", icon: "fa-clone", code: "AS", tk: 50 },
+                { name: "Label", icon: "fa-tag", code: "LB", tk: 50 },
+                { name: "Golden Ear", icon: "fa-ear-listen", code: "GE", tk: 50 },
+                { name: "Grammar", icon: "fa-spell-check", code: "GR", tk: 50 },
+                { name: "Vivid", icon: "fa-wand-magic-sparkles", code: "VV", tk: 50 },
+                { name: "Seeds", icon: "fa-seedling", code: "SD", tk: 50 }
+            ],
+            royal: [
+                { name: "Alike X", icon: "fa-star", code: "ASX", tk: 50 },
+                { name: "Label X", icon: "fa-tags", code: "LBX", tk: 50 },
+                { name: "Golden Ear X", icon: "fa-ear-deaf", code: "GEX", tk: 50 },
+                { name: "Grammar X", icon: "fa-pen-fancy", code: "GRX", tk: 50 },
+                { name: "Vivid X", icon: "fa-wand-magic", code: "VVX", tk: 50 },
+                { name: "Seeds X", icon: "fa-tree", code: "SDX", tk: 50 },
+                { name: "Figurative X", icon: "fa-mask", code: "FGX", tk: 50 },
+                { name: "Dictation X", icon: "fa-microphone-lines", code: "DTX", tk: 100 },
+                { name: "Sing Sang Sung X", icon: "fa-music", code: "SSSX", tk: 100 },
+                { name: "Elmagazine X", icon: "fa-book-open", code: "EMX", tk: 100 }
+            ]
+        };
+
+        const MISSION_SCHEDULE = {
+            getUnlockDate: (program, taskIndex) => {
+                const seasonStart = new Date("2026-02-26T00:00:00");
+                const royalStart = new Date("2026-02-28T00:00:00");
+                let targetDate = new Date(program === 'season' ? seasonStart : royalStart);
+
+                if (taskIndex > 1) {
+                    if (program === 'season') {
+                        let daysToAdd = 0;
+                        for (let j = 2; j <= taskIndex; j++) {
+                            daysToAdd += (j + 2); 
+                        }
+                        targetDate.setDate(targetDate.getDate() + daysToAdd);
+                    } else {
+                        targetDate.setDate(targetDate.getDate() + ((taskIndex - 1) * 3));
+                    }
+                }
+                return targetDate;
+            }
+        };
+
+        function openTasks(name, code) {
+            document.getElementById('mTitle').innerText = name;
+            const tGrid = document.getElementById('tGrid'); tGrid.innerHTML = '';
+            const type = document.querySelector('.tab-btn.active').innerText.toLowerCase().includes('royal') ? 'royal' : 'season';
+            
+            for (let i = 1; i <= 10; i++) {
+                const node = document.createElement('div');
+                node.className = 'task-node';
+                node.innerText = i;
+
+                const openDate = MISSION_SCHEDULE.getUnlockDate(type, i);
+                const isLocked = new Date() < openDate;
+
+                if (isLocked) {
+                    node.innerHTML += '<div class="lock-overlay"><i class="fas fa-lock"></i></div>';
+                    node.onclick = (e) => {
+                        if (!isLoggedIn) return openLogin();
+                        const existing = node.querySelector('.lock-tooltip');
+                        if (existing) existing.remove();
+                        const tt = document.createElement('div');
+                        tt.className = 'lock-tooltip';
+                        tt.innerText = `Available on: ${openDate.toDateString()}`;
+                        node.appendChild(tt);
+                        setTimeout(() => tt.remove(), 3000);
+                    };
+                } else {
+                    node.onclick = () => {
+                        if (!isLoggedIn) return openLogin();
+                        window.location.href = `EYCArena.html?email=${currentUser.email}&act=${code}&task=${i}`;
+                    };
+                }
+                tGrid.appendChild(node);
+            }
+            document.getElementById('taskModal').style.display = 'flex';
         }
 
-        document.getElementById('student-name').innerText = user.name;
-        document.getElementById('student-title').innerText = user.title;
-        document.getElementById('student-img').src = user.avatar;
-        document.getElementById('activity-title').innerText = currentActivity;
-        document.getElementById('mission-sub').innerText = `TASK ${currentTask.toString().padStart(2, '0')}`;
+        function openMailbox() {
+            document.getElementById('mailDrawer').classList.add('active');
+            document.getElementById('notifDot').style.display = 'none';
+            renderMails();
+        }
+        function closeMailbox() { document.getElementById('mailDrawer').classList.remove('active'); }
 
-        runRoyalLoader();
-        checkMissionPresence();
-    };
+        function renderMails() {
+            const list = document.getElementById('mailList');
+            const mails = JSON.parse(localStorage.getItem('eyc_mails') || '[]');
+            list.innerHTML = mails.length ? '' : '<p style="text-align:center; opacity:0.5;">No Comms</p>';
+            mails.forEach((m, i) => {
+                const bubble = document.createElement('div');
+                bubble.className = 'msg-bubble';
+                bubble.innerHTML = `<div style="font-size:0.6rem; color:var(--gold);">${m.date}</div><div style="font-weight:600; margin-top:5px;">Mission Update</div><div class="msg-content" id="msg-${i}">${m.text}</div>`;
+                bubble.onclick = () => {
+                    const content = document.getElementById(`msg-${i}`);
+                    content.style.display = content.style.display === 'block' ? 'none' : 'block';
+                };
+                list.appendChild(bubble);
+            });
+        }
 
-    function runRoyalLoader() {
-        const fill = document.getElementById('loader-fill');
-        const text = document.getElementById('loader-perc');
-        let p = 0;
-        const interval = setInterval(() => {
-            p += Math.floor(Math.random() * 15) + 5;
-            if (p >= 100) {
-                p = 100;
-                clearInterval(interval);
-                setTimeout(() => document.getElementById('arena-loader').style.display = 'none', 500);
-            }
-            fill.style.width = p + '%';
-            text.innerText = `Getting the Arena Ready... ${p}%`;
-        }, 200);
-    }
-
-    function checkMissionPresence() {
-        fetch(`${CORE_SCRIPT_URL}?action=checkMission&email=${userEmail}&activity=${currentActivity}&task=${currentTask}`)
-        .then(res => res.json())
-        .then(data => {
-            if (data.status === "completed") {
-                renderResult({ status: "success", grade: data.grade, analysis: data.analysis, isManual: data.isManual, alreadyDone: true });
+        function renderHeader() {
+            const header = document.getElementById('heroBanner');
+            if (isLoggedIn) {
+                document.getElementById('logoutBtn').style.display = "block";
+                header.innerHTML = `
+                    <div class="profile-card">
+                        <div class="avatar-wrapper">
+                            <div class="avatar-main" style="background-image: url('${currentUser.avatar}')"></div>
+                            <div class="rank-tag">RANK #${currentUser.rank}</div>
+                        </div>
+                        <h1 class="student-name">${currentUser.name}</h1>
+                        <p class="student-title">${currentUser.title}</p>
+                        <div class="stats-row">
+                            <div class="stat-item">
+                                <img src="${IMG.tk}" class="stat-icon" title="Tokens"> 
+                                <span>${currentUser.tokens}</span>
+                            </div>
+                            <div class="stat-item">
+                                <img src="${IMG.star}" class="stat-icon" title="Stars"> 
+                                <span>${currentUser.stars}</span>
+                            </div>
+                            <div class="stat-item">
+                                <img src="${IMG.gt}" class="stat-icon" title="Gold Tickets"> 
+                                <span>${currentUser.goldTickets}</span>
+                            </div>
+                        </div>
+                    </div>`;
+                if(currentUser.lastNotification) checkNotif(currentUser.lastNotification);
             } else {
-                document.getElementById('contentFrame').src = `missions/${currentActivity}.html?task=${currentTask}`;
+                header.innerHTML = `<h1 class="student-name">ARENA ACCESS</h1><button class="btn-exit" style="width:auto; margin-top:20px;" onclick="openLogin()">AUTHORIZE LOGIN</button>`;
             }
-        }).catch(() => {
-            document.getElementById('contentFrame').src = `missions/${currentActivity}.html?task=${currentTask}`;
-        });
-    }
+        }
 
-    function startSubmission() {
-        document.getElementById('contentFrame').contentWindow.postMessage({ type: 'REQUEST_MISSION_DATA' }, '*');
-    }
+        function generateCards() {
+            const grid = document.getElementById('cardsGrid'); grid.innerHTML = '';
+            const type = document.querySelector('.tab-btn.active').innerText.toLowerCase().includes('royal') ? 'royal' : 'season';
+            activities[type].forEach(act => {
+                const card = document.createElement('div');
+                card.className = 'activity-card';
+                card.innerHTML = `<i class="fa-solid ${act.icon} card-icon"></i><h3>${act.name}</h3><div class="tk-activity-badge">${act.tk} TK</div>`;
+                card.onclick = () => openTasks(act.name, act.code);
+                grid.appendChild(card);
+            });
+        }
 
-    window.addEventListener('message', function(event) {
-        if (event.data.type === 'MISSION_ANSWERS') submitToHQ(event.data.answers);
-    });
+        function checkNotif(msg) {
+            let mails = JSON.parse(localStorage.getItem('eyc_mails') || '[]');
+            if(!mails.some(m => m.text === msg)) {
+                mails.unshift({text: msg, date: new Date().toLocaleString()});
+                localStorage.setItem('eyc_mails', JSON.stringify(mails));
+                document.getElementById('notifDot').style.display = 'block';
+            }
+        }
 
-    function submitToHQ(answers) {
-        document.getElementById('sync-overlay').style.display = 'flex';
-        const userObj = JSON.parse(localStorage.getItem('eyc_user'));
-        fetch(MISSIONS_SCRIPT_URL, {
-            method: "POST",
-            mode: "cors",
-            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-            body: JSON.stringify({ activity: currentActivity, task: currentTask, email: userEmail, name: userObj.name, studentData: answers })
-        })
-        .then(res => res.json())
-        .then(gradingRes => {
-            if (gradingRes.status === "success") saveGradeToStudents(gradingRes);
-            else renderResult(gradingRes);
-        });
-    }
+        function switchType(type, btn) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            generateCards();
+        }
 
-    function saveGradeToStudents(res) {
-        fetch(`${CORE_SCRIPT_URL}?action=submitMission&email=${userEmail}&activity=${currentActivity}&task=${currentTask}&grade=${res.grade}&answers=${encodeURIComponent(res.answers)}&analysis=${encodeURIComponent(res.analysis)}`)
-        .then(r => r.json()).then(finalRes => renderResult(finalRes));
-    }
+        function handleLogin() {
+            const email = document.getElementById('loginEmail').value;
+            const code = document.getElementById('loginCode').value;
+            const btn = document.getElementById('loginSubmitBtn');
+            btn.innerText = "LINKING...";
+            fetch(`${SCRIPT_URL}?action=getProfile&email=${email}&code=${code}`)
+                .then(r => r.json()).then(res => {
+                    if(res.status === "success") {
+                        currentUser = res; currentUser.email = email; isLoggedIn = true;
+                        localStorage.setItem('eyc_user', JSON.stringify(currentUser));
+                        closeModal('loginModal'); renderHeader(); generateCards();
+                    } else alert(res.message);
+                    btn.innerText = "SIGN IN";
+                });
+        }
 
-    function renderResult(res) {
-        const display = document.getElementById('result-display');
-        document.getElementById('loader-content').style.display = 'none';
-        document.getElementById('sync-overlay').style.display = 'flex'; 
-        display.style.display = 'block';
+        function handleLogout() { localStorage.clear(); location.reload(); }
+        function openLogin() { document.getElementById('loginModal').style.display = 'flex'; }
+        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
 
-        if (res.status === "success") {
+        function renderResult(res) {
             const isManual = (res.grade === "PENDING" || res.isManual === true);
             const manualCodes = ["DTX", "EMX", "SSSX"];
-            const isHQReview = manualCodes.includes(currentActivity);
+            const isTransmission = manualCodes.includes(currentActivity);
 
-            let gradeText = isManual ? "PENDING" : `${res.grade} / 50`;
-            let subText = isHQReview ? "TRANSMISSION SECURED: HQ is reviewing your frequency" : (isManual ? "Your answer is under revision at HQ." : "Data synchronized with HQ Command.");
-            
+            let subText = "";
+            if (isTransmission) {
+                subText = "TRANSMISSION SECURED: HQ is reviewing your frequency";
+            } else if (isManual) {
+                subText = "Your answer is under revision at HQ.";
+            } else {
+                subText = "Data synchronized with HQ Command.";
+            }
+
             let appealBtnHtml = "";
             if (!isManual && parseInt(res.grade) < 40) {
                 appealBtnHtml = `<button id="appealBtn" class="btn btn-guide" style="margin-top:10px; width:100%; border-color:rgba(255,0,0,0.3)" onclick="requestReview()">REQUEST REVIEW (RR)</button>`;
             }
-
-            display.innerHTML = `
-                <i class="fas ${isManual ? 'fa-satellite-dish' : 'fa-award'}" style="font-size:3rem; color:var(--gold);"></i>
-                <h2 style="font-family:'Orbitron'; color:#fff; margin:15px 0;">MISSION LOG</h2>
-                <div style="font-size:2.5rem; color:var(--gold); font-weight:bold;">${gradeText}</div>
-                <p style="color:#888; font-size:0.8rem; margin-top:10px; line-height:1.5;">${subText}</p>
-                <button class="btn btn-submit" style="margin-top:20px; width:100%" onclick="exitArena()">RETURN TO BASE</button>
-                ${appealBtnHtml}
-            `;
         }
-    }
 
-    function exitArena() { window.location.href = 'MC.html'; }
-    function createStars() {
-        const container = document.getElementById('star-container');
-        for (let i = 0; i < 50; i++) {
-            const star = document.createElement('div');
-            star.className = 'star';
-            star.style.width = star.style.height = '2px';
-            star.style.top = Math.random() * 100 + '%';
-            star.style.left = Math.random() * 100 + '%';
-            star.style.setProperty('--duration', (Math.random() * 3 + 2) + 's');
-            container.appendChild(star);
+        function runRoyalLoader() {
+            const fill = document.getElementById('loader-fill');
+            const text = document.getElementById('loader-perc');
+            let progress = 0;
+            
+            let timer = setInterval(() => {
+                progress += Math.floor(Math.random() * 20);
+                if (progress >= 100) {
+                    progress = 100;
+                    clearInterval(timer);
+                    setTimeout(() => document.getElementById('arena-loader').style.fadeOut(), 400);
+                }
+                if(fill) fill.style.width = progress + '%';
+                if(text) text.innerText = `Getting the Arena Ready... ${progress}%`;
+            }, 150);
         }
-    }
-</script>
+
+        window.onload = () => {
+            const saved = localStorage.getItem('eyc_user');
+            if(saved) { currentUser = JSON.parse(saved); isLoggedIn = true; }
+            
+            const params = new URLSearchParams(window.location.search);
+            const currentActivity = params.get('act'); 
+            const currentTask = parseInt(params.get('task') || "1");
+
+            if (currentActivity) {
+                const royalCodes = ["ASX","VVX","LBX","SDX","GEX","GRX","DTX","SSSX","EMX","FGX"];
+                const activityType = royalCodes.includes(currentActivity) ? 'royal' : 'season';
+                const unlockDate = MISSION_SCHEDULE.getUnlockDate(activityType, currentTask);
+
+                if (new Date() < unlockDate) {
+                    document.body.innerHTML = `
+                        <div style="height:100vh; background:#000; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; font-family:'Orbitron';">
+                            <i class="fas fa-shield-alt" style="font-size:5rem; color:#C5A028; margin-bottom:20px;"></i>
+                            <h1 style="color:#C5A028;">ENTRY DENIED</h1>
+                            <p style="color:#888; margin-top:10px;">Mission signals will clear on:</p>
+                            <p style="color:#fff; margin-top:5px;">${unlockDate.toLocaleString()}</p>
+                            <button onclick="location.href='index.html'" style="margin-top:30px; padding:12px 25px; background:transparent; border:1px solid #C5A028; color:#C5A028; cursor:pointer;">RETURN TO BASE</button>
+                        </div>`;
+                    return;
+                }
+            }
+
+            renderHeader(); 
+            generateCards();
+            
+            const container = document.getElementById('star-container');
+            for (let i = 0; i < 50; i++) {
+                const s = document.createElement('div'); s.className = 'star';
+                s.style.width = s.style.height = '2px';
+                s.style.left = Math.random()*100+'%'; s.style.top = Math.random()*100+'%';
+                s.style.setProperty('--duration', (Math.random()*3+2)+'s');
+                container.appendChild(s);
+            }
+        };
+    </script>
 </body>
 </html>
