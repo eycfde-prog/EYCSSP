@@ -143,7 +143,6 @@
         currentActivity = params.get('act'); 
         currentTask = parseInt(params.get('task') || "1");
         
-        // Determine Program Type
         const royalCodes = ["ASX","VVX","LBX","SDX","GEX","GRX","DTX","SSSX","EMX","FGX"];
         activityType = royalCodes.includes(currentActivity) ? 'royal' : 'season';
 
@@ -244,7 +243,6 @@
             let gradeText = isManual ? "PENDING" : `${res.grade} / 50`;
             let subText = isHQReview ? "TRANSMISSION SECURED: HQ is reviewing your frequency" : (isManual ? "Your answer is under revision at HQ." : "Data synchronized with HQ Command.");
             
-            // Logic for Appeal Button: Grade < 40 and not manual
             let appealBtnHtml = "";
             if (!isManual && parseInt(res.grade) < 40) {
                 appealBtnHtml = `<button id="appealBtn" class="btn btn-guide" style="margin-top:10px; width:100%; border-color:rgba(255,0,0,0.3)" onclick="requestReview()">REQUEST REVIEW (RR)</button>`;
