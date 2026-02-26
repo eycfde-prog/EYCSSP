@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>EYC Arena | Royal Shield</title>
+    <title>EYC Arena | Royal Command</title>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Orbitron:wght@400;500;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
@@ -19,42 +19,52 @@
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { background: var(--bg-deep); color: white; height: 100dvh; display: flex; flex-direction: column; overflow: hidden; font-family: 'Poppins', sans-serif; }
         
-        #star-container { position: fixed; inset: 0; z-index: -2; background: radial-gradient(circle at center, #0a0c14 0%, #030306 100%); }
-        .star { position: absolute; background: white; border-radius: 50%; opacity: 0.3; animation: pulse 3s infinite ease-in-out; }
-        @keyframes pulse { 0%, 100% { opacity: 0.2; } 50% { opacity: 0.7; } }
+        /* Star Background */
+        #star-container { position: fixed; inset: 0; z-index: -2; background: radial-gradient(circle at top, #0a0b14 0%, #030306 100%); }
+        .star { position: absolute; background: #fff; border-radius: 50%; opacity: 0.3; animation: pulse var(--duration) infinite ease-in-out; }
+        @keyframes pulse { 0%, 100% { opacity: 0.2; transform: scale(1); } 50% { opacity: 0.7; transform: scale(1.5); } }
 
-        header { padding: 15px 20px; background: rgba(0,0,0,0.85); border-bottom: 1px solid var(--glass-border); z-index: 10; display: flex; justify-content: center; }
+        /* UI Header - Profile Centered */
+        header { padding: 15px; background: rgba(0,0,0,0.6); backdrop-filter: blur(10px); border-bottom: 1px solid var(--glass-border); z-index: 10; display: flex; justify-content: center; }
         .profile-center { display: flex; flex-direction: column; align-items: center; gap: 5px; }
-        .student-photo { width: 45px; height: 45px; border-radius: 50%; border: 2px solid var(--gold); object-fit: cover; box-shadow: 0 0 15px var(--glass-border); }
-        .name { font-family: 'Cinzel'; font-size: 0.9rem; color: var(--gold); font-weight: 700; letter-spacing: 1px; }
-        .rank-tag { font-family: 'Orbitron'; font-size: 0.6rem; color: #888; letter-spacing: 2px; }
+        .student-photo { width: 50px; height: 50px; border-radius: 50%; border: 2px solid var(--gold); padding: 2px; object-fit: cover; box-shadow: 0 0 15px var(--glass-border); }
+        .name { font-family: 'Cinzel'; font-size: 0.9rem; color: var(--gold); letter-spacing: 1px; }
+        .rank-tag { font-family: 'Orbitron'; font-size: 0.6rem; color: #888; text-transform: uppercase; }
 
+        /* Arena Layout */
         .arena-container { flex: 1; padding: 10px; position: relative; display: flex; flex-direction: column; }
-        .glass-iframe-wrapper { flex: 1; background: #000; border: 1px solid var(--glass-border); border-radius: 15px; overflow: hidden; position: relative; }
+        .glass-iframe-wrapper { flex: 1; background: #000; border: 1px solid var(--glass-border); border-radius: 15px; overflow: hidden; position: relative; box-shadow: inset 0 0 30px rgba(0,0,0,1); }
         iframe { width: 100%; height: 100%; border: none; }
 
-        /* Floating Task Info Bar */
-        .task-info-bar { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); padding: 8px 25px; border-radius: 20px; border: 1px solid var(--glass-border); display: flex; gap: 20px; z-index: 5; font-family: 'Orbitron'; font-size: 0.65rem; color: var(--gold); }
+        /* Task Info Bar (Floating above footer) */
+        .task-info-bar { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.8); padding: 8px 25px; border-radius: 20px; border: 1px solid var(--gold); display: flex; gap: 15px; align-items: center; backdrop-filter: blur(5px); z-index: 5; }
+        .info-segment { font-family: 'Orbitron'; font-size: 0.7rem; color: var(--gold-light); display: flex; align-items: center; gap: 8px; }
 
         /* Royal Loader */
-        #arena-loader { position: absolute; inset: 0; background: var(--bg-deep); z-index: 100; display: flex; flex-direction: column; justify-content: center; align-items: center; }
-        .progress-container { width: 200px; height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; margin-bottom: 15px; overflow: hidden; }
-        .progress-bar { width: 0%; height: 100%; background: var(--gold-gradient); transition: width 0.4s ease; }
+        #arena-loader { position: absolute; inset: 0; background: var(--bg-deep); z-index: 100; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 40px; text-align: center; }
+        .loader-bar-container { width: 100%; max-width: 300px; height: 4px; background: rgba(255,255,255,0.05); border-radius: 2px; margin-top: 20px; overflow: hidden; }
+        .loader-bar-fill { height: 100%; width: 0%; background: var(--gold-gradient); transition: width 0.4s ease; box-shadow: 0 0 10px var(--gold); }
+        .loader-text { font-family: 'Orbitron'; font-size: 0.7rem; color: var(--gold); margin-top: 15px; letter-spacing: 2px; }
 
-        footer { padding: 15px 20px; display: flex; gap: 10px; width: 100%; background: rgba(0,0,0,0.9); }
-        .btn { flex: 1; padding: 14px; border-radius: 10px; border: none; font-family: 'Orbitron'; font-size: 0.75rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: 0.3s; }
+        /* Footer Buttons */
+        footer { padding: 15px 20px; display: flex; gap: 10px; background: rgba(0,0,0,0.8); border-top: 1px solid var(--glass-border); }
+        .btn { flex: 1; padding: 14px; border-radius: 10px; border: none; font-family: 'Orbitron'; font-size: 0.7rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: 0.3s; }
         .btn-submit { background: var(--gold-gradient); color: #000; font-weight: 900; }
         .btn-guide { background: rgba(197, 160, 40, 0.1); color: var(--gold); border: 1px solid var(--gold); }
-        .btn-back { background: transparent; color: #666; border: 1px solid #333; max-width: 100px; }
+        .btn-back { background: transparent; color: #666; border: 1px solid #333; }
 
-        /* Glitch Effect for Result */
-        @keyframes glitch { 0% { transform: translate(0); } 20% { transform: translate(-2px, 2px); } 40% { transform: translate(-2px, -2px); } 60% { transform: translate(2px, 2px); } 80% { transform: translate(2px, -2px); } 100% { transform: translate(0); } }
-        .glitch-appear { animation: glitch 0.3s ease; }
+        /* Result & Glitch Effect */
+        #sync-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 2000; display: none; flex-direction: column; justify-content: center; align-items: center; backdrop-filter: blur(15px); }
+        .result-card { text-align: center; padding: 30px; border-radius: 25px; border: 1px solid var(--gold); background: #050508; width: 85%; max-width: 400px; animation: glitch 0.3s ease; }
+        @keyframes glitch {
+            0% { transform: translate(2px, 2px); opacity: 0; }
+            20% { transform: translate(-2px, -2px); }
+            40% { transform: translate(2px, -2px); }
+            100% { transform: translate(0); opacity: 1; }
+        }
 
-        #sync-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.98); z-index: 2000; display: none; flex-direction: column; justify-content: center; align-items: center; backdrop-filter: blur(20px); }
-        .result-card { text-align: center; padding: 40px; border-radius: 25px; border: 1px solid var(--gold); background: #050508; width: 90%; max-width: 400px; box-shadow: 0 0 40px rgba(197, 160, 40, 0.1); }
-        
-        .locked-screen { text-align: center; padding: 20px; color: var(--gold); font-family: 'Orbitron'; }
+        .lock-screen { position: fixed; inset: 0; background: #000; z-index: 9999; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px; }
+        .lock-icon { font-size: 4rem; color: var(--gold); margin-bottom: 20px; }
     </style>
 </head>
 <body>
@@ -62,10 +72,10 @@
     <div id="star-container"></div>
     <div id="sync-overlay">
         <div id="loader-content" style="text-align: center;">
-            <i class="fas fa-shield-halved fa-spin" style="font-size: 3rem; color: var(--gold); margin-bottom: 20px;"></i>
-            <p id="sync-text" style="font-family:'Orbitron'; color:var(--gold); letter-spacing: 2px;">ENCRYPTING DATA...</p>
+            <i class="fas fa-shield-halved fa-beat" style="font-size: 3rem; color: var(--gold);"></i>
+            <p style="margin-top:20px; font-family:'Orbitron'; color:var(--gold);">ENCRYPTING RESULTS...</p>
         </div>
-        <div id="result-display" style="display: none;" class="result-card glitch-appear"></div>
+        <div id="result-display" style="display: none;" class="result-card"></div>
     </div>
 
     <header>
@@ -79,38 +89,39 @@
     <main class="arena-container">
         <div class="glass-iframe-wrapper">
             <div id="arena-loader">
-                <div class="progress-container"><div id="pBar" class="progress-bar"></div></div>
-                <p id="pText" style="color:var(--gold); font-family:'Orbitron'; font-size:0.6rem; letter-spacing:1px;">Getting the Arena Ready... 0%</p>
+                <div class="loader-text" id="loader-perc">Getting the Arena Ready... 0%</div>
+                <div class="loader-bar-container"><div class="loader-bar-fill" id="loader-fill"></div></div>
             </div>
             <iframe id="contentFrame"></iframe>
+            
             <div class="task-info-bar">
-                <span id="act-label">ACTIVITY</span>
-                <span style="color:rgba(255,255,255,0.2)">|</span>
-                <span id="task-label">TASK 01</span>
+                <div class="info-segment"><i class="fas fa-bolt"></i> <span id="activity-title">ACTIVITY</span></div>
+                <div style="width:1px; height:15px; background:var(--gold); opacity:0.3;"></div>
+                <div class="info-segment"><i class="fas fa-crosshairs"></i> <span id="mission-sub">TASK 01</span></div>
             </div>
         </div>
     </main>
 
     <footer>
         <button class="btn btn-back" onclick="exitArena()"><i class="fas fa-chevron-left"></i></button>
-        <button id="submitBtn" class="btn btn-submit" onclick="startSubmission()"><i class="fas fa-bolt"></i> SUBMIT MISSION</button>
-        <button class="btn btn-guide" onclick="alert('Wolf Guide: Read carefully before submitting!')"><i class="fas fa-book-open"></i> GUIDE</button>
+        <button id="submitBtn" class="btn btn-submit" onclick="startSubmission()"><i class="fas fa-upload"></i> SUBMIT MISSION</button>
+        <button class="btn btn-guide" onclick="alert('Wolf Guide: Read carefully and submit once.')">GUIDE</button>
     </footer>
 
 <script>
     const CORE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz1D8BkAHFH0mwiw_n_2yL6jvQ04rrOb3mwiqKuxmHVTrynxzYzzF7XwIJQ-QnrrfQb/exec"; 
     const MISSIONS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz7KoJjI0VqYPBhJJfspL2RdAE8R5x8wdiRVrqvYL7cAdsisuyw-lE6IoAQsWWI-voRzw/exec"; 
 
-    // --- MISSION SCHEDULE PROTOCOL ---
+    // --- MISSION SCHEDULE PROTOCOL (Wolf Edition) ---
     const MISSION_SCHEDULE = {
         seasonStart: new Date("2026-02-26T10:00:00"),
         royalStart: new Date("2026-02-28T10:00:00"),
         getUnlockDate: function(type, taskNum) {
-            let date = new Date(type === 'season' ? this.seasonStart : this.royalStart);
+            let date = new Date(type === 'royal' ? this.royalStart : this.seasonStart);
             if (taskNum > 1) {
                 if (type === 'season') {
                     let totalGap = 0;
-                    for (let i = 2; i <= taskNum; i++) totalGap += (i + 2);
+                    for (let i = 2; i <= taskNum; i++) { totalGap += (i + 2); }
                     date.setDate(date.getDate() + totalGap);
                 } else {
                     date.setDate(date.getDate() + ((taskNum - 1) * 3));
@@ -120,7 +131,7 @@
         }
     };
 
-    let userEmail, currentActivity, currentTask, isRoyal;
+    let userEmail, currentActivity, currentTask, activityType;
 
     window.onload = function() {
         createStars();
@@ -128,56 +139,58 @@
         if (!user) return exitArena();
 
         const params = new URLSearchParams(window.location.search);
-        currentActivity = params.get('act') || "AS";
+        userEmail = user.email;
+        currentActivity = params.get('act'); 
         currentTask = parseInt(params.get('task') || "1");
-        isRoyal = currentActivity.endsWith('X');
-        const type = isRoyal ? 'royal' : 'season';
+        
+        // Determine Program Type
+        const royalCodes = ["ASX","VVX","LBX","SDX","GEX","GRX","DTX","SSSX","EMX","FGX"];
+        activityType = royalCodes.includes(currentActivity) ? 'royal' : 'season';
 
-        // Security Check
-        const unlockDate = MISSION_SCHEDULE.getUnlockDate(type, currentTask);
+        // --- THE SHIELD PROTOCOL CHECK ---
+        const unlockDate = MISSION_SCHEDULE.getUnlockDate(activityType, currentTask);
         if (new Date() < unlockDate) {
-            document.body.innerHTML = `<div id="star-container"></div><div class="locked-screen">
-                <i class="fas fa-user-secret" style="font-size:4rem; margin-bottom:20px;"></i>
-                <h2>ENTRY DENIED</h2>
-                <p style="margin-top:10px; opacity:0.7;">Mission signals will clear on:</p>
-                <h1 style="color:#fff; margin-top:10px;">${unlockDate.toLocaleString()}</h1>
-                <button onclick="window.history.back()" class="btn btn-submit" style="margin: 30px auto; width:200px;">ABORT</button>
-            </div>`;
-            createStars();
+            document.body.innerHTML = `
+                <div class="lock-screen">
+                    <i class="fas fa-user-shield lock-icon"></i>
+                    <h2 style="font-family:'Orbitron'; color:var(--gold);">ENTRY DENIED</h2>
+                    <p style="color:#888; margin-top:10px;">Mission signals will clear on:</p>
+                    <p style="color:#fff; font-family:'Orbitron'; margin-top:5px;">${unlockDate.toLocaleString()}</p>
+                    <button class="btn btn-guide" style="margin-top:30px; width:200px;" onclick="location.href='MC.html'">RETURN TO BASE</button>
+                </div>`;
             return;
         }
 
-        userEmail = user.email;
         document.getElementById('student-name').innerText = user.name;
         document.getElementById('student-title').innerText = user.title;
         document.getElementById('student-img').src = user.avatar;
-        document.getElementById('act-label').innerText = currentActivity;
-        document.getElementById('task-label').innerText = `TASK ${currentTask.toString().padStart(2, '0')}`;
+        document.getElementById('activity-title').innerText = currentActivity;
+        document.getElementById('mission-sub').innerText = `TASK ${currentTask.toString().padStart(2, '0')}`;
 
-        runLoader();
+        runRoyalLoader();
         checkMissionPresence();
     };
 
-    function runLoader() {
-        let progress = 0;
-        const bar = document.getElementById('pBar');
-        const txt = document.getElementById('pText');
+    function runRoyalLoader() {
+        const fill = document.getElementById('loader-fill');
+        const text = document.getElementById('loader-perc');
+        let p = 0;
         const interval = setInterval(() => {
-            progress += Math.floor(Math.random() * 15) + 5;
-            if (progress >= 100) {
-                progress = 100;
+            p += Math.floor(Math.random() * 15) + 5;
+            if (p >= 100) {
+                p = 100;
                 clearInterval(interval);
                 setTimeout(() => document.getElementById('arena-loader').style.display = 'none', 500);
             }
-            bar.style.width = progress + '%';
-            txt.innerText = `Getting the Arena Ready... ${progress}%`;
-        }, 150);
+            fill.style.width = p + '%';
+            text.innerText = `Getting the Arena Ready... ${p}%`;
+        }, 200);
     }
 
-    // Logic rest matches previous postMessage stability
     function checkMissionPresence() {
         fetch(`${CORE_SCRIPT_URL}?action=checkMission&email=${userEmail}&activity=${currentActivity}&task=${currentTask}`)
-        .then(res => res.json()).then(data => {
+        .then(res => res.json())
+        .then(data => {
             if (data.status === "completed") {
                 renderResult({ status: "success", grade: data.grade, analysis: data.analysis, isManual: data.isManual, alreadyDone: true });
             } else {
@@ -189,27 +202,32 @@
     }
 
     function startSubmission() {
-        const frame = document.getElementById('contentFrame').contentWindow;
-        frame.postMessage({ type: 'REQUEST_MISSION_DATA' }, '*');
+        document.getElementById('contentFrame').contentWindow.postMessage({ type: 'REQUEST_MISSION_DATA' }, '*');
     }
 
-    window.addEventListener('message', function(e) {
-        if (e.data.type === 'MISSION_ANSWERS') submitToHQ(e.data.answers);
+    window.addEventListener('message', function(event) {
+        if (event.data.type === 'MISSION_ANSWERS') submitToHQ(event.data.answers);
     });
 
     function submitToHQ(answers) {
         document.getElementById('sync-overlay').style.display = 'flex';
-        const payload = { activity: currentActivity, task: currentTask, email: userEmail, studentData: answers };
-        fetch(MISSIONS_SCRIPT_URL, { method: "POST", mode: "cors", body: JSON.stringify(payload) })
-        .then(res => res.json()).then(res => {
-            if (res.status === "success") saveGradeToStudents(res);
-            else renderResult(res);
+        const userObj = JSON.parse(localStorage.getItem('eyc_user'));
+        fetch(MISSIONS_SCRIPT_URL, {
+            method: "POST",
+            mode: "cors",
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify({ activity: currentActivity, task: currentTask, email: userEmail, name: userObj.name, studentData: answers })
+        })
+        .then(res => res.json())
+        .then(gradingRes => {
+            if (gradingRes.status === "success") saveGradeToStudents(gradingRes);
+            else renderResult(gradingRes);
         });
     }
 
     function saveGradeToStudents(res) {
         fetch(`${CORE_SCRIPT_URL}?action=submitMission&email=${userEmail}&activity=${currentActivity}&task=${currentTask}&grade=${res.grade}&answers=${encodeURIComponent(res.answers)}&analysis=${encodeURIComponent(res.analysis)}`)
-        .then(r => r.json()).then(final => renderResult(final));
+        .then(r => r.json()).then(finalRes => renderResult(finalRes));
     }
 
     function renderResult(res) {
@@ -219,29 +237,41 @@
         display.style.display = 'block';
 
         if (res.status === "success") {
-            const isManual = (res.grade === "PENDING" || ["DTX","EMX","SSSX"].includes(currentActivity));
-            let gradeVal = isManual ? "PENDING" : `${res.grade} / 50`;
-            let sub = isManual ? "TRANSMISSION SECURED: HQ is reviewing your frequency" : "Data synchronized with HQ Command.";
-            let rrBtn = (!isManual && parseInt(res.grade) < 40) ? `<button id="appealBtn" class="btn btn-guide" style="margin-top:10px; width:100%; border-color:red; color:red;" onclick="requestReview()">REQUEST REVIEW (RR)</button>` : "";
+            const isManual = (res.grade === "PENDING" || res.isManual === true);
+            const manualCodes = ["DTX", "EMX", "SSSX"];
+            const isHQReview = manualCodes.includes(currentActivity);
+
+            let gradeText = isManual ? "PENDING" : `${res.grade} / 50`;
+            let subText = isHQReview ? "TRANSMISSION SECURED: HQ is reviewing your frequency" : (isManual ? "Your answer is under revision at HQ." : "Data synchronized with HQ Command.");
+            
+            // Logic for Appeal Button: Grade < 40 and not manual
+            let appealBtnHtml = "";
+            if (!isManual && parseInt(res.grade) < 40) {
+                appealBtnHtml = `<button id="appealBtn" class="btn btn-guide" style="margin-top:10px; width:100%; border-color:rgba(255,0,0,0.3)" onclick="requestReview()">REQUEST REVIEW (RR)</button>`;
+            }
 
             display.innerHTML = `
-                <i class="fas fa-certificate" style="font-size:3rem; color:var(--gold);"></i>
-                <h2 style="font-family:'Orbitron'; color:#fff; margin:15px 0;">MISSION RECAP</h2>
-                <div style="font-size:2.5rem; color:var(--gold); font-weight:bold;">${gradeVal}</div>
-                <p style="color:#888; font-size:0.8rem; margin-top:10px;">${sub}</p>
+                <i class="fas ${isManual ? 'fa-satellite-dish' : 'fa-award'}" style="font-size:3rem; color:var(--gold);"></i>
+                <h2 style="font-family:'Orbitron'; color:#fff; margin:15px 0;">MISSION LOG</h2>
+                <div style="font-size:2.5rem; color:var(--gold); font-weight:bold;">${gradeText}</div>
+                <p style="color:#888; font-size:0.8rem; margin-top:10px; line-height:1.5;">${subText}</p>
                 <button class="btn btn-submit" style="margin-top:20px; width:100%" onclick="exitArena()">RETURN TO BASE</button>
-                ${rrBtn}`;
+                ${appealBtnHtml}
+            `;
         }
     }
 
     function exitArena() { window.location.href = 'MC.html'; }
     function createStars() {
         const container = document.getElementById('star-container');
-        for (let i = 0; i < 40; i++) {
-            const s = document.createElement('div'); s.className = 'star';
-            s.style.width = s.style.height = '2px';
-            s.style.top = Math.random() * 100 + '%'; s.style.left = Math.random() * 100 + '%';
-            container.appendChild(s);
+        for (let i = 0; i < 50; i++) {
+            const star = document.createElement('div');
+            star.className = 'star';
+            star.style.width = star.style.height = '2px';
+            star.style.top = Math.random() * 100 + '%';
+            star.style.left = Math.random() * 100 + '%';
+            star.style.setProperty('--duration', (Math.random() * 3 + 2) + 's');
+            container.appendChild(star);
         }
     }
 </script>
