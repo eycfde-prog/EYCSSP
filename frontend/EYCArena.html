@@ -79,7 +79,6 @@
             transform: scale(0.5); transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
         .gg-modal.active { transform: scale(1); }
-        /* Banner & Robot Circle */
         .gg-header {
             height: 60px; border-bottom: 1px solid var(--glass-border);
             display: flex; align-items: center; justify-content: space-between; padding: 0 20px;
@@ -89,7 +88,6 @@
             width: 70px; height: 70px; background: #000; border: 2px solid var(--gold);
             border-radius: 50%; z-index: 10; overflow: hidden; box-shadow: 0 0 20px var(--gold);
         }
-        /* Layout */
         .gg-body { flex: 1; display: flex; overflow: hidden; }
         .gg-sidebar {
             width: 150px; border-right: 1px solid var(--glass-border);
@@ -101,7 +99,6 @@
         }
         .gg-tab.active { background: var(--gold-gradient); color: #000; font-weight: bold; }
         .gg-content-area { flex: 1; padding: 20px; overflow-y: auto; font-size: 0.9rem; line-height: 1.6; }
-        /* Pulse Gemini */
         .gemini-btn {
             animation: pulse-gemini 2s infinite; color: #4285f4 !important;
         }
@@ -244,20 +241,36 @@
         document.getElementById('activity-title').innerText = currentActivity;
         document.getElementById('mission-sub').innerText = `TASK ${currentTask.toString().padStart(2, '0')}`;
 
+        setupIframeListener();
         runRoyalLoader();
         checkMissionPresence();
     };
+
+    function setupIframeListener() {
+        const iframe = document.getElementById('contentFrame');
+        iframe.addEventListener('load', function() {
+            const loader = document.getElementById('arena-loader');
+            if (loader) {
+                loader.style.display = 'none';
+                console.log("WOLF System: Arena Content Loaded. Shield Deactivated.");
+            }
+        });
+    }
 
     function runRoyalLoader() {
         const fill = document.getElementById('loader-fill');
         const text = document.getElementById('loader-perc');
         let p = 0;
         const interval = setInterval(() => {
-            p += Math.floor(Math.random() * 15) + 5;
+            if (p < 90) {
+                p += Math.floor(Math.random() * 10) + 2;
+            } else if (p < 100) {
+                p += 1;
+            }
+
             if (p >= 100) {
                 p = 100;
                 clearInterval(interval);
-                setTimeout(() => document.getElementById('arena-loader').style.display = 'none', 500);
             }
             fill.style.width = p + '%';
             text.innerText = `Getting the Arena Ready... ${p}%`;
@@ -269,6 +282,7 @@
         .then(res => res.json())
         .then(data => {
             if (data.status === "completed") {
+                document.getElementById('arena-loader').style.display = 'none';
                 renderResult({ status: "success", grade: data.grade, analysis: data.analysis, isManual: data.isManual, alreadyDone: true });
             } else {
                 document.getElementById('contentFrame').src = `missions/${currentActivity}.html?task=${currentTask}`;
@@ -351,7 +365,6 @@
         }
     }
 
-    // --- Galaxy Guide Functions ---
     let currentGGLang = "ENG";
     let ggData = null;
 
@@ -369,7 +382,6 @@
     function fetchGGData() {
         const contentArea = document.getElementById('gg-content');
         contentArea.innerHTML = `<div style="text-align:center; margin-top:50px;"><i class="fas fa-spinner fa-spin"></i> Fetching Mission Intel...</div>`;
-        
         const GG_API_URL = "https://script.google.com/macros/s/AKfycbx4QIDy4O6mnHq2Oa9PvU99nGfYyDfHuo67_vl6-jRnz8n3fMbLGouYmedqmleBgKz9XQ/exec"; 
         
         fetch(`${GG_API_URL}?activity=${currentActivity}&lang=${currentGGLang}`)
