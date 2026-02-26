@@ -61,7 +61,7 @@
             align-items: center;
             justify-content: space-between;
             gap: 20px;
-            transition: 0.3s;
+            transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .sentence-card.error-card { 
@@ -78,8 +78,16 @@
         .sentence-text {
             font-size: 1.1rem;
             flex-grow: 1;
-            color: #e0e0e0;
+            color: #b0b0b0; /* Dimmed by default */
             font-weight: 400;
+            transition: 0.4s ease; /* Smooth brightening */
+        }
+
+        /* Input Focus Magic: Brighten text when inputting fix */
+        .sentence-card:focus-within .sentence-text {
+            color: #ffffff;
+            filter: brightness(1.5);
+            text-shadow: 0 0 8px rgba(255,255,255,0.3);
         }
 
         .correction-input {
@@ -94,6 +102,7 @@
             outline: none;
             text-align: center;
             transition: 0.4s;
+            text-transform: lowercase; /* Visual Polish */
         }
 
         .correction-input:focus {
@@ -107,6 +116,13 @@
             font-size: 9px;
             color: #555;
             letter-spacing: 2px;
+            transition: 0.3s ease;
+        }
+
+        /* Success Pulse on Tag */
+        .tag-filled {
+            color: var(--gold) !important;
+            text-shadow: 0 0 5px var(--gold-glow);
         }
 
         @media (max-width: 600px) {
@@ -149,22 +165,31 @@ function loadScanner() {
     
     screen.innerHTML = sentences.map((s, i) => `
         <div class="sentence-card" id="card-${i}">
-            <span class="id-tag">L-ERR_0${i+1}</span>
+            <span class="id-tag" id="tag-${i}">L-ERR_0${i+1}</span>
             <div class="sentence-text">${s}</div>
             <input type="text" class="correction-input alike-input" id="fix-${i}" 
-                   placeholder="FIX..." onkeydown="preventSpaces(event)" autocomplete="off">
+                   placeholder="FIX..." onkeydown="handleInput(event, ${i})" 
+                   oninput="handleInput(event, ${i})" autocomplete="off">
         </div>
     `).join('');
 }
 
-function preventSpaces(e) {
+function handleInput(e, idx) {
+    // 1. Prevent Spaces
     if (e.key === " " || e.keyCode === 32) {
         e.preventDefault();
-        return false;
+    }
+
+    // 2. Success Pulse Logic: Update Tag Color
+    const input = document.getElementById(`fix-${idx}`);
+    const tag = document.getElementById(`tag-${idx}`);
+    if (input.value.trim().length > 0) {
+        tag.classList.add('tag-filled');
+    } else {
+        tag.classList.remove('tag-filled');
     }
 }
 
-// استلام الطلب من صفحة الأرينا
 window.addEventListener('message', function(event) {
     if (event.data.type === 'REQUEST_MISSION_DATA') {
         collectAndSend();
@@ -177,7 +202,8 @@ function collectAndSend() {
     let hasError = false;
 
     inputs.forEach((input, i) => {
-        const val = input.value.trim();
+        // Enforce Lowercase on Send
+        const val = input.value.trim().toLowerCase();
         const card = document.getElementById(`card-${i}`);
         if(!val) {
             hasError = true;
@@ -188,12 +214,8 @@ function collectAndSend() {
         }
     });
 
-    if(hasError) {
-        // تنبيه الصفحة الأم بأن البيانات ناقصة
-        return; 
-    }
+    if(hasError) return; 
 
-    // إرسال البيانات كمصفوفة حقيقية (Array) ليتوافق مع JSON.stringify في الأرينا
     window.parent.postMessage({ 
         type: 'MISSION_ANSWERS', 
         answers: answers 
