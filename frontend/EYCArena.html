@@ -19,52 +19,36 @@
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { background: var(--bg-deep); color: white; height: 100dvh; display: flex; flex-direction: column; overflow: hidden; font-family: 'Poppins', sans-serif; }
         
-        /* Star Background */
         #star-container { position: fixed; inset: 0; z-index: -2; background: radial-gradient(circle at top, #0a0b14 0%, #030306 100%); }
         .star { position: absolute; background: #fff; border-radius: 50%; opacity: 0.3; animation: pulse var(--duration) infinite ease-in-out; }
         @keyframes pulse { 0%, 100% { opacity: 0.2; transform: scale(1); } 50% { opacity: 0.7; transform: scale(1.5); } }
 
-        /* UI Header - Profile Centered */
         header { padding: 15px; background: rgba(0,0,0,0.6); backdrop-filter: blur(10px); border-bottom: 1px solid var(--glass-border); z-index: 10; display: flex; justify-content: center; }
         .profile-center { display: flex; flex-direction: column; align-items: center; gap: 5px; }
         .student-photo { width: 50px; height: 50px; border-radius: 50%; border: 2px solid var(--gold); padding: 2px; object-fit: cover; box-shadow: 0 0 15px var(--glass-border); }
         .name { font-family: 'Cinzel'; font-size: 0.9rem; color: var(--gold); letter-spacing: 1px; }
         .rank-tag { font-family: 'Orbitron'; font-size: 0.6rem; color: #888; text-transform: uppercase; }
 
-        /* Arena Layout */
         .arena-container { flex: 1; padding: 10px; position: relative; display: flex; flex-direction: column; }
         .glass-iframe-wrapper { flex: 1; background: #000; border: 1px solid var(--glass-border); border-radius: 15px; overflow: hidden; position: relative; box-shadow: inset 0 0 30px rgba(0,0,0,1); }
         iframe { width: 100%; height: 100%; border: none; }
 
-        /* Task Info Bar (Floating above footer) */
         .task-info-bar { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.8); padding: 8px 25px; border-radius: 20px; border: 1px solid var(--gold); display: flex; gap: 15px; align-items: center; backdrop-filter: blur(5px); z-index: 5; }
         .info-segment { font-family: 'Orbitron'; font-size: 0.7rem; color: var(--gold-light); display: flex; align-items: center; gap: 8px; }
 
-        /* Royal Loader */
         #arena-loader { position: absolute; inset: 0; background: var(--bg-deep); z-index: 100; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 40px; text-align: center; }
         .loader-bar-container { width: 100%; max-width: 300px; height: 4px; background: rgba(255,255,255,0.05); border-radius: 2px; margin-top: 20px; overflow: hidden; }
         .loader-bar-fill { height: 100%; width: 0%; background: var(--gold-gradient); transition: width 0.4s ease; box-shadow: 0 0 10px var(--gold); }
         .loader-text { font-family: 'Orbitron'; font-size: 0.7rem; color: var(--gold); margin-top: 15px; letter-spacing: 2px; }
 
-        /* Footer Buttons */
         footer { padding: 15px 20px; display: flex; gap: 10px; background: rgba(0,0,0,0.8); border-top: 1px solid var(--glass-border); }
         .btn { flex: 1; padding: 14px; border-radius: 10px; border: none; font-family: 'Orbitron'; font-size: 0.7rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: 0.3s; }
         .btn-submit { background: var(--gold-gradient); color: #000; font-weight: 900; }
         .btn-guide { background: rgba(197, 160, 40, 0.1); color: var(--gold); border: 1px solid var(--gold); }
         .btn-back { background: transparent; color: #666; border: 1px solid #333; }
 
-        /* Result & Glitch Effect */
         #sync-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 2000; display: none; flex-direction: column; justify-content: center; align-items: center; backdrop-filter: blur(15px); }
-        .result-card { text-align: center; padding: 30px; border-radius: 25px; border: 1px solid var(--gold); background: #050508; width: 85%; max-width: 400px; animation: glitch 0.3s ease; }
-        @keyframes glitch {
-            0% { transform: translate(2px, 2px); opacity: 0; }
-            20% { transform: translate(-2px, -2px); }
-            40% { transform: translate(2px, -2px); }
-            100% { transform: translate(0); opacity: 1; }
-        }
-
-        .lock-screen { position: fixed; inset: 0; background: #000; z-index: 9999; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px; }
-        .lock-icon { font-size: 4rem; color: var(--gold); margin-bottom: 20px; }
+        .result-card { text-align: center; padding: 30px; border-radius: 25px; border: 1px solid var(--gold); background: #050508; width: 85%; max-width: 400px; }
     </style>
 </head>
 <body>
@@ -112,25 +96,6 @@
     const CORE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz1D8BkAHFH0mwiw_n_2yL6jvQ04rrOb3mwiqKuxmHVTrynxzYzzF7XwIJQ-QnrrfQb/exec"; 
     const MISSIONS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz7KoJjI0VqYPBhJJfspL2RdAE8R5x8wdiRVrqvYL7cAdsisuyw-lE6IoAQsWWI-voRzw/exec"; 
 
-    // --- MISSION SCHEDULE PROTOCOL (Wolf Edition) ---
-    const MISSION_SCHEDULE = {
-        seasonStart: new Date("2026-02-26T10:00:00"),
-        royalStart: new Date("2026-02-28T10:00:00"),
-        getUnlockDate: function(type, taskNum) {
-            let date = new Date(type === 'royal' ? this.royalStart : this.seasonStart);
-            if (taskNum > 1) {
-                if (type === 'season') {
-                    let totalGap = 0;
-                    for (let i = 2; i <= taskNum; i++) { totalGap += (i + 2); }
-                    date.setDate(date.getDate() + totalGap);
-                } else {
-                    date.setDate(date.getDate() + ((taskNum - 1) * 3));
-                }
-            }
-            return date;
-        }
-    };
-
     let userEmail, currentActivity, currentTask, activityType;
 
     window.onload = function() {
@@ -143,23 +108,7 @@
         currentActivity = params.get('act'); 
         currentTask = parseInt(params.get('task') || "1");
         
-        const royalCodes = ["ASX","VVX","LBX","SDX","GEX","GRX","DTX","SSSX","EMX","FGX"];
-        activityType = royalCodes.includes(currentActivity) ? 'royal' : 'season';
-
-        // --- THE SHIELD PROTOCOL CHECK ---
-        const unlockDate = MISSION_SCHEDULE.getUnlockDate(activityType, currentTask);
-        if (new Date() < unlockDate) {
-            document.body.innerHTML = `
-                <div class="lock-screen">
-                    <i class="fas fa-user-shield lock-icon"></i>
-                    <h2 style="font-family:'Orbitron'; color:var(--gold);">ENTRY DENIED</h2>
-                    <p style="color:#888; margin-top:10px;">Mission signals will clear on:</p>
-                    <p style="color:#fff; font-family:'Orbitron'; margin-top:5px;">${unlockDate.toLocaleString()}</p>
-                    <button class="btn btn-guide" style="margin-top:30px; width:200px;" onclick="location.href='MC.html'">RETURN TO BASE</button>
-                </div>`;
-            return;
-        }
-
+        // Protocol Overridden: Time-check bypassed by WOLF
         document.getElementById('student-name').innerText = user.name;
         document.getElementById('student-title').innerText = user.title;
         document.getElementById('student-img').src = user.avatar;
@@ -243,18 +192,12 @@
             let gradeText = isManual ? "PENDING" : `${res.grade} / 50`;
             let subText = isHQReview ? "TRANSMISSION SECURED: HQ is reviewing your frequency" : (isManual ? "Your answer is under revision at HQ." : "Data synchronized with HQ Command.");
             
-            let appealBtnHtml = "";
-            if (!isManual && parseInt(res.grade) < 40) {
-                appealBtnHtml = `<button id="appealBtn" class="btn btn-guide" style="margin-top:10px; width:100%; border-color:rgba(255,0,0,0.3)" onclick="requestReview()">REQUEST REVIEW (RR)</button>`;
-            }
-
             display.innerHTML = `
                 <i class="fas ${isManual ? 'fa-satellite-dish' : 'fa-award'}" style="font-size:3rem; color:var(--gold);"></i>
                 <h2 style="font-family:'Orbitron'; color:#fff; margin:15px 0;">MISSION LOG</h2>
                 <div style="font-size:2.5rem; color:var(--gold); font-weight:bold;">${gradeText}</div>
                 <p style="color:#888; font-size:0.8rem; margin-top:10px; line-height:1.5;">${subText}</p>
                 <button class="btn btn-submit" style="margin-top:20px; width:100%" onclick="exitArena()">RETURN TO BASE</button>
-                ${appealBtnHtml}
             `;
         }
     }
