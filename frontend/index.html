@@ -1,132 +1,167 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>EYC Superstars | Ramadan Edition</title>
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Orbitron:wght@400;700;900&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-<style>
-:root {
---gold: #D4AF37;
---gold-light: #fcf6ba;
---gold-gradient: linear-gradient(135deg, #bf953f, #fcf6ba, #b38728);
---bg-deep: #050508;
---gold-glow: rgba(212, 175, 55, 0.4);
---gold-bright: #fff9d0;
---glass-border: rgba(212, 175, 55, 0.2);
---ember-orange: rgba(255, 100, 0, 0.15);
-}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>EYC Superstars | Ramadan Edition</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Orbitron:wght@400;700;900&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --gold: #D4AF37;
+            --gold-light: #fcf6ba;
+            --gold-gradient: linear-gradient(135deg, #bf953f, #fcf6ba, #b38728);
+            --bg-deep: #050508;
+            --gold-glow: rgba(212, 175, 55, 0.4);
+            --gold-bright: #fff9d0;
+            --glass-border: rgba(212, 175, 55, 0.2);
+            --ember-orange: rgba(255, 100, 0, 0.15);
+        }
 
-* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; -webkit-tap-highlight-color: transparent; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; -webkit-tap-highlight-color: transparent; }
 
-/* Fixed Scrolling: Changed overflow:hidden to auto to allow scrolling if content overflows on smaller screens */
-body { 
-    background: var(--bg-deep); 
-    color: white; 
-    min-height: 100vh; 
-    overflow-x: hidden; 
-    overflow-y: auto; 
-    display: flex; 
-    flex-direction: column; 
-}
+        body { 
+            background: var(--bg-deep); 
+            color: white; 
+            min-height: 100vh; 
+            overflow-x: hidden; 
+            overflow-y: auto; 
+            display: flex; 
+            flex-direction: column; 
+        }
 
-.crescent-hanging {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin-top: -15px;
-    opacity: 0.8;
-    animation: gentleSwing 5s ease-in-out infinite;
-    pointer-events: none;
-    z-index: 5;
-}
-.crescent-hanging i {
-    font-size: 2.2rem;
-    color: var(--gold);
-    filter: drop-shadow(0 0 15px var(--gold-glow));
-}
-.crescent-hanging span {
-    font-family: 'Cinzel', serif;
-    font-size: 0.5rem;
-    color: var(--gold-bright);
-    letter-spacing: 2px;
-    margin-top: -3px;
-    text-transform: uppercase;
-}
+        /* Galaxy Overlay System */
+        .galaxy-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(20px); z-index: 5000; display: none;
+            align-items: center; justify-content: center; padding: 20px;
+        }
+        .guide-modal {
+            background: #050508; border: 1px solid var(--gold); border-radius: 25px;
+            width: 100%; max-width: 500px; max-height: 80vh; display: flex; flex-direction: column;
+            box-shadow: 0 0 50px rgba(197, 160, 40, 0.2); position: relative;
+        }
+        /* Ramadan Theme Overrides */
+        .ramadan-guide-modal {
+            border-color: #E29E2E !important;
+            box-shadow: 0 0 40px rgba(226, 158, 46, 0.3) !important;
+        }
+        .ramadan-guide-modal .guide-title {
+            color: #E29E2E !important;
+        }
+        .ramadan-guide-modal .guide-action {
+            border-color: #E29E2E !important;
+            background: rgba(226, 158, 46, 0.05) !important;
+        }
 
-@keyframes gentleSwing {
-0%, 100% { transform: rotate(-3deg) translateY(0); }
-50% { transform: rotate(3deg) translateY(5px); }
-}
+        .guide-header { padding: 15px 20px; border-bottom: 1px solid var(--glass-border); display: flex; justify-content: space-between; align-items: center; }
+        .lang-switcher { display: flex; gap: 5px; background: #111; padding: 3px; border-radius: 10px; }
+        .lang-btn { padding: 5px 12px; border: none; background: transparent; color: #555; cursor: pointer; font-size: 0.7rem; font-family: 'Orbitron'; }
+        .lang-btn.active { background: var(--gold-gradient); color: #000; border-radius: 8px; font-weight: bold; }
+        .tabs-bar { display: flex; overflow-x: auto; padding: 10px; gap: 10px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .tab-item { white-space: nowrap; padding: 8px 15px; font-size: 0.7rem; font-family: 'Orbitron'; color: #888; cursor: pointer; border: 1px solid transparent; border-radius: 20px; }
+        .tab-item.active { border-color: var(--gold); color: var(--gold); background: rgba(197, 160, 40, 0.05); }
+        .guide-content { flex: 1; overflow-y: auto; padding: 25px; }
+        .guide-title { font-family: 'Cinzel'; color: var(--gold); margin-bottom: 15px; font-size: 1.2rem; }
+        .guide-text { color: #ccc; line-height: 1.7; font-size: 0.9rem; margin-bottom: 20px; }
+        .guide-action { background: rgba(197, 160, 40, 0.1); border: 1px dashed var(--gold); padding: 15px; border-radius: 15px; color: var(--gold-light); font-size: 0.8rem; }
 
-.hero { 
-    text-align: center; 
-    padding: 40px 20px 20px; 
-    display: flex; 
-    flex-direction: column; 
-    align-items: center; 
-}
+        .crescent-hanging {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: -15px;
+            opacity: 0.8;
+            animation: gentleSwing 5s ease-in-out infinite;
+            pointer-events: none;
+            z-index: 5;
+        }
+        .crescent-hanging i {
+            font-size: 2.2rem;
+            color: var(--gold);
+            filter: drop-shadow(0 0 15px var(--gold-glow));
+        }
+        .crescent-hanging span {
+            font-family: 'Cinzel', serif;
+            font-size: 0.5rem;
+            color: var(--gold-bright);
+            letter-spacing: 2px;
+            margin-top: -3px;
+            text-transform: uppercase;
+        }
 
-.logo-container { position: relative; margin-bottom: 15px; }
-.main-logo { width: 130px; filter: drop-shadow(0 0 25px var(--gold-glow)); z-index: 2; position: relative; }
-.hero h1 {
-    font-family: 'Cinzel', serif; font-size: clamp(2rem, 10vw, 3.8rem);
-    background: var(--gold-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-    line-height: 1.1; letter-spacing: 6px; filter: drop-shadow(0 0 15px rgba(212,175,55,0.3));
-}
+        @keyframes gentleSwing {
+            0%, 100% { transform: rotate(-3deg) translateY(0); }
+            50% { transform: rotate(3deg) translateY(5px); }
+        }
 
-#lantern-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; }
+        .hero { 
+            text-align: center; 
+            padding: 40px 20px 20px; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+        }
 
-.mission-control {
-flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
-padding: 20px 0;
-}
+        .logo-container { position: relative; margin-bottom: 15px; }
+        .main-logo { width: 130px; filter: drop-shadow(0 0 25px var(--gold-glow)); z-index: 2; position: relative; }
+        .hero h1 {
+            font-family: 'Cinzel', serif; font-size: clamp(2rem, 10vw, 3.8rem);
+            background: var(--gold-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            line-height: 1.1; letter-spacing: 6px; filter: drop-shadow(0 0 15px rgba(212,175,55,0.3));
+        }
 
-.core-container {
-position: relative; width: 280px; height: 280px;
-display: flex; align-items: center; justify-content: center; cursor: pointer; margin-bottom: 40px;
-}
+        #lantern-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; }
 
-.core-ring { position: absolute; border-radius: 50%; border: 1px solid var(--glass-border); transition: 0.5s ease; }
-.ring-outer { width: 100%; height: 100%; border-style: double; border-width: 2px; animation: rotateRight 30s linear infinite; }
-.ring-inner { width: 75%; height: 75%; border-style: dashed; border-width: 1px; opacity: 0.3; animation: rotateLeft 20s linear infinite; }
+        .mission-control {
+            flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+            padding: 20px 0;
+        }
 
-@keyframes corePulse {
-0% { box-shadow: 0 0 20px var(--gold-glow); }
-50% { box-shadow: 0 0 50px var(--gold); }
-100% { box-shadow: 0 0 20px var(--gold-glow); }
-}
+        .core-container {
+            position: relative; width: 280px; height: 280px;
+            display: flex; align-items: center; justify-content: center; cursor: pointer; margin-bottom: 40px;
+        }
 
-.main-core-btn {
-width: 140px; height: 140px; background: radial-gradient(circle, #101015 0%, #050508 100%);
-border: 1px solid var(--gold); border-radius: 50%;
-display: flex; flex-direction: column; align-items: center; justify-content: center;
-color: var(--gold); font-family: 'Orbitron';
-z-index: 10;
-animation: corePulse 3s infinite ease-in-out;
-}
+        .core-ring { position: absolute; border-radius: 50%; border: 1px solid var(--glass-border); transition: 0.5s ease; }
+        .ring-outer { width: 100%; height: 100%; border-style: double; border-width: 2px; animation: rotateRight 30s linear infinite; }
+        .ring-inner { width: 75%; height: 75%; border-style: dashed; border-width: 1px; opacity: 0.3; animation: rotateLeft 20s linear infinite; }
 
-.btn-stack { display: flex; flex-direction: column; gap: 15px; width: 100%; max-width: 300px; padding: 0 20px; margin-bottom: 20px; }
-.nav-btn {
-width: 100%; padding: 16px; border-radius: 12px; background: rgba(255, 255, 255, 0.03); color: #fff;
-border: 1px solid var(--glass-border); backdrop-filter: blur(10px); cursor: pointer;
-font-family: 'Orbitron'; text-decoration: none; text-align: center; font-size: 0.8rem; letter-spacing: 2px;
-}
-.nav-btn:hover { background: var(--gold-gradient); color: #000; transform: translateY(-3px); }
+        @keyframes corePulse {
+            0% { box-shadow: 0 0 20px var(--gold-glow); }
+            50% { box-shadow: 0 0 50px var(--gold); }
+            100% { box-shadow: 0 0 20px var(--gold-glow); }
+        }
 
-.fairy-float { position: fixed; bottom: 20px; right: 20px; width: 50px; height: 50px; background: var(--gold-gradient); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 100; box-shadow: 0 0 15px var(--gold); }
+        .main-core-btn {
+            width: 140px; height: 140px; background: radial-gradient(circle, #101015 0%, #050508 100%);
+            border: 1px solid var(--gold); border-radius: 50%;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            color: var(--gold); font-family: 'Orbitron';
+            z-index: 10;
+            animation: corePulse 3s infinite ease-in-out;
+        }
 
-footer { padding: 30px; text-align: center; opacity: 0.6; font-size: 0.5rem; letter-spacing: 2px; color: var(--gold); font-family: 'Orbitron'; }
+        .btn-stack { display: flex; flex-direction: column; gap: 15px; width: 100%; max-width: 300px; padding: 0 20px; margin-bottom: 20px; }
+        .nav-btn {
+            width: 100%; padding: 16px; border-radius: 12px; background: rgba(255, 255, 255, 0.03); color: #fff;
+            border: 1px solid var(--glass-border); backdrop-filter: blur(10px); cursor: pointer;
+            font-family: 'Orbitron'; text-decoration: none; text-align: center; font-size: 0.8rem; letter-spacing: 2px;
+        }
+        .nav-btn:hover { background: var(--gold-gradient); color: #000; transform: translateY(-3px); }
 
-@keyframes rotateRight { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-@keyframes rotateLeft { from { transform: rotate(360deg); } to { transform: rotate(0deg); } }
-</style>
+        .fairy-float { position: fixed; bottom: 20px; right: 20px; width: 50px; height: 50px; background: var(--gold-gradient); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 100; box-shadow: 0 0 15px var(--gold); }
+
+        footer { padding: 30px; text-align: center; opacity: 0.6; font-size: 0.5rem; letter-spacing: 2px; color: var(--gold); font-family: 'Orbitron'; }
+
+        @keyframes rotateRight { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        @keyframes rotateLeft { from { transform: rotate(360deg); } to { transform: rotate(0deg); } }
+    </style>
 </head>
 <body>
 
-<div class="fairy-float" onclick="alert('Fairytale Guide: System active! How can I help?')">
-<i class="fas fa-wand-sparkles" style="color: #000; font-size: 1.5rem;"></i>
+<div class="fairy-float" onclick="openGalaxyGuide()">
+    <i class="fas fa-wand-sparkles" style="color: #000; font-size: 1.5rem;"></i>
 </div>
 
 <header class="hero">
@@ -146,88 +181,151 @@ footer { padding: 30px; text-align: center; opacity: 0.6; font-size: 0.5rem; let
 <canvas id="lantern-canvas"></canvas>
 
 <section class="mission-control">
-<div class="core-container" onclick="startLaunch()">
-<div class="core-ring ring-outer"></div>
-<div class="core-ring ring-inner"></div>
-<div class="main-core-btn">
-<i class="fa-solid fa-lantern" style="font-size: 1.8rem; margin-bottom: 5px;"></i>
-<span style="font-size: 0.6rem;">ENTER ARENA</span>
-</div>
-</div>
-<div class="btn-stack">
-<a href="NP.html" class="nav-btn">New Agent</a>
-<a href="RNKS.html" class="nav-btn">Rankings</a>
-<a href="Rev.html" class="nav-btn">Reviews</a>
-</div>
+    <div class="core-container" onclick="startLaunch()">
+        <div class="core-ring ring-outer"></div>
+        <div class="core-ring ring-inner"></div>
+        <div class="main-core-btn">
+            <i class="fa-solid fa-lantern" style="font-size: 1.8rem; margin-bottom: 5px;"></i>
+            <span style="font-size: 0.6rem;">ENTER ARENA</span>
+        </div>
+    </div>
+    <div class="btn-stack">
+        <a href="NP.html" class="nav-btn">New Agent</a>
+        <a href="RNKS.html" class="nav-btn">Rankings</a>
+        <a href="Rev.html" class="nav-btn">Reviews</a>
+    </div>
 </section>
 
 <footer>&copy; 2026 EYC ACADEMY | RAMADAN PROTOCOL</footer>
 
 <script>
-const canvas = document.getElementById('lantern-canvas');
-const ctx = canvas.getContext('2d');
-let lanterns = [];
+    let masterData = [];
+    let currentLang = 'en';
 
-function initCanvas() {
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
-}
+    function openGalaxyGuide() {
+        const overlay = document.createElement('div');
+        overlay.className = 'galaxy-overlay';
+        overlay.id = 'guideOverlay';
+        overlay.innerHTML = `
+            <div class="guide-modal ramadan-guide-modal">
+                <div class="guide-header">
+                    <div class="lang-switcher">
+                        <button class="lang-btn ${currentLang==='ar'?'active':''}" onclick="toggleGuideLang('ar')">AR</button>
+                        <button class="lang-btn ${currentLang==='en'?'active':''}" onclick="toggleGuideLang('en')">EN</button>
+                    </div>
+                    <i class="fas fa-times" style="color:var(--gold); cursor:pointer;" onclick="document.getElementById('guideOverlay').remove()"></i>
+                </div>
+                <div class="tabs-bar" id="guideTabs"></div>
+                <div class="guide-content" id="guideView">
+                    <div style="text-align:center; padding-top:50px;"><i class="fas fa-spinner fa-spin"></i> Loading Galaxy Wisdom...</div>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(overlay);
+        overlay.style.display = 'flex';
+        fetchGuideData();
+    }
 
-class Lantern {
-constructor() { this.init(); }
-init() {
-this.x = Math.random() * canvas.width;
-this.y = canvas.height + 50;
-this.size = Math.random() * 10 + 8;
-this.speed = Math.random() * 0.5 + 0.2;
-this.opacity = Math.random() * 0.4 + 0.2;
-}
-update() {
-this.y -= this.speed;
-this.x += Math.sin(this.y / 50) * 0.3;
-if (this.y < -50) this.init();
-ctx.save();
-ctx.translate(this.x, this.y);
-ctx.globalAlpha = this.opacity;
-ctx.fillStyle = "#D4AF37";
+    async function fetchGuideData() {
+        const res = await fetch(`${SCRIPT_URL}?action=getMasterGuide&lang=${currentLang}`);
+        const result = await res.json();
+        if(result.status === 'success') {
+            masterData = result.data;
+            renderTabs();
+            showTab(0);
+        }
+    }
 
-ctx.beginPath();
-ctx.moveTo(0, -this.size);
-ctx.lineTo(this.size/2, -this.size/2);
-ctx.lineTo(this.size/2, this.size/2);
-ctx.lineTo(0, this.size);
-ctx.lineTo(-this.size/2, this.size/2);
-ctx.lineTo(-this.size/2, -this.size/2);
-ctx.closePath();
-ctx.fill();
+    function renderTabs() {
+        const container = document.getElementById('guideTabs');
+        container.innerHTML = masterData.map((item, idx) => `
+            <div class="tab-item ${idx===0?'active':''}" onclick="showTab(${idx}, this)">${item.tabName}</div>
+        `).join('');
+    }
 
-ctx.fillStyle = "#fcf6ba";
-ctx.beginPath();
-ctx.arc(0, 0, this.size/4, 0, Math.PI * 2);
-ctx.fill();
+    function showTab(idx, el) {
+        if(el) {
+            document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+            el.classList.add('active');
+        }
+        const item = masterData[idx];
+        document.getElementById('guideView').innerHTML = `
+            <h2 class="guide-title">${item.contentTitle}</h2>
+            <p class="guide-text">${item.tabContent.replace(/\n/g, '<br>')}</p>
+            <div class="guide-action"><i class="fas fa-magic"></i> ${item.action}</div>
+        `;
+    }
 
-ctx.restore();
-}
-}
+    function toggleGuideLang(lang) {
+        currentLang = lang;
+        fetchGuideData();
+    }
 
-function createLanterns() {
-lanterns = Array.from({length: 25}, () => new Lantern());
-}
+    const canvas = document.getElementById('lantern-canvas');
+    const ctx = canvas.getContext('2d');
+    let lanterns = [];
 
-function animate() {
-ctx.clearRect(0, 0, canvas.width, canvas.height);
-lanterns.forEach(l => l.update());
-requestAnimationFrame(animate);
-}
+    function initCanvas() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+    }
 
-function startLaunch() {
-document.body.style.transition = "0.5s";
-document.body.style.opacity = "0";
-setTimeout(() => { window.location.href = "MC.html"; }, 500);
-}
+    class Lantern {
+        constructor() { this.init(); }
+        init() {
+            this.x = Math.random() * canvas.width;
+            this.y = canvas.height + 50;
+            this.size = Math.random() * 10 + 8;
+            this.speed = Math.random() * 0.5 + 0.2;
+            this.opacity = Math.random() * 0.4 + 0.2;
+        }
+        update() {
+            this.y -= this.speed;
+            this.x += Math.sin(this.y / 50) * 0.3;
+            if (this.y < -50) this.init();
+            ctx.save();
+            ctx.translate(this.x, this.y);
+            ctx.globalAlpha = this.opacity;
+            ctx.fillStyle = "#D4AF37";
 
-window.addEventListener('resize', initCanvas);
-initCanvas(); createLanterns(); animate();
+            ctx.beginPath();
+            ctx.moveTo(0, -this.size);
+            ctx.lineTo(this.size/2, -this.size/2);
+            ctx.lineTo(this.size/2, this.size/2);
+            ctx.lineTo(0, this.size);
+            ctx.lineTo(-this.size/2, this.size/2);
+            ctx.lineTo(-this.size/2, -this.size/2);
+            ctx.closePath();
+            ctx.fill();
+
+            ctx.fillStyle = "#fcf6ba";
+            ctx.beginPath();
+            ctx.arc(0, 0, this.size/4, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.restore();
+        }
+    }
+
+    function createLanterns() {
+        lanterns = Array.from({length: 25}, () => new Lantern());
+    }
+
+    function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        lanterns.forEach(l => l.update());
+        requestAnimationFrame(animate);
+    }
+
+    function startLaunch() {
+        document.body.style.transition = "0.5s";
+        document.body.style.opacity = "0";
+        setTimeout(() => { window.location.href = "MC.html"; }, 500);
+    }
+
+    window.addEventListener('resize', initCanvas);
+    initCanvas(); createLanterns(); animate();
 </script>
 </body>
 </html>
+``` Would you like me to extract specific components from this integrated file into separate blocks?
