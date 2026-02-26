@@ -66,69 +66,54 @@
         .lock-screen { position: fixed; inset: 0; background: #000; z-index: 9999; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px; }
         .lock-icon { font-size: 4rem; color: var(--gold); margin-bottom: 20px; }
 
-        /* Galaxy Guide Glassmorphism UI */
-        #guideModal {
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.7);
-            backdrop-filter: blur(15px);
-            z-index: 3000;
-            display: none;
-            flex-direction: column;
-            padding: 20px;
-            animation: fadeIn 0.3s ease;
+        /* Galaxy Guide Modal */
+        .gg-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.85); 
+            backdrop-filter: blur(12px); z-index: 3000;
+            display: none; align-items: center; justify-content: center; padding: 20px;
         }
-        .guide-container {
-            background: var(--glass);
-            border: 1px solid var(--glass-border);
-            border-radius: 20px;
-            height: 80vh;
-            margin-top: 10vh;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
+        .gg-modal {
+            width: 95%; max-width: 800px; height: 80vh; background: #080a12;
+            border: 1px solid var(--gold); border-radius: 20px;
+            display: flex; flex-direction: column; position: relative;
+            transform: scale(0.5); transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
-        .guide-tabs {
-            display: flex;
-            overflow-x: auto;
-            background: rgba(0, 0, 0, 0.4);
-            border-bottom: 1px solid var(--glass-border);
+        .gg-modal.active { transform: scale(1); }
+        /* Banner & Robot Circle */
+        .gg-header {
+            height: 60px; border-bottom: 1px solid var(--glass-border);
+            display: flex; align-items: center; justify-content: space-between; padding: 0 20px;
         }
-        .guide-tab {
-            flex: 1;
-            min-width: 100px;
-            padding: 15px;
-            text-align: center;
-            font-family: 'Orbitron';
-            font-size: 0.65rem;
-            color: #888;
-            cursor: pointer;
-            transition: 0.3s;
+        .robot-circle {
+            position: absolute; top: -35px; left: 50%; transform: translateX(-50%);
+            width: 70px; height: 70px; background: #000; border: 2px solid var(--gold);
+            border-radius: 50%; z-index: 10; overflow: hidden; box-shadow: 0 0 20px var(--gold);
         }
-        .guide-tab.active {
-            color: var(--gold);
-            background: rgba(197, 160, 40, 0.1);
-            box-shadow: inset 0 -2px 0 var(--gold);
-            text-shadow: 0 0 10px var(--gold);
+        /* Layout */
+        .gg-body { flex: 1; display: flex; overflow: hidden; }
+        .gg-sidebar {
+            width: 150px; border-right: 1px solid var(--glass-border);
+            display: flex; flex-direction: column; gap: 5px; padding: 10px;
         }
-        #guideContent {
-            flex: 1;
-            padding: 20px;
-            overflow-y: auto;
-            font-family: 'Poppins';
-            line-height: 1.6;
-            color: #eee;
-            font-size: 0.9rem;
+        .gg-tab {
+            padding: 12px; font-size: 0.65rem; font-family: 'Orbitron'; color: #888;
+            text-align: center; cursor: pointer; border-radius: 8px; transition: 0.3s;
         }
-        .guide-close {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            color: var(--gold);
-            font-size: 1.5rem;
-            cursor: pointer;
+        .gg-tab.active { background: var(--gold-gradient); color: #000; font-weight: bold; }
+        .gg-content-area { flex: 1; padding: 20px; overflow-y: auto; font-size: 0.9rem; line-height: 1.6; }
+        /* Pulse Gemini */
+        .gemini-btn {
+            animation: pulse-gemini 2s infinite; color: #4285f4 !important;
         }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes pulse-gemini {
+            0% { box-shadow: 0 0 0 0 rgba(66, 133, 244, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(66, 133, 244, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(66, 133, 244, 0); }
+        }
+        @media (max-width: 600px) {
+            .gg-body { flex-direction: column; }
+            .gg-sidebar { width: 100%; flex-direction: row; overflow-x: auto; border-right: none; border-bottom: 1px solid var(--glass-border); }
+        }
     </style>
 </head>
 <body>
@@ -169,20 +154,35 @@
     <footer>
         <button class="btn btn-back" onclick="exitArena()"><i class="fas fa-chevron-left"></i></button>
         <button id="submitBtn" class="btn btn-submit" onclick="startSubmission()"><i class="fas fa-upload"></i> SUBMIT MISSION</button>
-        <button class="btn btn-guide">GUIDE</button>
+        <button class="btn btn-guide" onclick="openGG()">GUIDE</button>
     </footer>
 
-    <div id="guideModal">
-        <i class="fas fa-times guide-close" onclick="toggleGalaxyGuide()"></i>
-        <div class="guide-container">
-            <div class="guide-tabs">
-                <div class="guide-tab active" onclick="switchTab('info', this)">الفوائد</div>
-                <div class="guide-tab" onclick="switchTab('tips', this)">نصائح</div>
-                <div class="guide-tab" onclick="switchTab('notes', this)">ملاحظات</div>
-                <div class="guide-tab" onclick="switchTab('warnings', this)">تحذيرات</div>
-                <div class="guide-tab" onclick="switchTab('bonus', this)">بونص</div>
+    <div id="gg-overlay" class="gg-overlay">
+        <div class="gg-modal" id="gg-modal">
+            <div class="robot-circle">
+                <img src="https://cdn-icons-png.flaticon.com/512/4712/4712035.png" style="width:100%; height:100%; object-fit:cover;">
             </div>
-            <div id="guideContent">تحميل بيانات المجرة...</div>
+            
+            <div class="gg-header">
+                <div style="font-family:'Orbitron'; font-size:0.7rem; color:var(--gold);">GALAXY GUIDE <span id="gg-act-code"></span></div>
+                <div style="display:flex; gap:10px; align-items:center;">
+                    <button onclick="toggleGGLang()" style="background:none; border:1px solid var(--gold); color:var(--gold); padding:2px 8px; border-radius:5px; font-size:0.6rem; cursor:pointer;">SWAP ARA/ENG</button>
+                    <i class="fas fa-times" onclick="closeGG()" style="cursor:pointer; color:#666;"></i>
+                </div>
+            </div>
+
+            <div class="gg-body">
+                <div class="gg-sidebar">
+                    <div class="gg-tab active" onclick="switchGGTab(0, 'info')">INFO</div>
+                    <div class="gg-tab" onclick="switchGGTab(1, 'tips')">TIPS</div>
+                    <div class="gg-tab" onclick="switchGGTab(2, 'notes')">NOTES</div>
+                    <div class="gg-tab" onclick="switchGGTab(3, 'warnings')">CAUTION</div>
+                    <div class="gg-tab gemini-btn" onclick="switchGGTab(4, 'bonus')"><i class="fab fa-google"></i> GEMINI</div>
+                </div>
+                <div class="gg-content-area" id="gg-content">
+                    Loading encrypted data...
+                </div>
+            </div>
         </div>
     </div>
 
@@ -210,7 +210,6 @@
     };
 
     let userEmail, currentActivity, currentTask, activityType;
-    let cachedGuideData = null;
 
     window.onload = function() {
         createStars();
@@ -353,46 +352,57 @@
     }
 
     // --- Galaxy Guide Functions ---
-    function toggleGalaxyGuide() {
-        const modal = document.getElementById('guideModal');
-        if (modal.style.display === 'flex') {
-            modal.style.display = 'none';
-        } else {
-            modal.style.display = 'flex';
-            if (!cachedGuideData) fetchGuide();
+    let currentGGLang = "ENG";
+    let ggData = null;
+
+    function openGG() {
+        document.getElementById('gg-overlay').style.display = 'flex';
+        setTimeout(() => document.getElementById('gg-modal').classList.add('active'), 10);
+        fetchGGData();
+    }
+
+    function closeGG() {
+        document.getElementById('gg-modal').classList.remove('active');
+        setTimeout(() => document.getElementById('gg-overlay').style.display = 'none', 300);
+    }
+
+    function fetchGGData() {
+        const contentArea = document.getElementById('gg-content');
+        contentArea.innerHTML = `<div style="text-align:center; margin-top:50px;"><i class="fas fa-spinner fa-spin"></i> Fetching Mission Intel...</div>`;
+        
+        const GG_API_URL = "https://script.google.com/macros/s/AKfycbx4QIDy4O6mnHq2Oa9PvU99nGfYyDfHuo67_vl6-jRnz8n3fMbLGouYmedqmleBgKz9XQ/exec"; 
+        
+        fetch(`${GG_API_URL}?activity=${currentActivity}&lang=${currentGGLang}`)
+            .then(res => res.json())
+            .then(data => {
+                if(data.status === "success") {
+                    ggData = data;
+                    document.getElementById('gg-act-code').innerText = `| ${data.activityName}`;
+                    switchGGTab(0, 'info'); 
+                } else {
+                    contentArea.innerHTML = `<p style="color:#ff4444;">${data.message}</p>`;
+                }
+            })
+            .catch(err => contentArea.innerHTML = "Signal Lost. Check connection.");
+    }
+
+    function switchGGTab(index, key) {
+        const tabs = document.querySelectorAll('.gg-tab');
+        tabs.forEach(t => t.classList.remove('active'));
+        tabs[index].classList.add('active');
+        
+        if(ggData) {
+            document.getElementById('gg-content').innerHTML = `
+                <h3 style="color:var(--gold); font-family:'Orbitron'; margin-bottom:15px; text-transform:uppercase;">${key}</h3>
+                <div class="fade-in">${ggData[key] || 'No data available for this sector.'}</div>
+            `;
         }
     }
 
-    function fetchGuide() {
-        const lang = currentActivity.endsWith('E') ? "GGE" : "GGA";
-        const contentArea = document.getElementById('guideContent');
-        contentArea.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Communicating with Galaxy Guide...`;
-
-        fetch(`${CORE_SCRIPT_URL}?action=getGuide&activityCode=${currentActivity}&lang=${lang}`)
-            .then(res => res.json())
-            .then(data => {
-                if (data.status === "success") {
-                    cachedGuideData = data;
-                    switchTab('info', document.querySelector('.guide-tab'));
-                } else {
-                    contentArea.innerHTML = "No guide found for this activity.";
-                }
-            })
-            .catch(() => contentArea.innerHTML = "Connection Error.");
+    function toggleGGLang() {
+        currentGGLang = (currentGGLang === "ENG") ? "ARA" : "ENG";
+        fetchGGData();
     }
-
-    function switchTab(type, element) {
-        if (!cachedGuideData) return;
-        
-        document.querySelectorAll('.guide-tab').forEach(t => t.classList.remove('active'));
-        element.classList.add('active');
-        
-        const contentArea = document.getElementById('guideContent');
-        contentArea.innerHTML = cachedGuideData[type] || "No data available.";
-    }
-
-    // Update footer button to trigger guide
-    document.querySelector('.btn-guide').onclick = toggleGalaxyGuide;
 </script>
 </body>
 </html>
