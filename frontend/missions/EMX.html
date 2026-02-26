@@ -12,6 +12,7 @@
             --neon-blue: #00f2ff;
             --glass: rgba(255, 255, 255, 0.03); 
             --glass-border: rgba(212, 175, 55, 0.2);
+            --radar-green: #00ff41;
         }
 
         body { 
@@ -22,8 +23,8 @@
             direction: ltr;
         }
 
-        body::-webkit-scrollbar { width: 4px; }
-        body::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 10px; }
+        /* Selection Polish */
+        ::selection { background: var(--gold); color: #000; }
 
         .magazine-container {
             max-width: 850px; 
@@ -35,6 +36,7 @@
             backdrop-filter: blur(20px);
             box-shadow: 0 25px 60px rgba(0,0,0,0.6);
             animation: fadeInScale 0.6s ease-out;
+            position: relative;
         }
 
         @keyframes fadeInScale { 
@@ -65,7 +67,6 @@
             box-shadow: inset 0 0 40px rgba(0,0,0,0.4);
         }
 
-        /* الحرف الأول الملكي */
         .drop-cap::first-letter {
             font-family: 'Orbitron';
             font-size: 4rem;
@@ -83,9 +84,11 @@
             padding: 8px 25px; border-radius: 4px; cursor: pointer;
             font-family: 'Orbitron'; font-size: 10px; font-weight: bold;
             transition: 0.3s; box-shadow: 0 5px 20px rgba(0,0,0,0.4);
+            z-index: 10;
         }
         .copy-btn:hover { background: #fff; transform: translateY(-2px); }
 
+        /* Upload Zone & Radar FX */
         .upload-zone {
             margin-top: 40px; 
             padding: 30px; 
@@ -94,6 +97,7 @@
             border-radius: 15px; 
             text-align: center; 
             transition: 0.4s;
+            position: relative;
         }
         .upload-zone.active { 
             border: 1px solid var(--gold); 
@@ -101,46 +105,59 @@
             box-shadow: 0 0 20px var(--gold-glow);
         }
 
-        .upload-label { 
-            display: block; 
-            font-family: 'Orbitron'; 
-            color: var(--neon-blue); 
-            margin-bottom: 20px; 
-            font-size: 11px;
-            letter-spacing: 2px;
+        .audio-icon { 
+            font-size: 30px; color: var(--neon-blue); margin-bottom: 15px; 
+            display: inline-block; position: relative;
         }
 
-        .upload-zone.active .upload-label { color: var(--gold); }
-        
-        input[type="file"] { 
-            color: #888; 
-            font-family: 'Poppins'; 
-            font-size: 13px;
-            cursor: pointer;
-            background: rgba(255,255,255,0.05);
-            padding: 10px;
-            border-radius: 8px;
+        /* Radar Pulse Animation */
+        .upload-zone.active .audio-icon::after {
+            content: "";
+            position: absolute; top: 50%; left: 50%;
+            width: 100%; height: 100%;
+            border: 2px solid var(--radar-green);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            animation: radarPulse 1.5s infinite;
         }
 
-        .status-msg { 
-            margin-top: 20px; 
-            font-size: 11px; 
-            color: var(--gold); 
-            display: none; 
-            font-family: 'Orbitron';
-            letter-spacing: 2px;
-            animation: pulse 1.5s infinite;
+        @keyframes radarPulse {
+            0% { width: 30px; height: 30px; opacity: 1; }
+            100% { width: 80px; height: 80px; opacity: 0; }
         }
 
-        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+        /* Loading Overlay */
+        #loadingOverlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85);
+            display: none; flex-direction: column;
+            justify-content: center; align-items: center;
+            border-radius: 25px; z-index: 100;
+            font-family: 'Orbitron'; color: var(--gold);
+        }
 
-        .audio-icon { font-size: 30px; color: var(--neon-blue); margin-bottom: 15px; display: block; }
-        .upload-zone.active .audio-icon { color: var(--gold); content: "📡"; }
+        .spinner {
+            width: 40px; height: 40px;
+            border: 3px solid rgba(212,175,55,0.1);
+            border-top: 3px solid var(--gold);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 15px;
+        }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+
+        .error-msg { color: #ff4444 !important; animation: shake 0.4s; }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
     </style>
 </head>
 <body>
 
     <div class="magazine-container">
+        <div id="loadingOverlay">
+            <div class="spinner"></div>
+            <div style="font-size: 12px; letter-spacing: 2px;">ENCRYPTING SIGNAL...</div>
+        </div>
+
         <div class="header-m">
             <div>
                 <h1 id="m-title">ELMAGAZINE X</h1>
@@ -158,16 +175,16 @@
 
         <div class="upload-zone" id="dropZone">
             <span class="audio-icon" id="icon">🎙️</span>
-            <label class="upload-label">TRANSMIT VOICE REPORT (MP3 / WAV)</label>
-            <input type="file" id="audioFile" accept="audio/*" onchange="handleFileSelect()">
-            <div id="status" class="status-msg">ENCRYPTED SIGNAL READY</div>
+            <label class="upload-label" style="display:block; font-family:'Orbitron'; color:var(--neon-blue); font-size:11px; letter-spacing:2px; margin-bottom:15px;">TRANSMIT VOICE REPORT (MAX 10MB)</label>
+            <input type="file" id="audioFile" accept="audio/*" onchange="handleFileSelect()" style="color:#888; font-family:'Poppins'; font-size:13px; cursor:pointer;">
+            <div id="status" style="margin-top:20px; font-size:11px; color:var(--gold); display:none; font-family:'Orbitron'; letter-spacing:2px;">SIGNAL READY</div>
         </div>
     </div>
 
 <script>
     const magazineData = {
         "1": "The concept of artificial intelligence has transformed from science fiction into an everyday reality. Today, AI systems help us navigate traffic, suggest movies, and even translate languages in real-time. However, the true power of AI lies in its ability to analyze massive amounts of data to solve complex problems, such as predicting climate changes or discovering new medical treatments. While some people fear that machines might replace human workers, many experts believe that AI will actually act as a powerful tool to enhance human creativity. By handling repetitive and boring tasks, AI allows us to focus on more meaningful work that requires emotional intelligence and critical thinking. As we move forward, the challenge will be to ensure that these technologies are developed ethically and used for the benefit of everyone in society, creating a balanced future.",
-        // ... بقية النصوص كما هي في الكود الأصلي
+        // ... (يمكن إضافة بقية الـ Issues هنا)
     };
 
     const urlParams = new URLSearchParams(window.location.search);
@@ -183,22 +200,32 @@
         const text = document.getElementById('article-content').innerText;
         navigator.clipboard.writeText(text).then(() => {
             const btn = document.querySelector('.copy-btn');
-            const originalText = btn.innerText;
             btn.innerText = "COPIED!";
-            btn.style.background = "#fff";
-            setTimeout(() => { 
-                btn.innerText = originalText; 
-                btn.style.background = "var(--gold)";
-            }, 2000);
+            setTimeout(() => { btn.innerText = "COPY SCRIPT"; }, 2000);
         });
     }
 
     function handleFileSelect() {
+        const fileInput = document.getElementById('audioFile');
         const status = document.getElementById('status');
         const zone = document.getElementById('dropZone');
         const icon = document.getElementById('icon');
-        if(document.getElementById('audioFile').files.length > 0) {
-            status.innerText = "VOICE EVIDENCE SECURED & READY";
+
+        if(fileInput.files.length > 0) {
+            const file = fileInput.files[0];
+            
+            // Audio Validation (Max 10MB)
+            if (file.size > 10 * 1024 * 1024) {
+                status.innerText = "SIGNAL OVERLOAD: COMPRESS AUDIO";
+                status.classList.add('error-msg');
+                status.style.display = 'block';
+                fileInput.value = ""; // Clear file
+                zone.classList.remove('active');
+                return;
+            }
+
+            status.innerText = "VOICE EVIDENCE SECURED";
+            status.classList.remove('error-msg');
             status.style.display = 'block';
             zone.classList.add('active');
             icon.innerText = "📡";
@@ -213,11 +240,15 @@
 
     function collectAndSubmit() {
         const fileInput = document.getElementById('audioFile');
+        const loading = document.getElementById('loadingOverlay');
         
         if (fileInput.files.length === 0) {
             window.parent.postMessage({ type: 'MISSION_INCOMPLETE' }, '*');
             return;
         }
+
+        // Show Loading Overlay
+        loading.style.display = 'flex';
 
         const file = fileInput.files[0];
         const reader = new FileReader();
@@ -229,6 +260,9 @@
                 answers: e.target.result, 
                 missionNum: taskNum 
             }, '*');
+            
+            // Hide loading after a slight delay to ensure message sent
+            setTimeout(() => { loading.style.display = 'none'; }, 1000);
         };
 
         reader.readAsDataURL(file);
