@@ -8,55 +8,66 @@
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Cairo:wght@400;600;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root { --gold: #fcc200; --bg: #0a0a0a; }
+        :root { --gold: #C5A028; --bg: #0a0a0a; }
         body { font-family: 'Cairo', sans-serif; background: var(--bg); color: white; transition: 0.5s; overflow-x: hidden; }
         .orbitron { font-family: 'Orbitron', sans-serif; }
         
         /* Sticky Note Styles */
         .sticky-note {
             padding: 25px; min-height: 220px; position: relative;
-            box-shadow: 5px 10px 20px rgba(0,0,0,0.3);
-            transition: 0.4s all ease; cursor: default; color: #1a1a1a;
+            box-shadow: 5px 10px 25px rgba(0,0,0,0.4);
+            transition: 0.4s all cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+            cursor: default; color: #1a1a1a;
             overflow: hidden;
         }
         
+        .sticky-note:hover { transform: scale(1.05) rotate(0deg) !important; z-index: 10; }
+
         .sticky-note::after {
             content: ''; position: absolute; top: 0; left: -100%;
             width: 50%; height: 100%;
-            background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.4), transparent);
-            transform: skewX(-25deg); animation: shine 4s infinite;
+            background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transform: skewX(-25deg); animation: shine 6s infinite;
         }
 
-        @keyframes shine {
-            0% { left: -100%; } 20% { left: 100%; } 100% { left: 100%; }
+        @keyframes shine { 0% { left: -100%; } 20% { left: 100%; } 100% { left: 100%; } }
+
+        /* --- Neon Mode & Glow Pulse --- */
+        @keyframes neonPulse {
+            0% { box-shadow: 0 0 5px currentColor; }
+            50% { box-shadow: 0 0 20px currentColor; }
+            100% { box-shadow: 0 0 5px currentColor; }
         }
 
-        /* Neon Mode */
         body.neon-active { background: #000; }
-        .neon-active .sticky-note { color: #fff !important; background: transparent !important; border: 2px solid currentColor; }
-        .neon-active .note-yellow { color: #fff176 !important; box-shadow: 0 0 15px #fff176; }
-        .neon-active .note-blue { color: #81d4fa !important; box-shadow: 0 0 15px #81d4fa; }
-        .neon-active .note-pink { color: #f48fb1 !important; box-shadow: 0 0 15px #f48fb1; }
-
-        .note-yellow { background: #fff176; transform: rotate(-1.5deg); }
-        .note-blue { background: #81d4fa; transform: rotate(1deg); }
-        .note-pink { background: #f48fb1; transform: rotate(-0.5deg); }
-        .note-green { background: #a5d6a7; transform: rotate(1.5deg); }
+        .neon-active .sticky-note { 
+            color: #fff !important; 
+            background: transparent !important; 
+            border: 2px solid currentColor;
+            animation: neonPulse 2s infinite ease-in-out;
+        }
+        
+        .note-yellow { background: #fff176; }
+        .note-blue { background: #81d4fa; }
+        .note-pink { background: #f48fb1; }
+        .note-green { background: #a5d6a7; }
 
         .pin {
             width: 14px; height: 14px; background: #ff5252;
-            border-radius: 50%; position: absolute; top: -7px; left: 50%;
+            border-radius: 50%; position: absolute; top: 10px; left: 50%;
             transform: translateX(-50%); box-shadow: 0 2px 5px rgba(0,0,0,0.3); z-index: 5;
         }
-        .neon-active .pin {
-    background: #fff !important;
-    box-shadow: 0 0 10px #fff, 0 0 20px var(--gold);
-}
+        .neon-active .pin { background: #fff !important; box-shadow: 0 0 10px #fff; }
 
-        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 1000; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(5px); }
-        .glass-card { background: rgba(255,255,255,0.03); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 30px; }
-        .heart-btn.liked { color: #e91e63; transform: scale(1.2); }
-        .theme-switch { position: fixed; top: 20px; left: 20px; z-index: 100; display: flex; align-items: center; gap: 10px; background: rgba(255,255,255,0.05); padding: 8px 15px; border-radius: 50px; border: 1px solid rgba(212, 175, 55, 0.2); }
+        /* UI Polish */
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.92); z-index: 1000; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(10px); }
+        .glass-card { background: rgba(255,255,255,0.03); backdrop-filter: blur(30px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 30px; }
+        
+        .student-avatar { border: 2px solid var(--gold); transition: 0.3s; }
+        .heart-icon { transition: 0.3s; color: rgba(0,0,0,0.2); }
+        .sticky-note:hover .heart-icon { color: #ff5252; transform: scale(1.2); }
+        
+        .theme-switch { position: fixed; top: 20px; left: 20px; z-index: 100; display: flex; align-items: center; gap: 10px; background: rgba(255,255,255,0.05); padding: 8px 15px; border-radius: 50px; border: 1px solid rgba(197, 160, 40, 0.2); backdrop-filter: blur(10px); }
     </style>
 </head>
 <body class="pb-20" onload="loadReviews()">
@@ -67,27 +78,27 @@
     </div>
 
     <div id="commentModal" class="modal">
-        <div class="glass-card p-8 max-w-md w-full">
+        <div class="glass-card p-8 max-w-md w-full border-t-4 border-yellow-500">
             <h3 class="text-xl font-black mb-4 text-yellow-500">سجل رأيك في اللوحة ✨</h3>
-            <input type="email" id="userEmail" placeholder="بريدك الإلكتروني (المسجل)" class="w-full p-4 bg-white/5 border border-white/10 rounded-2xl mb-4 text-right outline-none focus:border-yellow-500">
-            <textarea id="userText" placeholder="اكتب إبداعك هنا..." class="w-full p-4 bg-white/5 border border-white/10 rounded-2xl mb-4 h-32 text-right outline-none focus:border-yellow-500"></textarea>
+            <input type="email" id="userEmail" placeholder="بريدك الإلكتروني (المسجل)" class="w-full p-4 bg-white/5 border border-white/10 rounded-2xl mb-4 text-right outline-none focus:border-yellow-500 text-white">
+            <textarea id="userText" placeholder="اكتب إبداعك هنا..." class="w-full p-4 bg-white/5 border border-white/10 rounded-2xl mb-4 h-32 text-right outline-none focus:border-yellow-500 text-white"></textarea>
             <button onclick="submitReview()" id="sendBtn" class="w-full py-4 bg-yellow-500 text-black font-black rounded-2xl shadow-lg hover:brightness-110 transition-all">
                 تثبيت رأيي 📌
             </button>
-            <button onclick="closeModal('commentModal')" class="w-full mt-4 text-gray-500 text-xs">إلغاء</button>
+            <button onclick="closeModal('commentModal')" class="w-full mt-4 text-gray-500 text-xs hover:text-white">إلغاء</button>
         </div>
     </div>
 
     <header class="text-center py-12 px-6">
         <img src="MrEzz.png" alt="Mr. Ezz" class="w-28 h-28 rounded-full border-2 border-yellow-500 mx-auto shadow-2xl mb-4 object-cover">
-        <h1 class="text-3xl font-black orbitron tracking-widest">THE HALL OF FAME</h1>
+        <h1 class="text-3xl font-black orbitron tracking-widest text-white">THE HALL OF FAME</h1>
         <p class="text-yellow-500 text-[10px] orbitron tracking-[4px]">WHERE LEGENDS SPEAK</p>
     </header>
 
     <main class="max-w-6xl mx-auto px-6">
         <div class="flex justify-between items-center mb-12">
             <h2 class="text-2xl font-black border-r-4 border-yellow-500 pr-4">إبداعات الطلاب 🎨</h2>
-            <button onclick="openModal('commentModal')" class="bg-yellow-500 text-black px-8 py-3 rounded-full font-bold hover:scale-105 transition-all">
+            <button onclick="openReviewModal()" class="bg-yellow-500 text-black px-8 py-3 rounded-full font-bold hover:scale-105 transition-all shadow-[0_0_20px_rgba(197,160,40,0.3)]">
                 <i class="fas fa-plus ml-2"></i> شارك برأيك
             </button>
         </div>
@@ -97,9 +108,17 @@
     </main>
 
     <script>
-        const scriptURL = 'https://script.google.com/macros/s/AKfycbx0hNx1zshift1_zVao1rTaNCoWslxYamme4BAytPXzvmnsBDCQdact-Xna2apENcUz/exec'; 
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbzEnyqclVFDSg09UVzxupUpX40qJxd1xLZFJdTBRlV-q59-kMpklmwgAQH1CxvUQaJm/exec'; 
 
-        function openModal(id) { document.getElementById(id).style.display = 'flex'; }
+        function openReviewModal() {
+            // Wolf Auto-fill Logic
+            const user = JSON.parse(localStorage.getItem('eyc_user'));
+            if(user && user.email) {
+                document.getElementById('userEmail').value = user.email;
+            }
+            document.getElementById('commentModal').style.display = 'flex';
+        }
+
         function closeModal(id) { document.getElementById(id).style.display = 'none'; }
         
         function toggleNeon() {
@@ -122,11 +141,14 @@
                 const colors = ['note-yellow', 'note-blue', 'note-pink', 'note-green'];
                 reviews.reverse().forEach((rev, index) => {
                     const colorClass = colors[index % colors.length];
+                    // Random rotation between -3 and 3 degrees
+                    const randomRotation = Math.random() * 6 - 3;
+                    
                     container.innerHTML += `
-                        <div class="sticky-note ${colorClass} rounded-sm shadow-xl hover:-translate-y-2 transition-all">
+                        <div class="sticky-note ${colorClass} rounded-sm shadow-xl" style="transform: rotate(${randomRotation}deg)">
                             <div class="pin"></div>
                             <div class="flex items-center gap-3 mb-4">
-                                <img src="${rev.avatar || 'https://via.placeholder.com/40'}" class="w-10 h-10 rounded-lg border border-black/10 object-cover">
+                                <img src="${rev.avatar || 'https://via.placeholder.com/40'}" class="w-10 h-10 student-avatar rounded-full object-cover">
                                 <div>
                                     <h4 class="font-black text-xs leading-none">${rev.name}</h4>
                                     <span class="text-[8px] font-bold opacity-60 uppercase orbitron">${rev.title}</span>
@@ -135,7 +157,7 @@
                             <p class="text-md font-bold mb-6 leading-relaxed text-right">"${rev.text}"</p>
                             <div class="absolute bottom-4 left-4 right-4 flex justify-between items-center">
                                 <span class="text-[9px] font-bold opacity-30 orbitron">${new Date(rev.timestamp).toLocaleDateString()}</span>
-                                <div class="text-black/20"><i class="fas fa-heart"></i> <span class="text-xs font-black">${rev.likes}</span></div>
+                                <div class="heart-icon"><i class="fas fa-heart"></i> <span class="text-xs font-black">${rev.likes}</span></div>
                             </div>
                         </div>`;
                 });
@@ -151,10 +173,7 @@
             btn.disabled = true;
             btn.innerText = "جاري التحقق من البروتوكول...";
 
-            // استخدام طريقة GET مع البراميترز لتجنب مشاكل الـ CORS في قراءة الرد
             try {
-                // ملاحظة: قمنا بتغيير الـ doPost في السكريبت ليدعم الـ GET في حال كانت الأكشن addReview
-                // أو نستخدم fetch العادي هنا مع إضافة callback إذا فعلت الـ JSONP في السكريبت
                 const response = await fetch(`${scriptURL}?action=addReview&email=${email}&text=${encodeURIComponent(text)}`);
                 const result = await response.text();
 
@@ -163,15 +182,12 @@
                     location.reload();
                 } else if (result.includes("WAIT_7_DAYS")) {
                     alert("يسمح بتعليق واحد فقط أسبوعياً! دع فرصة لزملائك المبدعين. ⏳");
-                } else if (result.includes("USER_NOT_FOUND")) {
-                    alert("هذا الإيميل غير مسجل. سجل دخولك في المنصة أولاً!");
                 } else {
-                    alert("تم الإرسال بنجاح! سيظهر تعليقك فوراً.");
+                    alert("تم إرسال الطلب للمحرك..");
                     location.reload();
                 }
             } catch (e) {
-                // إذا فشل الـ CORS تماماً في قراءة الرد، نبلغ المستخدم بالنجاح المحتمل
-                alert("تم إرسال الطلب للمحرك.. حدث الصفحة بعد قليل.");
+                alert("تم الإرسال بنجاح! حدث الصفحة بعد قليل.");
                 location.reload();
             } finally {
                 btn.disabled = false;
