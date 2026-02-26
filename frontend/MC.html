@@ -55,26 +55,13 @@
         }
         .master-tab.active { background: var(--gold-gradient); color: #000; font-weight: 900; }
         .gg-master-view { flex: 1; padding: 30px; overflow-y: auto; }
-
-        /* --- NEW CSS UPDATES --- */
-        .gg-nav-btn {
-            display: flex; align-items: center; justify-content: center; gap: 10px;
-            width: 100%; margin-top: 20px; padding: 12px;
-            background: var(--gold-gradient); color: #000;
-            border: none; border-radius: 10px; font-family: 'Orbitron';
-            font-weight: 700; font-size: 0.75rem; cursor: pointer;
-            transition: 0.3s; box-shadow: 0 4px 15px rgba(197, 160, 40, 0.2);
+        .lang-toggle {
+            display: flex; background: #111; border: 1px solid #333; border-radius: 20px; overflow: hidden;
         }
-        .gg-nav-btn:hover { transform: scale(1.02); filter: brightness(1.1); }
-
-        .master-lang-toggle {
-            background: rgba(255,255,255,0.05); border: 1px solid var(--gold);
-            color: var(--gold); padding: 5px 12px; border-radius: 15px;
-            cursor: pointer; font-family: 'Orbitron'; font-size: 0.6rem;
-            display: flex; align-items: center; gap: 6px; transition: 0.3s;
+        .lang-btn {
+            padding: 4px 12px; font-size: 0.6rem; cursor: pointer; border: none; background: transparent; color: #555;
         }
-        .master-lang-toggle:hover { background: var(--gold); color: #000; }
-        /* ------------------------ */
+        .lang-btn.active { background: var(--gold); color: #000; }
 
         /* Dashboard Styles */
         #star-container { position: fixed; inset: 0; z-index: -1; background: radial-gradient(circle at top, #0a0b14 0%, #030306 100%); }
@@ -120,6 +107,7 @@
         .tasks-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin: 30px 0; }
         .task-node { position: relative; aspect-ratio: 1; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-family: 'Orbitron'; font-size: 0.8rem; overflow: hidden; }
         .lock-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.85); display: flex; align-items: center; justify-content: center; color: var(--gold); z-index: 5; }
+        .lock-tooltip { position: absolute; bottom: 110%; background: #000; color: #fff; padding: 5px 10px; border-radius: 5px; font-size: 0.6rem; white-space: nowrap; border: 1px solid var(--gold); z-index: 100; pointer-events: none; }
 
         .btn-exit { background: transparent; border: 1px solid #444; color: #888; padding: 12px 30px; border-radius: 12px; cursor: pointer; font-family: 'Orbitron'; font-size: 0.7rem; transition: 0.3s; width: 100%; }
         .btn-exit:hover { border-color: var(--gold); color: var(--gold); }
@@ -182,7 +170,7 @@
         </div>
     </div>
 
-    <div class="fairytale-float" onclick="openMasterGG()">
+    <div class="fairytale-float">
         <i class="fas fa-wand-sparkles"></i>
     </div>
 
@@ -195,11 +183,11 @@
             <div class="gg-master-header">
                 <h3 style="font-family:'Orbitron'; color:var(--gold); font-size:0.8rem;">EYC MASTER GUIDE</h3>
                 <div style="display:flex; gap:15px; align-items:center;">
-                    <button class="master-lang-toggle" onclick="toggleMasterLang()">
-                        <i class="fas fa-language"></i>
-                        <span id="langToggleText">العربية</span>
-                    </button>
-                    <i class="fas fa-times-circle" onclick="closeMasterGG()" style="cursor:pointer; color:var(--gold); font-size:1.2rem;"></i>
+                    <div class="lang-toggle">
+                        <button id="langARA" class="lang-btn" onclick="setMasterLang('ARA')">ARA</button>
+                        <button id="langENG" class="lang-btn active" onclick="setMasterLang('ENG')">ENG</button>
+                    </div>
+                    <i class="fas fa-times" onclick="closeMasterGG()" style="cursor:pointer; color:#666;"></i>
                 </div>
             </div>
 
@@ -225,41 +213,36 @@
 
         let currentUser = null;
         let isLoggedIn = false;
-        let currentMasterLang = "ENG"; 
+        let currentMasterLang = "ENG";
         let fullMasterData = [];
 
-        /* --- UPDATED JAVASCRIPT FUNCTIONS --- */
+        // Updated Floating Button Action
+        document.querySelector('.fairytale-float').onclick = openMasterGG;
+
         function openMasterGG() {
-            const overlay = document.getElementById('ggMasterOverlay');
-            overlay.style.display = 'flex';
+            document.getElementById('ggMasterOverlay').style.display = 'flex';
             setTimeout(() => document.getElementById('ggMasterModal').classList.add('active'), 50);
             fetchMasterData();
         }
 
-        async function fetchMasterData() {
-            const view = document.getElementById('masterSoul');
-            const title = document.getElementById('masterTitle');
-            const actionBox = document.getElementById('masterAction');
-            
-            title.innerText = "";
-            actionBox.style.display = "none";
-            view.innerHTML = `
-                <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:200px; color:var(--gold);">
-                    <i class="fas fa-circle-notch fa-spin" style="font-size:2rem; margin-bottom:15px;"></i>
-                    <p style="font-family:'Orbitron'; font-size:0.7rem; letter-spacing:2px;">SYNCING DATA...</p>
-                </div>`;
+        function closeMasterGG() {
+            document.getElementById('ggMasterModal').classList.remove('active');
+            setTimeout(() => document.getElementById('ggMasterOverlay').style.display = 'none', 400);
+        }
 
-            try {
-                const res = await fetch(`${SCRIPT_URL}?source=master&lang=${currentMasterLang}`);
-                const response = await res.json();
-                if(response.status === "success") {
-                    fullMasterData = response.data;
-                    renderMasterTabs();
-                    displayTabContent(0);
-                }
-            } catch (e) {
-                view.innerHTML = `<p style="color:red; text-align:center;">CONNECTION ERROR</p>`;
-            }
+        function fetchMasterData() {
+            const tabsContainer = document.getElementById('masterTabs');
+            tabsContainer.innerHTML = `<div style="padding:20px;"><i class="fas fa-sync fa-spin"></i></div>`;
+            
+            fetch(`${SCRIPT_URL}?source=master&lang=${currentMasterLang}`)
+                .then(res => res.json())
+                .then(response => {
+                    if(response.status === "success") {
+                        fullMasterData = response.data;
+                        renderMasterTabs();
+                        displayTabContent(0);
+                    }
+                });
         }
 
         function renderMasterTabs() {
@@ -268,8 +251,8 @@
             fullMasterData.forEach((item, index) => {
                 const div = document.createElement('div');
                 div.className = `master-tab ${index === 0 ? 'active' : ''}`;
-                div.innerText = item.tabName.toUpperCase(); 
-                div.onclick = (e) => {
+                div.innerText = item.tabName;
+                div.onclick = () => {
                     document.querySelectorAll('.master-tab').forEach(t => t.classList.remove('active'));
                     div.classList.add('active');
                     displayTabContent(index);
@@ -281,45 +264,19 @@
         function displayTabContent(index) {
             const item = fullMasterData[index];
             if(!item) return;
-
-            const view = document.getElementById('masterSoul');
-            const actionBox = document.getElementById('masterAction');
-            actionBox.style.display = "block";
-
-            let navBtn = "";
-            const tabKey = item.tabName.toLowerCase().trim();
-            
-            if(tabKey.includes('new agent')) {
-                navBtn = `<button class="gg-nav-btn" onclick="window.location.href='NP.html'">Open NP.html <i class="fas fa-external-link-alt"></i></button>`;
-            } else if(tabKey.includes('ai squad')) {
-                navBtn = `<button class="gg-nav-btn" onclick="alert('Noor System: Activated')">Ask Noor <i class="fas fa-robot"></i></button>`;
-            } else if(tabKey.includes('rankings')) {
-                navBtn = `<button class="gg-nav-btn" onclick="window.location.href='RNKS.html'">Go to RNKS.html <i class="fas fa-trophy"></i></button>`;
-            } else if(tabKey.includes('reviews')) {
-                navBtn = `<button class="gg-nav-btn" onclick="window.location.href='Rev.html'">Go to Rev.html <i class="fas fa-star"></i></button>`;
-            }
-
             document.getElementById('masterTitle').innerText = item.contentTitle;
-            view.innerHTML = item.soulContent.replace(/\n/g, '<br>') + navBtn;
-            actionBox.innerText = `💡 GUIDANCE: ${item.action}`;
-            
-            document.querySelector('.gg-master-view').scrollTop = 0;
+            document.getElementById('masterSoul').innerHTML = item.soulContent.replace(/\n/g, '<br>');
+            document.getElementById('masterAction').innerText = `💡 GUIDANCE: ${item.action}`;
         }
 
-        function toggleMasterLang() {
-            currentMasterLang = (currentMasterLang === "ENG" ? "ARA" : "ENG");
-            const btnText = document.getElementById('langToggleText');
-            btnText.innerText = (currentMasterLang === "ENG" ? "العربية" : "ENGLISH");
+        function setMasterLang(lang) {
+            currentMasterLang = lang;
+            document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(`lang${lang}`).classList.add('active');
             fetchMasterData();
         }
 
-        function closeMasterGG() {
-            document.getElementById('ggMasterModal').classList.remove('active');
-            setTimeout(() => document.getElementById('ggMasterOverlay').style.display = 'none', 400);
-        }
-        /* -------------------------------------- */
-
-        // بقية دوال اللوجيك الأصلية (Stars, Activities, Login...)
+        // Logic for Stars and Activities
         const activities = {
             season: [
                 { name: "Alike", icon: "fa-clone", code: "AS", tk: 50 },
@@ -343,10 +300,99 @@
             ]
         };
 
-        function switchType(type, btn) {
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            generateCards();
+        const MISSION_SCHEDULE = {
+            getUnlockDate: (program, taskIndex) => {
+                const seasonStart = new Date("2026-02-26T00:00:00");
+                const royalStart = new Date("2026-02-28T00:00:00");
+                let targetDate = new Date(program === 'season' ? seasonStart : royalStart);
+
+                if (taskIndex > 1) {
+                    if (program === 'season') {
+                        let daysToAdd = 0;
+                        for (let j = 2; j <= taskIndex; j++) { daysToAdd += (j + 2); }
+                        targetDate.setDate(targetDate.getDate() + daysToAdd);
+                    } else {
+                        targetDate.setDate(targetDate.getDate() + ((taskIndex - 1) * 3));
+                    }
+                }
+                return targetDate;
+            }
+        };
+
+        function openTasks(name, code) {
+            document.getElementById('mTitle').innerText = name;
+            const tGrid = document.getElementById('tGrid'); tGrid.innerHTML = '';
+            const type = document.querySelector('.tab-btn.active').innerText.toLowerCase().includes('royal') ? 'royal' : 'season';
+            
+            for (let i = 1; i <= 10; i++) {
+                const node = document.createElement('div');
+                node.className = 'task-node';
+                node.innerText = i;
+
+                const openDate = MISSION_SCHEDULE.getUnlockDate(type, i);
+                const isLocked = new Date() < openDate;
+
+                if (isLocked) {
+                    node.innerHTML += '<div class="lock-overlay"><i class="fas fa-lock"></i></div>';
+                    node.onclick = () => {
+                        if (!isLoggedIn) return openLogin();
+                        alert(`Available on: ${openDate.toDateString()}`);
+                    };
+                } else {
+                    node.onclick = () => {
+                        if (!isLoggedIn) return openLogin();
+                        window.location.href = `EYCArena.html?email=${currentUser.email}&act=${code}&task=${i}`;
+                    };
+                }
+                tGrid.appendChild(node);
+            }
+            document.getElementById('taskModal').style.display = 'flex';
+        }
+
+        function openMailbox() {
+            document.getElementById('mailDrawer').classList.add('active');
+            document.getElementById('notifDot').style.display = 'none';
+            renderMails();
+        }
+        function closeMailbox() { document.getElementById('mailDrawer').classList.remove('active'); }
+
+        function renderMails() {
+            const list = document.getElementById('mailList');
+            const mails = JSON.parse(localStorage.getItem('eyc_mails') || '[]');
+            list.innerHTML = mails.length ? '' : '<p style="text-align:center; opacity:0.5;">No Comms</p>';
+            mails.forEach((m, i) => {
+                const bubble = document.createElement('div');
+                bubble.className = 'msg-bubble';
+                bubble.innerHTML = `<div style="font-size:0.6rem; color:var(--gold);">${m.date}</div><div style="font-weight:600; margin-top:5px;">Mission Update</div><div class="msg-content" id="msg-${i}">${m.text}</div>`;
+                bubble.onclick = () => {
+                    const content = document.getElementById(`msg-${i}`);
+                    content.style.display = content.style.display === 'block' ? 'none' : 'block';
+                };
+                list.appendChild(bubble);
+            });
+        }
+
+        function renderHeader() {
+            const header = document.getElementById('heroBanner');
+            if (isLoggedIn) {
+                document.getElementById('logoutBtn').style.display = "block";
+                header.innerHTML = `
+                    <div class="profile-card">
+                        <div class="avatar-wrapper">
+                            <div class="avatar-main" style="background-image: url('${currentUser.avatar}')"></div>
+                            <div class="rank-tag">RANK #${currentUser.rank}</div>
+                        </div>
+                        <h1 class="student-name">${currentUser.name}</h1>
+                        <p class="student-title">${currentUser.title}</p>
+                        <div class="stats-row">
+                            <div class="stat-item"><img src="${IMG.tk}" class="stat-icon"> <span>${currentUser.tokens}</span></div>
+                            <div class="stat-item"><img src="${IMG.star}" class="stat-icon"> <span>${currentUser.stars}</span></div>
+                            <div class="stat-item"><img src="${IMG.gt}" class="stat-icon"> <span>${currentUser.goldTickets}</span></div>
+                        </div>
+                    </div>`;
+            } else {
+                header.innerHTML = `<h1 class="student-name">ARENA ACCESS</h1><button class="btn-exit" style="width:auto; margin-top:20px;" onclick="openLogin()">AUTHORIZE LOGIN</button>`;
+            }
         }
 
         function generateCards() {
@@ -361,31 +407,46 @@
             });
         }
 
-        // Initialize Background Stars
-        function initStars() {
-            const container = document.getElementById('star-container');
-            for(let i=0; i<100; i++) {
-                const star = document.createElement('div');
-                star.className = 'star';
-                const size = Math.random() * 2;
-                star.style.width = `${size}px`;
-                star.style.height = `${size}px`;
-                star.style.top = `${Math.random() * 100}%`;
-                star.style.left = `${Math.random() * 100}%`;
-                star.style.setProperty('--duration', `${2 + Math.random() * 3}s`);
-                container.appendChild(star);
-            }
+        function handleLogin() {
+            const email = document.getElementById('loginEmail').value;
+            const code = document.getElementById('loginCode').value;
+            const btn = document.getElementById('loginSubmitBtn');
+            btn.innerText = "LINKING...";
+            fetch(`${SCRIPT_URL}?action=getProfile&email=${email}&code=${code}`)
+                .then(r => r.json()).then(res => {
+                    if(res.status === "success") {
+                        currentUser = res; currentUser.email = email; isLoggedIn = true;
+                        localStorage.setItem('eyc_user', JSON.stringify(currentUser));
+                        closeModal('loginModal'); renderHeader(); generateCards();
+                    } else alert(res.message);
+                    btn.innerText = "SIGN IN";
+                });
+        }
+
+        function handleLogout() { localStorage.clear(); location.reload(); }
+        function openLogin() { document.getElementById('loginModal').style.display = 'flex'; }
+        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+        function switchType(type, btn) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            generateCards();
         }
 
         window.onload = () => {
-            initStars();
+            const saved = localStorage.getItem('eyc_user');
+            if(saved) { currentUser = JSON.parse(saved); isLoggedIn = true; }
+            renderHeader(); 
             generateCards();
-            renderHeader();
+            
+            const container = document.getElementById('star-container');
+            for (let i = 0; i < 50; i++) {
+                const s = document.createElement('div'); s.className = 'star';
+                s.style.width = s.style.height = '2px';
+                s.style.left = Math.random()*100+'%'; s.style.top = Math.random()*100+'%';
+                s.style.setProperty('--duration', (Math.random()*3+2)+'s');
+                container.appendChild(s);
+            }
         };
-
-        // ... تكمال دوال المودال واللوجن حسب الحاجة ...
-        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
-        function openLogin() { document.getElementById('loginModal').style.display = 'flex'; }
     </script>
 </body>
 </html>
