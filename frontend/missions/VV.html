@@ -130,7 +130,6 @@
         img.onerror = function() { this.src = "https://via.placeholder.com/800x450?text=SIGNAL+LOST"; };
     }
 
-    // وظيفة فتح الصورة
     function openVision() {
         const overlay = document.getElementById('vision-overlay');
         const expImg = document.getElementById('expanded-img');
@@ -139,18 +138,42 @@
         expImg.src = imgUrl;
         overlay.style.display = 'flex';
 
-        // كشف الموبايل لتفعيل رسالة التدوير والزوم
+        if (overlay.requestFullscreen) {
+            overlay.requestFullscreen();
+        } else if (overlay.webkitRequestFullscreen) { /* Safari */
+            overlay.webkitRequestFullscreen();
+        } else if (overlay.msRequestFullscreen) { /* IE11 */
+            overlay.msRequestFullscreen();
+        }
+
         if (/Mobi|Android/i.test(navigator.userAgent)) {
             hint.style.display = 'block';
-            // السماح بالزوم عبر اللمس الأصلي للمتصفح في الـ Fullscreen
+            if (screen.orientation && screen.orientation.lock) {
+                screen.orientation.lock('landscape').catch(err => console.log("Orientation lock skipped"));
+            }
         }
     }
 
     function closeVision() {
+        if (document.exitFullscreen) {
+            document.exitFullscreen().catch(() => {});
+        } else if (document.webkitExitFullscreen) {
+            document.webkitExitFullscreen().catch(() => {});
+        }
+        
         document.getElementById('vision-overlay').style.display = 'none';
+        
+        if (screen.orientation && screen.orientation.unlock) {
+            screen.orientation.unlock();
+        }
     }
 
-    // تفعيل زوم الماوس للديسكتوب داخل الـ Overlay
+    document.addEventListener('fullscreenchange', () => {
+        if (!document.fullscreenElement) {
+            document.getElementById('vision-overlay').style.display = 'none';
+        }
+    });
+
     let scale = 1;
     document.getElementById('expanded-img').addEventListener('wheel', function(e) {
         e.preventDefault();
