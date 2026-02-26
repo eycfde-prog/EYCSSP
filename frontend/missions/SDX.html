@@ -39,18 +39,25 @@
             gap: 12px; margin-bottom: 25px;
         }
 
+        /* 1. Smart Detection Style */
         .sentence-card {
             background: var(--glass-bg); 
             border: 1px solid rgba(255,255,255,0.08);
             padding: 15px; border-radius: 12px; 
             font-size: 0.95rem; border-left: 4px solid var(--neon-blue); 
-            transition: 0.3s;
+            transition: all 0.5s ease;
+        }
+
+        .sentence-card.integrated {
+            opacity: 0.25;
+            filter: grayscale(1);
+            border-left-color: #555;
+            transform: scale(0.98);
         }
 
         .sentence-card.glitch-seed { 
             border-left-color: var(--glitch-red); 
             background: rgba(255, 0, 60, 0.08);
-            box-shadow: 0 0 15px rgba(255, 0, 60, 0.1);
         }
 
         .sentence-card span { 
@@ -59,20 +66,16 @@
             margin-bottom: 8px; letter-spacing: 2px;
         }
 
+        /* 2. Visual Polish: Dynamic Glow */
         textarea {
             width: 100%; height: 380px; 
             background: rgba(0, 0, 0, 0.6); 
-            border: 1px solid rgba(188, 19, 254, 0.4);
+            border: 2px solid rgba(188, 19, 254, 0.2);
             color: #f0f0f0; font-family: 'Rajdhani'; 
             font-size: 1.15rem; line-height: 1.7; 
             outline: none; resize: none; box-sizing: border-box;
             border-radius: 20px; padding: 22px; transition: 0.4s;
             box-shadow: inset 0 0 30px rgba(0,0,0,0.5);
-        }
-
-        textarea:focus { 
-            border-color: var(--neon-blue);
-            box-shadow: inset 0 0 30px rgba(0, 242, 255, 0.05), 0 0 20px rgba(188, 19, 254, 0.1);
         }
 
         .floating-counter {
@@ -83,22 +86,34 @@
             border-radius: 50%; display: flex;
             flex-direction: column; align-items: center;
             justify-content: center; box-shadow: 0 0 25px rgba(0, 242, 255, 0.25);
-            z-index: 1000; transition: 0.5s;
+            z-index: 1000; transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
+
+        /* 3. Error Handling Animations */
+        @keyframes shakeError {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-10px); }
+            40%, 80% { transform: translateX(10px); }
+        }
+
+        .floating-counter.error-shake {
+            animation: shakeError 0.4s ease-in-out;
+            border-color: var(--glitch-red) !important;
+            box-shadow: 0 0 40px var(--glitch-red) !important;
+        }
+        
+        .floating-counter.error-shake .num { color: var(--glitch-red) !important; }
 
         .floating-counter .num {
             font-family: 'Orbitron'; font-size: 1.3rem;
             font-weight: bold; color: var(--neon-blue);
         }
 
-        .floating-counter .label { font-size: 0.6rem; color: #777; }
-
         .floating-counter.ready {
             border-color: #00ff88;
             box-shadow: 0 0 35px rgba(0, 255, 136, 0.4);
             transform: scale(1.1);
         }
-        
         .floating-counter.ready .num { color: #00ff88; }
     </style>
 </head>
@@ -111,7 +126,7 @@
     <div id="sentences-area" class="sentences-grid"></div>
 
     <div class="writing-zone">
-        <textarea id="storyInput" placeholder="Inject protocols into the narrative stream... (150+ words required)" oninput="updateCount()"></textarea>
+        <textarea id="storyInput" placeholder="Inject protocols into the narrative stream... (150+ words required)" oninput="updateUI()"></textarea>
     </div>
 
     <div class="floating-counter" id="counter-circle">
@@ -135,28 +150,50 @@
 
     const urlParams = new URLSearchParams(window.location.search);
     const taskNum = urlParams.get('task') || "1";
+    let activeSentences = [];
 
     function loadSeedsX() {
-        const sentences = seedsXData[taskNum] || seedsXData["1"];
+        activeSentences = seedsXData[taskNum] || seedsXData["1"];
         const area = document.getElementById('sentences-area');
-        area.innerHTML = sentences.map((s, i) => `
-            <div class="sentence-card ${i === 5 ? 'glitch-seed' : ''}">
+        area.innerHTML = activeSentences.map((s, i) => `
+            <div class="sentence-card ${i === 5 ? 'glitch-seed' : ''}" id="card-${i}">
                 <span>INTEGRATION_SYNC_0${i+1}</span>
-                ${s}
+                <p class="s-text">${s}</p>
             </div>
         `).join('');
         document.getElementById('x-title').innerText = `SEEDS-X: MISSION ${taskNum.padStart(2, '0')}`;
     }
 
-    function updateCount() {
-        const text = document.getElementById('storyInput').value.trim();
+    function updateUI() {
+        const input = document.getElementById('storyInput');
+        const text = input.value.trim();
         const words = text ? text.split(/\s+/).filter(w => w.length > 0).length : 0;
         
+        // Update Count
         document.getElementById('count-num').innerText = words;
         const circle = document.getElementById('counter-circle');
         
+        // 2. Visual Polish: Update Glow intensity
+        const glowIntensity = Math.min(words / 150, 1) * 25;
+        input.style.boxShadow = `inset 0 0 30px rgba(0,0,0,0.5), 0 0 ${glowIntensity}px rgba(188, 19, 254, 0.4)`;
+        input.style.borderColor = words >= 150 ? "var(--neon-blue)" : `rgba(188, 19, 254, ${0.2 + (glowIntensity/50)})`;
+
         if(words >= 150) circle.classList.add('ready');
         else circle.classList.remove('ready');
+
+        // 1. Smart Detection: Check for integrated sentences
+        activeSentences.forEach((sentence, i) => {
+            const card = document.getElementById(`card-${i}`);
+            // استخدام نسخة مبسطة للمقارنة (تجاهل النقاط والحالات)
+            const cleanSentence = sentence.toLowerCase().replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g,"");
+            const cleanInput = text.toLowerCase().replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g,"");
+            
+            if(cleanInput.includes(cleanSentence)) {
+                card.classList.add('integrated');
+            } else {
+                card.classList.remove('integrated');
+            }
+        });
     }
 
     window.addEventListener('message', function(event) {
@@ -165,16 +202,21 @@
             const count = story ? story.split(/\s+/).filter(w => w.length > 0).length : 0;
 
             if(count < 150) {
-                window.parent.postMessage({ type: 'MISSION_INCOMPLETE', message: "System failure: Word count under 150." }, '*');
+                // 3. Error Handling: Shake and Red flash
+                const circle = document.getElementById('counter-circle');
+                circle.classList.add('error-shake');
+                setTimeout(() => circle.classList.remove('error-shake'), 500);
+                
+                window.parent.postMessage({ type: 'MISSION_INCOMPLETE', message: "CRITICAL: Protocol requires 150+ words." }, '*');
                 return;
             }
 
-window.parent.postMessage({ 
-    type: 'MISSION_ANSWERS', 
-    activityCode: 'SDX', // توحيد الرمز
-    answers: [story],    // وضع النص داخل مصفوفة
-    missionNum: taskNum 
-}, '*');
+            window.parent.postMessage({ 
+                type: 'MISSION_ANSWERS', 
+                activityCode: 'SDX',
+                answers: [story], 
+                missionNum: taskNum 
+            }, '*');
         }
     });
 
