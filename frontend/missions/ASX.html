@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Alike X | Phonetic Radar | Glassy Edition</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Poppins:wght@300;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root { 
             --gold: #D4AF37; 
@@ -55,29 +56,33 @@
         }
 
         .audio-btn { 
-            background: var(--glass);
+            background: rgba(212, 175, 55, 0.05);
             color: var(--gold); 
-            border: 1px solid var(--gold); 
-            padding: 10px 0; /* Changed from fixed 188px to responsive */
-            width: 100%;
-            border-radius: 12px; 
+            border: 2px solid var(--gold); 
+            width: 50px; height: 50px;
+            border-radius: 50%; 
             cursor: pointer; 
-            font-family: 'Orbitron'; 
-            font-size: 10px; 
-            margin-bottom: 15px; 
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            transition: 0.3s;
-            letter-spacing: 1px;
+            display: flex; align-items: center; justify-content: center;
+            transition: all 0.3s ease;
+            margin-bottom: 15px;
+            position: relative;
+            outline: none;
         }
 
-        .audio-btn:hover { 
-            background: var(--gold); 
-            color: black; 
-            box-shadow: 0 0 15px var(--gold-glow); 
+        .audio-btn.playing {
+            background: var(--gold);
+            color: black;
+            box-shadow: 0 0 20px var(--gold-glow);
+            animation: radarPulse 1.5s infinite;
         }
+
+        @keyframes radarPulse {
+            0% { box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.7); }
+            70% { box-shadow: 0 0 0 15px rgba(212, 175, 55, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(212, 175, 55, 0); }
+        }
+
+        .audio-btn i { font-size: 1.2rem; }
 
         .sentence-text { 
             font-size: 1.1rem; 
@@ -221,8 +226,8 @@
             const screen = document.getElementById('quiz-screen');
             screen.innerHTML = questions.map((q, i) => `
                 <div class="question-card" id="card-${i}">
-                    <button class="audio-btn" onclick="playAudio(${i})">
-                        <span style="font-size:14px">📡</span> INTERCEPT AUDIO CLUE
+                    <button class="audio-btn" onclick="playAudio(${i}, this)">
+                        <i class="fas fa-play"></i>
                     </button>
                     <div class="sentence-text">
                         ${q.s.replace('_______', `<span class="missing-word" id="display-${i}">_______</span>`)}
@@ -246,18 +251,43 @@
             answers[qIdx] = val;
         }
 
-        function playAudio(idx) {
+        function playAudio(idx, btn) {
             const t = parseInt(taskNum);
             const qIdx = parseInt(idx);
             const audioFileNum = ((t - 1) * 5) + (qIdx + 1);
-            
-            // تم تصحيح الرابط ليكون Raw ومباشر وتصحيح اسم المجلد ليكون eyclogs
             const rawUrl = "https://raw.githubusercontent.com/eycfde-prog/EYCSSP/main/frontend/eyclgos/alxaudio/";
             
+            if (window.currentAudio) {
+                window.currentAudio.pause();
+                document.querySelectorAll('.audio-btn').forEach(b => {
+                    b.classList.remove('playing');
+                    b.innerHTML = '<i class="fas fa-play"></i>';
+                });
+            }
+
             const audio = new Audio(`${rawUrl}${audioFileNum}.wav`);
+            window.currentAudio = audio;
+
+            btn.classList.add('playing');
+            btn.innerHTML = '<i class="fas fa-stop"></i>';
+
             audio.play().catch(e => {
-                console.error("Signal Lost for file:", audioFileNum, "Error:", e);
+                console.error("Signal Lost:", e);
+                resetBtn(btn);
             });
+
+            audio.onended = () => resetBtn(btn);
+            
+            btn.onclick = function() {
+                audio.pause();
+                resetBtn(btn);
+                btn.onclick = () => playAudio(idx, btn);
+            };
+        }
+
+        function resetBtn(btn) {
+            btn.classList.remove('playing');
+            btn.innerHTML = '<i class="fas fa-play"></i>';
         }
 
         window.addEventListener('message', function(event) {
