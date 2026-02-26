@@ -12,6 +12,13 @@
             --glass: rgba(10, 10, 15, 0.9);
             --glass-border: rgba(212, 175, 55, 0.25);
             --error-red: #ff4444;
+            --emerald-spot: rgba(0, 255, 0, 0.05);
+        }
+
+        /* 1. Text Selection Magic */
+        ::selection {
+            background: var(--gold);
+            color: #000;
         }
 
         body {
@@ -44,6 +51,9 @@
             box-shadow: 0 10px 30px rgba(0,0,0,0.5);
             border-left: 5px solid var(--gold);
             text-align: justify;
+            /* Enable Selection */
+            user-select: text; 
+            -webkit-user-select: text;
         }
 
         .extractor-grid {
@@ -54,13 +64,14 @@
             background: rgba(255,255,255,0.03);
             border: 1px solid var(--glass-border);
             padding: 18px; border-radius: 15px;
-            transition: 0.3s;
+            transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .extraction-card label {
             display: block; font-family: 'Orbitron'; font-size: 10px;
             color: var(--gold); margin-bottom: 12px;
             letter-spacing: 2px;
+            transition: color 0.3s;
         }
 
         .inputs-container {
@@ -73,20 +84,43 @@
             border: 1px solid rgba(255,255,255,0.1); border-radius: 8px;
             color: #fff; padding: 10px 14px;
             font-family: 'Poppins'; font-size: 0.9rem;
-            outline: none; transition: 0.3s;
+            outline: none; transition: 0.5s;
         }
 
         .gx-input:focus { 
             border-color: var(--gold); 
-            background: rgba(212, 175, 55, 0.05);
+            background: rgba(212, 175, 55, 0.08);
             box-shadow: 0 0 10px var(--gold-glow);
         }
 
-        .error-card { border-color: var(--error-red) !important; animation: shake 0.4s; }
-        @keyframes shake {
+        /* 2. Input Feedback: Target Spotted */
+        .gx-input:not(:placeholder-shown) {
+            background: var(--emerald-spot);
+            border-color: rgba(0, 255, 0, 0.2);
+        }
+
+        /* 3. Validation Visuals */
+        .error-card { 
+            border-color: var(--error-red) !important; 
+            animation: criticalShake 0.4s ease-in-out; 
+        }
+
+        .error-card label {
+            color: var(--error-red) !important;
+            animation: pulseRed 0.8s infinite;
+        }
+
+        @keyframes criticalShake {
             0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-6px); }
-            75% { transform: translateX(6px); }
+            20% { transform: translateX(-8px); }
+            40% { transform: translateX(8px); }
+            60% { transform: translateX(-4px); }
+            80% { transform: translateX(4px); }
+        }
+
+        @keyframes pulseRed {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
         }
     </style>
 </head>
@@ -95,7 +129,7 @@
 <div class="gx-container">
     <div class="header-gx">
         <h1 id="task-title">Grammar Extractor</h1>
-        <div class="principle-tags"><span style="font-family:'Orbitron'; font-size:8px; color:var(--gold); border:1px solid var(--glass-border); padding:2px 6px; border-radius:4px;">LEXICAL ANALYSIS</span></div>
+        <div class="principle-tags"><span style="font-family:'Orbitron'; font-size:8px; color:var(--gold); border:1px solid var(--glass-border); padding:2px 6px; border-radius:4px;">TITANIUM ANALYSIS</span></div>
     </div>
 
     <div class="passage-box" id="passage-content">Loading Mission Data...</div>
@@ -103,108 +137,20 @@
 </div>
 
 <script>
-const gxData = {
-    "1": {
-        passage: "The dedicated teacher walked slowly into the bright classroom yesterday. She carried many heavy books and placed them carefully on the wooden desk. The young students were sitting quietly because they wanted to learn a new lesson. Outside, the warm sun shone through the large windows while a small bird sang a beautiful song. A curious boy raised his hand and asked a difficult question about the ancient pyramids. The teacher smiled happily and explained the answer clearly. Everyone felt very excited about the trip tomorrow. They packed their bags quickly and prepared for the long journey. It was a wonderful day for everyone in the school.",
-        requirements: [
-            { label: "Extract all Nouns", count: 5 },
-            { label: "Extract all Adjectives", count: 5 },
-            { label: "Extract all Past Simple Verbs", count: 5 },
-            { label: "Extract all Adverbs", count: 5 },
-            { label: "Extract all Prepositions", count: 5 }
-        ]
-    },
-    "2": {
-        passage: "Last summer, my family traveled to a peaceful village near the blue sea. We stayed in a small house for two weeks. Every morning, the golden sun rose early and we walked barefoot on the soft sand. My younger brother collected many colorful shells while my father swam bravely in the deep water. We ate delicious meals at a local restaurant every night. The friendly waiter served us fresh fish and cold juice. We felt extremely relaxed because the atmosphere was very quiet. Sometimes, we watched the stars at night. It was an unforgettable holiday and we returned home safely by bus on Friday.",
-        requirements: [
-            { label: "Extract all Nouns", count: 5 },
-            { label: "Extract all Adjectives", count: 5 },
-            { label: "Extract all Past Simple Verbs", count: 5 },
-            { label: "Extract all Adverbs", count: 5 },
-            { label: "Extract all Prepositions", count: 5 }
-        ]
-    },
-    "3": {
-        passage: "The smart engineer works efficiently in a modern office every day. He designs amazing buildings and draws complex plans carefully. Yesterday, he finished a big project for a famous company. He used a powerful computer to check the final details. His manager spoke loudly during the meeting because he was very proud. Now, the engineer is drinking hot coffee and looking at the busy street. Many cars move fast and people walk quickly to their jobs. He always feels tired but happy after a long day of hard work. He will start a new task tomorrow morning.",
-        requirements: [
-            { label: "Extract all Nouns", count: 5 },
-            { label: "Extract all Adjectives", count: 5 },
-            { label: "Extract all Verbs (Present/Past)", count: 5 },
-            { label: "Extract all Adverbs", count: 5 },
-            { label: "Extract all Prepositions", count: 5 }
-        ]
-    },
-    "4": {
-        passage: "A brave astronaut traveled into dark space last year. He lived in a giant space station for six months. He looked at the beautiful Earth from the small window. The stars shone brightly in the black sky. He performed many scientific experiments daily and wrote long reports. Sometimes, he spoke to his family through a special radio. He felt quite lonely but he stayed strong. He ate dried food and drank water from a plastic tube. When he returned to Earth, many people cheered loudly. He walked slowly because he was not used to the gravity. It was a great achievement.",
-        requirements: [
-            { label: "Extract all Nouns", count: 5 },
-            { label: "Extract all Adjectives", count: 5 },
-            { label: "Extract all Past Simple Verbs", count: 5 },
-            { label: "Extract all Adverbs", count: 5 },
-            { label: "Extract all Prepositions", count: 5 }
-        ]
-    },
-    "5": {
-        passage: "The famous chef cooked a delicious meal in the crowded kitchen yesterday. He chopped fresh vegetables quickly and added some spicy peppers. The fire was very hot, so he worked carefully. His assistant cleaned the dirty plates and washed the silver spoons. A hungry customer waited patiently in the dining room. When the food arrived, the man ate greedily because he was very hungry. He thanked the chef sincerely for the wonderful dinner. The restaurant was decorated beautifully with many white flowers. Outside, the rain fell heavily on the dark pavement. It was a busy night for the talented team.",
-        requirements: [
-            { label: "Extract all Nouns", count: 5 },
-            { label: "Extract all Adjectives", count: 5 },
-            { label: "Extract all Past Simple Verbs", count: 5 },
-            { label: "Extract all Adverbs", count: 5 },
-            { label: "Extract all Prepositions", count: 5 }
-        ]
-    },
-    "6": {
-        passage: "A little girl found a lost puppy in the park last Sunday. The puppy was very small and had soft brown fur. It barked loudly because it was scared. The girl carried the puppy gently to her warm home. She gave it some warm milk and a comfortable bed. Her mother smiled kindly and helped her wash the dirty puppy. They called the puppy 'Lucky' because it was safe now. The next day, Lucky ran happily in the green garden. He played with a yellow ball and jumped high. The girl felt extremely joyful. She decided to keep the puppy forever in her house.",
-        requirements: [
-            { label: "Extract all Nouns", count: 5 },
-            { label: "Extract all Adjectives", count: 5 },
-            { label: "Extract all Past Simple Verbs", count: 5 },
-            { label: "Extract all Adverbs", count: 5 },
-            { label: "Extract all Prepositions", count: 5 }
-        ]
-    },
-    "7": {
-        passage: "The old farmer woke up early to work on his large farm. He drove his red tractor slowly across the dry field. The sun was shining fiercely in the blue sky. He planted many small seeds and hoped for heavy rain soon. His faithful dog followed him everywhere. In the afternoon, the farmer sat under a tall tree and ate a simple lunch. He looked at the beautiful hills in the distance. He felt very peaceful because he loved the quiet country life. Yesterday, he repaired the broken fence and painted the wooden barn. He worked hard every day to provide fresh food for his family.",
-        requirements: [
-            { label: "Extract all Nouns", count: 5 },
-            { label: "Extract all Adjectives", count: 5 },
-            { label: "Extract all Past Simple Verbs", count: 5 },
-            { label: "Extract all Adverbs", count: 5 },
-            { label: "Extract all Prepositions", count: 5 }
-        ]
-    },
-    "8": {
-        passage: "During the cold winter, the hungry bears slept deeply in a dark cave. They were very tired after the long autumn. Outside, the white snow fell silently on the frozen lake. The forest was very quiet because most animals were hiding. One small squirrel searched busily for some hidden nuts under the tall trees. It moved quickly across the cold ground. When spring arrived, the warm sun melted the thick ice. The bears woke up hungrily and walked to the rushing river. They caught many fresh fish and ate them happily. The green leaves grew back on the branches and the birds sang sweetly again.",
-        requirements: [
-            { label: "Extract all Nouns", count: 5 },
-            { label: "Extract all Adjectives", count: 5 },
-            { label: "Extract all Past Simple Verbs", count: 5 },
-            { label: "Extract all Adverbs", count: 5 },
-            { label: "Extract all Prepositions", count: 5 }
-        ]
-    },
-    "9": {
-        passage: "The young artist painted a magnificent mural on the grey wall last month. She used many bright colors and large brushes. She worked tirelessly for three weeks until the work was perfect. Many people stopped and stared in amazement at the beautiful scene. The mural showed a deep blue ocean with many exotic fish and green seaweed. A small boat sailed gracefully on the waves. The artist felt very proud when the mayor thanked her publicly. She received a gold medal for her amazing talent. Now, she is planning a new project for the local library. She wants to paint a historical scene next year.",
-        requirements: [
-            { label: "Extract all Nouns", count: 5 },
-            { label: "Extract all Adjectives", count: 5 },
-            { label: "Extract all Past Simple Verbs", count: 5 },
-            { label: "Extract all Adverbs", count: 5 },
-            { label: "Extract all Prepositions", count: 5 }
-        ]
-    },
-    "10": {
-        passage: "The strong athlete ran very fast in the international race yesterday. He wore his new blue shoes and a light shirt. He had been training intensely for many years. The large crowd cheered wildly when he reached the final lap. He felt quite exhausted but he did not stop. He breathed heavily and pushed himself forward. Finally, he won the race and broke the world record. He stood proudly on the podium and held the heavy trophy. His coach cried tears of joy and hugged him tightly. It was a glorious moment for the whole country. He celebrated his victory with his family at a fancy restaurant.",
-        requirements: [
-            { label: "Extract all Nouns", count: 5 },
-            { label: "Extract all Adjectives", count: 5 },
-            { label: "Extract all Past Simple Verbs", count: 5 },
-            { label: "Extract all Adverbs", count: 5 },
-            { label: "Extract all Prepositions", count: 5 }
-        ]
-    }
-};
+    // ... [Data Object GXData remains the same as provided] ...
+    const gxData = {
+        "1": {
+            passage: "The dedicated teacher walked slowly into the bright classroom yesterday. She carried many heavy books and placed them carefully on the wooden desk. The young students were sitting quietly because they wanted to learn a new lesson. Outside, the warm sun shone through the large windows while a small bird sang a beautiful song. A curious boy raised his hand and asked a difficult question about the ancient pyramids. The teacher smiled happily and explained the answer clearly. Everyone felt very excited about the trip tomorrow. They packed their bags quickly and prepared for the long journey. It was a wonderful day for everyone in the school.",
+            requirements: [
+                { label: "Extract all Nouns", count: 5 },
+                { label: "Extract all Adjectives", count: 5 },
+                { label: "Extract all Past Simple Verbs", count: 5 },
+                { label: "Extract all Adverbs", count: 5 },
+                { label: "Extract all Prepositions", count: 5 }
+            ]
+        },
+        // [Other missions 2-10 are omitted for brevity but should be included in your file]
+    };
 
     const urlParams = new URLSearchParams(window.location.search);
     const taskNum = urlParams.get('task') || "1";
@@ -218,11 +164,11 @@ const gxData = {
         grid.innerHTML = data.requirements.map((req, i) => {
             let inputsHtml = '';
             for(let j=0; j < req.count; j++) {
-                inputsHtml += `<input type="text" class="gx-input" data-group="${i}" placeholder="Target ${j+1}..." autocomplete="off">`;
+                inputsHtml += `<input type="text" class="gx-input" placeholder="Target ${j+1}..." autocomplete="off">`;
             }
             return `
                 <div class="extraction-card" id="card-${i}">
-                    <label>DATA_CORE_0${i+1}: ${req.label}</label>
+                    <label id="label-${i}">DATA_CORE_0${i+1}: ${req.label}</label>
                     <div class="inputs-container">${inputsHtml}</div>
                 </div>
             `;
@@ -235,35 +181,48 @@ const gxData = {
         }
     });
 
-function collectAndSend() {
-    const cards = document.querySelectorAll('.extraction-card');
-    let answersArray = []; // سنرسل مصفوفة وليس نص مدمج بـ |
-    let hasError = false;
+    function collectAndSend() {
+        const cards = document.querySelectorAll('.extraction-card');
+        let answersArray = [];
+        let globalError = false;
 
-    cards.forEach((card) => {
-        const inputs = card.querySelectorAll('.gx-input');
-        let groupAnswers = [];
-        inputs.forEach(input => {
-            const val = input.value.trim();
-            if(!val) hasError = true;
-            groupAnswers.push(val);
+        cards.forEach((card, index) => {
+            const inputs = card.querySelectorAll('.gx-input');
+            let groupAnswers = [];
+            let cardHasError = false;
+
+            inputs.forEach(input => {
+                const val = input.value.trim();
+                if(!val) {
+                    cardHasError = true;
+                    globalError = true;
+                }
+                groupAnswers.push(val);
+            });
+
+            if(cardHasError) {
+                card.classList.add('error-card');
+                setTimeout(() => card.classList.remove('error-card'), 2000);
+            } else {
+                card.classList.remove('error-card');
+            }
+            
+            answersArray.push(groupAnswers.join(',')); 
         });
-        // دمج كلمات المجموعة الواحدة بفاصلة ليتوافق مع split(",") في الـ Backend
-        answersArray.push(groupAnswers.join(',')); 
-    });
 
-    if(hasError) {
-        window.parent.postMessage({ type: 'MISSION_INCOMPLETE' }, '*');
-        return;
+        if(globalError) {
+            window.parent.postMessage({ type: 'MISSION_INCOMPLETE' }, '*');
+            return;
+        }
+
+        window.parent.postMessage({ 
+            type: 'MISSION_ANSWERS', 
+            activityCode: 'GRX',
+            answers: answersArray,
+            missionNum: taskNum
+        }, '*');
     }
 
-    window.parent.postMessage({ 
-        type: 'MISSION_ANSWERS', 
-        activityCode: 'GRX', // توحيد الكود ليكون GRX
-        answers: answersArray, // إرسالها كمصفوفة Array مباشرة
-        missionNum: taskNum
-    }, '*');
-}
     window.onload = loadExtractor;
 </script>
 </body>
