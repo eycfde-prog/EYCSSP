@@ -20,94 +20,74 @@
             margin: 0; padding: 20px; direction: ltr;
         }
 
-        .vivid-container {
-            max-width: 850px; margin: 0 auto; 
-            animation: slideUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
-        }
-
-        @keyframes slideUp { 
-            from { opacity: 0; transform: translateY(30px); } 
-            to { opacity: 1; transform: translateY(0); } 
-        }
-
-        .header-vivid { text-align: center; margin-bottom: 30px; }
-
-        .header-vivid h1 { 
-            font-family: 'Orbitron'; color: var(--vivid-blue); 
-            letter-spacing: 5px; margin: 0; font-size: 1.2rem;
-            text-shadow: 0 0 20px rgba(0, 212, 255, 0.4);
-            text-transform: uppercase;
-        }
-
+        /* حاوية الصورة المطورة */
         .image-frame {
             background: #000; border: 1px solid var(--border-glow);
             padding: 12px; border-radius: 20px; margin-bottom: 30px;
             box-shadow: 0 25px 60px rgba(0,0,0,0.8);
             position: relative; overflow: hidden;
             display: flex; align-items: center; justify-content: center;
-            min-height: 300px;
+            min-height: 200px; cursor: zoom-in;
         }
 
-        /* شعاع المسح الضوئي */
-        .image-frame::after {
-            content: ""; position: absolute;
-            top: -100%; left: 0; width: 100%; height: 20%;
-            background: linear-gradient(to bottom, transparent, var(--scan-line), transparent);
-            animation: radar 4s linear infinite;
-            z-index: 5; pointer-events: none;
-        }
-
-        @keyframes radar {
-            0% { top: -100%; }
-            100% { top: 200%; }
+        .image-frame::before {
+            content: "CLICK TO ENLARGE / ZOOM";
+            position: absolute; bottom: 20px; font-family: 'Orbitron';
+            font-size: 8px; color: var(--vivid-blue); opacity: 0.6;
+            z-index: 10; letter-spacing: 2px;
         }
 
         #target-image {
-            max-width: 100%; max-height: 500px; 
-            border-radius: 12px; transition: 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-            filter: saturate(1.1) brightness(0.9);
+            max-width: 100%; max-height: 400px; 
+            border-radius: 12px; transition: 0.4s;
         }
 
-        .image-frame:hover #target-image {
-            transform: scale(1.03); filter: saturate(1.2) brightness(1.1);
+        /* نظام الـ Fullscreen و Pop-up */
+        .overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.95); z-index: 9999;
+            justify-content: center; align-items: center;
+            backdrop-filter: blur(10px);
         }
 
-        .description-zone {
-            background: var(--glass-bg); border-radius: 25px;
-            padding: 30px; border: 1px solid rgba(255,255,255,0.08);
-            backdrop-filter: blur(20px); box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        .overlay img {
+            max-width: 95%; max-height: 95%;
+            object-fit: contain; transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
-        .description-zone label {
-            display: block; font-family: 'Orbitron'; color: var(--vivid-blue);
-            font-size: 10px; margin-bottom: 18px; letter-spacing: 3px;
+        /* تنبيه تدوير الموبايل */
+        #rotate-hint {
+            display: none; position: absolute; top: 20px; width: 100%;
+            text-align: center; color: var(--gold-trim);
+            font-family: 'Orbitron'; font-size: 10px; z-index: 10001;
+            animation: blink 1.5s infinite;
         }
 
+        @keyframes blink { 50% { opacity: 0; } }
+
+        /* تنسيقات الـ Textarea وبقية العناصر */
         textarea {
-            width: 100%; height: 200px; background: rgba(0,0,0,0.4); 
+            width: 100%; height: 180px; background: rgba(0,0,0,0.4); 
             border: 1px solid rgba(255,255,255,0.05);
             color: #f0f0f0; font-family: 'Rajdhani'; font-size: 1.25rem;
             line-height: 1.7; outline: none; resize: none; box-sizing: border-box;
-            border-left: 4px solid var(--vivid-blue); padding: 15px 25px;
-            border-radius: 0 18px 18px 0; transition: 0.3s;
-        }
-
-        textarea:focus {
-            background: rgba(0, 212, 255, 0.05);
-            border-left-width: 10px; border-color: rgba(0, 212, 255, 0.3);
-        }
-
-        .footer-tools {
-            display: flex; justify-content: space-between;
-            align-items: center; margin-top: 20px;
-            padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.05);
+            border-left: 4px solid var(--vivid-blue); padding: 15px;
+            border-radius: 0 18px 18px 0;
         }
 
         .word-counter {
-            font-family: 'Orbitron'; font-size: 10px;
-            color: var(--vivid-blue); background: rgba(0, 212, 255, 0.1);
-            padding: 6px 16px; border-radius: 50px; border: 1px solid var(--border-glow);
+            font-family: 'Orbitron'; font-size: 10px; color: var(--vivid-blue);
+            background: rgba(0, 212, 255, 0.1); padding: 6px 16px; border-radius: 50px;
         }
+
+        /* شعاع المسح */
+        .scan-bar {
+            position: absolute; width: 100%; height: 2px; background: var(--vivid-blue);
+            box-shadow: 0 0 15px var(--vivid-blue); top: 0; z-index: 6;
+            animation: scanMove 3s linear infinite; opacity: 0.5; pointer-events: none;
+        }
+        @keyframes scanMove { 0% { top: 0%; } 100% { top: 100%; } }
+
     </style>
 </head>
 <body>
@@ -115,79 +95,74 @@
     <div class="vivid-container">
         <div class="header-vivid">
             <h1 id="v-title">VIVID: VISUAL DECODING</h1>
-            <p style="color: #555; font-size: 10px; margin: 10px 0; letter-spacing: 2px;">SCANNING ARCHIVE FOR MISSION DATA...</p>
         </div>
 
-        <div class="image-frame">
+        <div class="image-frame" onclick="openVision()">
+            <div class="scan-bar"></div>
             <img id="target-image" src="" alt="Target Analysis">
         </div>
 
         <div class="description-zone">
-            <label>NARRATIVE SEQUENCE INPUT:</label>
             <textarea id="descInput" placeholder="Analyze lighting, textures, and atmospheric depth..." oninput="updateWordCount()"></textarea>
-            
-            <div class="footer-tools">
-                <div style="font-size: 10px; color: #666; font-style: italic;">"Every pixel holds a story."</div>
+            <div style="display: flex; justify-content: space-between; margin-top: 15px;">
                 <div class="word-counter">DATA_POINTS: <span id="wCount">0</span></div>
             </div>
         </div>
     </div>
 
+    <div id="vision-overlay" class="overlay" onclick="closeVision()">
+        <div id="rotate-hint">🔄 ROTATE DEVICE FOR FULL LANDSCAPE VIEW</div>
+        <img id="expanded-img" src="" alt="Expanded View">
+    </div>
+
 <script>
-    // الإعدادات الخاصة بمستودعك
     const GITHUB_USER = 'eycfde-prog'; 
     const REPO_NAME = 'EYCSSP'; 
-    const COMMIT_HASH = '097a3b5406f82538b36c2b064b1281594d73c960'; // الهاش الخاص بالملفات
+    const COMMIT_HASH = '097a3b5406f82538b36c2b064b1281594d73c960'; 
     
     const urlParams = new URLSearchParams(window.location.search);
     const taskNum = urlParams.get('task') || "1";
+    const imgUrl = `https://raw.githubusercontent.com/${GITHUB_USER}/${REPO_NAME}/${COMMIT_HASH}/frontend/eyclgos/vvpics/${taskNum}.png`;
 
     function initVivid() {
-        const imgElement = document.getElementById('target-image');
-        
-        // بناء الرابط المباشر للصورة من مجلد vvpics
-        // المسار: frontend/eyclgos/vvpics/{رقم المهمة}.png
-        const rawUrl = `https://raw.githubusercontent.com/${GITHUB_USER}/${REPO_NAME}/${COMMIT_HASH}/frontend/eyclgos/vvpics/${taskNum}.png`;
-        
-        imgElement.src = rawUrl;
-        
-        // معالجة حالة فشل تحميل الصورة (مثلاً لو الامتداد jpg وليس png)
-        imgElement.onerror = function() {
-            if (!this.src.endsWith('.jpg')) {
-                this.src = this.src.replace('.png', '.jpg');
-            } else {
-                this.src = "https://via.placeholder.com/800x450/050505/00d4ff?text=SIGNAL+LOST:+IMAGE+NOT+FOUND";
-            }
-        };
-        
-        document.getElementById('v-title').innerText = `VIVID: MISSION ${taskNum.padStart(2, '0')}`;
+        const img = document.getElementById('target-image');
+        img.src = imgUrl;
+        img.onerror = function() { this.src = "https://via.placeholder.com/800x450?text=SIGNAL+LOST"; };
     }
+
+    // وظيفة فتح الصورة
+    function openVision() {
+        const overlay = document.getElementById('vision-overlay');
+        const expImg = document.getElementById('expanded-img');
+        const hint = document.getElementById('rotate-hint');
+        
+        expImg.src = imgUrl;
+        overlay.style.display = 'flex';
+
+        // كشف الموبايل لتفعيل رسالة التدوير والزوم
+        if (/Mobi|Android/i.test(navigator.userAgent)) {
+            hint.style.display = 'block';
+            // السماح بالزوم عبر اللمس الأصلي للمتصفح في الـ Fullscreen
+        }
+    }
+
+    function closeVision() {
+        document.getElementById('vision-overlay').style.display = 'none';
+    }
+
+    // تفعيل زوم الماوس للديسكتوب داخل الـ Overlay
+    let scale = 1;
+    document.getElementById('expanded-img').addEventListener('wheel', function(e) {
+        e.preventDefault();
+        scale += e.deltaY * -0.001;
+        scale = Math.min(Math.max(.5, scale), 4);
+        this.style.transform = `scale(${scale})`;
+    });
 
     function updateWordCount() {
         const text = document.getElementById('descInput').value.trim();
-        const words = text ? text.split(/\s+/).filter(w => w.length > 0).length : 0;
-        document.getElementById('wCount').innerText = words;
+        document.getElementById('wCount').innerText = text ? text.split(/\s+/).length : 0;
     }
-
-    window.addEventListener('message', function(event) {
-        if (event.data.type === 'REQUEST_MISSION_DATA') {
-            const description = document.getElementById('descInput').value.trim();
-            
-            if(!description) {
-                document.getElementById('descInput').style.borderColor = "#ff4444";
-                document.getElementById('descInput').placeholder = "SYSTEM ERROR: INPUT REQUIRED BEFORE SUBMISSION";
-                return; 
-            }
-
-            // إرسال البيانات للأب (Google Sheets / Webhook)
-            window.parent.postMessage({ 
-                type: 'MISSION_ANSWERS', 
-                activityCode: 'VS',
-                answers: description,
-                task: taskNum // تم توحيد اسم المتغير ليكون task لسهولة المعالجة في السيرفر
-            }, '*');
-        }
-    });
 
     window.onload = initVivid;
 </script>
