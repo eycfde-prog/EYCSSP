@@ -11,6 +11,7 @@
             --neon-blue: #00f2ff;
             --glass-deep: rgba(10, 10, 20, 0.92);
             --border-purple: rgba(188, 19, 254, 0.4);
+            --error-red: #ff4444;
         }
 
         body { 
@@ -34,10 +35,12 @@
             backdrop-filter: blur(20px);
         }
 
+        /* Scanline effect */
         .audio-x-panel::after {
             content: ''; position: absolute; top: -100%; left: 0; width: 100%; height: 100%;
             background: linear-gradient(to bottom, transparent, rgba(188, 19, 254, 0.1), transparent);
             animation: scan 4s linear infinite;
+            pointer-events: none;
         }
 
         @keyframes scan { 0% { top: -100%; } 100% { top: 100%; } }
@@ -49,6 +52,13 @@
             letter-spacing: 5px; 
             margin: 0 0 20px 0;
             text-transform: uppercase;
+            transition: color 0.5s ease, text-shadow 0.5s ease;
+        }
+
+        /* Neon Blue Ready State */
+        .system-ready h1 {
+            color: var(--neon-blue) !important;
+            text-shadow: 0 0 15px var(--neon-blue);
         }
 
         audio { 
@@ -56,6 +66,8 @@
             height: 35px;
             filter: invert(1) hue-rotate(260deg) brightness(1.1); 
             opacity: 0.85;
+            /* Purple Glow Filter */
+            filter: invert(1) hue-rotate(260deg) brightness(1.1) drop-shadow(0 0 10px var(--neon-purple));
         }
 
         .summary-zone { display: flex; flex-direction: column; gap: 20px; }
@@ -66,7 +78,8 @@
             border-radius: 12px; 
             padding: 20px 25px; 
             position: relative;
-            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            /* Smooth Border Transition */
+            transition: border-color 0.4s ease, transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), background 0.4s ease;
         }
 
         .sentence-box:focus-within {
@@ -97,6 +110,14 @@
             outline: none;
         }
 
+        /* Fade-out Placeholder on Focus */
+        .x-input-field::placeholder {
+            transition: opacity 0.3s ease;
+        }
+        .x-input-field:focus::placeholder {
+            opacity: 0;
+        }
+
         .line-marker {
             position: absolute; left: 0; top: 50%; transform: translateY(-50%);
             width: 4px; height: 50%; 
@@ -111,11 +132,11 @@
         }
     </style>
 </head>
-<body>
+<body class="">
 
-    <div class="audio-x-panel">
+    <div class="audio-x-panel" id="headerPanel">
         <h1 id="x-title">GE-X: ANALYZING AUDIO</h1>
-        <audio id="xAudio" controls>
+        <audio id="xAudio" controls controlsList="nodownload">
             <source id="xSource" src="" type="audio/wav">
         </audio>
     </div>
@@ -124,34 +145,34 @@
         <div class="sentence-box">
             <div class="line-marker"></div>
             <label>Neural Link - Part 01 Summary</label>
-            <input type="text" id="sent-1" class="x-input-field" placeholder="Decoding segment 1...">
+            <input type="text" id="sent-1" class="x-input-field" placeholder="Decoding segment 1..." oninput="checkCompletion()">
         </div>
         <div class="sentence-box">
             <div class="line-marker"></div>
             <label>Neural Link - Part 02 Summary</label>
-            <input type="text" id="sent-2" class="x-input-field" placeholder="Decoding segment 2...">
+            <input type="text" id="sent-2" class="x-input-field" placeholder="Decoding segment 2..." oninput="checkCompletion()">
         </div>
         <div class="sentence-box">
             <div class="line-marker"></div>
             <label>Neural Link - Part 03 Summary</label>
-            <input type="text" id="sent-3" class="x-input-field" placeholder="Decoding segment 3...">
+            <input type="text" id="sent-3" class="x-input-field" placeholder="Decoding segment 3..." oninput="checkCompletion()">
         </div>
         <div class="sentence-box">
             <div class="line-marker"></div>
             <label>Neural Link - Part 04 Summary</label>
-            <input type="text" id="sent-4" class="x-input-field" placeholder="Decoding segment 4...">
+            <input type="text" id="sent-4" class="x-input-field" placeholder="Decoding segment 4..." oninput="checkCompletion()">
         </div>
         <div class="sentence-box">
             <div class="line-marker"></div>
             <label>Neural Link - Part 05 Summary</label>
-            <input type="text" id="sent-5" class="x-input-field" placeholder="Decoding segment 5...">
+            <input type="text" id="sent-5" class="x-input-field" placeholder="Decoding segment 5..." oninput="checkCompletion()">
         </div>
     </div>
 
 <script>
     const GITHUB_USER = 'eycfde-prog'; 
     const REPO_NAME = 'EYCSSP'; 
-    const BRANCH = 'main'; // أو الـ Hash إذا كنت تفضل تثبيت النسخة
+    const BRANCH = 'main'; 
 
     const urlParams = new URLSearchParams(window.location.search);
     const taskNum = urlParams.get('task') || "1";
@@ -159,20 +180,31 @@
     function initGEX() {
         const audio = document.getElementById('xAudio');
         const source = document.getElementById('xSource');
-        
-        // بناء الرابط الخام بناءً على بنية المستودع التي أرسلتها
-        // المسار: frontend/eyclgos/gexaudio/{رقم المهمة}.wav
         const rawAudioUrl = `https://raw.githubusercontent.com/${GITHUB_USER}/${REPO_NAME}/${BRANCH}/frontend/eyclgos/gexaudio/${taskNum}.wav`;
         
         source.src = rawAudioUrl;
         audio.load();
 
-        // التعامل مع خطأ التحميل
-        audio.onerror = function() {
-            console.error("Audio transmission lost at:", rawAudioUrl);
-        };
-
         document.getElementById('x-title').innerText = `GE-X: MISSION ${taskNum.padStart(2, '0')}`;
+    }
+
+    // UX Feedback: Check if all inputs are filled
+    function checkCompletion() {
+        let filledCount = 0;
+        for (let i = 1; i <= 5; i++) {
+            if (document.getElementById(`sent-${i}`).value.trim() !== "") filledCount++;
+        }
+
+        const header = document.getElementById('headerPanel');
+        const title = document.getElementById('x-title');
+
+        if (filledCount === 5) {
+            header.classList.add('system-ready');
+            title.innerText = "GE-X: SYSTEM READY";
+        } else {
+            header.classList.remove('system-ready');
+            title.innerText = `GE-X: MISSION ${taskNum.padStart(2, '0')}`;
+        }
     }
 
     window.addEventListener('message', function(event) {
@@ -190,7 +222,8 @@
             const val = input.value.trim();
             if (!val) {
                 allFilled = false;
-                input.parentElement.style.borderColor = "red";
+                // Smooth transition to error border
+                input.parentElement.style.borderColor = "var(--error-red)";
             } else {
                 input.parentElement.style.borderColor = "rgba(188, 19, 254, 0.15)";
                 answers.push(val);
