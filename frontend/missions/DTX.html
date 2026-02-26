@@ -7,11 +7,12 @@
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Poppins:wght@300;600&display=swap" rel="stylesheet">
     <style>
         :root { 
-            --gold: #D4AF37; 
-            --gold-glow: rgba(212, 175, 55, 0.4);
+            --gold: #C5A028; 
+            --gold-glow: rgba(197, 160, 40, 0.4);
             --error-red: #ff4444;
             --glass: rgba(255, 255, 255, 0.02); 
-            --glass-border: rgba(212, 175, 55, 0.2);
+            --glass-border: rgba(197, 160, 40, 0.2);
+            --scan-green: #00ff41;
         }
 
         body {
@@ -23,12 +24,12 @@
         }
 
         .dict-container {
-            background: rgba(10, 10, 15, 0.85); 
+            background: rgba(10, 10, 15, 0.9); 
             border: 1px solid var(--glass-border);
             border-radius: 20px; 
             padding: 30px; 
             text-align: center;
-            backdrop-filter: blur(15px);
+            backdrop-filter: blur(20px);
             max-width: 800px;
             margin: 0 auto;
             box-shadow: 0 20px 50px rgba(0,0,0,0.6);
@@ -53,6 +54,7 @@
             background: #000;
         }
 
+        /* --- Audio UX & Visualizer --- */
         .audio-section {
             display: grid; 
             grid-template-columns: 1fr 1fr; 
@@ -66,35 +68,65 @@
             padding: 20px 15px; 
             border-radius: 15px; 
             position: relative;
+            overflow: hidden;
         }
 
-        .warning-label {
-            display: block; font-family: 'Orbitron'; color: var(--error-red);
-            font-size: 9px; margin-bottom: 10px; letter-spacing: 1.5px;
+        .visualizer {
+            display: none;
+            justify-content: center;
+            align-items: flex-end;
+            height: 20px;
+            gap: 2px;
+            margin-bottom: 10px;
         }
+        .visualizer div {
+            width: 3px;
+            background: var(--gold);
+            animation: bounce 0.5s ease infinite alternate;
+        }
+        @keyframes bounce { from { height: 5px; } to { height: 20px; } }
 
         audio { width: 100%; height: 35px; filter: invert(1); }
 
+        /* --- Image Preview & Scan FX --- */
         .file-inputs-grid { 
             display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-top: 20px;
         }
 
         .file-box {
             background: rgba(0,0,0,0.3); border: 1px dashed var(--glass-border);
-            border-radius: 10px; padding: 15px 5px;
+            border-radius: 10px; padding: 15px 5px; transition: 0.3s;
+            position: relative; overflow: hidden;
         }
 
+        .preview-wrapper { position: relative; display: none; margin-top: 10px; }
+        
         .preview-img {
             width: 100%; height: 100px; object-fit: cover;
-            border-radius: 5px; margin-top: 10px; display: none;
-            border: 1px solid var(--gold);
+            border-radius: 5px; border: 1px solid var(--gold);
         }
+
+        .scan-line {
+            position: absolute; top: 0; left: 0; width: 100%; height: 2px;
+            background: var(--scan-green);
+            box-shadow: 0 0 10px var(--scan-green);
+            animation: scanLine 2s linear infinite;
+        }
+
+        @keyframes scanLine { 0% { top: 0; } 100% { top: 100%; } }
+
+        /* --- Error Handling --- */
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-8px); border-color: var(--error-red); }
+            75% { transform: translateX(8px); }
+        }
+        .shake { animation: shake 0.4s ease-in-out; }
 
         .expired-msg { 
             color: var(--error-red); font-family: 'Orbitron'; 
             font-size: 10px; margin-top: 10px; font-weight: bold;
         }
-        
         .locked { opacity: 0.5; pointer-events: none; }
     </style>
 </head>
@@ -110,7 +142,8 @@
 
     <div class="audio-section">
         <div class="audio-card" id="cardSlow">
-            <span class="warning-label">SINGLE PLAYBACK</span>
+            <div class="visualizer" id="vizSlow"><div></div><div style="animation-delay:0.1s"></div><div style="animation-delay:0.2s"></div></div>
+            <span style="display:block; font-family:'Orbitron'; color:var(--error-red); font-size:9px; letter-spacing:1.5px;">SINGLE PLAYBACK</span>
             <div style="font-size: 10px; margin-bottom: 10px;">ANALYTICAL (Slow)</div>
             <audio id="slowAudio" controls controlsList="nodownload noplaybackrate">
                 <source id="slowSource" src="" type="audio/wav">
@@ -118,7 +151,8 @@
         </div>
 
         <div class="audio-card" id="cardNormal">
-            <span class="warning-label">SINGLE PLAYBACK</span>
+            <div class="visualizer" id="vizNormal"><div></div><div style="animation-delay:0.1s"></div><div style="animation-delay:0.2s"></div></div>
+            <span style="display:block; font-family:'Orbitron'; color:var(--error-red); font-size:9px; letter-spacing:1.5px;">SINGLE PLAYBACK</span>
             <div style="font-size: 10px; margin-bottom: 10px;">REAL-TIME (Normal)</div>
             <audio id="normalAudio" controls controlsList="nodownload noplaybackrate">
                 <source id="normalSource" src="" type="audio/wav">
@@ -127,36 +161,43 @@
     </div>
 
     <div class="file-inputs-grid">
-        <div class="file-box">
+        <div class="file-box" id="box-p1">
             <span style="color:var(--gold); font-size:9px; font-family:'Orbitron'">PAGE_01</span>
-            <input type="file" accept="image/*" onchange="preview(this, 'p1')" style="font-size: 9px;">
-            <img id="p1" class="preview-img">
+            <input type="file" accept="image/*" onchange="processImage(this, 'p1')" style="font-size: 9px; width:100%">
+            <div id="wrapper-p1" class="preview-wrapper">
+                <div class="scan-line"></div>
+                <img id="p1" class="preview-img">
+            </div>
         </div>
-        <div class="file-box">
+        <div class="file-box" id="box-p2">
             <span style="color:var(--gold); font-size:9px; font-family:'Orbitron'">PAGE_02</span>
-            <input type="file" accept="image/*" onchange="preview(this, 'p2')" style="font-size: 9px;">
-            <img id="p2" class="preview-img">
+            <input type="file" accept="image/*" onchange="processImage(this, 'p2')" style="font-size: 9px; width:100%">
+            <div id="wrapper-p2" class="preview-wrapper">
+                <div class="scan-line"></div>
+                <img id="p2" class="preview-img">
+            </div>
         </div>
-        <div class="file-box">
+        <div class="file-box" id="box-p3">
             <span style="color:var(--gold); font-size:9px; font-family:'Orbitron'">PAGE_03</span>
-            <input type="file" accept="image/*" onchange="preview(this, 'p3')" style="font-size: 9px;">
-            <img id="p3" class="preview-img">
+            <input type="file" accept="image/*" onchange="processImage(this, 'p3')" style="font-size: 9px; width:100%">
+            <div id="wrapper-p3" class="preview-wrapper">
+                <div class="scan-line"></div>
+                <img id="p3" class="preview-img">
+            </div>
         </div>
     </div>
 </div>
 
+<canvas id="optimizer-canvas" style="display:none;"></canvas>
+
 <script>
     const urlParams = new URLSearchParams(window.location.search);
     const taskNum = urlParams.get('task') || "1";
-    
     const storageKeySlow = `DX_V4_T${taskNum}_S`;
     const storageKeyNormal = `DX_V4_T${taskNum}_N`;
 
     function initDictX() {
-        window.parent.postMessage({ type: 'CHECK_AUDIO_STATUS' }, '*');
-
         document.getElementById('task-title').innerText = `MISSION DX-${taskNum.padStart(2, '0')}`;
-        
         const base = "https://raw.githubusercontent.com/eycfde-prog/EYCSSP/main/frontend/eyclgos/dxaudio/";
         
         document.getElementById('mission-img').src = `${base}${taskNum}.png`;
@@ -165,62 +206,66 @@
         
         const slowA = document.getElementById('slowAudio');
         const normalA = document.getElementById('normalAudio');
-
-        slowA.load();
-        normalA.load();
-        
-        slowA.playbackRate = 1.0; 
+        slowA.load(); normalA.load();
 
         if (localStorage.getItem(storageKeySlow)) lockAudio(slowA, 'cardSlow');
         if (localStorage.getItem(storageKeyNormal)) lockAudio(normalA, 'cardNormal');
 
-        setupAudioLogic(slowA, storageKeySlow, 'cardSlow');
-        setupAudioLogic(normalA, storageKeyNormal, 'cardNormal');
+        setupAudioLogic(slowA, storageKeySlow, 'cardSlow', 'vizSlow');
+        setupAudioLogic(normalA, storageKeyNormal, 'cardNormal', 'vizNormal');
     }
 
-    window.addEventListener('message', (e) => {
-        if (e.data.type === 'AUDIO_STATUS_DATA') {
-            if (e.data.audio1 === "DONE") lockAudio(document.getElementById('slowAudio'), 'cardSlow');
-            if (e.data.audio2 === "DONE") lockAudio(document.getElementById('normalAudio'), 'cardNormal');
-        }
-        if (e.data.type === 'REQUEST_MISSION_DATA') collectAndSubmit();
-    });
-
-    function setupAudioLogic(el, key, cardId) {
+    function setupAudioLogic(el, key, cardId, vizId) {
+        const viz = document.getElementById(vizId);
         el.onplay = () => {
-            const num = (cardId === 'cardSlow') ? "1" : "2";
+            viz.style.display = 'flex';
             localStorage.setItem(key, "true");
-            window.parent.postMessage({ type: 'AUDIO_PLAYED', audioNum: num }, '*');
-            
-            el.ontimeupdate = () => {
-                if (el.seeking) el.currentTime = el.played.end(0);
-            };
+            window.parent.postMessage({ type: 'AUDIO_PLAYED', audioNum: (cardId === 'cardSlow' ? "1" : "2") }, '*');
         };
-        el.onended = () => lockAudio(el, cardId);
+        el.onpause = () => viz.style.display = 'none';
+        el.onended = () => { viz.style.display = 'none'; lockAudio(el, cardId); };
     }
 
     function lockAudio(el, cardId) {
-        el.pause();
-        el.controls = false;
-        el.style.display = "none";
+        el.pause(); el.style.display = "none";
         const card = document.getElementById(cardId);
         card.classList.add('locked');
-        if (!card.querySelector('.expired-msg')) {
-            card.insertAdjacentHTML('beforeend', '<p class="expired-msg">ACCESS TERMINATED</p>');
-        }
+        if (!card.querySelector('.expired-msg')) card.insertAdjacentHTML('beforeend', '<p class="expired-msg">ACCESS TERMINATED</p>');
     }
 
-    function preview(input, imgId) {
+    // --- Wolf's Canvas Hack & Image Optimization ---
+    function processImage(input, imgId) {
         const file = input.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                const img = document.getElementById(imgId);
-                img.src = e.target.result;
-                img.style.display = "block";
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const tempImg = new Image();
+            tempImg.src = e.target.result;
+            tempImg.onload = () => {
+                const canvas = document.getElementById('optimizer-canvas');
+                const ctx = canvas.getContext('2d');
+                
+                // Resize Logic (Max Width 1024px)
+                let width = tempImg.width;
+                let height = tempImg.height;
+                if (width > 1024) {
+                    height *= 1024 / width;
+                    width = 1024;
+                }
+                
+                canvas.width = width;
+                canvas.height = height;
+                ctx.drawImage(tempImg, 0, 0, width, height);
+                
+                const optimizedURL = canvas.toDataURL('image/jpeg', 0.7); // 70% Quality JPEG
+                const previewImg = document.getElementById(imgId);
+                previewImg.src = optimizedURL;
+                document.getElementById(`wrapper-${imgId}`).style.display = "block";
+                document.getElementById(`box-${imgId}`).classList.remove('shake');
             };
-            reader.readAsDataURL(file);
-        }
+        };
+        reader.readAsDataURL(file);
     }
 
     function collectAndSubmit() {
@@ -231,11 +276,15 @@
         });
 
         if (files.length === 0) {
-            alert("UPLOAD YOUR SCRIPT TO PROCEED");
+            // Trigger Wolf's Shake Animation
+            document.querySelectorAll('.file-box').forEach(box => {
+                box.classList.add('shake');
+                setTimeout(() => box.classList.remove('shake'), 500);
+            });
             return;
         }
 
-        window.parent.postMessage({ type: 'MISSION_ANSWERS', answers: files }, '*');
+        window.parent.postMessage({ type: 'MISSION_ANSWERS', activityCode: 'DX', answers: files }, '*');
     }
 
     window.onload = initDictX;
