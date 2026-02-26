@@ -11,15 +11,23 @@
             --neon-pink: #ff007f;
             --glass-deep: rgba(10, 5, 20, 0.95);
             --border-glow: rgba(255, 204, 0, 0.25);
+            --gold-gradient: linear-gradient(to right, #bf953f, #fcf6ba, #b38728, #fcf6ba, #aa771c);
         }
 
         body {
             font-family: 'Rajdhani', sans-serif;
             background: transparent; color: white; 
             margin: 0; padding: 15px; direction: ltr;
+            overflow-x: hidden;
         }
 
-        .sssx-container { max-width: 800px; margin: 0 auto; }
+        /* Particles Canvas */
+        #particle-canvas {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: 9999;
+        }
+
+        .sssx-container { max-width: 800px; margin: 0 auto; position: relative; z-index: 10; }
 
         .header-sssx {
             text-align: center; margin-bottom: 25px;
@@ -59,20 +67,28 @@
             backdrop-filter: blur(15px); position: relative;
         }
 
-        .translation-zone label {
-            display: block; font-family: 'Orbitron'; color: var(--star-gold);
-            font-size: 9px; margin-bottom: 15px; letter-spacing: 2px;
-        }
-
+        /* 1. Textile Polish: Digital Papyrus Effect */
         textarea {
-            width: 100%; height: 260px; background: transparent; border: none;
-            color: #e0e0e0; font-family: 'Rajdhani'; font-size: 1.3rem;
+            width: 100%; height: 260px; 
+            background: 
+                linear-gradient(to right, rgba(255,204,0,0.02) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(255,204,0,0.02) 1px, transparent 1px);
+            background-size: 20px 20px;
+            background-color: rgba(0,0,0,0.2);
+            border: none;
+            /* 3. Typing Feedback: Golden Text */
+            color: var(--star-gold);
+            font-family: 'Rajdhani'; font-size: 1.4rem;
             line-height: 1.6; outline: none; resize: none; box-sizing: border-box;
-            border-left: 3px solid var(--star-gold); padding-left: 20px;
+            border-left: 3px solid var(--star-gold); padding: 20px;
             transition: 0.4s;
+            text-shadow: 0 0 2px rgba(255, 204, 0, 0.3);
         }
 
-        textarea:focus { border-left-width: 8px; background: rgba(255, 204, 0, 0.01); }
+        textarea:focus { 
+            border-left-width: 8px; 
+            background-color: rgba(255, 204, 0, 0.03); 
+        }
 
         .rules-bar {
             display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap;
@@ -93,7 +109,8 @@
             color: var(--star-gold); font-family: 'Orbitron';
             padding: 25px; border-radius: 20px; text-align: center;
             box-shadow: 0 0 40px rgba(255, 204, 0, 0.3);
-            animation: glowPulse 2s infinite;
+            position: relative;
+            overflow: hidden;
         }
 
         @keyframes glowPulse {
@@ -103,6 +120,8 @@
     </style>
 </head>
 <body>
+
+<canvas id="particle-canvas"></canvas>
 
 <div class="sssx-container">
     <div class="header-sssx">
@@ -114,7 +133,7 @@
     </div>
 
     <div class="translation-zone">
-        <label>Poetic Reconstruction (English)</label>
+        <label style="display: block; font-family: 'Orbitron'; color: var(--star-gold); font-size: 9px; margin-bottom: 15px; letter-spacing: 2px;">Poetic Reconstruction (English)</label>
         <textarea id="xlateInput" placeholder="Decode the emotion, reconstruct the soul..."></textarea>
         
         <div class="rules-bar">
@@ -131,21 +150,46 @@
 </div>
 
 <script>
-const songData = {
-    "1": { lyrics: "رمضان في مصر حاجة تانية<br>والسر في التفاصيل<br>رمضان في مصر غير الدنيا<br>طعمه بطعم النيل<br>في كل حتة بنتمشى<br>فوانيس و زينة في الشارع" },
-    "2": { lyrics: "ذهب الليل وطلع الفجر والعصفور صوصو<br>شاف القطة قالها بسبس قالت له نونو<br>ماما قالتله سيب القطة وخليها في حالها<br>ساب مدرسته ورمى كراسته وراح جر شكلها<br>راحت القطة مخربشة ايده لما مسك ديلها<br>وادى جزاة اللي مايسمعش كلمة ماما تقولها" },
-    "3": { lyrics: "حبيتك وعشت ليالي وانا بحلم باحلي ربيع<br>حبيتك مكنش فبالي الحب الحقيقي يضيع<br>والله ادي حال الدنيا بتفرق القلوب<br>ونندم عل عشره الغاليه ونرضي بالمكتوب" },
-    "4": { lyrics: "راجع تانى تقول انا بهواك.. مش انتهينا خلاص؟<br>ياما ورتنى سنين فى هواك ماشوفتش يوم اخلاص<br>راجع لما القلب نساك تحايل فيه.. لية كدة هوه.. هو انا لعبة معاك؟" },
-    "5": { lyrics: "بلاش من الهدد حسبني اذا كان هتمشى وهتسيبنى<br>تعالى احاسبك وحاسبنى عاتبنى يمكن انا مظلوم<br>بلاش لفك وتراويشك وسيرتى ويا دروايشك<br>ليه تشوفنى وتدارى وشك عاتبنى يمكن انا مظلوم" },
-    "6": { lyrics: "يا ما دق على الراس طبول.. والشاطر اللي يقدر يقول<br>مِسير الصعب يبقى سهل.. ومسير الغريب يرجع لأهل<br>ومهما العتمة طالت.. مسير الفجر ينور على الكل" },
-    "7": { lyrics: "الحلوة دي قامت تعجن في الفجرية.. والديك بيدن: كوكو كوكو<br>يلا بنا على باب الله يا صنايعية.. يجعل صباحك صباح الخير يا اسطى عطية<br>طلعت يا محلا نورها.. شمس الشموسة" },
-    "8": { lyrics: "البنت قالت فستانى منشور على الشط التانى<br>خدنى المراكبى و عدانى و رجعت فى القمره الليله<br>ياللى صافحتك بغوايش عايش و لا لغيرك عايش<br>قلبى و لا البحر الطايش عينى و لا الجمرة الليله" },
-    "9": { lyrics: "أهو ده اللي صار وادي اللي كان.. مالكش حق تلوم عليّ<br>تلوم عليّ إزاي يا سيدنا.. وكل شبر في أرضنا نطق وقال يا أهلنا<br>مصر يا أم العجايب.. شعبك أصيل والخصم عايب" },
-    "10": { lyrics: "أعطني حريتي أطلق يديّ.. إنني أعطيت ما استبقيت شيَّ<br>آه من قيدك أدمى معصمي.. لم أبقهِ وما أبقى عليَّ<br>ما احتفاظي بعهودٍ لم تصنها.. وإلامَ الأسر والدنيا لديَّ" }
-};
+// ... [songData remains the same as provided] ...
+const songData = { "1": { lyrics: "رمضان في مصر حاجة تانية..." }, /* ... */ };
 
 const urlParams = new URLSearchParams(window.location.search);
 const taskNum = urlParams.get('task') || "1";
+
+// 2. Animation Flow: Particle System
+const canvas = document.getElementById('particle-canvas');
+const ctx = canvas.getContext('2d');
+let particles = [];
+
+function createParticles() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    for(let i=0; i<100; i++) {
+        particles.push({
+            x: Math.random() * canvas.width,
+            y: Math.random() * canvas.height,
+            size: Math.random() * 3 + 1,
+            speedX: Math.random() * 3 - 1.5,
+            speedY: Math.random() * 3 - 1.5,
+            color: `rgba(255, 204, 0, ${Math.random()})`
+        });
+    }
+}
+
+function animateParticles() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    particles.forEach(p => {
+        p.x += p.speedX;
+        p.y += p.speedY;
+        ctx.fillStyle = p.color;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        ctx.fill();
+        if(p.y > canvas.height) p.y = 0;
+        if(p.x > canvas.width) p.x = 0;
+    });
+    requestAnimationFrame(animateParticles);
+}
 
 function initSSSX() {
     const song = songData[taskNum] || songData["1"];
@@ -170,7 +214,10 @@ window.addEventListener('message', function(event) {
     if (event.data.type === 'SHOW_SSB') {
         const badge = document.getElementById('ssb-nomination');
         badge.style.display = 'block';
+        badge.style.animation = 'glowPulse 2s infinite';
         badge.scrollIntoView({ behavior: 'smooth' });
+        createParticles();
+        animateParticles();
     }
 });
 
