@@ -11,16 +11,43 @@
         .vividx-container { width: 100%; height: 100%; display: flex; flex-direction: column; gap: 10px; }
         .header-vx { text-align: center; border-bottom: 1px solid var(--glass-border); padding-bottom: 8px; flex-shrink: 0; }
         .header-vx h1 { font-family: 'Orbitron'; color: var(--gold); letter-spacing: 3px; margin: 0; font-size: 0.95rem; text-shadow: 0 0 12px var(--gold-glow); }
-        .image-frame-x { background: rgba(0,0,0,0.6); border: 1px solid var(--glass-border); padding: 8px; border-radius: 15px; position: relative; height: 220px; flex-shrink: 0; display: flex; justify-content: center; align-items: center; overflow: hidden; }
-        #target-image-x { width: 100%; height: 100%; object-fit: contain; border-radius: 10px; }
-        .chrono-tag { position: absolute; top: 15px; right: 15px; background: var(--deep-dark); border: 1px solid var(--gold); padding: 4px 12px; border-radius: 6px; font-family: 'Orbitron'; font-size: 9px; color: var(--gold); z-index: 10; }
+        
+        /* إطار الصورة مع خاصية التكبير */
+        .image-frame-x { 
+            background: rgba(0,0,0,0.6); border: 1px solid var(--glass-border); 
+            padding: 8px; border-radius: 15px; position: relative; 
+            height: 220px; flex-shrink: 0; display: flex; 
+            justify-content: center; align-items: center; overflow: hidden;
+            cursor: zoom-in;
+        }
+
+        #target-image-x { width: 100%; height: 100%; object-fit: contain; border-radius: 10px; transition: 0.3s; }
+        
+        /* نافذة الزووم (Overlay) */
+        .zoom-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.98); z-index: 9999;
+            justify-content: center; align-items: center; backdrop-filter: blur(15px);
+        }
+        .zoom-overlay img { max-width: 98%; max-height: 98%; object-fit: contain; }
+        .rotate-msg {
+            position: absolute; top: 20px; color: var(--gold); font-family: 'Orbitron';
+            font-size: 10px; text-align: center; width: 100%; animation: pulse 2s infinite;
+        }
+
+        .chrono-tag { position: absolute; top: 10px; right: 10px; background: var(--deep-dark); border: 1px solid var(--gold); padding: 4px 10px; border-radius: 6px; font-family: 'Orbitron'; font-size: 8px; color: var(--gold); z-index: 10; max-width: 70%; text-align: center; }
+        
         .story-zone { background: rgba(15, 15, 25, 0.8); border-radius: 20px; padding: 15px; border: 1px solid var(--glass-border); backdrop-filter: blur(10px); flex-grow: 1; display: flex; flex-direction: column; min-height: 0; }
         .story-zone label { display: block; font-family: 'Orbitron'; color: var(--gold); font-size: 8px; margin-bottom: 8px; letter-spacing: 2px; }
+        
         textarea { width: 100%; flex-grow: 1; background: rgba(0,0,0,0.3); border: 1px solid rgba(212, 175, 55, 0.1); border-radius: 12px; color: #e0e0e0; font-family: 'Poppins'; font-size: 0.95rem; line-height: 1.6; outline: none; resize: none; padding: 15px; transition: 0.3s; overflow-y: auto; }
         textarea:focus { border-color: var(--gold); background: rgba(212, 175, 55, 0.03); }
+        
         .footer-info { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; font-family: 'Orbitron'; font-size: 9px; color: #777; flex-shrink: 0; }
         .word-counter { font-size: 12px; font-weight: 700; color: var(--gold); }
         .sync-active { color: var(--success-neon); text-shadow: 0 0 8px var(--success-neon); }
+
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
     </style>
 </head>
 <body>
@@ -29,10 +56,13 @@
         <div class="header-vx">
             <h1 id="vx-title">MISSION VX-ARCHIVE</h1>
         </div>
-        <div class="image-frame-x">
+        
+        <div class="image-frame-x" onclick="activateZoom()">
             <img id="target-image-x" src="" alt="VividX Visual Target">
             <div class="chrono-tag" id="time-frame-text">SYNCING...</div>
+            <div style="position:absolute; bottom:10px; font-size:7px; font-family:Orbitron; color:var(--gold); opacity:0.5;">[ TAP TO EXPAND ]</div>
         </div>
+
         <div class="story-zone">
             <label>NARRATIVE CHRONICLE TRANSMISSION:</label>
             <textarea id="storyInput" oninput="updateCount()" placeholder="Accessing neural link..."></textarea>
@@ -43,53 +73,55 @@
         </div>
     </div>
 
+    <div id="zoom-box" class="zoom-overlay" onclick="closeZoom()">
+        <div class="rotate-msg">🔄 ROTATE FOR FULL CHRONO-VIEW | PINCH TO ZOOM</div>
+        <img id="zoomed-img" src="" alt="Enlarged Archive">
+    </div>
+
 <script>
     const GITHUB_USER = 'eycfde-prog'; 
     const REPO_NAME = 'EYCSSP'; 
     const BRANCH = 'main';
 
     const vividXScenarios = {
-        "1": { time: "Describe what happened in the past until the moment of the scene in the picture." },
-        "2": { time: "Describe what happened in the past until the moment of the scene in the picture." },
-        "3": { time: "Describe what is going to happen in the future from the moment of scene in the picture." },
-        "4": { time: "Describe what happened in the past until the moment of the scene in the picture." },
-        "5": { time: "Describe what happened in the past until the moment of the scene in the picture." },   
-        "6": { time: "Describe what is going to happen in the future from the moment of scene in the picture." },
-        "7": { time: "Describe what is going to happen in the future from the moment of scene in the picture." },
-        "8": { time: "Describe what happened in the past until the moment of the scene in the picture." },
-        "9": { time: "Describe what happened in the past until the moment of the scene in the picture." },
-        "10": { time: "Describe what is going to happen in the future from the moment of scene in the picture." },        
+        "1": { time: "Describe what happened in the past until the moment of the scene." },
+        "2": { time: "Describe what happened in the past until the moment of the scene." },
+        "3": { time: "Describe what is going to happen in the future from this scene." },
+        "4": { time: "Describe what happened in the past until the moment of the scene." },
+        "5": { time: "Describe what happened in the past until the moment of the scene." },   
+        "6": { time: "Describe what is going to happen in the future from this scene." },
+        "7": { time: "Describe what is going to happen in the future from this scene." },
+        "8": { time: "Describe what happened in the past until the moment of the scene." },
+        "9": { time: "Describe what happened in the past until the moment of the scene." },
+        "10": { time: "Describe what is going to happen in the future from this scene." }        
     };
 
     const urlParams = new URLSearchParams(window.location.search);
     const taskNum = urlParams.get('task') || "1";
+    const imgUrl = `https://raw.githubusercontent.com/${GITHUB_USER}/${REPO_NAME}/${BRANCH}/frontend/eyclgos/vvxpics/${taskNum}.png`;
 
     function initVividX() {
         const scenario = vividXScenarios[taskNum] || vividXScenarios["1"];
         const imgElement = document.getElementById('target-image-x');
-        
-        // المسار المستخرج من الرابط الذي أرسلته أنت: eyclgos/vvxpics
-        const rawUrl = `https://raw.githubusercontent.com/${GITHUB_USER}/${REPO_NAME}/${BRANCH}/frontend/eyclgos/vvxpics/${taskNum}.png`;
-        
-        imgElement.src = rawUrl;
+        imgElement.src = imgUrl;
 
         imgElement.onerror = function() { 
-            if(!this.src.endsWith('.jpg')) {
-                this.src = this.src.replace('.png', '.jpg');
-            } else if (!this.src.endsWith('.PNG')) {
-                this.src = this.src.replace('.jpg', '.PNG');
-            } else {
-                this.style.display = 'none';
-                const frame = document.querySelector('.image-frame-x');
-                if(!frame.querySelector('.err-msg')) {
-                    frame.innerHTML += `<div class="err-msg" style="color:var(--gold); font-family:Orbitron; font-size:10px; text-align:center;">⚠️ SIGNAL LOST: IMAGE ${taskNum} NOT FOUND</div>`;
-                }
-            }
+            this.src = "https://via.placeholder.com/500x300/050508/D4AF37?text=IMAGE+NOT+FOUND";
         };
 
         document.getElementById('time-frame-text').innerText = scenario.time;
-        document.getElementById('storyInput').placeholder = scenario.desc;
         document.getElementById('vx-title').innerText = `VIVID X | MISSION ${taskNum.padStart(2, '0')}`;
+    }
+
+    // وظائف الزووم
+    function activateZoom() {
+        const zoomBox = document.getElementById('zoom-box');
+        document.getElementById('zoomed-img').src = imgUrl;
+        zoomBox.style.display = 'flex';
+    }
+
+    function closeZoom() {
+        document.getElementById('zoom-box').style.display = 'none';
     }
 
     function updateCount() {
@@ -105,7 +137,7 @@
             const story = document.getElementById('storyInput').value.trim();
             const count = story ? story.split(/\s+/).filter(w => w.length > 0).length : 0;
             if(!story || count < 150) {
-                 window.parent.postMessage({ type: 'MISSION_INCOMPLETE', message: "Transmission failed. 150 words required." }, '*');
+                 window.parent.postMessage({ type: 'MISSION_INCOMPLETE', message: "150 words required." }, '*');
                  return;
             }
             window.parent.postMessage({ type: 'MISSION_ANSWERS', activityCode: 'VX', answers: story, task: taskNum }, '*');
