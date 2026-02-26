@@ -69,6 +69,7 @@
             font-family: 'Orbitron'; font-size: 0.6rem; font-weight: 900;
             padding: 4px 12px; border-radius: 50px; text-transform: uppercase;
             background: var(--gold-gradient);
+            color: #000;
         }
 
         .avatar-frame {
@@ -132,88 +133,90 @@
     </div>
 
     <script>
-        const scriptURL = 'https://script.google.com/macros/s/AKfycbxXtaWntLITxC5wdW5t5oEt3BGgvaw367AlMnBnnMpd5_9YC5rnHO6qxGA6nT6C8Q1BeQ/exec';
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbzEnyqclVFDSg09UVzxupUpX40qJxd1xLZFJdTBRlV-q59-kMpklmwgAQH1CxvUQaJm/exec';
 
         async function fetchRanks() {
-            simulateLoading();
+            const loader = document.getElementById('matrix-loader');
+            const percentText = document.getElementById('loading-percent');
+            
+            let progress = 0;
+            const loadInt = setInterval(() => {
+                if (progress < 90) progress += Math.random() * 10;
+                percentText.innerText = `${Math.floor(progress)}%`;
+            }, 150);
+
             try {
                 const response = await fetch(scriptURL + "?action=leaderboard");
                 const data = await response.json();
-                renderData(data);
                 
-                // إخفاء الـ Loader
+                clearInterval(loadInt);
+                percentText.innerText = "100%";
+                
+                renderData(data);
+
                 setTimeout(() => {
-                    document.getElementById('matrix-loader').style.opacity = '0';
-                    setTimeout(() => document.getElementById('matrix-loader').remove(), 1000);
-                }, 1000);
+                    loader.style.opacity = '0';
+                    setTimeout(() => loader.remove(), 1000);
+                }, 500);
             } catch (error) {
-                console.error('Data Fetch Error:', error);
+                percentText.innerText = "ERROR";
+                console.error('System Failure:', error);
             }
         }
 
-        function simulateLoading() {
-            let p = 0;
-            const interval = setInterval(() => {
-                p += Math.floor(Math.random() * 15);
-                if (p > 100) p = 100;
-                document.getElementById('loading-percent').innerText = `${p}%`;
-                if (p === 100) clearInterval(interval);
-            }, 100);
-        }
+        function renderData(data) {
+            const podiumContainer = document.getElementById('podium-container');
+            const ranksContainer = document.getElementById('ranks-container');
+            
+            podiumContainer.innerHTML = '';
+            ranksContainer.innerHTML = '';
 
-function renderData(data) {
-    const podiumContainer = document.getElementById('podium-container');
-    const ranksContainer = document.getElementById('ranks-container');
+            // 1. Podium Logic (Top 3)
+            const top3 = data.slice(0, 3);
+            const displayOrder = [1, 0, 2]; // 2nd, 1st, 3rd
+            
+            displayOrder.forEach(idx => {
+                const student = top3[idx];
+                if (!student) return;
+                
+                const rankClass = `rank-${idx + 1}`;
+                const isFirst = idx === 0;
+                
+                podiumContainer.innerHTML += `
+                    <div class="podium-item ${rankClass}">
+                        ${isFirst ? '<i class="fas fa-crown crown-icon"></i>' : ''}
+                        <div class="tier-tag">${student.Title || 'Greeny'}</div>
+                        <div class="avatar-frame">
+                            <img src="${student.Image || 'https://via.placeholder.com/150'}" class="avatar">
+                        </div>
+                        <h3 style="font-family:'Cinzel'">${student.Name}</h3>
+                        <div class="tk-text">${student.Tokens || 0} TK</div>
+                        <div class="sub-stats">Rank #${student.Rank} • ELITE</div>
+                    </div>
+                `;
+            });
 
-    // 1. معالجة بيانات منصة التتويج (أول 3 مراكز)
-    const top3 = data.slice(0, 3);
-    const order = [1, 0, 2]; // الترتيب البصري: الثاني على اليسار، الأول في المنتصف، الثالث على اليمين
-    let podiumHTML = '';
-
-    order.forEach(displayIdx => {
-        const student = top3[displayIdx];
-        if (!student) return;
-
-        // تنبيه: idx هنا هو ترتيبه الحقيقي في الداتا
-        const isGold = displayIdx === 0;
-
-        podiumHTML += `
-            <div class="podium-item rank-${displayIdx + 1}">
-                ${isGold ? '<i class="fas fa-crown crown-icon"></i>' : ''}
-                <div class="tier-tag">${student.Title || 'Greeny'}</div>
-                <div class="avatar-frame">
-                    <img src="${student.Image || 'https://via.placeholder.com/150'}" class="avatar">
-                </div>
-                <h3 style="font-family: 'Cinzel'; font-size: 1.1rem;">${student.Name}</h3>
-                <div class="tk-text" style="margin: 8px 0;">${student.Tokens || 0} <span style="font-size:0.6rem">TK</span></div>
-                <div class="sub-stats">Rank #${student.Rank} • ELITE AGENT</div>
-            </div>
-        `;
-    });
-    podiumContainer.innerHTML = podiumHTML;
-    podiumContainer.style.display = 'flex';
-}
-            // 2. معالجة قائمة بقية الأبطال
+            // 2. List Logic (Rest of Champions)
             let listHTML = '';
             data.slice(3).forEach((student) => {
                 listHTML += `
                     <div class="rank-row">
-                        <div style="font-family: 'Orbitron'; color: var(--gold); font-weight: 900;">#${student.Rank}</div>
-                        <div class="avatar-frame" style="width:50px; height:50px; margin:0; border-radius:12px;">
-                            <img src="${student.Image || 'https://via.placeholder.com/150'}" class="avatar" style="border-radius:10px;">
+                        <div style="color:var(--gold); font-weight:900;">#${student.Rank}</div>
+                        <div class="avatar-frame" style="width:45px; height:45px; margin:0; border-radius:10px;">
+                            <img src="${student.Image || 'https://via.placeholder.com/150'}" class="avatar" style="border-radius:8px;">
                         </div>
                         <div>
-                            <div style="font-family:'Cinzel'; font-size: 0.9rem; font-weight:700;">${student.Name}</div>
-                            <div style="font-size:0.6rem; color:var(--gold); text-transform:uppercase; letter-spacing:1px;">${student.Title || 'Warrior'}</div>
+                            <div style="font-family:'Cinzel'; font-size:0.9rem;">${student.Name}</div>
+                            <div style="font-size:0.6rem; color:var(--gold);">${student.Title || 'Warrior'}</div>
                         </div>
                         <div class="tk-text">${student.Tokens || 0} <span style="font-size:0.6rem">TK</span></div>
-                        <div class="row-achievement" style="font-size:0.7rem; color:#666; text-align:right;">
-                             MISSION ACTIVE
-                        </div>
+                        <div class="row-achievement" style="font-size:0.7rem; color:#666; text-align:right;">MISSION ACTIVE</div>
                     </div>
                 `;
             });
             ranksContainer.innerHTML = listHTML;
+            
+            podiumContainer.style.display = 'flex';
             ranksContainer.style.display = 'flex';
         }
 
