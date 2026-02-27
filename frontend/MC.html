@@ -19,6 +19,7 @@
         }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; -webkit-tap-highlight-color: transparent; }
         body { background: var(--bg-deep); color: white; min-height: 100vh; overflow-x: hidden; }
+        
         /* --- Galaxy Guide Overlay --- */
         .galaxy-overlay {
             position: fixed; inset: 0; background: rgba(0,0,0,0.85);
@@ -41,7 +42,8 @@
         .guide-action { background: rgba(226, 158, 46, 0.1); border: 1px dashed var(--ramadan-gold); padding: 15px; border-radius: 15px; color: #fcf6ba; font-size: 0.8rem; display: flex; gap: 10px; align-items: flex-start; }
         .loading-state { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; color: var(--ramadan-gold); font-family: 'Orbitron'; gap: 15px; }
         .lang-toggle-btn { background: rgba(226, 158, 46, 0.1); border: 1px solid var(--ramadan-gold); color: var(--ramadan-gold); padding: 8px 15px; border-radius: 10px; cursor: pointer; font-size: 0.8rem; display: flex; align-items: center; gap: 8px; }
-        /* --- Original Dashboard Styles --- */
+
+        /* --- Dashboard Styles --- */
         #star-container { position: fixed; inset: 0; z-index: -1; background: radial-gradient(circle at top, #0a0b14 0%, #030306 100%); }
         .star { position: absolute; background: #fff; border-radius: 50%; opacity: 0.3; animation: pulse var(--duration) infinite ease-in-out; }
         @keyframes pulse { 0%, 100% { opacity: 0.2; transform: scale(1); } 50% { opacity: 0.7; transform: scale(1.5); } }
@@ -71,11 +73,27 @@
         .modal-content { background: #050508; border-radius: 25px; padding: 40px; width: 90%; max-width: 400px; border: 1px solid var(--glass-border); position: relative; }
         .tasks-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin: 30px 0; }
         .task-node { position: relative; aspect-ratio: 1; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-family: 'Orbitron'; font-size: 0.8rem; overflow: hidden; }
-        .lock-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.85); display: flex; align-items: center; justify-content: center; color: var(--gold); z-index: 5; }
         .btn-exit { background: transparent; border: 1px solid #444; color: #888; padding: 12px 30px; border-radius: 12px; cursor: pointer; font-family: 'Orbitron'; font-size: 0.7rem; transition: 0.3s; width: 100%; }
         .btn-exit:hover { border-color: var(--gold); color: var(--gold); }
         .fairy-float { position: fixed; bottom: 20px; right: 20px; width: 55px; height: 55px; background: var(--gold-gradient); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 1000; box-shadow: 0 0 15px var(--gold); animation: float 3s infinite ease-in-out; }
         @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+        
+        /* --- New UI Buttons (Forgot & Signup) --- */
+        .btn-forgot { background: transparent; border: none; color: #888; font-size: 0.7rem; cursor: pointer; margin-top: 10px; text-decoration: underline; transition: 0.3s; }
+        .btn-forgot:hover { color: var(--gold); }
+        
+        .btn-signup-pulse {
+            width: 100%; margin-top: 20px; padding: 15px; border-radius: 12px; background: transparent;
+            border: 2px solid var(--gold); color: var(--gold); font-weight: 900; font-family: 'Orbitron';
+            cursor: pointer; text-align: center; text-decoration: none; display: block;
+            animation: goldPulse 2s infinite;
+        }
+        @keyframes goldPulse {
+            0% { box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.4); }
+            70% { box-shadow: 0 0 0 15px rgba(212, 175, 55, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(212, 175, 55, 0); }
+        }
+
         #mailDrawer { position: fixed; top: 0; right: -100%; width: 350px; height: 100%; background: rgba(5, 5, 8, 0.95); backdrop-filter: blur(25px); border-left: 1px solid var(--glass-border); z-index: 3000; transition: 0.5s cubic-bezier(0.7, 0, 0.3, 1); padding: 30px; overflow-y: auto; }
         #mailDrawer.active { right: 0; }
         .msg-bubble { background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border); padding: 15px; border-radius: 12px; margin-bottom: 10px; animation: slideIn 0.3s ease-out; }
@@ -121,12 +139,27 @@
                 <i class="fas fa-times-circle" style="color:var(--ramadan-gold); font-size:1.5rem; cursor:pointer;" onclick="closeGuide()"></i>
             </div>
             <div class="tabs-bar" id="guideTabs"></div>
-            <div class="guide-content" id="guideView">
-                <div class="loading-state">
-                    <i class="fas fa-sync-alt fa-spin"></i>
-                    <p>SYNCING MISSION DATA...</p>
-                </div>
+            <div class="guide-content" id="guideView"></div>
+        </div>
+    </div>
+
+    <div class="modal" id="loginModal">
+        <div class="modal-content">
+            <h2 style="font-family:'Cinzel'; color:var(--gold); text-align:center; margin-bottom:20px;">AUTHENTICATION</h2>
+            <input type="email" id="loginEmail" style="width:100%; padding:15px; margin:8px 0; border-radius:12px; background:rgba(255,255,255,0.05); border:1px solid #333; color:#fff;" placeholder="EMAIL">
+            <input type="password" id="loginCode" style="width:100%; padding:15px; margin:8px 0; border-radius:12px; background:rgba(255,255,255,0.05); border:1px solid #333; color:#fff;" placeholder="CODE">
+            <button onclick="handleLogin()" id="loginSubmitBtn" style="width:100%; margin-top:15px; padding:15px; border-radius:12px; background:var(--gold-gradient); border:none; font-weight:900; cursor:pointer;">SIGN IN</button>
+            
+            <center>
+                <button class="btn-forgot" onclick="handleForgotCode()">Forgot your access code?</button>
+            </center>
+
+            <div style="border-top: 1px solid rgba(255,255,255,0.1); margin-top: 20px; padding-top: 10px;">
+                <p style="font-size: 0.6rem; color: #666; text-align: center; font-family: 'Orbitron';">NEW AGENT?</p>
+                <a href="NP.html" class="btn-signup-pulse">CREATE NEW IDENTITY</a>
             </div>
+
+            <button class="btn-exit" style="margin-top:10px;" onclick="closeModal('loginModal')">CANCEL</button>
         </div>
     </div>
 
@@ -146,16 +179,6 @@
         </div>
     </div>
 
-    <div class="modal" id="loginModal">
-        <div class="modal-content">
-            <h2 style="font-family:'Cinzel'; color:var(--gold); text-align:center; margin-bottom:20px;">AUTHENTICATION</h2>
-            <input type="email" id="loginEmail" style="width:100%; padding:15px; margin:8px 0; border-radius:12px; background:rgba(255,255,255,0.05); border:1px solid #333; color:#fff;" placeholder="EMAIL">
-            <input type="password" id="loginCode" style="width:100%; padding:15px; margin:8px 0; border-radius:12px; background:rgba(255,255,255,0.05); border:1px solid #333; color:#fff;" placeholder="CODE">
-            <button onclick="handleLogin()" id="loginSubmitBtn" style="width:100%; margin-top:15px; padding:15px; border-radius:12px; background:var(--gold-gradient); border:none; font-weight:900; cursor:pointer;">SIGN IN</button>
-            <button class="btn-exit" style="margin-top:10px;" onclick="closeModal('loginModal')">CANCEL</button>
-        </div>
-    </div>
-
     <script>
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyqc75IcNeJodKsMDAk5u1k_pGFCfzCl_FHAMhDb3xRBoHwWCyoeLz7EhWYmOQoiOd8CA/exec"; 
         const PROFILE_URL = "https://script.google.com/macros/s/AKfycbzma3Ci5RtP6tM0PKi4gGpw5FOf9FWblOi6_njNBxhGSXKpqnHxDbumK9GSCC0kBzMV/exec"; 
@@ -165,56 +188,47 @@
         let currentUser = null;
         let isLoggedIn = false;
 
-        // --- Galaxy Guide Functions ---
-        function openGalaxyGuide() {
-            document.getElementById('guideOverlay').style.display = 'flex';
-            fetchGuideData();
+        // --- Auth Logic ---
+        function handleLogin() {
+            const email = document.getElementById('loginEmail').value;
+            const code = document.getElementById('loginCode').value;
+            const btn = document.getElementById('loginSubmitBtn');
+            if(!email || !code) return alert("Fill all fields");
+            btn.innerText = "LINKING...";
+            fetch(`${PROFILE_URL}?action=getProfile&email=${email}&code=${code}`)
+                .then(r => r.json()).then(res => {
+                    if(res.status === "success") {
+                        currentUser = res; currentUser.email = email; currentUser.code = code; isLoggedIn = true;
+                        localStorage.setItem('eyc_user', JSON.stringify(currentUser));
+                        closeModal('loginModal'); renderHeader(); generateCards();
+                    } else alert(res.message);
+                    btn.innerText = "SIGN IN";
+                });
         }
-        async function fetchGuideData() {
-            const view = document.getElementById('guideView');
-            view.innerHTML = `<div class="loading-state"><i class="fas fa-sync-alt fa-spin"></i><p>${currentLang === 'en' ? 'LOADING WISDOM...' : 'جاري تحميل الحكمة...'}</p></div>`;
-            try {
-                const res = await fetch(`${SCRIPT_URL}?action=getMasterGuide&lang=${currentLang}`);
-                const result = await res.json();
-                if(result.status === 'success') {
-                    masterData = result.data;
-                    renderTabs();
-                    showTab(0);
-                }
-            } catch (e) {
-                view.innerHTML = `<p style="text-align:center; color:#ff4444; padding:20px;">Connection Interrupted</p>`;
-            }
-        }
-        function renderTabs() {
-            const container = document.getElementById('guideTabs');
-            container.innerHTML = masterData.map((item, idx) => `<div class="tab-item ${idx===0?'active':''}" onclick="showTab(${idx}, this)">${item.tabName.toUpperCase()}</div>`).join('');
-        }
-        function showTab(idx, el) {
-            if(el) {
-                document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
-                el.classList.add('active');
-            }
-            const item = masterData[idx];
-            const view = document.getElementById('guideView');
-            view.innerHTML = `
-                <h2 class="guide-title">${item.contentTitle || item.tabName}</h2>
-                <div class="guide-text">${(item.tabContent || item.soulContent || "").replace(/\n/g, '<br>')}</div>
-                <div class="guide-action">
-                    <i class="fas fa-quote-left" style="opacity:0.3; font-size:1.2rem;"></i>
-                    <p>${item.action || ""}</p>
-                </div>
-            `;
-            view.scrollTop = 0;
-        }
-        function toggleLanguage() {
-            currentLang = (currentLang === 'en' ? 'ar' : 'en');
-            document.getElementById('modalBox').setAttribute('data-lang', currentLang);
-            document.getElementById('langText').innerText = (currentLang === 'en' ? 'العربية' : 'English');
-            fetchGuideData();
-        }
-        function closeGuide() { document.getElementById('guideOverlay').style.display = 'none'; }
 
-        // --- Dashboard Logic & Notification System ---
+        async function handleForgotCode() {
+            const email = document.getElementById('loginEmail').value;
+            if (!email) {
+                alert(currentLang === 'en' ? "Please enter your email first!" : "برجاء كتابة الإيميل أولاً!");
+                return;
+            }
+            if (!confirm(currentLang === 'en' ? `Send recovery code to: ${email}?` : `إرسال كود الاستعادة إلى: ${email}؟`)) return;
+            const btn = document.querySelector('.btn-forgot');
+            btn.innerText = "SENDING...";
+            btn.disabled = true;
+            try {
+                const response = await fetch(`${PROFILE_URL}?action=forgotCode&email=${email}`);
+                const result = await response.json();
+                if (result.status === "success") {
+                    alert(currentLang === 'en' ? "Code sent! Check your inbox." : "تم إرسال الكود! افحص بريدك الإلكتروني.");
+                } else {
+                    alert(currentLang === 'en' ? "Email not found." : "الإيميل غير مسجل.");
+                }
+            } catch (e) { alert("Connection Error"); }
+            finally { btn.innerText = "Forgot your access code?"; btn.disabled = false; }
+        }
+
+        // --- UI Rendering ---
         const IMG = {
             tk: "https://raw.githubusercontent.com/eycfde-prog/EYCSSP/047aeca8ef0fa0d95627552cfb62fd8300531134/frontend/eyclgos/Token.png",
             star: "https://raw.githubusercontent.com/eycfde-prog/EYCSSP/047aeca8ef0fa0d95627552cfb62fd8300531134/frontend/eyclgos/Star.png",
@@ -237,7 +251,6 @@
                 { name: "Grammar X", icon: "fa-pen-fancy", code: "GRX", tk: 50 },
                 { name: "Vivid X", icon: "fa-wand-magic", code: "VVX", tk: 50 },
                 { name: "Seeds X", icon: "fa-tree", code: "SDX", tk: 50 },
-                { name: "Figurative X", icon: "fa-mask", code: "FGX", tk: 50 },
                 { name: "Dictation X", icon: "fa-microphone-lines", code: "DTX", tk: 100 },
                 { name: "Sing Sang Sung X", icon: "fa-music", code: "SSSX", tk: 100 },
                 { name: "Elmagazine X", icon: "fa-book-open", code: "EMX", tk: 100 }
@@ -268,71 +281,6 @@
             }
         }
 
-        async function syncNotifications() {
-            if(!isLoggedIn) return;
-            try {
-                const res = await fetch(`${PROFILE_URL}?action=getProfile&email=${currentUser.email}&code=${currentUser.code}`);
-                const data = await res.json();
-                if(data.status === "success") {
-                    const newMsg = data.lastNotification;
-                    const savedMails = JSON.parse(localStorage.getItem('eyc_mails') || '[]');
-                    
-                    // تحقق إذا كانت الرسالة جديدة وليست مكررة لآخر رسالة
-                    if(newMsg && (!savedMails.length || savedMails[0].text !== newMsg)) {
-                        savedMails.unshift({
-                            text: newMsg,
-                            time: new Date().toLocaleString('en-GB', { hour: '2-digit', minute: '2-digit', day: '2-digit', month: 'short' })
-                        });
-                        localStorage.setItem('eyc_mails', JSON.stringify(savedMails.slice(0, 20))); // حفظ آخر 20 رسالة
-                        document.getElementById('notifDot').style.display = 'block';
-                    }
-                }
-            } catch(e) { console.log("Sync Error"); }
-        }
-
-        function openMailbox() {
-            document.getElementById('mailDrawer').classList.add('active');
-            document.getElementById('notifDot').style.display = 'none';
-            renderMails();
-            syncNotifications(); // تحديث لحظي عند الفتح
-        }
-
-        function renderMails() {
-            const list = document.getElementById('mailList');
-            const mails = JSON.parse(localStorage.getItem('eyc_mails') || '[]');
-            if(!mails.length) {
-                list.innerHTML = '<p style="text-align:center; opacity:0.5; margin-top:50px;">No incoming transmissions.</p>';
-                return;
-            }
-            list.innerHTML = mails.map(m => `
-                <div class="msg-bubble">
-                    <span class="msg-time">${m.time}</span>
-                    <p class="msg-text">${m.text}</p>
-                </div>
-            `).join('');
-        }
-
-        function handleLogin() {
-            const email = document.getElementById('loginEmail').value;
-            const code = document.getElementById('loginCode').value;
-            const btn = document.getElementById('loginSubmitBtn');
-            btn.innerText = "LINKING...";
-            fetch(`${PROFILE_URL}?action=getProfile&email=${email}&code=${code}`)
-                .then(r => r.json()).then(res => {
-                    if(res.status === "success") {
-                        currentUser = res; currentUser.email = email; currentUser.code = code; isLoggedIn = true;
-                        localStorage.setItem('eyc_user', JSON.stringify(currentUser));
-                        closeModal('loginModal'); renderHeader(); generateCards();
-                    } else alert(res.message);
-                    btn.innerText = "SIGN IN";
-                });
-        }
-
-        function handleLogout() { localStorage.clear(); location.reload(); }
-        function openLogin() { document.getElementById('loginModal').style.display = 'flex'; }
-        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
-        function closeMailbox() { document.getElementById('mailDrawer').classList.remove('active'); }
-
         function generateCards() {
             const grid = document.getElementById('cardsGrid'); grid.innerHTML = '';
             const type = document.querySelector('.tab-btn.active').innerText.toLowerCase().includes('royal') ? 'royal' : 'season';
@@ -356,8 +304,7 @@
             const tGrid = document.getElementById('tGrid'); tGrid.innerHTML = '';
             for (let i = 1; i <= 10; i++) {
                 const node = document.createElement('div');
-                node.className = 'task-node';
-                node.innerText = i;
+                node.className = 'task-node'; node.innerText = i;
                 node.onclick = () => {
                     if (!isLoggedIn) return openLogin();
                     window.location.href = `EYCArena.html?email=${currentUser.email}&act=${code}&task=${i}`;
@@ -367,21 +314,73 @@
             document.getElementById('taskModal').style.display = 'flex';
         }
 
+        // --- Helpers ---
+        function openLogin() { document.getElementById('loginModal').style.display = 'flex'; }
+        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+        function handleLogout() { localStorage.clear(); location.reload(); }
+        
+        async function syncNotifications() {
+            if(!isLoggedIn) return;
+            try {
+                const res = await fetch(`${PROFILE_URL}?action=getProfile&email=${currentUser.email}&code=${currentUser.code}`);
+                const data = await res.json();
+                if(data.status === "success") {
+                    const newMsg = data.lastNotification;
+                    const savedMails = JSON.parse(localStorage.getItem('eyc_mails') || '[]');
+                    if(newMsg && (!savedMails.length || savedMails[0].text !== newMsg)) {
+                        savedMails.unshift({ text: newMsg, time: new Date().toLocaleString('en-GB', { hour: '2-digit', minute: '2-digit' }) });
+                        localStorage.setItem('eyc_mails', JSON.stringify(savedMails.slice(0, 15)));
+                        document.getElementById('notifDot').style.display = 'block';
+                    }
+                }
+            } catch(e) {}
+        }
+
+        function openMailbox() {
+            document.getElementById('mailDrawer').classList.add('active');
+            document.getElementById('notifDot').style.display = 'none';
+            const list = document.getElementById('mailList');
+            const mails = JSON.parse(localStorage.getItem('eyc_mails') || '[]');
+            list.innerHTML = mails.length ? mails.map(m => `<div class="msg-bubble"><span class="msg-time">${m.time}</span><p class="msg-text">${m.text}</p></div>`).join('') : '<p style="text-align:center; opacity:0.5;">No transmissions.</p>';
+        }
+        function closeMailbox() { document.getElementById('mailDrawer').classList.remove('active'); }
+
+        // --- Galaxy Guide ---
+        function openGalaxyGuide() { document.getElementById('guideOverlay').style.display = 'flex'; fetchGuideData(); }
+        async function fetchGuideData() {
+            const view = document.getElementById('guideView');
+            view.innerHTML = '<div class="loading-state"><i class="fas fa-sync-alt fa-spin"></i></div>';
+            try {
+                const res = await fetch(`${SCRIPT_URL}?action=getMasterGuide&lang=${currentLang}`);
+                const result = await res.json();
+                if(result.status === 'success') {
+                    masterData = result.data; renderTabs(); showTab(0);
+                }
+            } catch (e) { view.innerHTML = "Error loading data."; }
+        }
+        function renderTabs() {
+            document.getElementById('guideTabs').innerHTML = masterData.map((item, idx) => `<div class="tab-item" onclick="showTab(${idx}, this)">${item.tabName}</div>`).join('');
+        }
+        function showTab(idx, el) {
+            if(el) { document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active')); el.classList.add('active'); }
+            const item = masterData[idx];
+            document.getElementById('guideView').innerHTML = `<h2 class="guide-title">${item.contentTitle}</h2><div class="guide-text">${item.tabContent.replace(/\n/g, '<br>')}</div>`;
+        }
+        function toggleLanguage() { currentLang = (currentLang === 'en' ? 'ar' : 'en'); fetchGuideData(); }
+        function closeGuide() { document.getElementById('guideOverlay').style.display = 'none'; }
+
         window.onload = () => {
             const saved = localStorage.getItem('eyc_user');
             if(saved) { currentUser = JSON.parse(saved); isLoggedIn = true; }
             renderHeader(); generateCards();
-            
-            // Background Stars
             const container = document.getElementById('star-container');
-            for (let i = 0; i < 50; i++) {
+            for (let i = 0; i < 40; i++) {
                 const s = document.createElement('div'); s.className = 'star';
                 s.style.width = s.style.height = '2px';
                 s.style.left = Math.random()*100+'%'; s.style.top = Math.random()*100+'%';
                 s.style.setProperty('--duration', (Math.random()*3+2)+'s');
                 container.appendChild(s);
             }
-            // Auto-Sync every 60 seconds
             setInterval(syncNotifications, 60000);
         };
     </script>
