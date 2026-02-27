@@ -19,9 +19,9 @@
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; -webkit-tap-highlight-color: transparent; }
-        body { background: var(--bg-deep); color: white; min-height: 100vh; overflow-x: hidden; display: flex; flex-direction: column; }
+        body { background: var(--bg-deep); color: white; min-height: 100vh; overflow-x: hidden; }
 
-        /* --- Galaxy Guide Styles (Transferred from index) --- */
+        /* --- Galaxy Guide Overlay (Copied from Index) --- */
         .galaxy-overlay {
             position: fixed; inset: 0; background: rgba(0,0,0,0.85);
             backdrop-filter: blur(20px); z-index: 5000; display: none;
@@ -33,7 +33,6 @@
             box-shadow: 0 0 50px rgba(226, 158, 46, 0.2); position: relative;
         }
         .guide-modal[data-lang="ar"] { direction: rtl; font-family: 'Cairo', sans-serif; }
-        .guide-modal[data-lang="ar"] .guide-title, .guide-modal[data-lang="ar"] .guide-text, .guide-modal[data-lang="ar"] .guide-action { text-align: right; }
         .guide-header { padding: 15px 20px; border-bottom: 1px solid var(--glass-border); display: flex; justify-content: space-between; align-items: center; }
         .tabs-bar { display: flex; overflow-x: auto; padding: 10px; gap: 10px; border-bottom: 1px solid rgba(255,255,255,0.05); }
         .tab-item { white-space: nowrap; padding: 8px 15px; font-size: 0.7rem; font-family: 'Orbitron'; color: #888; cursor: pointer; border: 1px solid transparent; border-radius: 20px; }
@@ -43,55 +42,64 @@
         .guide-text { color: #ccc; line-height: 1.7; font-size: 0.9rem; margin-bottom: 20px; text-align: justify; }
         .guide-action { background: rgba(226, 158, 46, 0.1); border: 1px dashed var(--ramadan-gold); padding: 15px; border-radius: 15px; color: #fcf6ba; font-size: 0.8rem; display: flex; gap: 10px; align-items: flex-start; }
         .loading-state { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; color: var(--ramadan-gold); font-family: 'Orbitron'; gap: 15px; }
-        .loading-state i { font-size: 2.5rem; }
-        .lang-toggle-btn { background: rgba(226, 158, 46, 0.1); border: 1px solid var(--ramadan-gold); color: var(--ramadan-gold); padding: 8px 15px; border-radius: 10px; cursor: pointer; font-family: 'Cairo', 'Poppins'; font-size: 0.8rem; display: flex; align-items: center; gap: 8px; transition: 0.3s; }
-        .lang-toggle-btn:hover { background: var(--ramadan-gold); color: #000; }
-        .portal-btn { width: 100%; margin-top: 20px; padding: 15px; border-radius: 12px; background: var(--gold-gradient); color: #000; border: none; font-family: 'Orbitron', 'Cairo'; font-weight: 900; font-size: 0.8rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; }
-        .fairy-float { position: fixed; bottom: 20px; right: 20px; width: 60px; height: 60px; background: var(--gold-gradient); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; box-shadow: 0 0 15px var(--gold); cursor: pointer; z-index: 1000; animation: float 3s infinite ease-in-out; color: #000; }
-        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+        .lang-toggle-btn { background: rgba(226, 158, 46, 0.1); border: 1px solid var(--ramadan-gold); color: var(--ramadan-gold); padding: 8px 15px; border-radius: 10px; cursor: pointer; font-size: 0.8rem; display: flex; align-items: center; gap: 8px; }
 
-        /* --- Dashboard Specific Styles --- */
+        /* --- Original Dashboard Styles --- */
         #star-container { position: fixed; inset: 0; z-index: -1; background: radial-gradient(circle at top, #0a0b14 0%, #030306 100%); }
         .star { position: absolute; background: #fff; border-radius: 50%; opacity: 0.3; animation: pulse var(--duration) infinite ease-in-out; }
         @keyframes pulse { 0%, 100% { opacity: 0.2; transform: scale(1); } 50% { opacity: 0.7; transform: scale(1.5); } }
+
         .top-nav { position: fixed; top: 0; width: 100%; padding: 20px 6%; display: flex; justify-content: space-between; align-items: center; z-index: 1000; backdrop-filter: blur(10px); border-bottom: 1px solid rgba(255,255,255,0.05); }
         .nav-icon { font-size: 1.2rem; color: var(--gold); cursor: pointer; transition: 0.3s; opacity: 0.8; }
         .nav-icon:hover { opacity: 1; transform: scale(1.1); filter: drop-shadow(0 0 8px var(--gold)); }
+
         .hero-banner { width: 100%; padding: 100px 20px 40px; text-align: center; }
         .profile-card { position: relative; display: inline-flex; flex-direction: column; align-items: center; }
         .avatar-wrapper { position: relative; width: 120px; height: 120px; padding: 4px; background: var(--gold-gradient); border-radius: 50%; box-shadow: 0 0 30px var(--gold-glow); margin-bottom: 15px; }
         .avatar-main { width: 100%; height: 100%; border-radius: 50%; border: 4px solid #050508; background-size: cover; background-position: center; }
         .rank-tag { position: absolute; bottom: -5px; background: #000; border: 1px solid var(--gold); padding: 2px 12px; border-radius: 10px; font-family: 'Orbitron'; font-size: 0.65rem; color: var(--gold); letter-spacing: 1px; }
+
         .student-name { font-family: 'Cinzel', serif; font-size: clamp(1.4rem, 5vw, 2rem); letter-spacing: 3px; background: var(--gold-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-top: 10px; }
         .student-title { font-size: 0.7rem; color: #888; text-transform: uppercase; letter-spacing: 3px; margin-top: 5px; }
+
         .stats-row { display: flex; gap: 20px; margin-top: 20px; background: rgba(255,255,255,0.03); padding: 10px 25px; border-radius: 30px; border: 1px solid var(--glass-border); align-items: center; }
         .stat-icon { height: 18px; object-fit: contain; }
         .stat-item { font-family: 'Orbitron'; font-size: 0.85rem; display: flex; align-items: center; gap: 8px; }
         .stat-item span { color: var(--gold); }
+
         .grid-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 20px; padding: 0 6% 100px; }
         .activity-card { background: linear-gradient(145deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.01) 100%); border: 1px solid rgba(255,255,255,0.08); border-radius: 20px; padding: 35px 15px; text-align: center; transition: 0.5s; cursor: pointer; position: relative; overflow: hidden; }
         .activity-card:hover { transform: translateY(-10px); border-color: var(--gold); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
         .card-icon { position: relative; z-index: 1; font-size: 2.2rem; margin-bottom: 10px; background: var(--gold-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .tk-activity-badge { font-family: 'Orbitron'; font-size: 0.6rem; color: var(--gold); border: 1px solid var(--gold); padding: 2px 8px; border-radius: 5px; margin-top: 10px; display: inline-block; }
+
+        .tab-switcher { background: #000; padding: 4px; border-radius: 15px; display: flex; border: 1px solid var(--glass-border); width: 90%; max-width: 300px; margin: 20px auto; }
+        .tab-btn { flex: 1; padding: 12px; border: none; background: transparent; color: #666; border-radius: 12px; cursor: pointer; font-weight: 700; font-size: 0.65rem; letter-spacing: 2px; }
+        .tab-btn.active { color: #000; background: var(--gold-gradient); }
+
+        .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.9); display: none; justify-content: center; align-items: center; z-index: 2000; backdrop-filter: blur(20px); }
+        .modal-content { background: #050508; border-radius: 25px; padding: 40px; width: 90%; max-width: 400px; border: 1px solid var(--glass-border); position: relative; }
+
+        .tasks-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin: 30px 0; }
+        .task-node { position: relative; aspect-ratio: 1; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-family: 'Orbitron'; font-size: 0.8rem; overflow: hidden; }
+        .lock-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.85); display: flex; align-items: center; justify-content: center; color: var(--gold); z-index: 5; }
+
+        .btn-exit { background: transparent; border: 1px solid #444; color: #888; padding: 12px 30px; border-radius: 12px; cursor: pointer; font-family: 'Orbitron'; font-size: 0.7rem; transition: 0.3s; width: 100%; }
+        .btn-exit:hover { border-color: var(--gold); color: var(--gold); }
+
+        .fairy-float { position: fixed; bottom: 20px; right: 20px; width: 55px; height: 55px; background: var(--gold-gradient); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 1000; box-shadow: 0 0 15px var(--gold); animation: float 3s infinite ease-in-out; }
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+
         #mailDrawer { position: fixed; top: 0; right: -100%; width: 350px; height: 100%; background: rgba(5, 5, 8, 0.95); backdrop-filter: blur(25px); border-left: 1px solid var(--glass-border); z-index: 3000; transition: 0.5s cubic-bezier(0.7, 0, 0.3, 1); padding: 30px; }
         #mailDrawer.active { right: 0; }
         .msg-bubble { background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border); padding: 15px; border-radius: 12px; margin-bottom: 10px; cursor: pointer; }
         .msg-content { font-size: 0.8rem; color: #ccc; margin-top: 10px; display: none; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.1); }
-        .tab-switcher { background: #000; padding: 4px; border-radius: 15px; display: flex; border: 1px solid var(--glass-border); width: 90%; max-width: 300px; margin: 20px auto; }
-        .tab-btn { flex: 1; padding: 12px; border: none; background: transparent; color: #666; border-radius: 12px; cursor: pointer; font-weight: 700; font-size: 0.65rem; letter-spacing: 2px; }
-        .tab-btn.active { color: #000; background: var(--gold-gradient); }
-        .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.9); display: none; justify-content: center; align-items: center; z-index: 2000; backdrop-filter: blur(20px); }
-        .modal-content { background: #050508; border-radius: 25px; padding: 40px; width: 90%; max-width: 400px; border: 1px solid var(--glass-border); position: relative; }
-        .tasks-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin: 30px 0; }
-        .task-node { position: relative; aspect-ratio: 1; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-family: 'Orbitron'; font-size: 0.8rem; overflow: hidden; }
-        .lock-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.85); display: flex; align-items: center; justify-content: center; color: var(--gold); z-index: 5; }
-        .btn-exit { background: transparent; border: 1px solid #444; color: #888; padding: 12px 30px; border-radius: 12px; cursor: pointer; font-family: 'Orbitron'; font-size: 0.7rem; transition: 0.3s; width: 100%; }
-        .btn-exit:hover { border-color: var(--gold); color: var(--gold); }
     </style>
 </head>
 <body>
 
     <div id="star-container"></div>
+    
     <nav class="top-nav">
         <i class="fas fa-arrow-left nav-icon" onclick="window.location.href='index.html'"></i>
         <div style="display: flex; align-items: center; gap: 15px;">
@@ -111,6 +119,29 @@
     </div>
 
     <main><div class="grid-container" id="cardsGrid"></div></main>
+
+    <div class="fairy-float" onclick="openGalaxyGuide()">
+        <i class="fas fa-wand-sparkles" style="color: #000; font-size: 1.5rem;"></i>
+    </div>
+
+    <div class="galaxy-overlay" id="guideOverlay">
+        <div class="guide-modal" id="modalBox" data-lang="en">
+            <div class="guide-header">
+                <button class="lang-toggle-btn" onclick="toggleLanguage()">
+                    <i class="fas fa-language"></i> 
+                    <span id="langText">العربية</span>
+                </button>
+                <i class="fas fa-times-circle" style="color:var(--ramadan-gold); font-size:1.5rem; cursor:pointer;" onclick="closeGuide()"></i>
+            </div>
+            <div class="tabs-bar" id="guideTabs"></div>
+            <div class="guide-content" id="guideView">
+                <div class="loading-state">
+                    <i class="fas fa-sync-alt fa-spin"></i>
+                    <p>SYNCING MISSION DATA...</p>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <div id="mailDrawer">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px;">
@@ -138,44 +169,18 @@
         </div>
     </div>
 
-    <div class="fairy-float" onclick="openGalaxyGuide()">
-        <i class="fas fa-wand-sparkles"></i>
-    </div>
-
     <script>
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxKeR3d1VVm7eIxoAaveoPF5lNDbnamLTi8d-OL0i6xhakPMLq-IsW9C9kHwUibTJf5/exec";
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyqc75IcNeJodKsMDAk5u1k_pGFCfzCl_FHAMhDb3xRBoHwWCyoeLz7EhWYmOQoiOd8CA/exec"; // Your Guide Sheet API
+        const PROFILE_URL = "https://script.google.com/macros/s/AKfycbxPtQjQ7qcPG_-giAmxb_5mk7hMpFmVwfIELuY4G_soHTiTWikZmNrxq-63oo_QqXN2zg/exec"; // Your Login Sheet API
         
-        const IMG = {
-            tk: "https://raw.githubusercontent.com/eycfde-prog/EYCSSP/047aeca8ef0fa0d95627552cfb62fd8300531134/frontend/eyclgos/Token.png",
-            star: "https://raw.githubusercontent.com/eycfde-prog/EYCSSP/047aeca8ef0fa0d95627552cfb62fd8300531134/frontend/eyclgos/Star.png",
-            gt: "https://raw.githubusercontent.com/eycfde-prog/EYCSSP/047aeca8ef0fa0d95627552cfb62fd8300531134/frontend/eyclgos/GT.png"
-        };
-
-        let currentUser = null;
-        let isLoggedIn = false;
         let masterData = [];
         let currentLang = 'en';
+        let currentUser = null;
+        let isLoggedIn = false;
 
-        // --- Galaxy Guide Logic (Transferred from index) ---
+        // --- Galaxy Guide Functions ---
         function openGalaxyGuide() {
-            if(document.getElementById('guideOverlay')) return;
-            const overlay = document.createElement('div');
-            overlay.className = 'galaxy-overlay';
-            overlay.id = 'guideOverlay';
-            overlay.innerHTML = `
-                <div class="guide-modal" id="modalBox" data-lang="${currentLang}">
-                    <div class="guide-header">
-                        <button class="lang-toggle-btn" onclick="toggleLanguage()">
-                            <i class="fas fa-language"></i> <span id="langText">${currentLang === 'en' ? 'العربية' : 'English'}</span>
-                        </button>
-                        <i class="fas fa-times-circle" style="color:var(--ramadan-gold); font-size:1.5rem; cursor:pointer;" onclick="closeGuide()"></i>
-                    </div>
-                    <div class="tabs-bar" id="guideTabs"></div>
-                    <div class="guide-content" id="guideView">
-                        <div class="loading-state"><i class="fas fa-sync-alt fa-spin"></i><p>SYNCING RAMADAN PROTOCOL...</p></div>
-                    </div>
-                </div>`;
-            document.body.appendChild(overlay);
+            const overlay = document.getElementById('guideOverlay');
             overlay.style.display = 'flex';
             fetchGuideData();
         }
@@ -191,12 +196,13 @@
                     renderTabs();
                     showTab(0);
                 }
-            } catch (e) { view.innerHTML = `<p style="text-align:center; color:#ff4444; padding:20px;">Connection Interrupted</p>`; }
+            } catch (e) {
+                view.innerHTML = `<p style="text-align:center; color:#ff4444; padding:20px;">Connection Interrupted</p>`;
+            }
         }
 
         function renderTabs() {
             const container = document.getElementById('guideTabs');
-            if(!container) return;
             container.innerHTML = masterData.map((item, idx) => `<div class="tab-item ${idx===0?'active':''}" onclick="showTab(${idx}, this)">${item.tabName.toUpperCase()}</div>`).join('');
         }
 
@@ -207,38 +213,33 @@
             }
             const item = masterData[idx];
             const view = document.getElementById('guideView');
-            if(!view) return;
-            
-            let actionButton = '';
-            const tabKey = item.tabName.toLowerCase().trim();
-            if(tabKey.includes('new agent')) actionButton = `<button class="portal-btn" onclick="window.location.href='NP.html'">${currentLang === 'en' ? 'Access NP Portal' : 'دخول بوابة العملاء'} <i class="fas fa-user-plus"></i></button>`;
-            else if(tabKey.includes('ai squad')) actionButton = `<button class="portal-btn" onclick="alert('Noor: System Online.')">${currentLang === 'en' ? 'Consult Noor' : 'استشارة نور'} <i class="fas fa-robot"></i></button>`;
-            else if(tabKey.includes('rankings')) actionButton = `<button class="portal-btn" onclick="window.location.href='RNKS.html'">${currentLang === 'en' ? 'View Leaderboard' : 'عرض لوحة الصدارة'} <i class="fas fa-trophy"></i></button>`;
-            else if(tabKey.includes('reviews')) actionButton = `<button class="portal-btn" onclick="window.location.href='Rev.html'">${currentLang === 'en' ? 'Wall of Fame' : 'جدار التميز'} <i class="fas fa-comment-stars"></i></button>`;
-
             view.innerHTML = `
-                <h2 class="guide-title">${item.contentTitle}</h2>
-                <div class="guide-text">${item.tabContent.replace(/\n/g, '<br>')}</div>
-                <div class="guide-action"><i class="fas fa-quote-left" style="opacity:0.3; font-size:1.2rem;"></i><p>${item.action}</p></div>
-                ${actionButton}`;
+                <h2 class="guide-title">${item.contentTitle || item.tabName}</h2>
+                <div class="guide-text">${(item.tabContent || item.soulContent || "").replace(/\n/g, '<br>')}</div>
+                <div class="guide-action">
+                    <i class="fas fa-quote-left" style="opacity:0.3; font-size:1.2rem;"></i>
+                    <p>${item.action || ""}</p>
+                </div>
+            `;
             view.scrollTop = 0;
         }
 
         function toggleLanguage() {
             currentLang = (currentLang === 'en' ? 'ar' : 'en');
-            const modal = document.getElementById('modalBox');
-            if(modal) modal.setAttribute('data-lang', currentLang);
-            const langText = document.getElementById('langText');
-            if(langText) langText.innerText = (currentLang === 'en' ? 'العربية' : 'English');
+            document.getElementById('modalBox').setAttribute('data-lang', currentLang);
+            document.getElementById('langText').innerText = (currentLang === 'en' ? 'العربية' : 'English');
             fetchGuideData();
         }
 
-        function closeGuide() {
-            const ov = document.getElementById('guideOverlay');
-            if(ov) { ov.style.opacity = '0'; setTimeout(() => ov.remove(), 300); }
-        }
+        function closeGuide() { document.getElementById('guideOverlay').style.display = 'none'; }
 
-        // --- Activity and Dashboard Logic ---
+        // --- Original Dashboard Logic ---
+        const IMG = {
+            tk: "https://raw.githubusercontent.com/eycfde-prog/EYCSSP/047aeca8ef0fa0d95627552cfb62fd8300531134/frontend/eyclgos/Token.png",
+            star: "https://raw.githubusercontent.com/eycfde-prog/EYCSSP/047aeca8ef0fa0d95627552cfb62fd8300531134/frontend/eyclgos/Star.png",
+            gt: "https://raw.githubusercontent.com/eycfde-prog/EYCSSP/047aeca8ef0fa0d95627552cfb62fd8300531134/frontend/eyclgos/GT.png"
+        };
+
         const activities = {
             season: [
                 { name: "Alike", icon: "fa-clone", code: "AS", tk: 50 },
@@ -262,58 +263,6 @@
             ]
         };
 
-        const MISSION_SCHEDULE = {
-            getUnlockDate: (program, taskIndex) => {
-                const seasonStart = new Date("2026-02-26T00:00:00");
-                const royalStart = new Date("2026-02-28T00:00:00");
-                let targetDate = new Date(program === 'season' ? seasonStart : royalStart);
-                if (taskIndex > 1) {
-                    if (program === 'season') {
-                        let daysToAdd = 0;
-                        for (let j = 2; j <= taskIndex; j++) { daysToAdd += (j + 2); }
-                        targetDate.setDate(targetDate.getDate() + daysToAdd);
-                    } else { targetDate.setDate(targetDate.getDate() + ((taskIndex - 1) * 3)); }
-                }
-                return targetDate;
-            }
-        };
-
-        function openTasks(name, code) {
-            document.getElementById('mTitle').innerText = name;
-            const tGrid = document.getElementById('tGrid'); tGrid.innerHTML = '';
-            const type = document.querySelector('.tab-btn.active').innerText.toLowerCase().includes('royal') ? 'royal' : 'season';
-            for (let i = 1; i <= 10; i++) {
-                const node = document.createElement('div');
-                node.className = 'task-node';
-                node.innerText = i;
-                const openDate = MISSION_SCHEDULE.getUnlockDate(type, i);
-                const isLocked = new Date() < openDate;
-                if (isLocked) {
-                    node.innerHTML += '<div class="lock-overlay"><i class="fas fa-lock"></i></div>';
-                    node.onclick = () => { if (!isLoggedIn) return openLogin(); alert(`Available on: ${openDate.toDateString()}`); };
-                } else {
-                    node.onclick = () => { if (!isLoggedIn) return openLogin(); window.location.href = `EYCArena.html?email=${currentUser.email}&act=${code}&task=${i}`; };
-                }
-                tGrid.appendChild(node);
-            }
-            document.getElementById('taskModal').style.display = 'flex';
-        }
-
-        function openMailbox() { document.getElementById('mailDrawer').classList.add('active'); document.getElementById('notifDot').style.display = 'none'; renderMails(); }
-        function closeMailbox() { document.getElementById('mailDrawer').classList.remove('active'); }
-
-        function renderMails() {
-            const list = document.getElementById('mailList');
-            const mails = JSON.parse(localStorage.getItem('eyc_mails') || '[]');
-            list.innerHTML = mails.length ? '' : '<p style="text-align:center; opacity:0.5;">No Comms</p>';
-            mails.forEach((m, i) => {
-                const bubble = document.createElement('div'); bubble.className = 'msg-bubble';
-                bubble.innerHTML = `<div style="font-size:0.6rem; color:var(--gold);">${m.date}</div><div style="font-weight:600; margin-top:5px;">Mission Update</div><div class="msg-content" id="msg-${i}">${m.text}</div>`;
-                bubble.onclick = () => { const content = document.getElementById(`msg-${i}`); content.style.display = content.style.display === 'block' ? 'none' : 'block'; };
-                list.appendChild(bubble);
-            });
-        }
-
         function renderHeader() {
             const header = document.getElementById('heroBanner');
             if (isLoggedIn) {
@@ -332,7 +281,9 @@
                             <div class="stat-item"><img src="${IMG.gt}" class="stat-icon"> <span>${currentUser.goldTickets}</span></div>
                         </div>
                     </div>`;
-            } else { header.innerHTML = `<h1 class="student-name">ARENA ACCESS</h1><button class="btn-exit" style="width:auto; margin-top:20px;" onclick="openLogin()">AUTHORIZE LOGIN</button>`; }
+            } else {
+                header.innerHTML = `<h1 class="student-name">ARENA ACCESS</h1><button class="btn-exit" style="width:auto; margin-top:20px;" onclick="openLogin()">AUTHORIZE LOGIN</button>`;
+            }
         }
 
         function generateCards() {
@@ -352,7 +303,7 @@
             const code = document.getElementById('loginCode').value;
             const btn = document.getElementById('loginSubmitBtn');
             btn.innerText = "LINKING...";
-            fetch(`${SCRIPT_URL}?action=getProfile&email=${email}&code=${code}`)
+            fetch(`${PROFILE_URL}?action=getProfile&email=${email}&code=${code}`)
                 .then(r => r.json()).then(res => {
                     if(res.status === "success") {
                         currentUser = res; currentUser.email = email; isLoggedIn = true;
@@ -366,17 +317,46 @@
         function handleLogout() { localStorage.clear(); location.reload(); }
         function openLogin() { document.getElementById('loginModal').style.display = 'flex'; }
         function closeModal(id) { document.getElementById(id).style.display = 'none'; }
-        function switchType(type, btn) { document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active')); btn.classList.add('active'); generateCards(); }
+        function switchType(type, btn) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            generateCards();
+        }
+
+        function openTasks(name, code) {
+            document.getElementById('mTitle').innerText = name;
+            const tGrid = document.getElementById('tGrid'); tGrid.innerHTML = '';
+            for (let i = 1; i <= 10; i++) {
+                const node = document.createElement('div');
+                node.className = 'task-node';
+                node.innerText = i;
+                node.onclick = () => {
+                    if (!isLoggedIn) return openLogin();
+                    window.location.href = `EYCArena.html?email=${currentUser.email}&act=${code}&task=${i}`;
+                };
+                tGrid.appendChild(node);
+            }
+            document.getElementById('taskModal').style.display = 'flex';
+        }
+
+        function openMailbox() { document.getElementById('mailDrawer').classList.add('active'); renderMails(); }
+        function closeMailbox() { document.getElementById('mailDrawer').classList.remove('active'); }
+        function renderMails() {
+            const list = document.getElementById('mailList');
+            const mails = JSON.parse(localStorage.getItem('eyc_mails') || '[]');
+            list.innerHTML = mails.length ? '' : '<p style="text-align:center; opacity:0.5;">No Comms</p>';
+        }
 
         window.onload = () => {
             const saved = localStorage.getItem('eyc_user');
             if(saved) { currentUser = JSON.parse(saved); isLoggedIn = true; }
-            renderHeader(); 
-            generateCards();
+            renderHeader(); generateCards();
+            
             const container = document.getElementById('star-container');
             for (let i = 0; i < 50; i++) {
                 const s = document.createElement('div'); s.className = 'star';
-                s.style.width = s.style.height = '2px'; s.style.left = Math.random()*100+'%'; s.style.top = Math.random()*100+'%';
+                s.style.width = s.style.height = '2px';
+                s.style.left = Math.random()*100+'%'; s.style.top = Math.random()*100+'%';
                 s.style.setProperty('--duration', (Math.random()*3+2)+'s');
                 container.appendChild(s);
             }
