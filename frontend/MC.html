@@ -202,243 +202,310 @@
         </div>
     </div>
 
-    <script>
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxKeR3d1VVm7eIxoAaveoPF5lNDbnamLTi8d-OL0i6xhakPMLq-IsW9C9kHwUibTJf5/exec";
+<div class="fairytale-float" onclick="openMasterGG()">
+    <i class="fas fa-wand-sparkles"></i>
+</div>
+
+<div id="ggMasterOverlay" class="gg-master-overlay">
+    <div class="gg-master-modal" id="ggMasterModal">
+        <div class="robot-master-circle">
+            <img src="https://cdn-icons-png.flaticon.com/512/4712/4712035.png" style="width:100%; height:100%; padding:10px;">
+        </div>
         
-        const IMG = {
-            tk: "https://raw.githubusercontent.com/eycfde-prog/EYCSSP/047aeca8ef0fa0d95627552cfb62fd8300531134/frontend/eyclgos/Token.png",
-            star: "https://raw.githubusercontent.com/eycfde-prog/EYCSSP/047aeca8ef0fa0d95627552cfb62fd8300531134/frontend/eyclgos/Star.png",
-            gt: "https://raw.githubusercontent.com/eycfde-prog/EYCSSP/047aeca8ef0fa0d95627552cfb62fd8300531134/frontend/eyclgos/GT.png"
-        };
+        <div class="gg-master-header">
+            <h3 style="font-family:'Orbitron'; color:var(--gold); font-size:0.8rem; letter-spacing: 2px;">EYC MASTER GUIDE</h3>
+            <div style="display:flex; gap:15px; align-items:center;">
+                <div class="lang-toggle">
+                    <button id="langARA" class="lang-btn" onclick="setMasterLang('ARA')">العربية</button>
+                    <button id="langENG" class="lang-btn active" onclick="setMasterLang('ENG')">English</button>
+                </div>
+                <i class="fas fa-times-circle" onclick="closeMasterGG()" style="cursor:pointer; color:var(--gold); font-size: 1.5rem; opacity: 0.7;"></i>
+            </div>
+        </div>
 
-        let currentUser = null;
-        let isLoggedIn = false;
-        let currentMasterLang = "ENG";
-        let fullMasterData = [];
+        <div class="gg-master-body">
+            <div class="gg-master-drawer" id="masterTabs">
+            </div>
+            <div class="gg-master-view">
+                <div id="guideLoading" style="display:none; text-align:center; padding: 50px;">
+                    <i class="fas fa-sync fa-spin" style="color:var(--gold); font-size: 2rem;"></i>
+                </div>
+                <div id="guideContentArea">
+                    <h2 id="masterTitle" style="font-family:'Cinzel'; color:var(--gold); margin-bottom:15px; font-size: 1.4rem;"></h2>
+                    <div id="masterSoul" style="color:#ccc; line-height:1.8; font-size:0.9rem; margin-bottom:25px; text-align: justify;"></div>
+                    <div id="masterAction" style="background:rgba(197, 160, 40, 0.08); border:1px dashed var(--gold); padding:18px; border-radius:15px; color:var(--gold-light); font-size:0.85rem; display: flex; gap: 10px; align-items: flex-start;">
+                        <i class="fas fa-lightbulb" style="margin-top: 3px;"></i>
+                        <span id="actionText"></span>
+                    </div>
+                    <div id="dynamicPortalArea"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
-        // Updated Floating Button Action
-        document.querySelector('.fairytale-float').onclick = openMasterGG;
+<script>
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxPtQjQ7qcPG_-giAmxb_5mk7hMpFmVwfIELuY4G_soHTiTWikZmNrxq-63oo_QqXN2zg/exec";
+    
+    const IMG = {
+        tk: "https://raw.githubusercontent.com/eycfde-prog/EYCSSP/047aeca8ef0fa0d95627552cfb62fd8300531134/frontend/eyclgos/Token.png",
+        star: "https://raw.githubusercontent.com/eycfde-prog/EYCSSP/047aeca8ef0fa0d95627552cfb62fd8300531134/frontend/eyclgos/Star.png",
+        gt: "https://raw.githubusercontent.com/eycfde-prog/EYCSSP/047aeca8ef0fa0d95627552cfb62fd8300531134/frontend/eyclgos/GT.png"
+    };
 
-        function openMasterGG() {
-            document.getElementById('ggMasterOverlay').style.display = 'flex';
-            setTimeout(() => document.getElementById('ggMasterModal').classList.add('active'), 50);
-            fetchMasterData();
-        }
+    let currentUser = null;
+    let isLoggedIn = false;
+    let currentMasterLang = "ENG";
+    let fullMasterData = [];
 
-        function closeMasterGG() {
-            document.getElementById('ggMasterModal').classList.remove('active');
-            setTimeout(() => document.getElementById('ggMasterOverlay').style.display = 'none', 400);
-        }
+    function openMasterGG() {
+        const overlay = document.getElementById('ggMasterOverlay');
+        overlay.style.display = 'flex';
+        setTimeout(() => document.getElementById('ggMasterModal').classList.add('active'), 50);
+        fetchMasterData();
+    }
 
-        function fetchMasterData() {
-            const tabsContainer = document.getElementById('masterTabs');
-            tabsContainer.innerHTML = `<div style="padding:20px;"><i class="fas fa-sync fa-spin"></i></div>`;
-            
-            fetch(`${SCRIPT_URL}?source=master&lang=${currentMasterLang}`)
-                .then(res => res.json())
-                .then(response => {
-                    if(response.status === "success") {
-                        fullMasterData = response.data;
-                        renderMasterTabs();
-                        displayTabContent(0);
-                    }
-                });
-        }
+    function closeMasterGG() {
+        document.getElementById('ggMasterModal').classList.remove('active');
+        setTimeout(() => {
+            document.getElementById('ggMasterOverlay').style.display = 'none';
+        }, 400);
+    }
 
-        function renderMasterTabs() {
-            const tabsContainer = document.getElementById('masterTabs');
-            tabsContainer.innerHTML = "";
-            fullMasterData.forEach((item, index) => {
-                const div = document.createElement('div');
-                div.className = `master-tab ${index === 0 ? 'active' : ''}`;
-                div.innerText = item.tabName;
-                div.onclick = () => {
-                    document.querySelectorAll('.master-tab').forEach(t => t.classList.remove('active'));
-                    div.classList.add('active');
-                    displayTabContent(index);
-                };
-                tabsContainer.appendChild(div);
-            });
-        }
+    function fetchMasterData() {
+        const tabsContainer = document.getElementById('masterTabs');
+        const contentArea = document.getElementById('guideContentArea');
+        const loader = document.getElementById('guideLoading');
 
-        function displayTabContent(index) {
-            const item = fullMasterData[index];
-            if(!item) return;
-            document.getElementById('masterTitle').innerText = item.contentTitle;
-            document.getElementById('masterSoul').innerHTML = item.soulContent.replace(/\n/g, '<br>');
-            document.getElementById('masterAction').innerText = `💡 GUIDANCE: ${item.action}`;
-        }
-
-        function setMasterLang(lang) {
-            currentMasterLang = lang;
-            document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById(`lang${lang}`).classList.add('active');
-            fetchMasterData();
-        }
-
-        // Logic for Stars and Activities
-        const activities = {
-            season: [
-                { name: "Alike", icon: "fa-clone", code: "AS", tk: 50 },
-                { name: "Label", icon: "fa-tag", code: "LB", tk: 50 },
-                { name: "Golden Ear", icon: "fa-ear-listen", code: "GE", tk: 50 },
-                { name: "Grammar", icon: "fa-spell-check", code: "GR", tk: 50 },
-                { name: "Vivid", icon: "fa-wand-magic-sparkles", code: "VV", tk: 50 },
-                { name: "Seeds", icon: "fa-seedling", code: "SD", tk: 50 }
-            ],
-            royal: [
-                { name: "Alike X", icon: "fa-star", code: "ASX", tk: 50 },
-                { name: "Label X", icon: "fa-tags", code: "LBX", tk: 50 },
-                { name: "Golden Ear X", icon: "fa-ear-deaf", code: "GEX", tk: 50 },
-                { name: "Grammar X", icon: "fa-pen-fancy", code: "GRX", tk: 50 },
-                { name: "Vivid X", icon: "fa-wand-magic", code: "VVX", tk: 50 },
-                { name: "Seeds X", icon: "fa-tree", code: "SDX", tk: 50 },
-                { name: "Figurative X", icon: "fa-mask", code: "FGX", tk: 50 },
-                { name: "Dictation X", icon: "fa-microphone-lines", code: "DTX", tk: 100 },
-                { name: "Sing Sang Sung X", icon: "fa-music", code: "SSSX", tk: 100 },
-                { name: "Elmagazine X", icon: "fa-book-open", code: "EMX", tk: 100 }
-            ]
-        };
-
-        const MISSION_SCHEDULE = {
-            getUnlockDate: (program, taskIndex) => {
-                const seasonStart = new Date("2026-02-26T00:00:00");
-                const royalStart = new Date("2026-02-28T00:00:00");
-                let targetDate = new Date(program === 'season' ? seasonStart : royalStart);
-
-                if (taskIndex > 1) {
-                    if (program === 'season') {
-                        let daysToAdd = 0;
-                        for (let j = 2; j <= taskIndex; j++) { daysToAdd += (j + 2); }
-                        targetDate.setDate(targetDate.getDate() + daysToAdd);
-                    } else {
-                        targetDate.setDate(targetDate.getDate() + ((taskIndex - 1) * 3));
-                    }
+        contentArea.style.opacity = '0.3';
+        loader.style.display = 'block';
+        
+        fetch(`${SCRIPT_URL}?source=master&lang=${currentMasterLang}`)
+            .then(res => res.json())
+            .then(response => {
+                if(response.status === "success") {
+                    fullMasterData = response.data;
+                    renderMasterTabs();
+                    displayTabContent(0);
                 }
-                return targetDate;
-            }
-        };
+            })
+            .catch(e => console.error("WOLF ERROR: Sync Failed", e))
+            .finally(() => {
+                loader.style.display = 'none';
+                contentArea.style.opacity = '1';
+            });
+    }
 
-        function openTasks(name, code) {
-            document.getElementById('mTitle').innerText = name;
-            const tGrid = document.getElementById('tGrid'); tGrid.innerHTML = '';
-            const type = document.querySelector('.tab-btn.active').innerText.toLowerCase().includes('royal') ? 'royal' : 'season';
-            
-            for (let i = 1; i <= 10; i++) {
-                const node = document.createElement('div');
-                node.className = 'task-node';
-                node.innerText = i;
+    function renderMasterTabs() {
+        const container = document.getElementById('masterTabs');
+        container.innerHTML = fullMasterData.map((item, idx) => `
+            <div class="master-tab ${idx === 0 ? 'active' : ''}" onclick="selectMasterTab(${idx}, this)">
+                ${item.tabName.toUpperCase()}
+            </div>
+        `).join('');
+    }
 
-                const openDate = MISSION_SCHEDULE.getUnlockDate(type, i);
-                const isLocked = new Date() < openDate;
+    function selectMasterTab(idx, el) {
+        document.querySelectorAll('.master-tab').forEach(t => t.classList.remove('active'));
+        el.classList.add('active');
+        displayTabContent(idx);
+    }
 
-                if (isLocked) {
-                    node.innerHTML += '<div class="lock-overlay"><i class="fas fa-lock"></i></div>';
-                    node.onclick = () => {
-                        if (!isLoggedIn) return openLogin();
-                        alert(`Available on: ${openDate.toDateString()}`);
-                    };
+    function displayTabContent(idx) {
+        const item = fullMasterData[idx];
+        if(!item) return;
+
+        const view = document.querySelector('.gg-master-view');
+        view.style.direction = currentMasterLang === 'ARA' ? 'rtl' : 'ltr';
+
+        document.getElementById('masterTitle').innerText = item.contentTitle;
+        
+        const content = item.tabContent || item.soulContent || "";
+        document.getElementById('masterSoul').innerHTML = content.replace(/\n/g, '<br>');
+        
+        const action = item.action || "";
+        document.getElementById('actionText').innerText = action;
+        document.getElementById('masterAction').innerText = `💡 GUIDANCE: ${action}`;
+
+        const portalArea = document.getElementById('dynamicPortalArea');
+        portalArea.innerHTML = ''; 
+        const tabKey = item.tabName.toLowerCase();
+        
+        if(tabKey.includes('agent') || tabKey.includes('عميل')) {
+            portalArea.innerHTML = `<button class="portal-btn" style="margin-top:20px; width:100%; padding:15px; border-radius:12px; background:var(--gold-gradient); border:none; color:#000; font-family:'Orbitron'; font-weight:900; cursor:pointer;" onclick="location.href='NP.html'">INITIALIZE AGENT NP</button>`;
+        }
+    }
+
+    function setMasterLang(lang) {
+        currentMasterLang = lang;
+        document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(`lang${lang}`).classList.add('active');
+        fetchMasterData();
+    }
+
+    const activities = {
+        season: [
+            { name: "Alike", icon: "fa-clone", code: "AS", tk: 50 },
+            { name: "Label", icon: "fa-tag", code: "LB", tk: 50 },
+            { name: "Golden Ear", icon: "fa-ear-listen", code: "GE", tk: 50 },
+            { name: "Grammar", icon: "fa-spell-check", code: "GR", tk: 50 },
+            { name: "Vivid", icon: "fa-wand-magic-sparkles", code: "VV", tk: 50 },
+            { name: "Seeds", icon: "fa-seedling", code: "SD", tk: 50 }
+        ],
+        royal: [
+            { name: "Alike X", icon: "fa-star", code: "ASX", tk: 50 },
+            { name: "Label X", icon: "fa-tags", code: "LBX", tk: 50 },
+            { name: "Golden Ear X", icon: "fa-ear-deaf", code: "GEX", tk: 50 },
+            { name: "Grammar X", icon: "fa-pen-fancy", code: "GRX", tk: 50 },
+            { name: "Vivid X", icon: "fa-wand-magic", code: "VVX", tk: 50 },
+            { name: "Seeds X", icon: "fa-tree", code: "SDX", tk: 50 },
+            { name: "Figurative X", icon: "fa-mask", code: "FGX", tk: 50 },
+            { name: "Dictation X", icon: "fa-microphone-lines", code: "DTX", tk: 100 },
+            { name: "Sing Sang Sung X", icon: "fa-music", code: "SSSX", tk: 100 },
+            { name: "Elmagazine X", icon: "fa-book-open", code: "EMX", tk: 100 }
+        ]
+    };
+
+    const MISSION_SCHEDULE = {
+        getUnlockDate: (program, taskIndex) => {
+            const seasonStart = new Date("2026-02-26T00:00:00");
+            const royalStart = new Date("2026-02-28T00:00:00");
+            let targetDate = new Date(program === 'season' ? seasonStart : royalStart);
+
+            if (taskIndex > 1) {
+                if (program === 'season') {
+                    let daysToAdd = 0;
+                    for (let j = 2; j <= taskIndex; j++) { daysToAdd += (j + 2); }
+                    targetDate.setDate(targetDate.getDate() + daysToAdd);
                 } else {
-                    node.onclick = () => {
-                        if (!isLoggedIn) return openLogin();
-                        window.location.href = `EYCArena.html?email=${currentUser.email}&act=${code}&task=${i}`;
-                    };
+                    targetDate.setDate(targetDate.getDate() + ((taskIndex - 1) * 3));
                 }
-                tGrid.appendChild(node);
             }
-            document.getElementById('taskModal').style.display = 'flex';
+            return targetDate;
         }
+    };
 
-        function openMailbox() {
-            document.getElementById('mailDrawer').classList.add('active');
-            document.getElementById('notifDot').style.display = 'none';
-            renderMails();
-        }
-        function closeMailbox() { document.getElementById('mailDrawer').classList.remove('active'); }
+    function openTasks(name, code) {
+        document.getElementById('mTitle').innerText = name;
+        const tGrid = document.getElementById('tGrid'); tGrid.innerHTML = '';
+        const type = document.querySelector('.tab-btn.active').innerText.toLowerCase().includes('royal') ? 'royal' : 'season';
+        
+        for (let i = 1; i <= 10; i++) {
+            const node = document.createElement('div');
+            node.className = 'task-node';
+            node.innerText = i;
 
-        function renderMails() {
-            const list = document.getElementById('mailList');
-            const mails = JSON.parse(localStorage.getItem('eyc_mails') || '[]');
-            list.innerHTML = mails.length ? '' : '<p style="text-align:center; opacity:0.5;">No Comms</p>';
-            mails.forEach((m, i) => {
-                const bubble = document.createElement('div');
-                bubble.className = 'msg-bubble';
-                bubble.innerHTML = `<div style="font-size:0.6rem; color:var(--gold);">${m.date}</div><div style="font-weight:600; margin-top:5px;">Mission Update</div><div class="msg-content" id="msg-${i}">${m.text}</div>`;
-                bubble.onclick = () => {
-                    const content = document.getElementById(`msg-${i}`);
-                    content.style.display = content.style.display === 'block' ? 'none' : 'block';
+            const openDate = MISSION_SCHEDULE.getUnlockDate(type, i);
+            const isLocked = new Date() < openDate;
+
+            if (isLocked) {
+                node.innerHTML += '<div class="lock-overlay"><i class="fas fa-lock"></i></div>';
+                node.onclick = () => {
+                    if (!isLoggedIn) return openLogin();
+                    alert(`Available on: ${openDate.toDateString()}`);
                 };
-                list.appendChild(bubble);
-            });
-        }
-
-        function renderHeader() {
-            const header = document.getElementById('heroBanner');
-            if (isLoggedIn) {
-                document.getElementById('logoutBtn').style.display = "block";
-                header.innerHTML = `
-                    <div class="profile-card">
-                        <div class="avatar-wrapper">
-                            <div class="avatar-main" style="background-image: url('${currentUser.avatar}')"></div>
-                            <div class="rank-tag">RANK #${currentUser.rank}</div>
-                        </div>
-                        <h1 class="student-name">${currentUser.name}</h1>
-                        <p class="student-title">${currentUser.title}</p>
-                        <div class="stats-row">
-                            <div class="stat-item"><img src="${IMG.tk}" class="stat-icon"> <span>${currentUser.tokens}</span></div>
-                            <div class="stat-item"><img src="${IMG.star}" class="stat-icon"> <span>${currentUser.stars}</span></div>
-                            <div class="stat-item"><img src="${IMG.gt}" class="stat-icon"> <span>${currentUser.goldTickets}</span></div>
-                        </div>
-                    </div>`;
             } else {
-                header.innerHTML = `<h1 class="student-name">ARENA ACCESS</h1><button class="btn-exit" style="width:auto; margin-top:20px;" onclick="openLogin()">AUTHORIZE LOGIN</button>`;
+                node.onclick = () => {
+                    if (!isLoggedIn) return openLogin();
+                    window.location.href = `EYCArena.html?email=${currentUser.email}&act=${code}&task=${i}`;
+                };
             }
+            tGrid.appendChild(node);
         }
+        document.getElementById('taskModal').style.display = 'flex';
+    }
 
-        function generateCards() {
-            const grid = document.getElementById('cardsGrid'); grid.innerHTML = '';
-            const type = document.querySelector('.tab-btn.active').innerText.toLowerCase().includes('royal') ? 'royal' : 'season';
-            activities[type].forEach(act => {
-                const card = document.createElement('div');
-                card.className = 'activity-card';
-                card.innerHTML = `<i class="fa-solid ${act.icon} card-icon"></i><h3>${act.name}</h3><div class="tk-activity-badge">${act.tk} TK</div>`;
-                card.onclick = () => openTasks(act.name, act.code);
-                grid.appendChild(card);
+    function openMailbox() {
+        document.getElementById('mailDrawer').classList.add('active');
+        document.getElementById('notifDot').style.display = 'none';
+        renderMails();
+    }
+    function closeMailbox() { document.getElementById('mailDrawer').classList.remove('active'); }
+
+    function renderMails() {
+        const list = document.getElementById('mailList');
+        const mails = JSON.parse(localStorage.getItem('eyc_mails') || '[]');
+        list.innerHTML = mails.length ? '' : '<p style="text-align:center; opacity:0.5;">No Comms</p>';
+        mails.forEach((m, i) => {
+            const bubble = document.createElement('div');
+            bubble.className = 'msg-bubble';
+            bubble.innerHTML = `<div style="font-size:0.6rem; color:var(--gold);">${m.date}</div><div style="font-weight:600; margin-top:5px;">Mission Update</div><div class="msg-content" id="msg-${i}">${m.text}</div>`;
+            bubble.onclick = () => {
+                const content = document.getElementById(`msg-${i}`);
+                content.style.display = content.style.display === 'block' ? 'none' : 'block';
+            };
+            list.appendChild(bubble);
+        });
+    }
+
+    function renderHeader() {
+        const header = document.getElementById('heroBanner');
+        if (isLoggedIn) {
+            document.getElementById('logoutBtn').style.display = "block";
+            header.innerHTML = `
+                <div class="profile-card">
+                    <div class="avatar-wrapper">
+                        <div class="avatar-main" style="background-image: url('${currentUser.avatar}')"></div>
+                        <div class="rank-tag">RANK #${currentUser.rank}</div>
+                    </div>
+                    <h1 class="student-name">${currentUser.name}</h1>
+                    <p class="student-title">${currentUser.title}</p>
+                    <div class="stats-row">
+                        <div class="stat-item"><img src="${IMG.tk}" class="stat-icon"> <span>${currentUser.tokens}</span></div>
+                        <div class="stat-item"><img src="${IMG.star}" class="stat-icon"> <span>${currentUser.stars}</span></div>
+                        <div class="stat-item"><img src="${IMG.gt}" class="stat-icon"> <span>${currentUser.goldTickets}</span></div>
+                    </div>
+                </div>`;
+        } else {
+            header.innerHTML = `<h1 class="student-name">ARENA ACCESS</h1><button class="btn-exit" style="width:auto; margin-top:20px;" onclick="openLogin()">AUTHORIZE LOGIN</button>`;
+        }
+    }
+
+    function generateCards() {
+        const grid = document.getElementById('cardsGrid'); grid.innerHTML = '';
+        const type = document.querySelector('.tab-btn.active').innerText.toLowerCase().includes('royal') ? 'royal' : 'season';
+        activities[type].forEach(act => {
+            const card = document.createElement('div');
+            card.className = 'activity-card';
+            card.innerHTML = `<i class="fa-solid ${act.icon} card-icon"></i><h3>${act.name}</h3><div class="tk-activity-badge">${act.tk} TK</div>`;
+            card.onclick = () => openTasks(act.name, act.code);
+            grid.appendChild(card);
+        });
+    }
+
+    function handleLogin() {
+        const email = document.getElementById('loginEmail').value;
+        const code = document.getElementById('loginCode').value;
+        const btn = document.getElementById('loginSubmitBtn');
+        btn.innerText = "LINKING...";
+        fetch(`${SCRIPT_URL}?action=getProfile&email=${email}&code=${code}`)
+            .then(r => r.json()).then(res => {
+                if(res.status === "success") {
+                    currentUser = res; currentUser.email = email; isLoggedIn = true;
+                    localStorage.setItem('eyc_user', JSON.stringify(currentUser));
+                    closeModal('loginModal'); renderHeader(); generateCards();
+                } else alert(res.message);
+                btn.innerText = "SIGN IN";
             });
-        }
+    }
 
-        function handleLogin() {
-            const email = document.getElementById('loginEmail').value;
-            const code = document.getElementById('loginCode').value;
-            const btn = document.getElementById('loginSubmitBtn');
-            btn.innerText = "LINKING...";
-            fetch(`${SCRIPT_URL}?action=getProfile&email=${email}&code=${code}`)
-                .then(r => r.json()).then(res => {
-                    if(res.status === "success") {
-                        currentUser = res; currentUser.email = email; isLoggedIn = true;
-                        localStorage.setItem('eyc_user', JSON.stringify(currentUser));
-                        closeModal('loginModal'); renderHeader(); generateCards();
-                    } else alert(res.message);
-                    btn.innerText = "SIGN IN";
-                });
-        }
+    function handleLogout() { localStorage.clear(); location.reload(); }
+    function openLogin() { document.getElementById('loginModal').style.display = 'flex'; }
+    function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+    function switchType(type, btn) {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        generateCards();
+    }
 
-        function handleLogout() { localStorage.clear(); location.reload(); }
-        function openLogin() { document.getElementById('loginModal').style.display = 'flex'; }
-        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
-        function switchType(type, btn) {
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            generateCards();
-        }
-
-        window.onload = () => {
-            const saved = localStorage.getItem('eyc_user');
-            if(saved) { currentUser = JSON.parse(saved); isLoggedIn = true; }
-            renderHeader(); 
-            generateCards();
-            
-            const container = document.getElementById('star-container');
+    window.onload = () => {
+        const saved = localStorage.getItem('eyc_user');
+        if(saved) { currentUser = JSON.parse(saved); isLoggedIn = true; }
+        renderHeader(); 
+        generateCards();
+        
+        const container = document.getElementById('star-container');
+        if(container) {
             for (let i = 0; i < 50; i++) {
                 const s = document.createElement('div'); s.className = 'star';
                 s.style.width = s.style.height = '2px';
@@ -446,7 +513,6 @@
                 s.style.setProperty('--duration', (Math.random()*3+2)+'s');
                 container.appendChild(s);
             }
-        };
-    </script>
-</body>
-</html>
+        }
+    };
+</script>
