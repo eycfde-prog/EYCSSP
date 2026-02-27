@@ -133,92 +133,90 @@
     </div>
 
     <script>
-        const scriptURL = 'https://script.google.com/macros/s/AKfycbzTSf7Znvn0Rvwrw-9dZ12Tiggqo6cUGUwSTE3hqLnHdZ0G0bZmVcgyGbh7A2-a-N4J/exec';
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbyhM0HAV37p5ChjQyh8MBezy87EEcFgvZOShT_8fquZO0sNEK8e98JOsfyv-FJFJilL/exec';
 
-        async function fetchRanks() {
-            const loader = document.getElementById('matrix-loader');
-            const percentText = document.getElementById('loading-percent');
-            
-            let progress = 0;
-            const loadInt = setInterval(() => {
-                if (progress < 90) progress += Math.random() * 10;
-                percentText.innerText = `${Math.floor(progress)}%`;
-            }, 150);
-
-            try {
-                const response = await fetch(scriptURL + "?action=leaderboard");
-                const data = await response.json();
-                
-                clearInterval(loadInt);
-                percentText.innerText = "100%";
-                
-                renderData(data);
-
-                setTimeout(() => {
-                    loader.style.opacity = '0';
-                    setTimeout(() => loader.remove(), 1000);
-                }, 500);
-            } catch (error) {
-                percentText.innerText = "ERROR";
-                console.error('System Failure:', error);
-            }
+async function fetchRanks() {
+    const loader = document.getElementById('matrix-loader');
+    const percentText = document.getElementById('loading-percent');
+    
+    try {
+        // إضافة Timestamp لمنع الكاش (Cache) وضمان تحديث البيانات
+        const response = await fetch(scriptURL + "?action=leaderboard&t=" + new Date().getTime());
+        const data = await response.json();
+        
+        // التحقق مما إذا كانت البيانات مصفوفة (Array)
+        if (Array.isArray(data)) {
+            renderData(data);
+        } else if (data.status === "error") {
+            throw new Error(data.message);
         }
 
-        function renderData(data) {
-            const podiumContainer = document.getElementById('podium-container');
-            const ranksContainer = document.getElementById('ranks-container');
-            
-            podiumContainer.innerHTML = '';
-            ranksContainer.innerHTML = '';
+        percentText.innerText = "100%";
+        setTimeout(() => {
+            loader.style.opacity = '0';
+            setTimeout(() => loader.remove(), 1000);
+        }, 500);
 
-            // 1. Podium Logic (Top 3)
-            const top3 = data.slice(0, 3);
-            const displayOrder = [1, 0, 2]; // 2nd, 1st, 3rd
-            
-            displayOrder.forEach(idx => {
-                const student = top3[idx];
-                if (!student) return;
-                
-                const rankClass = `rank-${idx + 1}`;
-                const isFirst = idx === 0;
-                
-                podiumContainer.innerHTML += `
-                    <div class="podium-item ${rankClass}">
-                        ${isFirst ? '<i class="fas fa-crown crown-icon"></i>' : ''}
-                        <div class="tier-tag">${student.Title || 'Greeny'}</div>
-                        <div class="avatar-frame">
-                            <img src="${student.Image || 'https://via.placeholder.com/150'}" class="avatar">
-                        </div>
-                        <h3 style="font-family:'Cinzel'">${student.Name}</h3>
-                        <div class="tk-text">${student.Tokens || 0} TK</div>
-                        <div class="sub-stats">Rank #${student.Rank} • ELITE</div>
-                    </div>
-                `;
-            });
+    } catch (error) {
+        percentText.innerText = "SYSTEM OFFLINE";
+        console.error('WOLF Error Report:', error);
+    }
+}
 
-            // 2. List Logic (Rest of Champions)
-            let listHTML = '';
-            data.slice(3).forEach((student) => {
-                listHTML += `
-                    <div class="rank-row">
-                        <div style="color:var(--gold); font-weight:900;">#${student.Rank}</div>
-                        <div class="avatar-frame" style="width:45px; height:45px; margin:0; border-radius:10px;">
-                            <img src="${student.Image || 'https://via.placeholder.com/150'}" class="avatar" style="border-radius:8px;">
-                        </div>
-                        <div>
-                            <div style="font-family:'Cinzel'; font-size:0.9rem;">${student.Name}</div>
-                            <div style="font-size:0.6rem; color:var(--gold);">${student.Title || 'Warrior'}</div>
-                        </div>
-                        <div class="tk-text">${student.Tokens || 0} <span style="font-size:0.6rem">TK</span></div>
-                        <div class="row-achievement" style="font-size:0.7rem; color:#666; text-align:right;">MISSION ACTIVE</div>
-                    </div>
-                `;
-            });
-            ranksContainer.innerHTML = listHTML;
-            
-            podiumContainer.style.display = 'flex';
-            ranksContainer.style.display = 'flex';
-        }
+function renderData(data) {
+    const podiumContainer = document.getElementById('podium-container');
+    const ranksContainer = document.getElementById('ranks-container');
+    
+    // تصحيح منطق المنصة (الأول في المنتصف)
+    const top3 = data.slice(0, 3);
+    // ترتيب العرض: الثاني (يسار)، الأول (منتصف)، الثالث (يمين)
+    const displayIndices = [];
+    if (top3[1]) displayIndices.push(1); // الثاني
+    if (top3[0]) displayIndices.push(0); // الأول
+    if (top3[2]) displayIndices.push(2); // الثالث
+
+    let podiumHTML = '';
+    displayIndices.forEach(idx => {
+        const student = top3[idx];
+        const isFirst = idx === 0;
+        podiumHTML += `
+            <div class="podium-item rank-${idx + 1}">
+                ${isFirst ? '<i class="fas fa-crown crown-icon"></i>' : ''}
+                <div class="tier-tag">${student.Title}</div>
+                <div class="avatar-frame">
+                    <img src="${student.Image}" class="avatar">
+                </div>
+                <h3 style="font-family:'Cinzel'">${student.Name}</h3>
+                <div class="tk-text">${student.Tokens} TK</div>
+                <div class="sub-stats">Rank #${student.Rank}</div>
+            </div>
+        `;
+    });
+    podiumContainer.innerHTML = podiumHTML;
+
+    // باقي القائمة
+    let listHTML = '';
+    data.slice(3).forEach((student) => {
+        listHTML += `
+            <div class="rank-row">
+                <div style="color:var(--gold); font-weight:900;">#${student.Rank}</div>
+                <div class="avatar-frame" style="width:45px; height:45px; margin:0; border-radius:10px;">
+                    <img src="${student.Image}" class="avatar" style="border-radius:8px;">
+                </div>
+                <div>
+                    <div style="font-family:'Cinzel'; font-size:0.9rem;">${student.Name}</div>
+                    <div style="font-size:0.6rem; color:var(--gold);">${student.Title}</div>
+                </div>
+                <div class="tk-text">${student.Tokens} <span style="font-size:0.6rem">TK</span></div>
+                <div class="row-achievement" style="font-size:0.7rem; color:#666; text-align:right;">ACTIVE AGENT</div>
+            </div>
+        `;
+    });
+    ranksContainer.innerHTML = listHTML;
+    
+    podiumContainer.style.display = 'flex';
+    ranksContainer.style.display = 'flex';
+}
 
         fetchRanks();
     </script>
