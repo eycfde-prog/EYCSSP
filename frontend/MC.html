@@ -3,245 +3,308 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>EYC Superstars | Mission Control</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Orbitron:wght@400;700;900&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <title>EYC Super Stars | Command Center</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Orbitron:wght@400;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    
     <style>
         :root {
-            --gold: #b38728;
-            --gold-bright: #fcf6ba;
-            --gold-gradient: linear-gradient(135deg, #a67c00, #ffdc73, #8b6914);
-            --bg-deep: #050508;
+            --gold: #b38728; /* ذهبي مطفي قليلاً للوضوح */
+            --gold-gradient: linear-gradient(135deg, #bf953f, #fcf6ba, #b38728);
+            --bg-deep: #030306; 
             --glass: rgba(255, 255, 255, 0.03);
-            --glass-border: rgba(212, 175, 55, 0.2);
-            --gold-glow: rgba(212, 175, 55, 0.3);
+            --glass-border: rgba(212, 175, 55, 0.15);
+            --black-trans: rgba(0, 0, 0, 0.85);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; -webkit-tap-highlight-color: transparent; }
         body { background: var(--bg-deep); color: white; min-height: 100vh; overflow-x: hidden; }
 
-        /* Header & Stats */
-        .main-header { padding: 20px; background: rgba(0,0,0,0.8); border-bottom: 1px solid var(--glass-border); sticky: top; z-index: 100; }
-        .user-profile { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; }
-        .avatar { width: 55px; height: 55px; border-radius: 50%; border: 2px solid var(--gold); padding: 2px; }
-        
-        .stats-row { display: flex; justify-content: space-around; background: var(--glass); border-radius: 12px; padding: 10px; border: 1px solid var(--glass-border); }
-        .stat-item { display: flex; flex-direction: column; align-items: center; gap: 5px; }
-        .stat-img { width: 22px; height: 22px; object-fit: contain; }
-        .stat-val { font-family: 'Orbitron'; font-size: 0.8rem; color: var(--gold-bright); }
+        #star-container { position: fixed; inset: 0; z-index: -1; background: radial-gradient(circle at top, #0a0b14 0%, #030306 100%); }
+        .star { position: absolute; background: #fff; border-radius: 50%; opacity: 0.3; animation: pulse var(--duration) infinite ease-in-out; }
+        @keyframes pulse { 0%, 100% { opacity: 0.2; transform: scale(1); } 50% { opacity: 0.7; transform: scale(1.5); } }
 
-        /* Tabs */
-        .tabs { display: flex; justify-content: center; gap: 10px; padding: 20px; }
-        .tab-btn { 
-            padding: 10px 25px; border-radius: 8px; background: var(--glass); border: 1px solid var(--glass-border);
-            color: #888; font-family: 'Orbitron'; cursor: pointer; transition: 0.3s; font-size: 0.75rem;
+        /* --- Floating Guide (Fairytale) --- */
+        .guide-floating {
+            position: fixed; bottom: 30px; right: 20px; width: 60px; height: 60px;
+            background: var(--gold-gradient); border-radius: 50%; display: flex;
+            align-items: center; justify-content: center; cursor: pointer;
+            box-shadow: 0 0 20px rgba(212,175,55,0.4); z-index: 1001;
+            animation: float 3s infinite ease-in-out;
         }
-        .tab-btn.active { background: var(--gold-gradient); color: #000; font-weight: 900; box-shadow: 0 0 15px var(--gold-glow); }
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
 
-        /* Activity Grid */
-        .activity-grid { 
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); 
-            gap: 15px; padding: 15px; max-width: 1000px; margin: 0 auto;
-        }
-        @media (max-width: 480px) { .activity-grid { grid-template-columns: repeat(2, 1fr); } }
+        /* --- Top Navigation --- */
+        .top-nav { position: fixed; top: 0; width: 100%; padding: 15px 6%; display: flex; justify-content: space-between; align-items: center; z-index: 1000; backdrop-filter: blur(15px); border-bottom: 1px solid var(--glass-border); }
+        .nav-icon { font-size: 1.2rem; color: var(--gold); cursor: pointer; transition: 0.3s; }
 
-        .activity-card {
-            background: var(--glass); border: 1px solid var(--glass-border); border-radius: 15px;
-            padding: 20px; text-align: center; position: relative; cursor: pointer; transition: 0.3s;
-            overflow: hidden;
-        }
-        .activity-card:hover { transform: translateY(-5px); border-color: var(--gold); }
-        .activity-card i { font-size: 1.8rem; color: var(--gold); margin-bottom: 10px; display: block; }
-        .activity-card span { font-family: 'Orbitron'; font-size: 0.7rem; letter-spacing: 1px; }
-        
-        .tk-badge { 
-            position: absolute; top: 8px; right: 8px; background: rgba(0,0,0,0.6); 
-            padding: 2px 6px; border-radius: 5px; font-size: 0.6rem; color: var(--gold-bright);
-            border: 0.5px solid var(--gold); font-family: 'Orbitron';
-        }
+        /* --- Profile Icons & Stats --- */
+        .stat-img { width: 18px; height: 18px; object-fit: contain; }
+        .stats-row { display: flex; gap: 15px; margin-top: 20px; background: var(--glass); padding: 8px 20px; border-radius: 20px; border: 1px solid var(--glass-border); }
+        .stat-item { font-family: 'Orbitron'; font-size: 0.75rem; display: flex; align-items: center; gap: 6px; }
 
-        /* Task Modal & Locks */
-        .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.9); display: none; align-items: center; justify-content: center; z-index: 2000; padding: 20px; }
-        .modal-content { background: #0a0a0f; border: 1px solid var(--gold); border-radius: 20px; width: 100%; max-width: 400px; padding: 25px; }
-        .task-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-top: 20px; }
+        /* --- Dashboard Grid --- */
+        .grid-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 20px; padding: 20px 6% 120px; justify-content: center; }
+        .activity-card { 
+            background: linear-gradient(145deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.01) 100%); 
+            border: 1px solid var(--glass-border); border-radius: 18px; padding: 30px 15px; text-align: center; 
+            transition: 0.4s; cursor: pointer; position: relative;
+        }
+        .activity-card:hover { transform: translateY(-8px); border-color: var(--gold); }
+        .tk-badge { position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.6); color: var(--gold); font-family: 'Orbitron'; font-size: 0.6rem; padding: 2px 8px; border-radius: 8px; border: 1px solid var(--gold); }
+        .card-icon { font-size: 2rem; margin-bottom: 15px; background: var(--gold-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
+        /* --- Task Nodes with Locks --- */
+        .tasks-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin: 25px 0; }
         .task-node { 
-            aspect-ratio: 1; background: var(--glass); border: 1px solid var(--glass-border);
-            border-radius: 8px; display: flex; align-items: center; justify-content: center;
-            font-family: 'Orbitron'; font-size: 0.9rem; position: relative; cursor: pointer;
+            aspect-ratio: 1; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); 
+            border-radius: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; 
+            cursor: pointer; position: relative; transition: 0.3s;
         }
-        .lock-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.7); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: var(--gold); }
-        .release-pop { 
-            position: absolute; bottom: 110%; left: 50%; transform: translateX(-50%);
-            background: #000; color: var(--gold); padding: 5px 10px; border-radius: 5px;
-            font-size: 0.6rem; border: 1px solid var(--gold); white-space: nowrap; z-index: 10;
+        .lock-overlay { font-size: 0.7rem; color: #666; margin-top: 4px; }
+        .task-date-popup {
+            position: absolute; top: -35px; left: 50%; transform: translateX(-50%);
+            background: #000; color: #fff; font-size: 0.6rem; padding: 4px 8px;
+            border-radius: 4px; white-space: nowrap; display: none; z-index: 10;
+            border: 1px solid var(--gold);
         }
 
-        /* Floating Fairy */
-        .fairy-float {
-            position: fixed; bottom: 25px; left: 20px; width: 55px; height: 55px;
-            background: var(--gold-gradient); border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            box-shadow: 0 0 20px var(--gold-glow); cursor: pointer; z-index: 1500;
-            animation: float 3s ease-in-out infinite;
+        /* --- Mailbox Overhaul --- */
+        .mail-card {
+            background: rgba(255,255,255,0.03); border-radius: 15px; padding: 15px; margin-bottom: 12px;
+            border-left: 3px solid var(--gold); transition: 0.3s; cursor: pointer;
         }
-        @keyframes float { 0%, 100% { transform: translateY(0) rotate(0); } 50% { transform: translateY(-12px) rotate(10deg); } }
+        .mail-card:hover { background: rgba(212, 175, 55, 0.05); transform: scale(1.02); }
+        .mail-content-box {
+            background: #0a0a0f; border: 1px solid var(--glass-border); border-radius: 20px;
+            padding: 25px; line-height: 1.8; color: #ddd; font-size: 0.9rem;
+        }
 
-        /* Mailbox Styles */
-        .mail-btn { position: absolute; top: 20px; right: 20px; font-size: 1.4rem; color: var(--gold); cursor: pointer; }
-        .badge { position: absolute; top: -5px; right: -5px; background: red; color: white; border-radius: 50%; padding: 2px 6px; font-size: 0.6rem; }
+        /* --- Utility --- */
+        .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.92); display: none; justify-content: center; align-items: center; z-index: 2000; backdrop-filter: blur(15px); }
+        .modal-content { width: 90%; max-width: 450px; }
+        .tab-switcher { background: #000; padding: 5px; border-radius: 50px; display: flex; border: 1px solid var(--glass-border); width: 280px; margin: 20px auto; }
+        .tab-btn { flex: 1; padding: 10px; border: none; background: transparent; color: #666; border-radius: 40px; cursor: pointer; font-weight: 700; font-size: 0.65rem; transition: 0.3s; }
+        .tab-btn.active { color: #000; background: var(--gold-gradient); }
     </style>
 </head>
 <body>
 
-    <div class="fairy-float" onclick="alert('Fairytale Guide: System active! How can I help?')">
-        <i class="fas fa-wand-sparkles" style="color: #000; font-size: 1.5rem;"></i>
+    <div id="star-container"></div>
+
+    <div class="guide-floating" onclick="alert('Guidance System Offline - Coming Soon')">
+        <i class="fas fa-hat-wizard" style="font-size: 1.5rem; color: #000;"></i>
     </div>
 
-    <header class="main-header" id="userHeader">
-        </header>
-
-    <div class="tabs">
-        <div class="tab-btn active" onclick="switchTab('season', this)">SEASON</div>
-        <div class="tab-btn" onclick="switchTab('royal', this)">ROYAL X</div>
-    </div>
-
-    <section class="activity-grid" id="actGrid"></section>
-
-    <div id="taskModal" class="modal">
-        <div class="modal-content">
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-                <h3 id="mTitle" style="font-family:'Cinzel'; color:var(--gold);">ACTIVITY</h3>
-                <i class="fas fa-times" onclick="closeModal()" style="cursor:pointer;"></i>
+    <nav class="top-nav">
+        <i class="fas fa-chevron-left nav-icon" onclick="window.location.href='index.html'"></i>
+        <div style="display: flex; gap: 20px;">
+            <div onclick="openMailbox()" style="position: relative; cursor: pointer;">
+                <i class="fas fa-paper-plane nav-icon"></i>
+                <span id="notifDot" style="display:none; position:absolute; top:-2px; right:-2px; width:8px; height:8px; background:red; border-radius:50%;"></span>
             </div>
-            <div class="task-grid" id="tGrid"></div>
+            <i class="fas fa-power-off nav-icon" id="logoutBtn" style="display:none;" onclick="handleLogout()"></i>
+        </div>
+    </nav>
+
+    <header class="hero-banner" id="heroBanner" style="padding-top: 100px; text-align: center;"></header>
+
+    <div class="tab-switcher">
+        <button class="tab-btn active" onclick="switchType('season', this)">SEASON</button>
+        <button class="tab-btn" onclick="switchType('royal', this)">ROYAL X</button>
+    </div>
+
+    <main><div class="grid-container" id="cardsGrid"></div></main>
+
+    <div class="modal" id="taskModal">
+        <div class="modal-content" style="background:#050508; padding:30px; border-radius:30px; border:1px solid var(--glass-border);">
+            <h2 id="mTitle" style="text-align:center; font-family:'Cinzel'; color:var(--gold);">MISSION</h2>
+            <div class="tasks-grid" id="tGrid"></div>
+            <button onclick="closeModal('taskModal')" style="width:100%; padding:12px; background:transparent; border:1px solid #333; color:#666; border-radius:12px; cursor:pointer;">RETURN</button>
+        </div>
+    </div>
+
+    <div class="modal" id="mailModal">
+        <div class="modal-content">
+            <div id="mailboxView">
+                <h3 style="font-family:'Orbitron'; color:var(--gold); margin-bottom:20px;">COMMS CENTER</h3>
+                <div id="mailList" style="max-height: 400px; overflow-y: auto;"></div>
+                <button onclick="closeModal('mailModal')" style="width:100%; margin-top:20px; padding:10px; background:none; border:none; color:var(--gold);">CLOSE</button>
+            </div>
+            <div id="mailDetailView" style="display:none;">
+                <div class="mail-content-box" id="fullMessageContent"></div>
+                <button onclick="backToMailbox()" style="width:100%; margin-top:20px; padding:12px; background:var(--gold-gradient); border:none; border-radius:10px; font-weight:bold;">BACK</button>
+            </div>
         </div>
     </div>
 
     <script>
-        const IMG_URLS = {
-            tk: "https://raw.githubusercontent.com/eycfde-prog/EYCSSP/main/frontend/eyclgos/Token.png",
-            star: "https://raw.githubusercontent.com/eycfde-prog/EYCSSP/main/frontend/eyclgos/Star.png",
-            gt: "https://raw.githubusercontent.com/eycfde-prog/EYCSSP/main/frontend/eyclgos/GT.png"
-        };
+        const SCRIPT_URL = "YOUR_SCRIPT_URL_HERE";
+        let currentUser = null;
+        let isLoggedIn = false;
 
         const activities = {
             season: [
-                { name: "Alike", icon: "fa-clone", code: "AS", tk: 50 },
-                { name: "Vivid", icon: "fa-wand-magic-sparkles", code: "VV", tk: 50 },
-                { name: "Label", icon: "fa-tag", code: "LB", tk: 50 },
-                { name: "Grammar", icon: "fa-spell-check", code: "GR", tk: 50 },
-                { name: "Golden Ear", icon: "fa-ear-listen", code: "GE", tk: 50 },
-                { name: "Seeds", icon: "fa-seedling", code: "SD", tk: 50 }
+                { name: "Alike", icon: "fa-clone", tk: 50, code: "AS" },
+                { name: "Vivid", icon: "fa-wand-magic-sparkles", tk: 50, code: "VV" },
+                { name: "Label", icon: "fa-tag", tk: 50, code: "LB" },
+                { name: "Grammar", icon: "fa-spell-check", tk: 50, code: "GR" },
+                { name: "Golden Ear", icon: "fa-ear-listen", tk: 50, code: "GE" },
+                { name: "Seeds", icon: "fa-seedling", tk: 50, code: "SD" }
             ],
             royal: [
-                { name: "Alike X", icon: "fa-star", code: "ASX", tk: 50 },
-                { name: "Vivid X", icon: "fa-wand-magic", code: "VVX", tk: 50 },
-                { name: "Label X", icon: "fa-tags", code: "LBX", tk: 50 },
-                { name: "Seeds X", icon: "fa-tree", code: "SDX", tk: 50 },
-                { name: "Golden Ear X", icon: "fa-ear-deaf", code: "GEX", tk: 50 },
-                { name: "Grammar X", icon: "fa-pen-fancy", code: "GRX", tk: 50 },
-                { name: "Figurative X", icon: "fa-mask", code: "FGX", tk: 50 },
-                { name: "Dictation X", icon: "fa-microphone-lines", code: "DTX", tk: 100 },
-                { name: "Sing Sang Sung X", icon: "fa-music", code: "SSSX", tk: 100 },
-                { name: "Elmagazine X", icon: "fa-book-open", code: "EMX", tk: 100 }
+                { name: "Alike X", icon: "fa-star", tk: 50, code: "ASX" },
+                { name: "Label X", icon: "fa-tags", tk: 50, code: "LBX" },
+                { name: "Golden Ear X", icon: "fa-ear-flash", tk: 50, code: "GEX" },
+                { name: "Grammar X", icon: "fa-pen-nib", tk: 50, code: "GRX" },
+                { name: "Vivid X", icon: "fa-bolt", tk: 50, code: "VVX" },
+                { name: "Seeds X", icon: "fa-leaf", tk: 50, code: "SDX" },
+                { name: "Figurative X", icon: "fa-mask", tk: 50, code: "FGX" },
+                { name: "Dictation X", icon: "fa-microphone", tk: 100, code: "DTX" },
+                { name: "Sing Sang Sung", icon: "fa-music", tk: 100, code: "SSSX" },
+                { name: "Elmagazine X", icon: "fa-book", tk: 100, code: "EMX" }
             ]
         };
 
-        let currentUser = JSON.parse(localStorage.getItem('studentData')) || { name: "Guest", tokens: 0, stars: 0, goldTickets: 0, avatar: "https://via.placeholder.com/100" };
-        let isLoggedIn = !!localStorage.getItem('studentData');
+        function calculateTaskDate(type, taskIndex) {
+            const startSeason = new Date(2026, 1, 25); // Feb 25
+            const startRoyal = new Date(2026, 1, 28);  // Feb 28
+            let date = new Date(type === 'season' ? startSeason : startRoyal);
 
-        function renderHeader() {
-            document.getElementById('userHeader').innerHTML = `
-                <div class="user-profile">
-                    <img src="${currentUser.avatar}" class="avatar">
-                    <div>
-                        <h4 style="font-family:'Orbitron'; font-size:0.9rem;">${currentUser.name}</h4>
-                        <p style="font-size:0.6rem; color:var(--gold);">RANK: AGENT</p>
-                    </div>
-                    <i class="fas fa-envelope mail-btn" onclick="openMailbox()"></i>
-                </div>
-                <div class="stats-row">
-                    <div class="stat-item"><img src="${IMG_URLS.tk}" class="stat-img"><span class="stat-val">${currentUser.tokens}</span></div>
-                    <div class="stat-item"><img src="${IMG_URLS.star}" class="stat-img"><span class="stat-val">${currentUser.stars}</span></div>
-                    <div class="stat-item"><img src="${IMG_URLS.gt}" class="stat-img"><span class="stat-val">${currentUser.goldTickets}</span></div>
-                </div>
-            `;
+            if (taskIndex > 0) {
+                if (type === 'season') {
+                    // زيادة تدريجية: 4, 5, 6...
+                    let daysToAdd = 0;
+                    for(let i=1; i<=taskIndex; i++) daysToAdd += (3 + i);
+                    date.setDate(date.getDate() + daysToAdd);
+                } else {
+                    // زيادة ثابتة 3 أيام
+                    date.setDate(date.getDate() + (taskIndex * 3));
+                }
+            }
+            return date;
         }
 
-        function switchTab(type, btn) {
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            const grid = document.getElementById('actGrid');
-            grid.innerHTML = '';
+        function generateCards() {
+            const grid = document.getElementById('cardsGrid'); grid.innerHTML = '';
+            const type = document.querySelector('.tab-btn.active').innerText.toLowerCase().includes('royal') ? 'royal' : 'season';
             activities[type].forEach(act => {
-                grid.innerHTML += `
-                    <div class="activity-card" onclick="openTasks('${act.name}', '${act.code}', '${act.tk}', '${type}')">
-                        <div class="tk-badge">${act.tk} TK</div>
-                        <i class="fas ${act.icon}"></i>
-                        <span>${act.name}</span>
-                    </div>
-                `;
+                const card = document.createElement('div');
+                card.className = 'activity-card';
+                card.innerHTML = `<div class="tk-badge">${act.tk} TK</div><i class="fa-solid ${act.icon} card-icon"></i><h3 style="font-size:0.9rem; letter-spacing:1px;">${act.name}</h3>`;
+                card.onclick = () => openTasks(act.name, act.code, type);
+                grid.appendChild(card);
             });
         }
 
-        function getReleaseDate(type, index) {
-            const start = new Date("2026-02-28T00:00:00"); // السبت (بداية نزول المهمة الثانية)
-            if (index === 0) return new Date("2026-02-26T00:00:00"); // المهمة الأولى متاحة من الخميس
-            
-            let d = new Date(start);
-            if (type === 'season') {
-                let daysToAdd = 0;
-                for(let i=1; i<=index; i++) { daysToAdd += (2 + i); } // سيكوينس: +3، +4، +5...
-                d.setDate(d.getDate() + daysToAdd);
-            } else {
-                d.setDate(d.getDate() + (index * 3)); // رويال: كل 3 أيام ثابتة
-            }
-            return d;
-        }
-
-        function openTasks(name, code, tk, type) {
-            const now = new Date();
+        function openTasks(name, code, type) {
             document.getElementById('mTitle').innerText = name;
-            const tGrid = document.getElementById('tGrid');
-            tGrid.innerHTML = '';
+            const tGrid = document.getElementById('tGrid'); tGrid.innerHTML = '';
+            const today = new Date();
 
             for (let i = 0; i < 10; i++) {
+                const taskDate = calculateTaskDate(type, i);
+                const isLocked = today < taskDate;
                 const node = document.createElement('div');
                 node.className = 'task-node';
-                node.innerText = i + 1;
-                
-                const releaseDate = getReleaseDate(type, i);
-                const isLocked = now < releaseDate;
+                node.innerHTML = `
+                    <span style="font-family:'Orbitron'; font-weight:bold;">${i+1}</span>
+                    <div class="task-date-popup">${taskDate.toDateString()}</div>
+                    ${isLocked ? '<i class="fas fa-lock lock-overlay"></i>' : '<i class="fas fa-play" style="font-size:0.5rem; color:var(--gold);"></i>'}
+                `;
 
-                if (isLocked) {
-                    node.innerHTML += `<div class="lock-overlay"><i class="fas fa-lock"></i></div>`;
-                    node.onclick = () => showPop(node, releaseDate);
-                } else {
-                    node.onclick = () => {
-                        if (!isLoggedIn) { alert("Please login to access missions!"); return; }
-                        window.location.href = `Arena.html?act=${code}&t=${i+1}`;
-                    };
-                }
+                node.onclick = (e) => {
+                    if (!isLoggedIn) return alert("AUTHORIZED LOGIN REQUIRED");
+                    if (isLocked) {
+                        const popup = node.querySelector('.task-date-popup');
+                        popup.style.display = 'block';
+                        setTimeout(() => popup.style.display = 'none', 2000);
+                    } else {
+                        // Launch Task logic here
+                        console.log("Launching task", i+1);
+                    }
+                };
                 tGrid.appendChild(node);
             }
             document.getElementById('taskModal').style.display = 'flex';
         }
 
-        function showPop(parent, date) {
-            const old = parent.querySelector('.release-pop'); if(old) old.remove();
-            const p = document.createElement('div');
-            p.className = 'release-pop';
-            p.innerText = `Starts: ${date.toLocaleDateString('en-GB', {day:'2-digit', month:'short'})}`;
-            parent.appendChild(p);
-            setTimeout(() => p.remove(), 2500);
+        function renderHeader() {
+            const header = document.getElementById('heroBanner');
+            if (isLoggedIn) {
+                document.getElementById('logoutBtn').style.display = "block";
+                header.innerHTML = `
+                    <div style="display:inline-block; position:relative;">
+                        <img src="${currentUser.avatar}" style="width:100px; height:100px; border-radius:50%; border:3px solid var(--gold); box-shadow:0 0 20px var(--gold-glow);">
+                        <div style="background:#000; border:1px solid var(--gold); padding:2px 10px; border-radius:10px; font-size:0.6rem; margin-top:-10px; position:relative;">RANK #${currentUser.rank}</div>
+                    </div>
+                    <h2 style="font-family:'Cinzel'; background:var(--gold-gradient); -webkit-background-clip:text; -webkit-text-fill-color:transparent; margin-top:15px;">${currentUser.name}</h2>
+                    <div class="stats-row" style="justify-content:center; display:inline-flex;">
+                        <div class="stat-item"><img src="https://raw.githubusercontent.com/eycfde-prog/EYCSSP/047aeca8ef0fa0d95627552cfb62fd8300531134/frontend/eyclgos/Token.png" class="stat-img"> <span>${currentUser.tokens}</span></div>
+                        <div class="stat-item"><img src="https://raw.githubusercontent.com/eycfde-prog/EYCSSP/047aeca8ef0fa0d95627552cfb62fd8300531134/frontend/eyclgos/Star.png" class="stat-img"> <span>${currentUser.stars}</span></div>
+                        <div class="stat-item"><img src="https://raw.githubusercontent.com/eycfde-prog/EYCSSP/047aeca8ef0fa0d95627552cfb62fd8300531134/frontend/eyclgos/GT.png" class="stat-img"> <span>${currentUser.goldTickets}</span></div>
+                    </div>
+                `;
+            } else {
+                header.innerHTML = `<h2 style="font-family:'Cinzel';">GUEST COMMAND</h2><button onclick="alert('Redirecting to Auth...')" style="margin-top:20px; padding:10px 30px; border-radius:20px; background:var(--gold-gradient); border:none; cursor:pointer; font-weight:bold;">LOGIN</button>`;
+            }
         }
 
-        function closeModal() { document.getElementById('taskModal').style.display = 'none'; }
-        
+        // ... بقية دوال المايل بوكس المعدلة ...
+        function openMailbox() {
+            document.getElementById('mailModal').style.display = 'flex';
+            renderMailList();
+        }
+
+        function renderMailList() {
+            const list = document.getElementById('mailList');
+            const mails = JSON.parse(localStorage.getItem('eyc_mails') || '[]');
+            list.innerHTML = mails.map((m, i) => `
+                <div class="mail-card" onclick="readMail(${i})">
+                    <div style="font-size:0.6rem; opacity:0.5;">${m.date}</div>
+                    <div style="font-size:0.8rem; text-overflow:ellipsis; overflow:hidden; white-space:nowrap;">${m.text}</div>
+                </div>
+            `).join('') || '<p style="text-align:center; opacity:0.5;">No Comms Found</p>';
+        }
+
+        function readMail(i) {
+            const mails = JSON.parse(localStorage.getItem('eyc_mails'));
+            document.getElementById('mailboxView').style.display = 'none';
+            document.getElementById('mailDetailView').style.display = 'block';
+            document.getElementById('fullMessageContent').innerText = mails[i].text;
+        }
+
+        function backToMailbox() {
+            document.getElementById('mailDetailView').style.display = 'none';
+            document.getElementById('mailboxView').style.display = 'block';
+        }
+
+        function switchType(type, btn) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            generateCards();
+        }
+
+        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+
+        function createStars() {
+            const container = document.getElementById('star-container');
+            for (let i = 0; i < 50; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.style.width = star.style.height = '2px';
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                star.style.setProperty('--duration', (Math.random() * 3 + 2) + 's');
+                container.appendChild(star);
+            }
+        }
+
         window.onload = () => {
-            renderHeader();
-            switchTab('season', document.querySelector('.tab-btn'));
+            createStars();
+            const saved = localStorage.getItem('eyc_user');
+            if(saved) { currentUser = JSON.parse(saved); isLoggedIn = true; }
+            renderHeader(); 
+            generateCards();
         };
     </script>
 </body>
