@@ -17,10 +17,8 @@
             --glass-border: rgba(212, 175, 55, 0.2);
             --ramadan-gold: #E29E2E;
         }
-
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; -webkit-tap-highlight-color: transparent; }
         body { background: var(--bg-deep); color: white; min-height: 100vh; overflow-x: hidden; }
-
         /* --- Galaxy Guide Overlay --- */
         .galaxy-overlay {
             position: fixed; inset: 0; background: rgba(0,0,0,0.85);
@@ -43,61 +41,50 @@
         .guide-action { background: rgba(226, 158, 46, 0.1); border: 1px dashed var(--ramadan-gold); padding: 15px; border-radius: 15px; color: #fcf6ba; font-size: 0.8rem; display: flex; gap: 10px; align-items: flex-start; }
         .loading-state { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; color: var(--ramadan-gold); font-family: 'Orbitron'; gap: 15px; }
         .lang-toggle-btn { background: rgba(226, 158, 46, 0.1); border: 1px solid var(--ramadan-gold); color: var(--ramadan-gold); padding: 8px 15px; border-radius: 10px; cursor: pointer; font-size: 0.8rem; display: flex; align-items: center; gap: 8px; }
-
         /* --- Original Dashboard Styles --- */
         #star-container { position: fixed; inset: 0; z-index: -1; background: radial-gradient(circle at top, #0a0b14 0%, #030306 100%); }
         .star { position: absolute; background: #fff; border-radius: 50%; opacity: 0.3; animation: pulse var(--duration) infinite ease-in-out; }
         @keyframes pulse { 0%, 100% { opacity: 0.2; transform: scale(1); } 50% { opacity: 0.7; transform: scale(1.5); } }
-
         .top-nav { position: fixed; top: 0; width: 100%; padding: 20px 6%; display: flex; justify-content: space-between; align-items: center; z-index: 1000; backdrop-filter: blur(10px); border-bottom: 1px solid rgba(255,255,255,0.05); }
         .nav-icon { font-size: 1.2rem; color: var(--gold); cursor: pointer; transition: 0.3s; opacity: 0.8; }
         .nav-icon:hover { opacity: 1; transform: scale(1.1); filter: drop-shadow(0 0 8px var(--gold)); }
-
         .hero-banner { width: 100%; padding: 100px 20px 40px; text-align: center; }
         .profile-card { position: relative; display: inline-flex; flex-direction: column; align-items: center; }
         .avatar-wrapper { position: relative; width: 120px; height: 120px; padding: 4px; background: var(--gold-gradient); border-radius: 50%; box-shadow: 0 0 30px var(--gold-glow); margin-bottom: 15px; }
         .avatar-main { width: 100%; height: 100%; border-radius: 50%; border: 4px solid #050508; background-size: cover; background-position: center; }
         .rank-tag { position: absolute; bottom: -5px; background: #000; border: 1px solid var(--gold); padding: 2px 12px; border-radius: 10px; font-family: 'Orbitron'; font-size: 0.65rem; color: var(--gold); letter-spacing: 1px; }
-
         .student-name { font-family: 'Cinzel', serif; font-size: clamp(1.4rem, 5vw, 2rem); letter-spacing: 3px; background: var(--gold-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-top: 10px; }
         .student-title { font-size: 0.7rem; color: #888; text-transform: uppercase; letter-spacing: 3px; margin-top: 5px; }
-
         .stats-row { display: flex; gap: 20px; margin-top: 20px; background: rgba(255,255,255,0.03); padding: 10px 25px; border-radius: 30px; border: 1px solid var(--glass-border); align-items: center; }
         .stat-icon { height: 18px; object-fit: contain; }
         .stat-item { font-family: 'Orbitron'; font-size: 0.85rem; display: flex; align-items: center; gap: 8px; }
         .stat-item span { color: var(--gold); }
-
         .grid-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 20px; padding: 0 6% 100px; }
         .activity-card { background: linear-gradient(145deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.01) 100%); border: 1px solid rgba(255,255,255,0.08); border-radius: 20px; padding: 35px 15px; text-align: center; transition: 0.5s; cursor: pointer; position: relative; overflow: hidden; }
         .activity-card:hover { transform: translateY(-10px); border-color: var(--gold); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
         .card-icon { position: relative; z-index: 1; font-size: 2.2rem; margin-bottom: 10px; background: var(--gold-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .tk-activity-badge { font-family: 'Orbitron'; font-size: 0.6rem; color: var(--gold); border: 1px solid var(--gold); padding: 2px 8px; border-radius: 5px; margin-top: 10px; display: inline-block; }
-
         .tab-switcher { background: #000; padding: 4px; border-radius: 15px; display: flex; border: 1px solid var(--glass-border); width: 90%; max-width: 300px; margin: 20px auto; }
         .tab-btn { flex: 1; padding: 12px; border: none; background: transparent; color: #666; border-radius: 12px; cursor: pointer; font-weight: 700; font-size: 0.65rem; letter-spacing: 2px; }
         .tab-btn.active { color: #000; background: var(--gold-gradient); }
-
         .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.9); display: none; justify-content: center; align-items: center; z-index: 2000; backdrop-filter: blur(20px); }
         .modal-content { background: #050508; border-radius: 25px; padding: 40px; width: 90%; max-width: 400px; border: 1px solid var(--glass-border); position: relative; }
-
         .tasks-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin: 30px 0; }
         .task-node { position: relative; aspect-ratio: 1; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-family: 'Orbitron'; font-size: 0.8rem; overflow: hidden; }
-        
+        .lock-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.85); display: flex; align-items: center; justify-content: center; color: var(--gold); z-index: 5; }
         .btn-exit { background: transparent; border: 1px solid #444; color: #888; padding: 12px 30px; border-radius: 12px; cursor: pointer; font-family: 'Orbitron'; font-size: 0.7rem; transition: 0.3s; width: 100%; }
         .btn-exit:hover { border-color: var(--gold); color: var(--gold); }
-
         .fairy-float { position: fixed; bottom: 20px; right: 20px; width: 55px; height: 55px; background: var(--gold-gradient); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 1000; box-shadow: 0 0 15px var(--gold); animation: float 3s infinite ease-in-out; }
         @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
-
-        #mailDrawer { position: fixed; top: 0; right: -100%; width: 350px; height: 100%; background: rgba(5, 5, 8, 0.95); backdrop-filter: blur(25px); border-left: 1px solid var(--glass-border); z-index: 3000; transition: 0.5s cubic-bezier(0.7, 0, 0.3, 1); padding: 30px; }
+        #mailDrawer { position: fixed; top: 0; right: -100%; width: 350px; height: 100%; background: rgba(5, 5, 8, 0.95); backdrop-filter: blur(25px); border-left: 1px solid var(--glass-border); z-index: 3000; transition: 0.5s cubic-bezier(0.7, 0, 0.3, 1); padding: 30px; overflow-y: auto; }
         #mailDrawer.active { right: 0; }
-        .msg-bubble { background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border); padding: 15px; border-radius: 12px; margin-bottom: 15px; }
-        .msg-date { font-size: 0.6rem; color: var(--gold); font-family: 'Orbitron'; margin-bottom: 5px; }
-        .msg-text { font-size: 0.85rem; color: #eee; line-height: 1.5; }
+        .msg-bubble { background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border); padding: 15px; border-radius: 12px; margin-bottom: 10px; animation: slideIn 0.3s ease-out; }
+        @keyframes slideIn { from { transform: translateX(50px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        .msg-time { font-size: 0.6rem; color: var(--gold); display: block; margin-bottom: 5px; font-family: 'Orbitron'; }
+        .msg-text { font-size: 0.8rem; color: #eee; line-height: 1.4; }
     </style>
 </head>
 <body>
-
     <div id="star-container"></div>
     
     <nav class="top-nav">
@@ -105,7 +92,7 @@
         <div style="display: flex; align-items: center; gap: 15px;">
             <div id="notifBell" class="nav-icon" onclick="openMailbox()" style="position: relative;">
                 <i class="fas fa-bell"></i>
-                <span id="notifDot" style="display:none; position: absolute; top: -5px; right: -5px; width: 10px; height: 10px; background: #ff0000; border-radius: 50%; border: 2px solid var(--bg-deep);"></span>
+                <span id="notifDot" style="display:none; position: absolute; top: -5px; right: -5px; width: 10px; height: 10px; background: #ff0000; border-radius: 50%; border: 2px solid var(--bg-deep); box-shadow: 0 0 10px red;"></span>
             </div>
             <i class="fas fa-power-off nav-icon" id="logoutBtn" style="display:none;" onclick="handleLogout()"></i>
         </div>
@@ -145,7 +132,7 @@
 
     <div id="mailDrawer">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px;">
-            <h2 style="font-family:'Orbitron'; color:var(--gold); font-size:1.1rem;">COMMS CENTER</h2>
+            <h2 style="font-family:'Orbitron'; color:var(--gold); font-size:1.1rem;">Comms Center</h2>
             <i class="fas fa-times" onclick="closeMailbox()" style="cursor:pointer; color:var(--gold);"></i>
         </div>
         <div id="mailList"></div>
@@ -177,65 +164,12 @@
         let currentLang = 'en';
         let currentUser = null;
         let isLoggedIn = false;
-        let checkInterval = null;
-
-        // --- Notifications & Mailbox (WOLF FIX) ---
-        async function fetchMessages() {
-            if(!isLoggedIn || !currentUser) return;
-            try {
-                const res = await fetch(`${PROFILE_URL}?action=getProfile&email=${currentUser.email}&code=${currentUser.code}`);
-                const data = await res.json();
-                
-                // التأكد من وجود الرسالة في الاستجابة (تأكد أن الأب سكريبت يرسل حقل messageFromEzz)
-                const newMsg = data.messageFromEzz || data.ezzMsg || "";
-                
-                if(newMsg.trim() !== "") {
-                    let savedMails = JSON.parse(localStorage.getItem('eyc_mails') || '[]');
-                    // التحقق إذا كانت الرسالة جديدة ولم تضاف من قبل
-                    if (savedMails.length === 0 || savedMails[0].text !== newMsg.trim()) {
-                        const mailObj = {
-                            text: newMsg.trim(),
-                            date: new Date().toLocaleString('en-GB', { day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit' })
-                        };
-                        savedMails.unshift(mailObj);
-                        localStorage.setItem('eyc_mails', JSON.stringify(savedMails));
-                        document.getElementById('notifDot').style.display = 'block';
-                        renderMails();
-                    }
-                }
-            } catch (e) { console.error("Sync Error:", e); }
-        }
-
-        function renderMails() {
-            const list = document.getElementById('mailList');
-            const mails = JSON.parse(localStorage.getItem('eyc_mails') || '[]');
-            if(mails.length === 0) {
-                list.innerHTML = '<p style="text-align:center; opacity:0.3; margin-top:50px;">NO COMMS YET</p>';
-                return;
-            }
-            list.innerHTML = mails.map(m => `
-                <div class="msg-bubble">
-                    <div class="msg-date">${m.date}</div>
-                    <div class="msg-text">${m.text}</div>
-                </div>
-            `).join('');
-        }
-
-        function openMailbox() {
-            document.getElementById('mailDrawer').classList.add('active');
-            document.getElementById('notifDot').style.display = 'none';
-            renderMails();
-        }
-
-        function closeMailbox() { document.getElementById('mailDrawer').classList.remove('active'); }
 
         // --- Galaxy Guide Functions ---
         function openGalaxyGuide() {
-            const overlay = document.getElementById('guideOverlay');
-            overlay.style.display = 'flex';
+            document.getElementById('guideOverlay').style.display = 'flex';
             fetchGuideData();
         }
-
         async function fetchGuideData() {
             const view = document.getElementById('guideView');
             view.innerHTML = `<div class="loading-state"><i class="fas fa-sync-alt fa-spin"></i><p>${currentLang === 'en' ? 'LOADING WISDOM...' : 'جاري تحميل الحكمة...'}</p></div>`;
@@ -251,12 +185,10 @@
                 view.innerHTML = `<p style="text-align:center; color:#ff4444; padding:20px;">Connection Interrupted</p>`;
             }
         }
-
         function renderTabs() {
             const container = document.getElementById('guideTabs');
             container.innerHTML = masterData.map((item, idx) => `<div class="tab-item ${idx===0?'active':''}" onclick="showTab(${idx}, this)">${item.tabName.toUpperCase()}</div>`).join('');
         }
-
         function showTab(idx, el) {
             if(el) {
                 document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
@@ -274,17 +206,15 @@
             `;
             view.scrollTop = 0;
         }
-
         function toggleLanguage() {
             currentLang = (currentLang === 'en' ? 'ar' : 'en');
             document.getElementById('modalBox').setAttribute('data-lang', currentLang);
             document.getElementById('langText').innerText = (currentLang === 'en' ? 'العربية' : 'English');
             fetchGuideData();
         }
-
         function closeGuide() { document.getElementById('guideOverlay').style.display = 'none'; }
 
-        // --- Dashboard Core ---
+        // --- Dashboard Logic & Notification System ---
         const IMG = {
             tk: "https://raw.githubusercontent.com/eycfde-prog/EYCSSP/047aeca8ef0fa0d95627552cfb62fd8300531134/frontend/eyclgos/Token.png",
             star: "https://raw.githubusercontent.com/eycfde-prog/EYCSSP/047aeca8ef0fa0d95627552cfb62fd8300531134/frontend/eyclgos/Star.png",
@@ -332,21 +262,54 @@
                             <div class="stat-item"><img src="${IMG.gt}" class="stat-icon"> <span>${currentUser.goldTickets}</span></div>
                         </div>
                     </div>`;
+                syncNotifications();
             } else {
                 header.innerHTML = `<h1 class="student-name">ARENA ACCESS</h1><button class="btn-exit" style="width:auto; margin-top:20px;" onclick="openLogin()">AUTHORIZE LOGIN</button>`;
             }
         }
 
-        function generateCards() {
-            const grid = document.getElementById('cardsGrid'); grid.innerHTML = '';
-            const type = document.querySelector('.tab-btn.active').innerText.toLowerCase().includes('royal') ? 'royal' : 'season';
-            activities[type].forEach(act => {
-                const card = document.createElement('div');
-                card.className = 'activity-card';
-                card.innerHTML = `<i class="fa-solid ${act.icon} card-icon"></i><h3>${act.name}</h3><div class="tk-activity-badge">${act.tk} TK</div>`;
-                card.onclick = () => openTasks(act.name, act.code);
-                grid.appendChild(card);
-            });
+        async function syncNotifications() {
+            if(!isLoggedIn) return;
+            try {
+                const res = await fetch(`${PROFILE_URL}?action=getProfile&email=${currentUser.email}&code=${currentUser.code}`);
+                const data = await res.json();
+                if(data.status === "success") {
+                    const newMsg = data.lastNotification;
+                    const savedMails = JSON.parse(localStorage.getItem('eyc_mails') || '[]');
+                    
+                    // تحقق إذا كانت الرسالة جديدة وليست مكررة لآخر رسالة
+                    if(newMsg && (!savedMails.length || savedMails[0].text !== newMsg)) {
+                        savedMails.unshift({
+                            text: newMsg,
+                            time: new Date().toLocaleString('en-GB', { hour: '2-digit', minute: '2-digit', day: '2-digit', month: 'short' })
+                        });
+                        localStorage.setItem('eyc_mails', JSON.stringify(savedMails.slice(0, 20))); // حفظ آخر 20 رسالة
+                        document.getElementById('notifDot').style.display = 'block';
+                    }
+                }
+            } catch(e) { console.log("Sync Error"); }
+        }
+
+        function openMailbox() {
+            document.getElementById('mailDrawer').classList.add('active');
+            document.getElementById('notifDot').style.display = 'none';
+            renderMails();
+            syncNotifications(); // تحديث لحظي عند الفتح
+        }
+
+        function renderMails() {
+            const list = document.getElementById('mailList');
+            const mails = JSON.parse(localStorage.getItem('eyc_mails') || '[]');
+            if(!mails.length) {
+                list.innerHTML = '<p style="text-align:center; opacity:0.5; margin-top:50px;">No incoming transmissions.</p>';
+                return;
+            }
+            list.innerHTML = mails.map(m => `
+                <div class="msg-bubble">
+                    <span class="msg-time">${m.time}</span>
+                    <p class="msg-text">${m.text}</p>
+                </div>
+            `).join('');
         }
 
         function handleLogin() {
@@ -360,9 +323,6 @@
                         currentUser = res; currentUser.email = email; currentUser.code = code; isLoggedIn = true;
                         localStorage.setItem('eyc_user', JSON.stringify(currentUser));
                         closeModal('loginModal'); renderHeader(); generateCards();
-                        fetchMessages(); // جلب الرسائل فور تسجيل الدخول
-                        if(checkInterval) clearInterval(checkInterval);
-                        checkInterval = setInterval(fetchMessages, 30000);
                     } else alert(res.message);
                     btn.innerText = "SIGN IN";
                 });
@@ -371,6 +331,20 @@
         function handleLogout() { localStorage.clear(); location.reload(); }
         function openLogin() { document.getElementById('loginModal').style.display = 'flex'; }
         function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+        function closeMailbox() { document.getElementById('mailDrawer').classList.remove('active'); }
+
+        function generateCards() {
+            const grid = document.getElementById('cardsGrid'); grid.innerHTML = '';
+            const type = document.querySelector('.tab-btn.active').innerText.toLowerCase().includes('royal') ? 'royal' : 'season';
+            activities[type].forEach(act => {
+                const card = document.createElement('div');
+                card.className = 'activity-card';
+                card.innerHTML = `<i class="fa-solid ${act.icon} card-icon"></i><h3>${act.name}</h3><div class="tk-activity-badge">${act.tk} TK</div>`;
+                card.onclick = () => openTasks(act.name, act.code);
+                grid.appendChild(card);
+            });
+        }
+
         function switchType(type, btn) {
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
@@ -395,14 +369,10 @@
 
         window.onload = () => {
             const saved = localStorage.getItem('eyc_user');
-            if(saved) { 
-                currentUser = JSON.parse(saved); 
-                isLoggedIn = true; 
-                fetchMessages(); // جلب الرسائل المخزنة والجديدة فور الفتح
-                checkInterval = setInterval(fetchMessages, 30000);
-            }
-            renderHeader(); generateCards(); renderMails();
+            if(saved) { currentUser = JSON.parse(saved); isLoggedIn = true; }
+            renderHeader(); generateCards();
             
+            // Background Stars
             const container = document.getElementById('star-container');
             for (let i = 0; i < 50; i++) {
                 const s = document.createElement('div'); s.className = 'star';
@@ -411,6 +381,8 @@
                 s.style.setProperty('--duration', (Math.random()*3+2)+'s');
                 container.appendChild(s);
             }
+            // Auto-Sync every 60 seconds
+            setInterval(syncNotifications, 60000);
         };
     </script>
 </body>
