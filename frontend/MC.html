@@ -82,8 +82,7 @@
 
         .tasks-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin: 30px 0; }
         .task-node { position: relative; aspect-ratio: 1; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-family: 'Orbitron'; font-size: 0.8rem; overflow: hidden; }
-        .lock-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.85); display: flex; align-items: center; justify-content: center; color: var(--gold); z-index: 5; }
-
+        
         .btn-exit { background: transparent; border: 1px solid #444; color: #888; padding: 12px 30px; border-radius: 12px; cursor: pointer; font-family: 'Orbitron'; font-size: 0.7rem; transition: 0.3s; width: 100%; }
         .btn-exit:hover { border-color: var(--gold); color: var(--gold); }
 
@@ -92,10 +91,9 @@
 
         #mailDrawer { position: fixed; top: 0; right: -100%; width: 350px; height: 100%; background: rgba(5, 5, 8, 0.95); backdrop-filter: blur(25px); border-left: 1px solid var(--glass-border); z-index: 3000; transition: 0.5s cubic-bezier(0.7, 0, 0.3, 1); padding: 30px; }
         #mailDrawer.active { right: 0; }
-        .msg-bubble { background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border); padding: 15px; border-radius: 12px; margin-bottom: 15px; animation: slideIn 0.3s ease; }
+        .msg-bubble { background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border); padding: 15px; border-radius: 12px; margin-bottom: 15px; }
         .msg-date { font-size: 0.6rem; color: var(--gold); font-family: 'Orbitron'; margin-bottom: 5px; }
         .msg-text { font-size: 0.85rem; color: #eee; line-height: 1.5; }
-        @keyframes slideIn { from { transform: translateX(30px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
     </style>
 </head>
 <body>
@@ -107,7 +105,7 @@
         <div style="display: flex; align-items: center; gap: 15px;">
             <div id="notifBell" class="nav-icon" onclick="openMailbox()" style="position: relative;">
                 <i class="fas fa-bell"></i>
-                <span id="notifDot" style="display:none; position: absolute; top: -5px; right: -5px; width: 10px; height: 10px; background: #ff0000; border-radius: 50%; border: 2px solid var(--bg-deep); box-shadow: 0 0 10px red;"></span>
+                <span id="notifDot" style="display:none; position: absolute; top: -5px; right: -5px; width: 10px; height: 10px; background: #ff0000; border-radius: 50%; border: 2px solid var(--bg-deep);"></span>
             </div>
             <i class="fas fa-power-off nav-icon" id="logoutBtn" style="display:none;" onclick="handleLogout()"></i>
         </div>
@@ -150,7 +148,7 @@
             <h2 style="font-family:'Orbitron'; color:var(--gold); font-size:1.1rem;">COMMS CENTER</h2>
             <i class="fas fa-times" onclick="closeMailbox()" style="cursor:pointer; color:var(--gold);"></i>
         </div>
-        <div id="mailList" style="max-height: 80vh; overflow-y: auto; padding-right: 5px;"></div>
+        <div id="mailList"></div>
     </div>
 
     <div class="modal" id="taskModal">
@@ -181,20 +179,22 @@
         let isLoggedIn = false;
         let checkInterval = null;
 
-        // --- Notifications & Mailbox Logic ---
-        async function checkNotifications() {
+        // --- Notifications & Mailbox (WOLF FIX) ---
+        async function fetchMessages() {
             if(!isLoggedIn || !currentUser) return;
             try {
                 const res = await fetch(`${PROFILE_URL}?action=getProfile&email=${currentUser.email}&code=${currentUser.code}`);
                 const data = await res.json();
-                if(data.status === "success" && data.messageFromEzz) {
-                    const newMsg = data.messageFromEzz.trim();
+                
+                // التأكد من وجود الرسالة في الاستجابة (تأكد أن الأب سكريبت يرسل حقل messageFromEzz)
+                const newMsg = data.messageFromEzz || data.ezzMsg || "";
+                
+                if(newMsg.trim() !== "") {
                     let savedMails = JSON.parse(localStorage.getItem('eyc_mails') || '[]');
-                    
-                    // إذا كانت الرسالة جديدة وغير موجودة في أول السجل
-                    if (newMsg !== "" && (savedMails.length === 0 || savedMails[0].text !== newMsg)) {
+                    // التحقق إذا كانت الرسالة جديدة ولم تضاف من قبل
+                    if (savedMails.length === 0 || savedMails[0].text !== newMsg.trim()) {
                         const mailObj = {
-                            text: newMsg,
+                            text: newMsg.trim(),
                             date: new Date().toLocaleString('en-GB', { day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit' })
                         };
                         savedMails.unshift(mailObj);
@@ -203,14 +203,14 @@
                         renderMails();
                     }
                 }
-            } catch (e) { console.error("Sync Error"); }
+            } catch (e) { console.error("Sync Error:", e); }
         }
 
         function renderMails() {
             const list = document.getElementById('mailList');
             const mails = JSON.parse(localStorage.getItem('eyc_mails') || '[]');
             if(mails.length === 0) {
-                list.innerHTML = '<p style="text-align:center; opacity:0.3; margin-top:50px; font-family:Orbitron;">NO INCOMING COMMS</p>';
+                list.innerHTML = '<p style="text-align:center; opacity:0.3; margin-top:50px;">NO COMMS YET</p>';
                 return;
             }
             list.innerHTML = mails.map(m => `
@@ -284,7 +284,7 @@
 
         function closeGuide() { document.getElementById('guideOverlay').style.display = 'none'; }
 
-        // --- Original Dashboard Logic ---
+        // --- Dashboard Core ---
         const IMG = {
             tk: "https://raw.githubusercontent.com/eycfde-prog/EYCSSP/047aeca8ef0fa0d95627552cfb62fd8300531134/frontend/eyclgos/Token.png",
             star: "https://raw.githubusercontent.com/eycfde-prog/EYCSSP/047aeca8ef0fa0d95627552cfb62fd8300531134/frontend/eyclgos/Star.png",
@@ -357,27 +357,18 @@
             fetch(`${PROFILE_URL}?action=getProfile&email=${email}&code=${code}`)
                 .then(r => r.json()).then(res => {
                     if(res.status === "success") {
-                        currentUser = res; 
-                        currentUser.email = email; 
-                        currentUser.code = code; 
-                        isLoggedIn = true;
+                        currentUser = res; currentUser.email = email; currentUser.code = code; isLoggedIn = true;
                         localStorage.setItem('eyc_user', JSON.stringify(currentUser));
-                        closeModal('loginModal'); 
-                        renderHeader(); 
-                        generateCards();
-                        checkNotifications();
+                        closeModal('loginModal'); renderHeader(); generateCards();
+                        fetchMessages(); // جلب الرسائل فور تسجيل الدخول
                         if(checkInterval) clearInterval(checkInterval);
-                        checkInterval = setInterval(checkNotifications, 30000); // تحديث كل 30 ثانية
+                        checkInterval = setInterval(fetchMessages, 30000);
                     } else alert(res.message);
                     btn.innerText = "SIGN IN";
                 });
         }
 
-        function handleLogout() { 
-            localStorage.clear(); 
-            if(checkInterval) clearInterval(checkInterval);
-            location.reload(); 
-        }
+        function handleLogout() { localStorage.clear(); location.reload(); }
         function openLogin() { document.getElementById('loginModal').style.display = 'flex'; }
         function closeModal(id) { document.getElementById(id).style.display = 'none'; }
         function switchType(type, btn) {
@@ -407,12 +398,10 @@
             if(saved) { 
                 currentUser = JSON.parse(saved); 
                 isLoggedIn = true; 
-                checkNotifications();
-                checkInterval = setInterval(checkNotifications, 30000);
+                fetchMessages(); // جلب الرسائل المخزنة والجديدة فور الفتح
+                checkInterval = setInterval(fetchMessages, 30000);
             }
-            renderHeader(); 
-            generateCards();
-            renderMails();
+            renderHeader(); generateCards(); renderMails();
             
             const container = document.getElementById('star-container');
             for (let i = 0; i < 50; i++) {
