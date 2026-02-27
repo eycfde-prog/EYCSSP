@@ -3,17 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>EYC Super Stars | Command Center</title>
+    <title>EYC Super Stars | Elite Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Orbitron:wght@400;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root {
-            --gold: #b38728; /* ذهبي مطفي قليلاً للوضوح */
-            --gold-gradient: linear-gradient(135deg, #bf953f, #fcf6ba, #b38728);
+            --gold: #C5A028;
+            --gold-light: #E5D291;
+            --gold-gradient: linear-gradient(135deg, #a6841c, #E5D291, #8e6d15);
             --bg-deep: #030306; 
             --glass: rgba(255, 255, 255, 0.03);
-            --glass-border: rgba(212, 175, 55, 0.15);
-            --black-trans: rgba(0, 0, 0, 0.85);
+            --glass-border: rgba(197, 160, 40, 0.2);
+            --neon-gold: 0 0 15px rgba(197, 160, 40, 0.4);
+            --gold-glow: rgba(212, 175, 55, 0.3);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; -webkit-tap-highlight-color: transparent; }
@@ -23,90 +25,54 @@
         .star { position: absolute; background: #fff; border-radius: 50%; opacity: 0.3; animation: pulse var(--duration) infinite ease-in-out; }
         @keyframes pulse { 0%, 100% { opacity: 0.2; transform: scale(1); } 50% { opacity: 0.7; transform: scale(1.5); } }
 
-        /* --- Floating Guide (Fairytale) --- */
-        .guide-floating {
-            position: fixed; bottom: 30px; right: 20px; width: 60px; height: 60px;
-            background: var(--gold-gradient); border-radius: 50%; display: flex;
-            align-items: center; justify-content: center; cursor: pointer;
-            box-shadow: 0 0 20px rgba(212,175,55,0.4); z-index: 1001;
-            animation: float 3s infinite ease-in-out;
-        }
-        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
+        .top-nav { position: fixed; top: 0; width: 100%; padding: 20px 6%; display: flex; justify-content: space-between; align-items: center; z-index: 1000; backdrop-filter: blur(10px); border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .nav-icon { font-size: 1.2rem; color: var(--gold); cursor: pointer; transition: 0.3s; opacity: 0.8; }
+        .nav-icon:hover { opacity: 1; transform: scale(1.1); filter: drop-shadow(0 0 8px var(--gold)); }
 
-        /* --- Top Navigation --- */
-        .top-nav { position: fixed; top: 0; width: 100%; padding: 15px 6%; display: flex; justify-content: space-between; align-items: center; z-index: 1000; backdrop-filter: blur(15px); border-bottom: 1px solid var(--glass-border); }
-        .nav-icon { font-size: 1.2rem; color: var(--gold); cursor: pointer; transition: 0.3s; }
+        .hero-banner { width: 100%; padding: 100px 20px 40px; text-align: center; }
+        .profile-card { position: relative; display: inline-flex; flex-direction: column; align-items: center; }
+        .avatar-wrapper { position: relative; width: 120px; height: 120px; padding: 4px; background: var(--gold-gradient); border-radius: 50%; box-shadow: 0 0 30px var(--gold-glow); margin-bottom: 15px; }
+        .avatar-main { width: 100%; height: 100%; border-radius: 50%; border: 4px solid #050508; background-size: cover; background-position: center; }
+        .rank-tag { position: absolute; bottom: -5px; background: #000; border: 1px solid var(--gold); padding: 2px 12px; border-radius: 10px; font-family: 'Orbitron'; font-size: 0.65rem; color: var(--gold); letter-spacing: 1px; }
 
-        /* --- Profile Icons & Stats --- */
-        .stat-img { width: 18px; height: 18px; object-fit: contain; }
-        .stats-row { display: flex; gap: 15px; margin-top: 20px; background: var(--glass); padding: 8px 20px; border-radius: 20px; border: 1px solid var(--glass-border); }
-        .stat-item { font-family: 'Orbitron'; font-size: 0.75rem; display: flex; align-items: center; gap: 6px; }
+        .student-name { font-family: 'Cinzel', serif; font-size: clamp(1.4rem, 5vw, 2rem); letter-spacing: 3px; background: var(--gold-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-top: 10px; }
+        .student-title { font-size: 0.7rem; color: #888; text-transform: uppercase; letter-spacing: 3px; margin-top: 5px; }
 
-        /* --- Dashboard Grid --- */
-        .grid-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 20px; padding: 20px 6% 120px; justify-content: center; }
-        .activity-card { 
-            background: linear-gradient(145deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.01) 100%); 
-            border: 1px solid var(--glass-border); border-radius: 18px; padding: 30px 15px; text-align: center; 
-            transition: 0.4s; cursor: pointer; position: relative;
-        }
-        .activity-card:hover { transform: translateY(-8px); border-color: var(--gold); }
-        .tk-badge { position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.6); color: var(--gold); font-family: 'Orbitron'; font-size: 0.6rem; padding: 2px 8px; border-radius: 8px; border: 1px solid var(--gold); }
-        .card-icon { font-size: 2rem; margin-bottom: 15px; background: var(--gold-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .stats-row { display: flex; gap: 20px; margin-top: 20px; background: rgba(255,255,255,0.03); padding: 10px 25px; border-radius: 30px; border: 1px solid var(--glass-border); align-items: center; }
+        .stat-icon { height: 18px; object-fit: contain; }
+        .stat-item { font-family: 'Orbitron'; font-size: 0.85rem; display: flex; align-items: center; gap: 8px; }
+        .stat-item span { color: var(--gold); }
 
-        /* --- Task Nodes with Locks --- */
-        .tasks-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin: 25px 0; }
-        .task-node { 
-            aspect-ratio: 1; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); 
-            border-radius: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; 
-            cursor: pointer; position: relative; transition: 0.3s;
-        }
-        .lock-overlay { font-size: 0.7rem; color: #666; margin-top: 4px; }
-        .task-date-popup {
-            position: absolute; top: -35px; left: 50%; transform: translateX(-50%);
-            background: #000; color: #fff; font-size: 0.6rem; padding: 4px 8px;
-            border-radius: 4px; white-space: nowrap; display: none; z-index: 10;
-            border: 1px solid var(--gold);
-        }
+        .grid-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 20px; padding: 0 6% 100px; }
+        .activity-card { background: linear-gradient(145deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.01) 100%); border: 1px solid rgba(255,255,255,0.08); border-radius: 20px; padding: 35px 15px; text-align: center; transition: 0.5s; cursor: pointer; position: relative; overflow: hidden; }
+        .activity-card:hover { transform: translateY(-10px); border-color: var(--gold); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .card-icon { position: relative; z-index: 1; font-size: 2.2rem; margin-bottom: 10px; background: var(--gold-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .tk-activity-badge { font-family: 'Orbitron'; font-size: 0.6rem; color: var(--gold); border: 1px solid var(--gold); padding: 2px 8px; border-radius: 5px; margin-top: 10px; display: inline-block; }
 
-        /* --- Mailbox Overhaul --- */
-        .mail-card {
-            background: rgba(255,255,255,0.03); border-radius: 15px; padding: 15px; margin-bottom: 12px;
-            border-left: 3px solid var(--gold); transition: 0.3s; cursor: pointer;
-        }
-        .mail-card:hover { background: rgba(212, 175, 55, 0.05); transform: scale(1.02); }
-        .mail-content-box {
-            background: #0a0a0f; border: 1px solid var(--glass-border); border-radius: 20px;
-            padding: 25px; line-height: 1.8; color: #ddd; font-size: 0.9rem;
-        }
-
-        /* --- Utility --- */
-        .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.92); display: none; justify-content: center; align-items: center; z-index: 2000; backdrop-filter: blur(15px); }
-        .modal-content { width: 90%; max-width: 450px; }
-        .tab-switcher { background: #000; padding: 5px; border-radius: 50px; display: flex; border: 1px solid var(--glass-border); width: 280px; margin: 20px auto; }
-        .tab-btn { flex: 1; padding: 10px; border: none; background: transparent; color: #666; border-radius: 40px; cursor: pointer; font-weight: 700; font-size: 0.65rem; transition: 0.3s; }
+        .tab-switcher { background: #000; padding: 4px; border-radius: 15px; display: flex; border: 1px solid var(--glass-border); width: 90%; max-width: 300px; margin: 20px auto; }
+        .tab-btn { flex: 1; padding: 12px; border: none; background: transparent; color: #666; border-radius: 12px; cursor: pointer; font-weight: 700; font-size: 0.65rem; letter-spacing: 2px; }
         .tab-btn.active { color: #000; background: var(--gold-gradient); }
+
+        .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.9); display: none; justify-content: center; align-items: center; z-index: 2000; backdrop-filter: blur(20px); }
+        .modal-content { background: #050508; border-radius: 25px; padding: 40px; width: 90%; max-width: 400px; border: 1px solid var(--glass-border); position: relative; }
+
+        .tasks-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin: 30px 0; }
+        .task-node { position: relative; aspect-ratio: 1; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-family: 'Orbitron'; font-size: 0.8rem; overflow: hidden; transition: 0.3s; }
+        .task-node:hover { background: rgba(197, 160, 40, 0.1); border-color: var(--gold); }
+
+        .btn-exit { background: transparent; border: 1px solid #444; color: #888; padding: 12px 30px; border-radius: 12px; cursor: pointer; font-family: 'Orbitron'; font-size: 0.7rem; transition: 0.3s; width: 100%; }
+        .btn-exit:hover { border-color: var(--gold); color: var(--gold); }
     </style>
 </head>
 <body>
 
     <div id="star-container"></div>
-
-    <div class="guide-floating" onclick="alert('Guidance System Offline - Coming Soon')">
-        <i class="fas fa-hat-wizard" style="font-size: 1.5rem; color: #000;"></i>
-    </div>
-
     <nav class="top-nav">
-        <i class="fas fa-chevron-left nav-icon" onclick="window.location.href='index.html'"></i>
-        <div style="display: flex; gap: 20px;">
-            <div onclick="openMailbox()" style="position: relative; cursor: pointer;">
-                <i class="fas fa-paper-plane nav-icon"></i>
-                <span id="notifDot" style="display:none; position:absolute; top:-2px; right:-2px; width:8px; height:8px; background:red; border-radius:50%;"></span>
-            </div>
-            <i class="fas fa-power-off nav-icon" id="logoutBtn" style="display:none;" onclick="handleLogout()"></i>
-        </div>
+        <i class="fas fa-arrow-left nav-icon" onclick="window.location.href='index.html'"></i>
+        <i class="fas fa-power-off nav-icon" id="logoutBtn" style="display:none;" onclick="handleLogout()"></i>
     </nav>
 
-    <header class="hero-banner" id="heroBanner" style="padding-top: 100px; text-align: center;"></header>
+    <header class="hero-banner" id="heroBanner"></header>
 
     <div class="tab-switcher">
         <button class="tab-btn active" onclick="switchType('season', this)">SEASON</button>
@@ -116,112 +82,69 @@
     <main><div class="grid-container" id="cardsGrid"></div></main>
 
     <div class="modal" id="taskModal">
-        <div class="modal-content" style="background:#050508; padding:30px; border-radius:30px; border:1px solid var(--glass-border);">
-            <h2 id="mTitle" style="text-align:center; font-family:'Cinzel'; color:var(--gold);">MISSION</h2>
+        <div class="modal-content">
+            <h2 id="mTitle" style="text-align:center; font-family:'Cinzel'; color:#fff; margin-bottom:20px;">MISSION</h2>
             <div class="tasks-grid" id="tGrid"></div>
-            <button onclick="closeModal('taskModal')" style="width:100%; padding:12px; background:transparent; border:1px solid #333; color:#666; border-radius:12px; cursor:pointer;">RETURN</button>
+            <button class="btn-exit" onclick="closeModal('taskModal')">CLOSE</button>
         </div>
     </div>
 
-    <div class="modal" id="mailModal">
+    <div class="modal" id="loginModal">
         <div class="modal-content">
-            <div id="mailboxView">
-                <h3 style="font-family:'Orbitron'; color:var(--gold); margin-bottom:20px;">COMMS CENTER</h3>
-                <div id="mailList" style="max-height: 400px; overflow-y: auto;"></div>
-                <button onclick="closeModal('mailModal')" style="width:100%; margin-top:20px; padding:10px; background:none; border:none; color:var(--gold);">CLOSE</button>
-            </div>
-            <div id="mailDetailView" style="display:none;">
-                <div class="mail-content-box" id="fullMessageContent"></div>
-                <button onclick="backToMailbox()" style="width:100%; margin-top:20px; padding:12px; background:var(--gold-gradient); border:none; border-radius:10px; font-weight:bold;">BACK</button>
-            </div>
+            <h2 style="font-family:'Cinzel'; color:var(--gold); text-align:center; margin-bottom:20px;">AUTHENTICATION</h2>
+            <input type="email" id="loginEmail" style="width:100%; padding:15px; margin:8px 0; border-radius:12px; background:rgba(255,255,255,0.05); border:1px solid #333; color:#fff;" placeholder="EMAIL">
+            <input type="password" id="loginCode" style="width:100%; padding:15px; margin:8px 0; border-radius:12px; background:rgba(255,255,255,0.05); border:1px solid #333; color:#fff;" placeholder="CODE">
+            <button onclick="handleLogin()" id="loginSubmitBtn" style="width:100%; margin-top:15px; padding:15px; border-radius:12px; background:var(--gold-gradient); border:none; font-weight:900; cursor:pointer;">SIGN IN</button>
+            <button class="btn-exit" style="margin-top:10px;" onclick="closeModal('loginModal')">CANCEL</button>
         </div>
     </div>
 
     <script>
-        const SCRIPT_URL = "YOUR_SCRIPT_URL_HERE";
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxe3gYkhNIN4cMqpY2RAglBYWp-m9XHxMiVGXLR7-7j-gPo9Cc0zdg1ALQmT2i-griu/exec";
+        const IMG = {
+            tk: "https://raw.githubusercontent.com/eycfde-prog/EYCSSP/047aeca8ef0fa0d95627552cfb62fd8300531134/frontend/eyclgos/Token.png",
+            star: "https://raw.githubusercontent.com/eycfde-prog/EYCSSP/047aeca8ef0fa0d95627552cfb62fd8300531134/frontend/eyclgos/Star.png",
+            gt: "https://raw.githubusercontent.com/eycfde-prog/EYCSSP/047aeca8ef0fa0d95627552cfb62fd8300531134/frontend/eyclgos/GT.png"
+        };
+
         let currentUser = null;
         let isLoggedIn = false;
 
         const activities = {
             season: [
-                { name: "Alike", icon: "fa-clone", tk: 50, code: "AS" },
-                { name: "Vivid", icon: "fa-wand-magic-sparkles", tk: 50, code: "VV" },
-                { name: "Label", icon: "fa-tag", tk: 50, code: "LB" },
-                { name: "Grammar", icon: "fa-spell-check", tk: 50, code: "GR" },
-                { name: "Golden Ear", icon: "fa-ear-listen", tk: 50, code: "GE" },
-                { name: "Seeds", icon: "fa-seedling", tk: 50, code: "SD" }
+                { name: "Alike", icon: "fa-clone", code: "AS", tk: 50 },
+                { name: "Label", icon: "fa-tag", code: "LB", tk: 50 },
+                { name: "Golden Ear", icon: "fa-ear-listen", code: "GE", tk: 50 },
+                { name: "Grammar", icon: "fa-spell-check", code: "GR", tk: 50 },
+                { name: "Vivid", icon: "fa-wand-magic-sparkles", code: "VV", tk: 50 },
+                { name: "Seeds", icon: "fa-seedling", code: "SD", tk: 50 }
             ],
             royal: [
-                { name: "Alike X", icon: "fa-star", tk: 50, code: "ASX" },
-                { name: "Label X", icon: "fa-tags", tk: 50, code: "LBX" },
-                { name: "Golden Ear X", icon: "fa-ear-flash", tk: 50, code: "GEX" },
-                { name: "Grammar X", icon: "fa-pen-nib", tk: 50, code: "GRX" },
-                { name: "Vivid X", icon: "fa-bolt", tk: 50, code: "VVX" },
-                { name: "Seeds X", icon: "fa-leaf", tk: 50, code: "SDX" },
-                { name: "Figurative X", icon: "fa-mask", tk: 50, code: "FGX" },
-                { name: "Dictation X", icon: "fa-microphone", tk: 100, code: "DTX" },
-                { name: "Sing Sang Sung", icon: "fa-music", tk: 100, code: "SSSX" },
-                { name: "Elmagazine X", icon: "fa-book", tk: 100, code: "EMX" }
+                { name: "Alike X", icon: "fa-star", code: "ASX", tk: 50 },
+                { name: "Label X", icon: "fa-tags", code: "LBX", tk: 50 },
+                { name: "Golden Ear X", icon: "fa-ear-deaf", code: "GEX", tk: 50 },
+                { name: "Grammar X", icon: "fa-pen-fancy", code: "GRX", tk: 50 },
+                { name: "Vivid X", icon: "fa-wand-magic", code: "VVX", tk: 50 },
+                { name: "Seeds X", icon: "fa-tree", code: "SDX", tk: 50 },
+                { name: "Figurative X", icon: "fa-mask", code: "FGX", tk: 50 },
+                { name: "Dictation X", icon: "fa-microphone-lines", code: "DTX", tk: 100 },
+                { name: "Sing Sang Sung X", icon: "fa-music", code: "SSSX", tk: 100 },
+                { name: "Elmagazine X", icon: "fa-book-open", code: "EMX", tk: 100 }
             ]
         };
 
-        function calculateTaskDate(type, taskIndex) {
-            const startSeason = new Date(2026, 1, 25); // Feb 25
-            const startRoyal = new Date(2026, 1, 28);  // Feb 28
-            let date = new Date(type === 'season' ? startSeason : startRoyal);
-
-            if (taskIndex > 0) {
-                if (type === 'season') {
-                    // زيادة تدريجية: 4, 5, 6...
-                    let daysToAdd = 0;
-                    for(let i=1; i<=taskIndex; i++) daysToAdd += (3 + i);
-                    date.setDate(date.getDate() + daysToAdd);
-                } else {
-                    // زيادة ثابتة 3 أيام
-                    date.setDate(date.getDate() + (taskIndex * 3));
-                }
-            }
-            return date;
-        }
-
-        function generateCards() {
-            const grid = document.getElementById('cardsGrid'); grid.innerHTML = '';
-            const type = document.querySelector('.tab-btn.active').innerText.toLowerCase().includes('royal') ? 'royal' : 'season';
-            activities[type].forEach(act => {
-                const card = document.createElement('div');
-                card.className = 'activity-card';
-                card.innerHTML = `<div class="tk-badge">${act.tk} TK</div><i class="fa-solid ${act.icon} card-icon"></i><h3 style="font-size:0.9rem; letter-spacing:1px;">${act.name}</h3>`;
-                card.onclick = () => openTasks(act.name, act.code, type);
-                grid.appendChild(card);
-            });
-        }
-
-        function openTasks(name, code, type) {
+        // Wolf: Time Protocol Disabled
+        function openTasks(name, code) {
             document.getElementById('mTitle').innerText = name;
             const tGrid = document.getElementById('tGrid'); tGrid.innerHTML = '';
-            const today = new Date();
-
-            for (let i = 0; i < 10; i++) {
-                const taskDate = calculateTaskDate(type, i);
-                const isLocked = today < taskDate;
+            
+            for (let i = 1; i <= 10; i++) {
                 const node = document.createElement('div');
                 node.className = 'task-node';
-                node.innerHTML = `
-                    <span style="font-family:'Orbitron'; font-weight:bold;">${i+1}</span>
-                    <div class="task-date-popup">${taskDate.toDateString()}</div>
-                    ${isLocked ? '<i class="fas fa-lock lock-overlay"></i>' : '<i class="fas fa-play" style="font-size:0.5rem; color:var(--gold);"></i>'}
-                `;
-
-                node.onclick = (e) => {
-                    if (!isLoggedIn) return alert("AUTHORIZED LOGIN REQUIRED");
-                    if (isLocked) {
-                        const popup = node.querySelector('.task-date-popup');
-                        popup.style.display = 'block';
-                        setTimeout(() => popup.style.display = 'none', 2000);
-                    } else {
-                        // Launch Task logic here
-                        console.log("Launching task", i+1);
-                    }
+                node.innerText = i;
+                node.onclick = () => {
+                    if (!isLoggedIn) return openLogin();
+                    window.location.href = `EYCArena.html?email=${currentUser.email}&act=${code}&task=${i}`;
                 };
                 tGrid.appendChild(node);
             }
@@ -233,49 +156,34 @@
             if (isLoggedIn) {
                 document.getElementById('logoutBtn').style.display = "block";
                 header.innerHTML = `
-                    <div style="display:inline-block; position:relative;">
-                        <img src="${currentUser.avatar}" style="width:100px; height:100px; border-radius:50%; border:3px solid var(--gold); box-shadow:0 0 20px var(--gold-glow);">
-                        <div style="background:#000; border:1px solid var(--gold); padding:2px 10px; border-radius:10px; font-size:0.6rem; margin-top:-10px; position:relative;">RANK #${currentUser.rank}</div>
-                    </div>
-                    <h2 style="font-family:'Cinzel'; background:var(--gold-gradient); -webkit-background-clip:text; -webkit-text-fill-color:transparent; margin-top:15px;">${currentUser.name}</h2>
-                    <div class="stats-row" style="justify-content:center; display:inline-flex;">
-                        <div class="stat-item"><img src="https://raw.githubusercontent.com/eycfde-prog/EYCSSP/047aeca8ef0fa0d95627552cfb62fd8300531134/frontend/eyclgos/Token.png" class="stat-img"> <span>${currentUser.tokens}</span></div>
-                        <div class="stat-item"><img src="https://raw.githubusercontent.com/eycfde-prog/EYCSSP/047aeca8ef0fa0d95627552cfb62fd8300531134/frontend/eyclgos/Star.png" class="stat-img"> <span>${currentUser.stars}</span></div>
-                        <div class="stat-item"><img src="https://raw.githubusercontent.com/eycfde-prog/EYCSSP/047aeca8ef0fa0d95627552cfb62fd8300531134/frontend/eyclgos/GT.png" class="stat-img"> <span>${currentUser.goldTickets}</span></div>
-                    </div>
-                `;
+                    <div class="profile-card">
+                        <div class="avatar-wrapper">
+                            <div class="avatar-main" style="background-image: url('${currentUser.avatar}')"></div>
+                            <div class="rank-tag">RANK #${currentUser.rank}</div>
+                        </div>
+                        <h1 class="student-name">${currentUser.name}</h1>
+                        <p class="student-title">${currentUser.title}</p>
+                        <div class="stats-row">
+                            <div class="stat-item"><img src="${IMG.tk}" class="stat-icon"> <span>${currentUser.tokens}</span></div>
+                            <div class="stat-item"><img src="${IMG.star}" class="stat-icon"> <span>${currentUser.stars}</span></div>
+                            <div class="stat-item"><img src="${IMG.gt}" class="stat-icon"> <span>${currentUser.goldTickets}</span></div>
+                        </div>
+                    </div>`;
             } else {
-                header.innerHTML = `<h2 style="font-family:'Cinzel';">GUEST COMMAND</h2><button onclick="alert('Redirecting to Auth...')" style="margin-top:20px; padding:10px 30px; border-radius:20px; background:var(--gold-gradient); border:none; cursor:pointer; font-weight:bold;">LOGIN</button>`;
+                header.innerHTML = `<h1 class="student-name">ARENA ACCESS</h1><button class="btn-exit" style="width:auto; margin-top:20px;" onclick="openLogin()">AUTHORIZE LOGIN</button>`;
             }
         }
 
-        // ... بقية دوال المايل بوكس المعدلة ...
-        function openMailbox() {
-            document.getElementById('mailModal').style.display = 'flex';
-            renderMailList();
-        }
-
-        function renderMailList() {
-            const list = document.getElementById('mailList');
-            const mails = JSON.parse(localStorage.getItem('eyc_mails') || '[]');
-            list.innerHTML = mails.map((m, i) => `
-                <div class="mail-card" onclick="readMail(${i})">
-                    <div style="font-size:0.6rem; opacity:0.5;">${m.date}</div>
-                    <div style="font-size:0.8rem; text-overflow:ellipsis; overflow:hidden; white-space:nowrap;">${m.text}</div>
-                </div>
-            `).join('') || '<p style="text-align:center; opacity:0.5;">No Comms Found</p>';
-        }
-
-        function readMail(i) {
-            const mails = JSON.parse(localStorage.getItem('eyc_mails'));
-            document.getElementById('mailboxView').style.display = 'none';
-            document.getElementById('mailDetailView').style.display = 'block';
-            document.getElementById('fullMessageContent').innerText = mails[i].text;
-        }
-
-        function backToMailbox() {
-            document.getElementById('mailDetailView').style.display = 'none';
-            document.getElementById('mailboxView').style.display = 'block';
+        function generateCards() {
+            const grid = document.getElementById('cardsGrid'); grid.innerHTML = '';
+            const type = document.querySelector('.tab-btn.active').innerText.toLowerCase().includes('royal') ? 'royal' : 'season';
+            activities[type].forEach(act => {
+                const card = document.createElement('div');
+                card.className = 'activity-card';
+                card.innerHTML = `<i class="fa-solid ${act.icon} card-icon"></i><h3>${act.name}</h3><div class="tk-activity-badge">${act.tk} TK</div>`;
+                card.onclick = () => openTasks(act.name, act.code);
+                grid.appendChild(card);
+            });
         }
 
         function switchType(type, btn) {
@@ -284,27 +192,40 @@
             generateCards();
         }
 
-        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
-
-        function createStars() {
-            const container = document.getElementById('star-container');
-            for (let i = 0; i < 50; i++) {
-                const star = document.createElement('div');
-                star.className = 'star';
-                star.style.width = star.style.height = '2px';
-                star.style.left = Math.random() * 100 + '%';
-                star.style.top = Math.random() * 100 + '%';
-                star.style.setProperty('--duration', (Math.random() * 3 + 2) + 's');
-                container.appendChild(star);
-            }
+        function handleLogin() {
+            const email = document.getElementById('loginEmail').value;
+            const code = document.getElementById('loginCode').value;
+            const btn = document.getElementById('loginSubmitBtn');
+            btn.innerText = "LINKING...";
+            fetch(`${SCRIPT_URL}?action=getProfile&email=${email}&code=${code}`)
+                .then(r => r.json()).then(res => {
+                    if(res.status === "success") {
+                        currentUser = res; currentUser.email = email; isLoggedIn = true;
+                        localStorage.setItem('eyc_user', JSON.stringify(currentUser));
+                        closeModal('loginModal'); renderHeader(); generateCards();
+                    } else alert(res.message);
+                    btn.innerText = "SIGN IN";
+                });
         }
 
+        function handleLogout() { localStorage.clear(); location.reload(); }
+        function openLogin() { document.getElementById('loginModal').style.display = 'flex'; }
+        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+
         window.onload = () => {
-            createStars();
             const saved = localStorage.getItem('eyc_user');
             if(saved) { currentUser = JSON.parse(saved); isLoggedIn = true; }
             renderHeader(); 
             generateCards();
+            
+            const container = document.getElementById('star-container');
+            for (let i = 0; i < 50; i++) {
+                const s = document.createElement('div'); s.className = 'star';
+                s.style.width = s.style.height = '2px';
+                s.style.left = Math.random()*100+'%'; s.style.top = Math.random()*100+'%';
+                s.style.setProperty('--duration', (Math.random()*3+2)+'s');
+                container.appendChild(s);
+            }
         };
     </script>
 </body>
