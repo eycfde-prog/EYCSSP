@@ -3,92 +3,272 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>EYC Super Stars | Elite Dashboard</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Orbitron:wght@400;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <title>EYC Superstars | Ramadan Edition</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Orbitron:wght@400;700;900&family=Poppins:wght@300;400;600&family=Amiri:wght@700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" href="style.css">
+    
+    <style>
+        :root {
+            --gold: #D4AF37;
+            --gold-light: #fcf6ba;
+            --gold-gradient: linear-gradient(135deg, #bf953f, #fcf6ba, #b38728);
+            --bg-deep: #030306;
+            --gold-glow: rgba(212, 175, 55, 0.3);
+            --glass-border: rgba(212, 175, 55, 0.15);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { background: var(--bg-deep); color: white; min-height: 100vh; overflow-x: hidden; display: flex; flex-direction: column; }
+
+        /* Background - Ramadan Atmosphere */
+        #ramadan-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; }
+        .bg-glow {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle at 50% 30%, rgba(212, 175, 55, 0.08) 0%, transparent 70%);
+            z-index: -1;
+        }
+
+        /* Hero Section */
+        .hero { text-align: center; padding: 60px 20px 20px; display: flex; flex-direction: column; align-items: center; }
+
+        .logo-container { position: relative; margin-bottom: 25px; }
+        
+        /* الهلال خلف اللوجو */
+        .crescent {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -55%);
+            font-size: 180px;
+            color: var(--gold);
+            opacity: 0.15;
+            filter: blur(2px);
+            z-index: 1;
+            text-shadow: 0 0 30px var(--gold);
+        }
+
+        .main-logo { width: 140px; filter: drop-shadow(0 0 25px var(--gold-glow)); z-index: 2; position: relative; }
+
+        .hero h1 {
+            font-family: 'Cinzel', serif; font-size: clamp(1.8rem, 10vw, 3.5rem);
+            background: var(--gold-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            line-height: 1.1; letter-spacing: 6px; margin-top: 15px;
+        }
+
+        .ramadan-kareem {
+            font-family: 'Amiri', serif; font-size: 1.8rem; color: var(--gold);
+            margin-top: 5px; letter-spacing: 4px; opacity: 0.8;
+            text-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
+        }
+
+        /* Mission Control */
+        .mission-control { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: space-around; padding-bottom: 40px; }
+
+        .core-container {
+            position: relative; width: clamp(260px, 75vw, 320px); height: clamp(260px, 75vw, 320px);
+            display: flex; align-items: center; justify-content: center; cursor: pointer; margin: 20px 0;
+        }
+
+        .core-ring { position: absolute; border-radius: 50%; border: 1px solid var(--glass-border); transition: 0.5s ease; }
+        .ring-outer { width: 100%; height: 100%; border-style: double; border-width: 2px; animation: rotateRight 40s linear infinite; }
+        .ring-inner { width: 80%; height: 80%; border-style: dashed; border-width: 1px; opacity: 0.4; animation: rotateLeft 25s linear infinite; }
+
+        @keyframes rotateRight { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        @keyframes rotateLeft { from { transform: rotate(360deg); } to { transform: rotate(0deg); } }
+
+        .main-core-btn {
+            width: 55%; height: 55%;
+            background: radial-gradient(circle, #0a0a0f 0%, #030306 100%);
+            border: 1px solid var(--gold); border-radius: 50%;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            color: var(--gold); font-family: 'Orbitron'; font-weight: 900;
+            box-shadow: 0 0 40px rgba(212, 175, 55, 0.1), inset 0 0 20px var(--gold-glow);
+            z-index: 10; transition: 0.4s;
+        }
+
+        .core-container:hover .main-core-btn { transform: scale(1.05); box-shadow: 0 0 50px var(--gold-glow); }
+
+        /* Navigation Buttons */
+        .btn-stack { display: flex; flex-direction: column; gap: 15px; width: 100%; max-width: 300px; padding: 0 20px; }
+
+        .nav-btn {
+            width: 100%; padding: 16px; border-radius: 12px;
+            background: rgba(255, 255, 255, 0.03); color: #fff;
+            border: 1px solid var(--glass-border); backdrop-filter: blur(10px);
+            cursor: pointer; transition: 0.3s; font-family: 'Orbitron';
+            text-decoration: none; text-align: center; font-size: 0.8rem;
+            letter-spacing: 2px; font-weight: 600;
+        }
+
+        .nav-btn:hover { background: var(--gold-gradient); color: #000; transform: translateY(-2px); }
+
+        footer { padding: 30px; text-align: center; opacity: 0.5; font-size: 0.6rem; color: var(--gold); font-family: 'Orbitron'; letter-spacing: 2px; }
+        
+        .star { position: absolute; width: 2px; height: 2px; background: #fff; border-radius: 50%; opacity: 0.5; }
+
+        .refresh-mini {
+            font-size: 0.7rem;
+            color: var(--gold);
+            cursor: pointer;
+            margin-left: 10px;
+            transition: 0.3s;
+        }
+        .refresh-mini:hover { transform: rotate(180deg); }
+        .fa-spin-custom { animation: fa-spin 1s linear infinite; }
+    </style>
 </head>
 <body>
 
-    <div id="star-container"></div>
-    <nav class="top-nav">
-        <i class="fas fa-arrow-left nav-icon" onclick="window.location.href='index.html'"></i>
-        <div style="display: flex; align-items: center; gap: 15px;">
-            <div id="notifBell" class="nav-icon" onclick="openMailbox()" style="position: relative;">
-                <i class="fas fa-bell"></i>
-                <span id="notifDot" style="display:none; position: absolute; top: -5px; right: -5px; width: 10px; height: 10px; background: red; border-radius: 50%; border: 2px solid var(--bg-deep);"></span>
+    <div class="bg-glow"></div>
+    <canvas id="ramadan-canvas"></canvas>
+
+    <header class="hero" id="heroBanner">
+        <div class="logo-container">
+            <div class="crescent"><i class="fas fa-moon"></i></div>
+            <img src="logo.png" alt="EYC Logo" class="main-logo">
+        </div>
+        <h1>SUPERSTARS</h1>
+        <div class="ramadan-kareem">رمضان كريم</div>
+    </header>
+
+    <section class="mission-control">
+        <div class="core-container" onclick="startLaunch()">
+            <div id="starOrbit" style="position:absolute; inset:0;"></div>
+            <div class="core-ring ring-outer"></div>
+            <div class="core-ring ring-inner"></div>
+            <div class="main-core-btn">
+                <i class="fas fa-mosque" style="font-size: 1.8rem; margin-bottom: 10px; opacity: 0.8;"></i>
+                <span style="letter-spacing: 4px; font-size: 0.7rem;">ENTER HUB</span>
             </div>
-            <i class="fas fa-power-off nav-icon" id="logoutBtn" style="display:none;" onclick="handleLogout()"></i>
         </div>
-    </nav>
-
-    <header class="hero-banner" id="heroBanner"></header>
-
-    <div class="tab-switcher">
-        <button class="tab-btn active" onclick="switchType('season', this)">SEASON</button>
-        <button class="tab-btn" onclick="switchType('royal', this)">ROYAL X</button>
-    </div>
-
-    <main><div class="grid-container" id="cardsGrid"></div></main>
-
-    <div id="mailDrawer">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px;">
-            <h2 style="font-family:'Orbitron'; color:var(--gold); font-size:1.1rem;">Your MailBox</h2>
-            <i class="fas fa-times" onclick="closeMailbox()" style="cursor:pointer; color:var(--gold);"></i>
+        
+        <div class="btn-stack">
+            <a href="NP.html" class="nav-btn">New Agent</a>
+            <a href="RNKS.html" class="nav-btn">Hall of Fame</a>
+            <a href="Rev.html" class="nav-btn">Academy Reviews</a>
         </div>
-        <div id="mailList"></div>
-    </div>
+    </section>
 
-    <div class="modal" id="taskModal">
-        <div class="modal-content">
-            <h2 id="mTitle" style="text-align:center; font-family:'Cinzel'; color:#fff; margin-bottom:20px;">MISSION</h2>
-            <div class="tasks-grid" id="tGrid"></div>
-            <button class="btn-exit" onclick="closeModal('taskModal')">CLOSE</button>
-        </div>
-    </div>
+    <button id="logoutBtn" style="display:none; position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); background: none; border: 1px solid var(--gold); color: var(--gold); padding: 5px 15px; border-radius: 20px; cursor: pointer;">LOGOUT</button>
 
-    <div class="modal" id="loginModal">
-        <div class="modal-content">
-            <h2 style="font-family:'Cinzel'; color:var(--gold); text-align:center; margin-bottom:20px;">AUTHENTICATION</h2>
-            <input type="email" id="loginEmail" style="width:100%; padding:15px; margin:8px 0; border-radius:12px; background:rgba(255,255,255,0.05); border:1px solid #333; color:#fff;" placeholder="EMAIL">
-            <input type="password" id="loginCode" style="width:100%; padding:15px; margin:8px 0; border-radius:12px; background:rgba(255,255,255,0.05); border:1px solid #333; color:#fff;" placeholder="CODE">
-            <button onclick="handleLogin()" id="loginSubmitBtn" style="width:100%; margin-top:15px; padding:15px; border-radius:12px; background:var(--gold-gradient); border:none; font-weight:900; cursor:pointer;">SIGN IN</button>
-            <button class="btn-exit" style="margin-top:10px;" onclick="closeModal('loginModal')">CANCEL</button>
-        </div>
-    </div>
+    <footer>&copy; 2026 EYC ACADEMY | RAMADAN INTERFACE</footer>
 
-    <div class="fairytale-float">
-        <i class="fas fa-wand-sparkles"></i>
-    </div>
+    <script>
+        const canvas = document.getElementById('ramadan-canvas');
+        const ctx = canvas.getContext('2d');
+        let lanterns = [];
 
-    <div id="ggMasterOverlay" class="gg-master-overlay">
-        <div class="gg-master-modal" id="ggMasterModal">
-            <div class="robot-master-circle">
-                <img src="https://cdn-icons-png.flaticon.com/512/4712/4712035.png" style="width:100%; height:100%; padding:10px;">
-            </div>
+        function initCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+
+        class Lantern {
+            constructor() { this.init(); }
+            init() {
+                this.x = Math.random() * canvas.width;
+                this.y = canvas.height + 50;
+                this.size = Math.random() * 15 + 10;
+                this.speed = Math.random() * 0.5 + 0.2;
+                this.wobble = Math.random() * 2;
+                this.wobbleSpeed = Math.random() * 0.02;
+                this.opacity = Math.random() * 0.4 + 0.1;
+            }
+            update() {
+                this.y -= this.speed;
+                this.x += Math.sin(this.y * this.wobbleSpeed) * 0.5;
+                if (this.y < -50) this.init();
+                
+                ctx.save();
+                ctx.globalAlpha = this.opacity;
+                ctx.fillStyle = "#D4AF37";
+                ctx.font = `${this.size}px "Font Awesome 6 Free"`;
+                ctx.fontWeight = "900";
+                ctx.fillText("\uf673", this.x, this.y); 
+                ctx.restore();
+            }
+        }
+
+        function createLanterns() {
+            lanterns = Array.from({length: 15}, () => new Lantern());
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            lanterns.forEach(l => l.update());
+            requestAnimationFrame(animate);
+        }
+
+        function startLaunch() {
+            if (window.navigator.vibrate) window.navigator.vibrate(30);
+            document.body.style.transition = "0.5s";
+            document.body.style.opacity = "0";
+            setTimeout(() => { window.location.href = "MC.html"; }, 500);
+        }
+
+        window.addEventListener('resize', initCanvas);
+        initCanvas(); createLanterns(); animate();
+
+        function renderHeader() {
+            const header = document.getElementById('heroBanner');
+            if (isLoggedIn) {
+                document.getElementById('logoutBtn').style.display = "block";
+                header.innerHTML = `
+                    <div class="profile-card">
+                        <div class="avatar-wrapper">
+                            <div class="avatar-main" style="background-image: url('${currentUser.avatar}')"></div>
+                            <div class="rank-tag">RANK #${currentUser.rank}</div>
+                        </div>
+                        <h1 class="student-name">${currentUser.name} <i class="fas fa-sync-alt refresh-mini" id="refreshBtn" onclick="refreshData()"></i></h1>
+                        <p class="student-title">${currentUser.title}</p>
+                        <div class="stats-row">
+                            <div class="stat-item"><img src="${IMG.tk}" class="stat-icon"> <span>${currentUser.tokens}</span></div>
+                            <div class="stat-item"><img src="${IMG.star}" class="stat-icon"> <span>${currentUser.stars}</span></div>
+                            <div class="stat-item"><img src="${IMG.gt}" class="stat-icon"> <span>${currentUser.goldTickets}</span></div>
+                        </div>
+                    </div>`;
+            } else {
+                header.innerHTML = `<h1 class="student-name">ARENA ACCESS</h1><button class="btn-exit" style="width:auto; margin-top:20px;" onclick="openLogin()">AUTHORIZE LOGIN</button>`;
+            }
+        }
+
+        function refreshData() {
+            const btn = document.getElementById('refreshBtn');
+            btn.classList.add('fa-spin'); 
             
-            <div class="gg-master-header">
-                <h3 style="font-family:'Orbitron'; color:var(--gold); font-size:0.8rem;">EYC MASTER GUIDE</h3>
-                <div style="display:flex; gap:15px; align-items:center;">
-                    <div class="lang-toggle">
-                        <button id="langARA" class="lang-btn" onclick="setMasterLang('ARA')">ARA</button>
-                        <button id="langENG" class="lang-btn active" onclick="setMasterLang('ENG')">ENG</button>
-                    </div>
-                    <i class="fas fa-times" onclick="closeMasterGG()" style="cursor:pointer; color:#666;"></i>
-                </div>
-            </div>
+            const email = currentUser.email;
+            const code = localStorage.getItem('eyc_last_code'); 
 
-            <div class="gg-master-body">
-                <div class="gg-master-drawer" id="masterTabs"></div>
-                <div class="gg-master-view">
-                    <h2 id="masterTitle" style="font-family:'Cinzel'; color:var(--gold); margin-bottom:10px;"></h2>
-                    <div id="masterSoul" style="color:#ccc; line-height:1.8; font-size:0.9rem; margin-bottom:20px;"></div>
-                    <div id="masterAction" style="background:rgba(197, 160, 40, 0.1); border:1px dashed var(--gold); padding:15px; border-radius:12px; color:var(--gold-light); font-size:0.8rem;"></div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <script src="script.js"></script>
+            fetch(`${SCRIPT_URL}?action=getProfile&email=${email}&code=${code}`)
+                .then(r => r.json())
+                .then(res => {
+                    if(res.status === "success") {
+                        currentUser = res;
+                        currentUser.email = email;
+                        localStorage.setItem('eyc_user', JSON.stringify(currentUser));
+                        
+                        if(res.message) {
+                            const newMail = {
+                                date: new Date().toLocaleDateString(),
+                                text: res.message 
+                            };
+                            let mails = JSON.parse(localStorage.getItem('eyc_mails') || '[]');
+                            if(mails.length === 0 || mails[0].text !== newMail.text) {
+                                mails.unshift(newMail);
+                                localStorage.setItem('eyc_mails', JSON.stringify(mails.slice(0,10))); 
+                                document.getElementById('notifDot').style.display = 'block';
+                            }
+                        }
+                        
+                        renderHeader();
+                        alert("Data Synced with EYC Cloud! ⚡");
+                    }
+                    btn.classList.remove('fa-spin');
+                })
+                .catch(err => {
+                    console.error(err);
+                    btn.classList.remove('fa-spin');
+                });
+        }
+    </script>
 </body>
 </html>
