@@ -110,6 +110,47 @@
             .rank-row { grid-template-columns: 40px 60px 1fr 100px; }
             .row-achievement { display: none; }
         }
+
+        /* Profile Modal Styles */
+        .profile-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.9);
+            backdrop-filter: blur(15px); z-index: 10000;
+            display: none; align-items: center; justify-content: center;
+            padding: 20px;
+        }
+
+        .profile-card {
+            background: linear-gradient(145deg, #12121a, #050508);
+            border: 1px solid var(--gold);
+            width: 100%; max-width: 400px;
+            border-radius: 30px; padding: 40px 20px;
+            text-align: center; position: relative;
+            box-shadow: 0 0 50px rgba(212, 175, 55, 0.2);
+        }
+
+        .close-profile {
+            position: absolute; top: 20px; right: 20px;
+            color: var(--gold); font-size: 1.5rem; cursor: pointer;
+        }
+
+        .modal-avatar {
+            width: 150px; height: 150px; border-radius: 30px;
+            border: 3px solid var(--gold); margin-bottom: 20px;
+            box-shadow: 0 0 20px var(--gold);
+        }
+
+        .modal-stats {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 15px;
+            margin-top: 30px;
+        }
+
+        .stat-box {
+            background: rgba(255,255,255,0.05); padding: 15px;
+            border-radius: 15px; border: 1px solid rgba(212, 175, 55, 0.1);
+        }
+
+        .stat-val { display: block; color: var(--gold); font-family: 'Orbitron'; font-size: 1.2rem; }
+        .stat-lbl { font-size: 0.6rem; color: #888; text-transform: uppercase; letter-spacing: 2px; } 
     </style>
 </head>
 <body>
@@ -132,91 +173,128 @@
         <div class="rank-list" id="ranks-container"></div>
     </div>
 
+    <div class="profile-overlay" id="profileOverlay">
+        <div class="profile-card">
+            <i class="fas fa-times close-profile" onclick="closeProfile()"></i>
+            <img src="" id="m-avatar" class="modal-avatar">
+            <h2 id="m-name" style="font-family:'Cinzel'; color: var(--gold);"></h2>
+            <div id="m-title" class="tier-tag" style="display:inline-block; margin-top:10px;"></div>
+            
+            <div class="modal-stats">
+                <div class="stat-box">
+                    <span class="stat-val" id="m-rank">#0</span>
+                    <span class="stat-lbl">Global Rank</span>
+                </div>
+                <div class="stat-box">
+                    <span class="stat-val" id="m-tokens">0</span>
+                    <span class="stat-lbl">Tokens (TK)</span>
+                </div>
+                <div class="stat-box">
+                    <span class="stat-val" id="m-quizzes">0</span>
+                    <span class="stat-lbl">Quizzes</span>
+                </div>
+                <div class="stat-box">
+                    <span class="stat-val" id="m-stars">0</span>
+                    <span class="stat-lbl">Stars / Tickets</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
         const scriptURL = 'https://script.google.com/macros/s/AKfycbyhM0HAV37p5ChjQyh8MBezy87EEcFgvZOShT_8fquZO0sNEK8e98JOsfyv-FJFJilL/exec';
+        let allStudents = [];
 
-async function fetchRanks() {
-    const loader = document.getElementById('matrix-loader');
-    const percentText = document.getElementById('loading-percent');
-    
-    try {
-        // إضافة Timestamp لمنع الكاش (Cache) وضمان تحديث البيانات
-        const response = await fetch(scriptURL + "?action=leaderboard&t=" + new Date().getTime());
-        const data = await response.json();
-        
-        // التحقق مما إذا كانت البيانات مصفوفة (Array)
-        if (Array.isArray(data)) {
-            renderData(data);
-        } else if (data.status === "error") {
-            throw new Error(data.message);
+        async function fetchRanks() {
+            const loader = document.getElementById('matrix-loader');
+            const percentText = document.getElementById('loading-percent');
+            
+            try {
+                const response = await fetch(scriptURL + "?action=leaderboard&t=" + new Date().getTime());
+                const data = await response.json();
+                
+                if (Array.isArray(data)) {
+                    renderData(data);
+                } else if (data.status === "error") {
+                    throw new Error(data.message);
+                }
+
+                percentText.innerText = "100%";
+                setTimeout(() => {
+                    loader.style.opacity = '0';
+                    setTimeout(() => loader.remove(), 1000);
+                }, 500);
+
+            } catch (error) {
+                percentText.innerText = "SYSTEM OFFLINE";
+                console.error('WOLF Error Report:', error);
+            }
         }
 
-        percentText.innerText = "100%";
-        setTimeout(() => {
-            loader.style.opacity = '0';
-            setTimeout(() => loader.remove(), 1000);
-        }, 500);
+        function renderData(data) {
+            allStudents = data;
+            const podiumContainer = document.getElementById('podium-container');
+            const ranksContainer = document.getElementById('ranks-container');
+            
+            const top3 = data.slice(0, 3);
+            const displayIndices = [1, 0, 2];
 
-    } catch (error) {
-        percentText.innerText = "SYSTEM OFFLINE";
-        console.error('WOLF Error Report:', error);
-    }
-}
+            let podiumHTML = '';
+            displayIndices.forEach(idx => {
+                if(!top3[idx]) return;
+                const student = top3[idx];
+                podiumHTML += `
+                    <div class="podium-item rank-${idx + 1}" onclick="showProfile('${student.Rank}')" style="cursor:pointer">
+                        ${idx === 0 ? '<i class="fas fa-crown crown-icon"></i>' : ''}
+                        <div class="tier-tag">${student.Title}</div>
+                        <div class="avatar-frame"><img src="${student.Image}" class="avatar"></div>
+                        <h3 style="font-family:'Cinzel'">${student.Name}</h3>
+                        <div class="tk-text">${student.Tokens} TK</div>
+                    </div>`;
+            });
+            podiumContainer.innerHTML = podiumHTML;
 
-function renderData(data) {
-    const podiumContainer = document.getElementById('podium-container');
-    const ranksContainer = document.getElementById('ranks-container');
-    
-    // تصحيح منطق المنصة (الأول في المنتصف)
-    const top3 = data.slice(0, 3);
-    // ترتيب العرض: الثاني (يسار)، الأول (منتصف)، الثالث (يمين)
-    const displayIndices = [];
-    if (top3[1]) displayIndices.push(1); // الثاني
-    if (top3[0]) displayIndices.push(0); // الأول
-    if (top3[2]) displayIndices.push(2); // الثالث
+            let listHTML = '';
+            data.slice(3).forEach((student) => {
+                listHTML += `
+                    <div class="rank-row" onclick="showProfile('${student.Rank}')" style="cursor:pointer">
+                        <div style="color:var(--gold); font-weight:900;">#${student.Rank}</div>
+                        <div class="avatar-frame" style="width:45px; height:45px; margin:0; border-radius:10px;">
+                            <img src="${student.Image}" class="avatar" style="border-radius:8px;">
+                        </div>
+                        <div>
+                            <div style="font-family:'Cinzel'; font-size:0.9rem;">${student.Name}</div>
+                            <div style="font-size:0.6rem; color:var(--gold);">${student.Title}</div>
+                        </div>
+                        <div class="tk-text">${student.Tokens} <span style="font-size:0.6rem">TK</span></div>
+                        <div class="row-achievement" style="font-size:0.7rem; color:#666; text-align:right;">VIEW PROFILE</div>
+                    </div>`;
+            });
+            ranksContainer.innerHTML = listHTML;
+            
+            podiumContainer.style.display = 'flex';
+            ranksContainer.style.display = 'flex';
+        }
 
-    let podiumHTML = '';
-    displayIndices.forEach(idx => {
-        const student = top3[idx];
-        const isFirst = idx === 0;
-        podiumHTML += `
-            <div class="podium-item rank-${idx + 1}">
-                ${isFirst ? '<i class="fas fa-crown crown-icon"></i>' : ''}
-                <div class="tier-tag">${student.Title}</div>
-                <div class="avatar-frame">
-                    <img src="${student.Image}" class="avatar">
-                </div>
-                <h3 style="font-family:'Cinzel'">${student.Name}</h3>
-                <div class="tk-text">${student.Tokens} TK</div>
-                <div class="sub-stats">Rank #${student.Rank}</div>
-            </div>
-        `;
-    });
-    podiumContainer.innerHTML = podiumHTML;
+        function showProfile(rank) {
+            const student = allStudents.find(s => s.Rank == rank);
+            if(!student) return;
 
-    // باقي القائمة
-    let listHTML = '';
-    data.slice(3).forEach((student) => {
-        listHTML += `
-            <div class="rank-row">
-                <div style="color:var(--gold); font-weight:900;">#${student.Rank}</div>
-                <div class="avatar-frame" style="width:45px; height:45px; margin:0; border-radius:10px;">
-                    <img src="${student.Image}" class="avatar" style="border-radius:8px;">
-                </div>
-                <div>
-                    <div style="font-family:'Cinzel'; font-size:0.9rem;">${student.Name}</div>
-                    <div style="font-size:0.6rem; color:var(--gold);">${student.Title}</div>
-                </div>
-                <div class="tk-text">${student.Tokens} <span style="font-size:0.6rem">TK</span></div>
-                <div class="row-achievement" style="font-size:0.7rem; color:#666; text-align:right;">ACTIVE AGENT</div>
-            </div>
-        `;
-    });
-    ranksContainer.innerHTML = listHTML;
-    
-    podiumContainer.style.display = 'flex';
-    ranksContainer.style.display = 'flex';
-}
+            document.getElementById('m-avatar').src = student.Image;
+            document.getElementById('m-name').innerText = student.Name;
+            document.getElementById('m-title').innerText = student.Title;
+            document.getElementById('m-rank').innerText = '#' + student.Rank;
+            document.getElementById('m-tokens').innerText = student.Tokens;
+            
+            document.getElementById('m-quizzes').innerText = student.Quizzes || '0'; 
+            document.getElementById('m-stars').innerText = student.Stars || '0';
+
+            document.getElementById('profileOverlay').style.display = 'flex';
+        }
+
+        function closeProfile() {
+            document.getElementById('profileOverlay').style.display = 'none';
+        }
 
         fetchRanks();
     </script>
