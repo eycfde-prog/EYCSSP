@@ -190,12 +190,12 @@
                     <span class="stat-lbl">Tokens (TK)</span>
                 </div>
                 <div class="stat-box">
-                    <span class="stat-val" id="m-quizzes">0</span>
-                    <span class="stat-lbl">Quizzes</span>
+                    <span class="stat-val" id="m-stars">0</span>
+                    <span class="stat-lbl">Stars ⭐</span>
                 </div>
                 <div class="stat-box">
-                    <span class="stat-val" id="m-stars">0</span>
-                    <span class="stat-lbl">Stars / Tickets</span>
+                    <span class="stat-val" id="m-tickets">0</span>
+                    <span class="stat-lbl">Tickets 🎫</span>
                 </div>
             </div>
         </div>
@@ -280,14 +280,16 @@
             const student = allStudents.find(s => s.Rank == rank);
             if(!student) return;
 
+            // البيانات الأساسية
             document.getElementById('m-avatar').src = student.Image;
             document.getElementById('m-name').innerText = student.Name;
             document.getElementById('m-title').innerText = student.Title;
             document.getElementById('m-rank').innerText = '#' + student.Rank;
             document.getElementById('m-tokens').innerText = student.Tokens;
             
-            document.getElementById('m-quizzes').innerText = student.Quizzes || '0'; 
+            // التعديل المطلوب: ربط النجوم والتذاكر
             document.getElementById('m-stars').innerText = student.Stars || '0';
+            document.getElementById('m-tickets').innerText = student.Tickets || '0';
 
             document.getElementById('profileOverlay').style.display = 'flex';
         }
