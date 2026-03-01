@@ -181,7 +181,7 @@ function handleInput(e, idx) {
     }
 
     // 2. Success Pulse Logic: Update Tag Color
-    const input = document.getElementById(`Only the right word-${idx}`);
+    const input = document.getElementById(`fix-${idx}`);
     const tag = document.getElementById(`tag-${idx}`);
     if (input.value.trim().length > 0) {
         tag.classList.add('tag-filled');
