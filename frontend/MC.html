@@ -20,7 +20,7 @@
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; -webkit-tap-highlight-color: transparent; }
         body { background: var(--bg-deep); color: white; min-height: 100vh; overflow-x: hidden; }
         
-        /* --- MeMe Chat UI (WOLF Optimized) --- */
+        /* --- MeMe Chat UI --- */
         .fairy-float { 
             width: 80px !important; height: 80px !important; 
             background: none !important; box-shadow: none !important;
@@ -34,17 +34,23 @@
         }
         .chat-messages {
             flex: 1; overflow-y: auto; padding: 10px; display: flex; flex-direction: column; gap: 10px;
+            scrollbar-width: thin; scrollbar-color: var(--gold) transparent;
         }
         .meme-msg, .user-msg {
             max-width: 85%; padding: 12px; border-radius: 15px; font-size: 0.9rem; line-height: 1.5;
+            position: relative;
         }
         .meme-msg { background: rgba(226, 158, 46, 0.1); color: #fff; align-self: flex-start; border: 1px solid var(--ramadan-gold); }
         .user-msg { background: var(--gold-gradient); color: #000; align-self: flex-end; font-weight: bold; }
-        .pinned-questions { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
+        
+        .pinned-questions { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0; justify-content: center; }
         .pin-btn { 
             background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); 
             color: var(--gold); padding: 5px 12px; border-radius: 20px; font-size: 0.75rem; cursor: pointer;
+            transition: 0.3s;
         }
+        .pin-btn:hover { background: var(--gold); color: #000; }
+
         .chat-input-area {
             display: flex; gap: 10px; padding: 15px; border-top: 1px solid var(--glass-border); background: #050508;
         }
@@ -53,9 +59,7 @@
             border-radius: 12px; color: white; padding: 10px; font-family: 'Cairo';
         }
         .voice-btn { color: var(--gold); font-size: 1.2rem; display: flex; align-items: center; cursor: pointer; }
-        @media (max-height: 600px) { .guide-modal { max-height: 95vh; } }
-
-        /* --- Galaxy Guide Overlay --- */
+        
         .galaxy-overlay {
             position: fixed; inset: 0; background: rgba(0,0,0,0.85);
             backdrop-filter: blur(20px); z-index: 5000; display: none;
@@ -63,8 +67,8 @@
         }
         .guide-modal {
             background: #050508; border: 1px solid var(--ramadan-gold); border-radius: 25px;
-            width: 100%; max-width: 500px; max-height: 80vh; display: flex; flex-direction: column;
-            box-shadow: 0 0 50px rgba(226, 158, 46, 0.2); position: relative;
+            width: 100%; max-width: 500px; height: 85vh; display: flex; flex-direction: column;
+            box-shadow: 0 0 50px rgba(226, 158, 46, 0.2); position: relative; overflow: hidden;
         }
         .guide-header { padding: 15px 20px; border-bottom: 1px solid var(--glass-border); display: flex; justify-content: space-between; align-items: center; }
         
@@ -162,21 +166,19 @@
             <div class="chat-container">
                 <div class="chat-messages" id="chatBox">
                     <div class="meme-msg">أهلاً بك يا بطل! أنا ميمي، كيف يمكنني مساعدتك اليوم؟</div>
-                    <div class="pinned-questions">
-                        <button class="pin-btn" onclick="sendPinned('كيف أحصل على توكنز؟')">💰 التوكنز</button>
-                        <button class="pin-btn" onclick="sendPinned('شرح مهام الموسم')">🏆 المهام</button>
-                        <button class="pin-btn" onclick="sendPinned('اعتراض على درجة')">⚠️ اعتراض</button>
-                    </div>
                 </div>
-                <div id="loadingChat" style="display:none; text-align:center; color:var(--gold); font-size:0.8rem; padding:5px;">
-                    <i class="fas fa-spinner fa-spin"></i> جاري استدعاء البيانات...
+                <div class="pinned-questions">
+                    <button class="pin-btn" onclick="sendPinned('كيف أحصل على توكنز؟')">💰 التوكنز</button>
+                    <button class="pin-btn" onclick="sendPinned('شرح مهام الموسم')">🏆 المهام</button>
+                    <button class="pin-btn" onclick="sendPinned('اعتراض على درجة')">⚠️ اعتراض</button>
+                </div>
+                <div id="loadingChat" style="display:none; text-align:center; color:var(--gold); font-size:0.8rem; padding:10px;">
+                    <i class="fas fa-sparkles fa-spin"></i> ميمي بيفكر...
                 </div>
                 <div class="chat-input-area">
-                    <input type="text" id="userInput" class="chat-input" placeholder="اسأل ميمي...">
+                    <input type="text" id="userInput" class="chat-input" placeholder="اسأل ميمي..." onkeypress="if(event.key==='Enter') askMeMe()">
                     <div class="voice-btn" onclick="startVoice()"><i class="fas fa-microphone"></i></div>
-                    <button onclick="askMeMe()" style="background:none; border:none; color:var(--gold); cursor:pointer;">
-                        <i class="fas fa-paper-plane"></i>
-                    </button>
+                    <div class="voice-btn" onclick="askMeMe()"><i class="fas fa-paper-plane"></i></div>
                 </div>
             </div>
         </div>
@@ -220,7 +222,6 @@
         let currentUser = null;
         let isLoggedIn = false;
 
-        // --- MeMe Intelligence Logic ---
         function openMeMe() { document.getElementById('guideOverlay').style.display = 'flex'; }
         function closeGuide() { document.getElementById('guideOverlay').style.display = 'none'; }
 
@@ -232,18 +233,34 @@
             appendMsg(query, 'user');
             input.value = '';
             
+            if(checkGeneralTalk(query)) return;
+
             const loader = document.getElementById('loadingChat');
             loader.style.display = 'block';
 
             try {
                 const res = await fetch(`${SCRIPT_URL}?action=askMeMe&query=${encodeURIComponent(query)}`);
                 const data = await res.json();
-                appendMsg(data.answer, 'meme');
+                
+                if(data.answer.includes("بروتوكولاتي")) {
+                   appendMsg("يا بطل، السؤال ده تفاصيله مش عندي حالياً. حاول تسأل عن أسماء الأنشطة زي (Seeds أو Alike) أو استخدم الزراير اللي فوق!", 'meme');
+                } else {
+                   appendMsg(data.answer, 'meme');
+                }
             } catch (e) {
-                appendMsg("آسفة، حدث خطأ في الاتصال بالسيرفر.", 'meme');
+                appendMsg("يا بطل حصل مشكلة في الاتصال، جرب تاني كمان شوية.", 'meme');
             } finally {
                 loader.style.display = 'none';
             }
+        }
+
+        function checkGeneralTalk(q) {
+            const greetings = ["ازيك", "سلام", "هاي", "hi", "hello", "ميمي"];
+            if (greetings.some(word => q.toLowerCase().includes(word))) {
+                appendMsg("أنا زي الفل يا بطل وطاير من الحماس! قولي محتاج مساعدة في إيه بخصوص الأرينا؟", 'meme');
+                return true;
+            }
+            return false;
         }
 
         function appendMsg(text, type) {
@@ -256,8 +273,19 @@
         }
 
         function sendPinned(text) {
-            document.getElementById('userInput').value = text;
-            askMeMe();
+            appendMsg(text, 'user');
+            askMeMeFromBtn(text);
+        }
+
+        async function askMeMeFromBtn(query) {
+            const loader = document.getElementById('loadingChat');
+            loader.style.display = 'block';
+            try {
+                const res = await fetch(`${SCRIPT_URL}?action=askMeMe&query=${encodeURIComponent(query)}`);
+                const data = await res.json();
+                appendMsg(data.answer, 'meme');
+            } catch (e) { appendMsg("عذراً، حاول مرة أخرى.", 'meme'); }
+            finally { loader.style.display = 'none'; }
         }
 
         function startVoice() {
@@ -270,7 +298,6 @@
             };
         }
 
-        // --- Auth Logic ---
         function handleLogin() {
             const email = document.getElementById('loginEmail').value;
             const code = document.getElementById('loginCode').value;
