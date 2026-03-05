@@ -167,10 +167,7 @@
                 <div class="chat-messages" id="chatBox">
                     <div class="meme-msg">أهلاً بك يا بطل! أنا ميمي، كيف يمكنني مساعدتك اليوم؟</div>
                 </div>
-                <div class="pinned-questions">
-                    <button class="pin-btn" onclick="sendPinned('كيف أحصل على توكنز؟')">💰 التوكنز</button>
-                    <button class="pin-btn" onclick="sendPinned('شرح مهام الموسم')">🏆 المهام</button>
-                    <button class="pin-btn" onclick="sendPinned('اعتراض على درجة')">⚠️ اعتراض</button>
+                <div class="pinned-questions" id="pinnedActivities">
                 </div>
                 <div id="loadingChat" style="display:none; text-align:center; color:var(--gold); font-size:0.8rem; padding:10px;">
                     <i class="fas fa-sparkles fa-spin"></i> ميمي بيفكر...
@@ -216,11 +213,26 @@
     </div>
 
     <script>
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbycB7vKmdnXJlMm0RhfTaDbCh00sDQ0jbm903BfLj9Q2a5o6D-tz4YUF_bt8tQtHq0aGA/exec"; 
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbydTJsUZK8SwXXZlQvrtWm3LuQPyMcXBqb0hKSC3NJzuC5mjEQXByOw-TB73rzwDou9lw/exec"; 
         const PROFILE_URL = "https://script.google.com/macros/s/AKfycbzma3Ci5RtP6tM0PKi4gGpw5FOf9FWblOi6_njNBxhGSXKpqnHxDbumK9GSCC0kBzMV/exec"; 
+        const GEM_URL = "https://gemini.google.com/gem/1YilbB-J3XlwZjO2qalSldKnA5u-R0DP3?usp=sharing";
         
+        const pinnedList = [
+            "Alike (AS)", "Label (LB)", "Golden Ear (GE)", "Grammar (GR)", "Vivid (VV)", "Seeds (SD)",
+            "Alike X (ASX)", "Label X (LX)", "Grammar X (GRX)", "Dictation X (SSSX)", 
+            "Sing Sang Sung (SSSX)", "Emagazaine X (ELX)", "Golden Ear X (GEX)", 
+            "Figurative X (FX)", "Seeds X (SX)", "Vivid X (VVX)"
+        ];
+
         let currentUser = null;
         let isLoggedIn = false;
+
+        function initPinned() {
+            const container = document.getElementById('pinnedActivities');
+            container.innerHTML = pinnedList.map(act => 
+                `<button class="pin-btn" onclick="sendPinned('${act}')">${act}</button>`
+            ).join('');
+        }
 
         function openMeMe() { document.getElementById('guideOverlay').style.display = 'flex'; }
         function closeGuide() { document.getElementById('guideOverlay').style.display = 'none'; }
@@ -230,37 +242,46 @@
             const query = input.value.trim();
             if (!query) return;
 
+            const studentName = currentUser ? currentUser.name : "يا بطل";
             appendMsg(query, 'user');
             input.value = '';
-            
-            if(checkGeneralTalk(query)) return;
 
             const loader = document.getElementById('loadingChat');
             loader.style.display = 'block';
 
             try {
-                const res = await fetch(`${SCRIPT_URL}?action=askMeMe&query=${encodeURIComponent(query)}`);
+                const res = await fetch(`${SCRIPT_URL}?action=askMeMe&query=${encodeURIComponent(query)}&name=${encodeURIComponent(studentName)}`);
                 const data = await res.json();
                 
-                if(data.answer.includes("بروتوكولاتي")) {
-                   appendMsg("يا بطل، السؤال ده تفاصيله مش عندي حالياً. حاول تسأل عن أسماء الأنشطة زي (Seeds أو Alike) أو استخدم الزراير اللي فوق!", 'meme');
-                } else {
-                   appendMsg(data.answer, 'meme');
+                appendMsg(data.answer, 'meme');
+
+                if (data.status === "success") {
+                    const footerText = data.found 
+                        ? "وممكن كمان تبعتلي على جيميني وأنا هرد عليك بتفاصيل أكتر."
+                        : "";
+                    
+                    if(footerText) appendMsg(footerText, 'meme');
+                    appendGeminiBtn();
                 }
             } catch (e) {
-                appendMsg("يا بطل حصل مشكلة في الاتصال، جرب تاني كمان شوية.", 'meme');
+                appendMsg("يا بطل حصل مشكلة في الاتصال، جرب تاني.", 'meme');
             } finally {
                 loader.style.display = 'none';
             }
         }
 
-        function checkGeneralTalk(q) {
-            const greetings = ["ازيك", "سلام", "هاي", "hi", "hello", "ميمي"];
-            if (greetings.some(word => q.toLowerCase().includes(word))) {
-                appendMsg("أنا زي الفل يا بطل وطاير من الحماس! قولي محتاج مساعدة في إيه بخصوص الأرينا؟", 'meme');
-                return true;
-            }
-            return false;
+        function appendGeminiBtn() {
+            const chatBox = document.getElementById('chatBox');
+            const btnDiv = document.createElement('div');
+            btnDiv.style.textAlign = 'center';
+            btnDiv.style.margin = '10px 0';
+            btnDiv.innerHTML = `
+                <a href="${GEM_URL}" target="_blank" class="btn-signup-pulse" 
+                   style="display:inline-block; width:auto; padding:10px 20px; font-size:0.8rem; background: #4285f4; border:none; color:white;">
+                   <i class="fas fa-wand-magic-sparkles"></i> Ask MeMe (Gemini)
+                </a>`;
+            chatBox.appendChild(btnDiv);
+            chatBox.scrollTop = chatBox.scrollHeight;
         }
 
         function appendMsg(text, type) {
@@ -458,6 +479,7 @@
                 s.style.setProperty('--duration', (Math.random()*3+2)+'s');
                 container.appendChild(s);
             }
+            initPinned();
             setInterval(syncNotifications, 60000);
         };
     </script>
