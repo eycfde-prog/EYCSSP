@@ -188,6 +188,24 @@
     }
 
     window.onload = initVivid;
+// --- WOLF SYSTEM: CONNECTION REPAIR ---
+window.addEventListener('message', function(event) {
+    if (event.data.type === 'REQUEST_MISSION_DATA') {
+        const studentAnswer = document.getElementById('descInput').value.trim();
+        
+        // التحقق من وجود نص (حتى لو كلمة واحدة)
+        if (!studentAnswer) {
+            alert("Analysis required! The Arena cannot sync empty data.");
+            return;
+        }
+
+        // إرسال البيانات للـ Arena ليقوم الـ Script الأساسي ببعتها للـ Sheet
+        window.parent.postMessage({
+            type: 'MISSION_ANSWERS',
+            answers: studentAnswer
+        }, '*');
+    }
+});
 </script>
 </body>
 </html>
