@@ -183,9 +183,9 @@
                         <button class="pin-btn" onclick="sendPinned('Alike X (ASX)')">ASX</button>
                         <button class="pin-btn" onclick="sendPinned('Label X (LX)')">LX</button>
                         <button class="pin-btn" onclick="sendPinned('Grammar X (GRX)')">GRX</button>
-                        <button class="pin-btn" onclick="sendPinned('Dictation X (SSSX)')">DTX</button>
+                        <button class="pin-btn" onclick="sendPinned('Dictation X (DTX)')">DTX</button>
                         <button class="pin-btn" onclick="sendPinned('Sing Sang Sung (SSSX)')">SSSX</button>
-                        <button class="pin-btn" onclick="sendPinned('Emagazaine X (ELX)')">ELX</button>
+                        <button class="pin-btn" onclick="sendPinned('Emagazaine X (EMX)')">EMX</button>
                         <button class="pin-btn" onclick="sendPinned('Golden Ear X (GEX)')">GEX</button>
                         <button class="pin-btn" onclick="sendPinned('Figurative X (FX)')">FX</button>
                         <button class="pin-btn" onclick="sendPinned('Seeds X (SX)')">SX</button>
@@ -196,7 +196,7 @@
                     <i class="fas fa-spinner fa-spin"></i> جاري استدعاء البيانات...
                 </div>
                 <div class="chat-input-area">
-                    <input type="text" id="userInput" class="chat-input" placeholder="اسأل ميمي...">
+                    <input type="text" id="userInput" class="chat-input" placeholder="اسأل ميمي..." onkeypress="if(event.key === 'Enter') askMeMe()">
                     <div class="voice-btn" onclick="startVoice()"><i class="fas fa-microphone"></i></div>
                     <button onclick="askMeMe()" style="background:none; border:none; color:var(--gold); cursor:pointer;">
                         <i class="fas fa-paper-plane"></i>
@@ -238,7 +238,7 @@
     </div>
 
     <script>
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzX5z1nSK00Xp-ebI7JCeOj1P2I41Wmuy0XbvoBufKOhGUs-EC4r5mncwd7RR4mzZRmLA/exec"; 
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxpfdvcXHUGfXOlBPpj-V0Q1z5WGYfYEROCrySDuNvgapBnfpgfpQJqlyzdQ1KQAfTgeg/exec"; 
         const PROFILE_URL = "https://script.google.com/macros/s/AKfycbzma3Ci5RtP6tM0PKi4gGpw5FOf9FWblOi6_njNBxhGSXKpqnHxDbumK9GSCC0kBzMV/exec"; 
         const GEMINI_LINK = "https://gemini.google.com/gem/1YilbB-J3XlwZjO2qalSldKnA5u-R0DP3?usp=sharing";
 
@@ -261,11 +261,12 @@
             loader.style.display = 'block';
 
             try {
-                const sName = currentUser ? currentUser.name : "يا بطل";
-                const res = await fetch(`${SCRIPT_URL}?action=askMeMe&query=${encodeURIComponent(query)}&name=${encodeURIComponent(sName)}`);
+                const sName = currentUser ? currentUser.name : "Student";
+                // Fixed mapping: ensure GAS receives 'query' and 'studentName'
+                const res = await fetch(`${SCRIPT_URL}?action=askMeMe&query=${encodeURIComponent(query)}&studentName=${encodeURIComponent(sName)}`);
                 const data = await res.json();
                 
-                appendMsg(data.answer, 'meme');
+                appendMsg(data.answer || "عذراً يا بطل، لم أستطع فهم ذلك.", 'meme');
 
                 setTimeout(() => {
                     appendGeminiOption();
@@ -280,7 +281,10 @@
 
         function appendGeminiOption() {
             const chatBox = document.getElementById('chatBox');
+            if(document.getElementById('geminiLinkBtn')) return; // Prevent duplicates
+
             const div = document.createElement('div');
+            div.id = 'geminiLinkBtn';
             div.style.textAlign = "center";
             div.style.margin = "10px 0";
             div.innerHTML = `
