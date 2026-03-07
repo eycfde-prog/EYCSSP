@@ -140,6 +140,53 @@
             .guide-modal { border-radius: 0; border: none; width: 100%; height: 100%; }
             .top-nav { padding: 15px 4%; }
         }
+        /* أنيميشن اهتزاز الجرس ولونه الأحمر */
+@keyframes ring-red {
+    0% { transform: rotate(0); color: #ff4d4d; }
+    10% { transform: rotate(15deg); }
+    20% { transform: rotate(-15deg); }
+    30% { transform: rotate(10deg); }
+    40% { transform: rotate(-10deg); }
+    50% { transform: rotate(5deg); }
+    60% { transform: rotate(-5deg); }
+    100% { transform: rotate(0); color: #ff4d4d; }
+}
+
+.bell-active {
+    animation: ring-red 0.8s infinite;
+    filter: drop-shadow(0 0 10px red);
+}
+
+/* تنسيق Inbox الفلاش سكرين */
+.msg-bubble {
+    cursor: pointer;
+    transition: 0.3s;
+    position: relative;
+    border-left: 4px solid var(--gold); /* للرسايل الجديدة */
+}
+
+.msg-bubble.read {
+    border-left: 4px solid transparent;
+    opacity: 0.7;
+}
+
+.msg-bubble:hover {
+    background: rgba(212, 175, 55, 0.1);
+}
+
+/* عرض الرسالة بالكامل */
+.viewing-msg .msg-text {
+    white-space: normal;
+    font-size: 1rem;
+}
+
+.back-btn {
+    display: none;
+    color: var(--gold);
+    cursor: pointer;
+    margin-bottom: 15px;
+    font-size: 0.9rem;
+}
     </style>
 </head>
 <body>
@@ -226,13 +273,19 @@
         </div>
     </div>
 
-    <div id="mailDrawer">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px;">
-            <h2 style="font-family:'Orbitron'; color:var(--gold); font-size:1.1rem;">Comms Center</h2>
-            <i class="fas fa-times" onclick="closeMailbox()" style="cursor:pointer; color:var(--gold);"></i>
-        </div>
-        <div id="mailList"></div>
+<div id="mailDrawer">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+        <h2 style="font-family:'Orbitron'; color:var(--gold); font-size:1.1rem;">Comms Center</h2>
+        <i class="fas fa-times" onclick="closeMailbox()" style="cursor:pointer; color:var(--gold);"></i>
     </div>
+    
+    <div id="backToInbox" class="back-btn" onclick="showMailList()">
+        <i class="fas fa-arrow-left"></i> Back to Messages
+    </div>
+
+    <div id="mailList">
+        </div>
+</div>
 
     <div class="modal" id="taskModal">
         <div class="modal-content">
@@ -242,347 +295,403 @@
         </div>
     </div>
 
-<script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxpfdvcXHUGfXOlBPpj-V0Q1z5WGYfYEROCrySDuNvgapBnfpgfpQJqlyzdQ1KQAfTgeg/exec"; 
-    const PROFILE_URL = "https://script.google.com/macros/s/AKfycbwtZCLtKzMLI1Qo1SC8Zh0Dai7NJjC75NMK5EAZnHTds9rhLef9usnX1lWJowYP0njh/exec"; 
-    const GEMINI_LINK = "https://gemini.google.com/gem/1YilbB-J3XlwZjO2qalSldKnA5u-R0DP3?usp=sharing";
+// مصفوفة لتخزين الرسايل محلياً
+let localMessages = [];
 
-    let currentUser = null;
-    let isLoggedIn = false;
-
-    const IMG = {
-        tk: "https://raw.githubusercontent.com/eycfde-prog/EYCSSP/047aeca8ef0fa0d95627552cfb62fd8300531134/frontend/eyclgos/Token.png",
-        star: "https://raw.githubusercontent.com/eycfde-prog/EYCSSP/047aeca8ef0fa0d95627552cfb62fd8300531134/frontend/eyclgos/Star.png",
-        gt: "https://raw.githubusercontent.com/eycfde-prog/EYCSSP/047aeca8ef0fa0d95627552cfb62fd8300531134/frontend/eyclgos/GT.png"
-    };
-
-    const activities = {
-        season: [
-            { name: "Alike", icon: "fa-clone", code: "AS", tk: 50 },
-            { name: "Label", icon: "fa-tag", code: "LB", tk: 50 },
-            { name: "Golden Ear", icon: "fa-ear-listen", code: "GE", tk: 50 },
-            { name: "Grammar", icon: "fa-spell-check", code: "GR", tk: 50 },
-            { name: "Vivid", icon: "fa-wand-magic-sparkles", code: "VV", tk: 50 },
-            { name: "Seeds", icon: "fa-seedling", code: "SD", tk: 50 }
-        ],
-        royal: [
-            { name: "Alike X", icon: "fa-star", code: "ASX", tk: 50 },
-            { name: "Label X", icon: "fa-tags", code: "LBX", tk: 50 },
-            { name: "Golden Ear X", icon: "fa-ear-deaf", code: "GEX", tk: 50 },
-            { name: "Grammar X", icon: "fa-pen-fancy", code: "GRX", tk: 50 },
-            { name: "Vivid X", icon: "fa-wand-magic", code: "VVX", tk: 50 },
-            { name: "Seeds X", icon: "fa-tree", code: "SDX", tk: 50 },
-            { name: "Dictation X", icon: "fa-microphone-lines", code: "DTX", tk: 100 },
-            { name: "Sing Sang Sung X", icon: "fa-music", code: "SSSX", tk: 100 },
-            { name: "Elmagazine X", icon: "fa-book-open", code: "EMX", tk: 100 }
-        ]
-    };
-
-    // --- 1. نظام التحديث التلقائي المصلح ---
-    async function startLiveSync() {
-        if (!isLoggedIn) return;
-
-        setInterval(async () => {
-            try {
-                const res = await fetch(`${PROFILE_URL}?action=getProfile&email=${currentUser.email}&code=${currentUser.code}`);
-                const data = await res.json();
-                
-                if (data.status === "success") {
-                    currentUser.tokens = data.tokens;
-                    currentUser.stars = data.stars;
-                    currentUser.goldTickets = data.goldTickets;
-                    currentUser.rank = data.rank;
-                    currentUser.title = data.title;
-                    
-                    updateStatDisplay();
-                    await syncNotifications();
-                }
-            } catch (e) {
-                console.error("Sync Error:", e);
-            }
-        }, 15000);
-    }
-
-    // --- 2. تحديث أرقام الواجهة ---
-    function updateStatDisplay() {
-        const statsRow = document.querySelector('.stats-row');
-        if (statsRow && currentUser) {
-            statsRow.innerHTML = `
-                <div class="stat-item"><img src="${IMG.tk}" class="stat-icon"> <span>${currentUser.tokens}</span></div>
-                <div class="stat-item"><img src="${IMG.star}" class="stat-icon"> <span>${currentUser.stars}</span></div>
-                <div class="stat-item"><img src="${IMG.gt}" class="stat-icon"> <span>${currentUser.goldTickets}</span></div>
-            `;
-        }
-        if(document.querySelector('.rank-tag')) document.querySelector('.rank-tag').innerText = `RANK #${currentUser.rank}`;
-        if(document.querySelector('.student-title')) document.querySelector('.student-title').innerText = currentUser.title;
-    }
-
-    // --- 3. نظام الإشعارات (الربط مع العمود N) ---
-    async function syncNotifications() {
-        if (!isLoggedIn) return;
-        try {
-            const res = await fetch(`${PROFILE_URL}?action=getMail&email=${currentUser.email}`);
-            const data = await res.json();
-            
-            const mailList = document.getElementById('mailList');
-            const notifDot = document.getElementById('notifDot');
-            const bell = document.getElementById('notifBell');
-            
-            if(data && data.length > 0) {
-                const lastMsg = data[0].text;
-                const cachedMsg = localStorage.getItem('last_notif');
-
-                if (lastMsg !== cachedMsg) {
-                    notifDot.style.display = 'block';
-                    if(bell) bell.classList.add('fa-bounce');
-                    localStorage.setItem('last_notif', lastMsg);
-                }
-
-                mailList.innerHTML = '';
-                data.forEach(msg => {
-                    const div = document.createElement('div');
-                    div.className = 'msg-bubble';
-                    div.innerHTML = `<span class="msg-time">${msg.date}</span><p class="msg-text">${msg.text}</p>`;
-                    mailList.appendChild(div);
-                });
-            }
-        } catch(e) {
-            console.log("Mail Sync Error");
-        }
-    }
-
-    // --- 4. وظائف الدخول والخروج ---
-    function handleLogin() {
-        const email = document.getElementById('loginEmail').value;
-        const code = document.getElementById('loginCode').value;
-        const btn = document.getElementById('loginSubmitBtn');
-        if(!email || !code) return alert("Fill all fields");
+async function syncNotifications() {
+    if (!isLoggedIn) return;
+    try {
+        const res = await fetch(`${PROFILE_URL}?action=getMail&email=${currentUser.email}`);
+        const data = await res.json();
         
-        btn.innerText = "LINKING...";
-        fetch(`${PROFILE_URL}?action=getProfile&email=${email}&code=${code}`)
-            .then(r => r.json()).then(res => {
-                if(res.status === "success") {
-                    currentUser = res; 
-                    currentUser.email = email; 
-                    currentUser.code = code; 
-                    isLoggedIn = true;
-                    localStorage.setItem('eyc_user', JSON.stringify(currentUser));
-                    closeModal('loginModal'); 
-                    renderHeader(); 
-                    generateCards();
-                    startLiveSync();
-                } else alert(res.message);
-                btn.innerText = "SIGN IN";
-            });
-    }
+        if(data && data.length > 0) {
+            localMessages = data;
+            const bell = document.getElementById('notifBell');
+            const notifDot = document.getElementById('notifDot');
+            
+            // جلب قائمة المعرفات المقروءة من الـ localStorage
+            const readIds = JSON.parse(localStorage.getItem('read_msgs') || "[]");
+            
+            // التأكد إذا كان هناك رسالة جديدة لم تقرأ بعد
+            const hasNew = data.some(msg => !readIds.includes(msg.date + msg.text.substring(0,10)));
 
-    function handleLogout() {
-        localStorage.removeItem('eyc_user');
-        location.reload();
-    }
-
-    async function handleForgotCode() {
-        const email = document.getElementById('loginEmail').value;
-        if (!email) { alert("Please enter your email first!"); return; }
-        const btn = document.querySelector('.btn-forgot');
-        btn.innerText = "SENDING...";
-        try {
-            const response = await fetch(`${PROFILE_URL}?action=forgotCode&email=${email}`);
-            const result = await response.json();
-            if (result.status === "success") alert("Code sent! Check your inbox.");
-            else alert("Email not found.");
-        } catch (e) { alert("Connection Error"); }
-        finally { btn.innerText = "Forgot your access code?"; }
-    }
-
-    // --- 5. ميزات MeMe ---
-    function openMeMe() { 
-        document.getElementById('guideOverlay').style.display = 'flex'; 
-        document.body.style.overflow = 'hidden';
-    }
-    function closeGuide() { 
-        document.getElementById('guideOverlay').style.display = 'none'; 
-        document.body.style.overflow = 'auto';
-    }
-
-    async function askMeMe() {
-        const input = document.getElementById('userInput');
-        const query = input.value.trim();
-        if (!query) return;
-
-        appendMsg(query, 'user');
-        input.value = '';
-
-        const welcomeResponses = {
-            "ازيك": "بخير يا بطل! مستعدين لرحلة النهاردة؟",
-            "عامل ايه": "كله تمام! متحمس جداً أشوف إنجازاتك في Arena.",
-            "مين": "أنا ميمي (MeMe)، مساعدك الذكي في EYC Super Stars.. أنا هنا عشان أسهل عليك المهام!",
-            "انت مين": "أنا ميمي (MeMe)، مساعدك الذكي في EYC Super Stars.. أنا هنا عشان أسهل عليك المهام!",
-            "ايه دا": "دي منصة الأبطال! هنا تقدر تخلص مهامك، تجمع توكنز، وتنافس على المركز الأول.",
-            "سلام": "مع السلامة يا بطل، مستنيك ترجع أقوى!",
-            "شكرا": "العفو! دا واجبي يا نجم."
-        };
-
-        for (let key in welcomeResponses) {
-            if (query.includes(key)) {
-                setTimeout(() => {
-                    appendMsg(welcomeResponses[key], 'meme');
-                    appendGeminiOption();
-                }, 400);
-                return;
+            if (hasNew) {
+                notifDot.style.display = 'block';
+                bell.classList.add('bell-active'); // تفعيل الاهتزاز واللون الأحمر
+            } else {
+                notifDot.style.display = 'none';
+                bell.classList.remove('bell-active');
             }
+            
+            renderMailList();
         }
+    } catch(e) { console.log("Mail Sync Error"); }
+}
 
-        const loader = document.getElementById('loadingChat');
-        loader.style.display = 'block';
+function renderMailList() {
+    const mailList = document.getElementById('mailList');
+    const readIds = JSON.parse(localStorage.getItem('read_msgs') || "[]");
+    
+    mailList.innerHTML = '';
+    document.getElementById('backToInbox').style.display = 'none';
 
+    localMessages.forEach((msg, index) => {
+        const msgId = msg.date + msg.text.substring(0,10);
+        const isRead = readIds.includes(msgId);
+        
+        const div = document.createElement('div');
+        div.className = `msg-bubble ${isRead ? 'read' : ''}`;
+        div.onclick = () => openSingleMsg(index, msgId);
+        
+        // عرض جزء من الرسالة في القائمة
+        const shortText = msg.text.length > 50 ? msg.text.substring(0, 50) + "..." : msg.text;
+        
+        div.innerHTML = `
+            <span class="msg-time">${msg.date}</span>
+            <p class="msg-text">${shortText}</p>
+            ${!isRead ? '<span style="color:red; font-size:0.6rem;">NEW</span>' : ''}
+        `;
+        mailList.appendChild(div);
+    });
+}
+
+function openSingleMsg(index, msgId) {
+    const msg = localMessages[index];
+    const mailList = document.getElementById('mailList');
+    const backBtn = document.getElementById('backToInbox');
+    
+    // حفظ الرسالة كـ مقروءة
+    let readIds = JSON.parse(localStorage.getItem('read_msgs') || "[]");
+    if(!readIds.includes(msgId)) {
+        readIds.push(msgId);
+        localStorage.setItem('read_msgs', JSON.stringify(readIds));
+    }
+
+    // عرض الرسالة كاملة
+    mailList.classList.add('viewing-msg');
+    backBtn.style.display = 'block';
+    mailList.innerHTML = `
+        <div class="msg-bubble read" style="cursor:default; border:none; background:none;">
+            <span class="msg-time" style="font-size:0.8rem;">${msg.date}</span>
+            <p class="msg-text" style="font-size:1.1rem; line-height:1.6; color:#fff;">${msg.text}</p>
+        </div>
+    `;
+    
+    // تحديث شكل الجرس فوراً
+    syncNotifications();
+}
+
+function showMailList() {
+    document.getElementById('mailList').classList.remove('viewing-msg');
+    renderMailList();
+}
+
+function openMailbox() {
+    document.getElementById('mailDrawer').classList.add('active');
+    showMailList(); // التأكد من عرض القائمة عند الفتح
+}
+
+function closeMailbox() {
+    document.getElementById('mailDrawer').classList.remove('active');
+}
+
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxpfdvcXHUGfXOlBPpj-V0Q1z5WGYfYEROCrySDuNvgapBnfpgfpQJqlyzdQ1KQAfTgeg/exec"; 
+const PROFILE_URL = "https://script.google.com/macros/s/AKfycbwtZCLtKzMLI1Qo1SC8Zh0Dai7NJjC75NMK5EAZnHTds9rhLef9usnX1lWJowYP0njh/exec"; 
+const GEMINI_LINK = "https://gemini.google.com/gem/1YilbB-J3XlwZjO2qalSldKnA5u-R0DP3?usp=sharing";
+
+let currentUser = null;
+let isLoggedIn = false;
+
+const IMG = {
+    tk: "https://raw.githubusercontent.com/eycfde-prog/EYCSSP/047aeca8ef0fa0d95627552cfb62fd8300531134/frontend/eyclgos/Token.png",
+    star: "https://raw.githubusercontent.com/eycfde-prog/EYCSSP/047aeca8ef0fa0d95627552cfb62fd8300531134/frontend/eyclgos/Star.png",
+    gt: "https://raw.githubusercontent.com/eycfde-prog/EYCSSP/047aeca8ef0fa0d95627552cfb62fd8300531134/frontend/eyclgos/GT.png"
+};
+
+const activities = {
+    season: [
+        { name: "Alike", icon: "fa-clone", code: "AS", tk: 50 },
+        { name: "Label", icon: "fa-tag", code: "LB", tk: 50 },
+        { name: "Golden Ear", icon: "fa-ear-listen", code: "GE", tk: 50 },
+        { name: "Grammar", icon: "fa-spell-check", code: "GR", tk: 50 },
+        { name: "Vivid", icon: "fa-wand-magic-sparkles", code: "VV", tk: 50 },
+        { name: "Seeds", icon: "fa-seedling", code: "SD", tk: 50 }
+    ],
+    royal: [
+        { name: "Alike X", icon: "fa-star", code: "ASX", tk: 50 },
+        { name: "Label X", icon: "fa-tags", code: "LBX", tk: 50 },
+        { name: "Golden Ear X", icon: "fa-ear-deaf", code: "GEX", tk: 50 },
+        { name: "Grammar X", icon: "fa-pen-fancy", code: "GRX", tk: 50 },
+        { name: "Vivid X", icon: "fa-wand-magic", code: "VVX", tk: 50 },
+        { name: "Seeds X", icon: "fa-tree", code: "SDX", tk: 50 },
+        { name: "Dictation X", icon: "fa-microphone-lines", code: "DTX", tk: 100 },
+        { name: "Sing Sang Sung X", icon: "fa-music", code: "SSSX", tk: 100 },
+        { name: "Elmagazine X", icon: "fa-book-open", code: "EMX", tk: 100 }
+    ]
+};
+
+async function startLiveSync() {
+    if (!isLoggedIn) return;
+
+    setInterval(async () => {
         try {
-            const sName = currentUser ? currentUser.name : "Student";
-            const res = await fetch(`${SCRIPT_URL}?action=askMeMe&query=${encodeURIComponent(query)}&studentName=${encodeURIComponent(sName)}`);
+            const res = await fetch(`${PROFILE_URL}?action=getProfile&email=${currentUser.email}&code=${currentUser.code}`);
             const data = await res.json();
             
-            appendMsg(data.answer || "عذراً يا بطل، لم أستطع فهم ذلك.", 'meme');
-            appendGeminiOption();
-
+            if (data.status === "success") {
+                currentUser.tokens = data.tokens;
+                currentUser.stars = data.stars;
+                currentUser.goldTickets = data.goldTickets;
+                currentUser.rank = data.rank;
+                currentUser.title = data.title;
+                
+                updateStatDisplay();
+                await syncNotifications();
+            }
         } catch (e) {
-            appendMsg("يا بطل حصل مشكلة في الاتصال، جرب تاني.", 'meme');
-        } finally {
-            loader.style.display = 'none';
+            console.error("Sync Error:", e);
         }
-    }
+    }, 15000);
+}
 
-    function appendGeminiOption() {
-        const chatBox = document.getElementById('chatBox');
-        const oldBtn = document.getElementById('geminiLinkBtn');
-        if(oldBtn) oldBtn.remove(); 
-
-        const div = document.createElement('div');
-        div.id = 'geminiLinkBtn';
-        div.style.textAlign = "center";
-        div.style.margin = "10px 0";
-        div.style.animation = "slideIn 0.5s ease";
-        div.innerHTML = `
-            <p style="font-size:0.75rem; color:var(--gold); margin-bottom:8px; opacity:0.8;">
-                ✨ لمزيد من التفاصيل أو المساعدة المتقدمة:
-            </p>
-            <a href="${GEMINI_LINK}" target="_blank" class="pin-btn" style="background:var(--gold-gradient); color:#000; border:none; font-weight:bold; padding:10px 25px; text-decoration:none; border-radius:20px; display:inline-block; box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);">
-                <i class="fas fa-robot"></i> اسأل ميمي على Gemini
-            </a>
+function updateStatDisplay() {
+    const statsRow = document.querySelector('.stats-row');
+    if (statsRow && currentUser) {
+        statsRow.innerHTML = `
+            <div class="stat-item"><img src="${IMG.tk}" class="stat-icon"> <span>${currentUser.tokens}</span></div>
+            <div class="stat-item"><img src="${IMG.star}" class="stat-icon"> <span>${currentUser.stars}</span></div>
+            <div class="stat-item"><img src="${IMG.gt}" class="stat-icon"> <span>${currentUser.goldTickets}</span></div>
         `;
-        chatBox.appendChild(div);
-        chatBox.scrollTop = chatBox.scrollHeight;
     }
+    if(document.querySelector('.rank-tag')) document.querySelector('.rank-tag').innerText = `RANK #${currentUser.rank}`;
+    if(document.querySelector('.student-title')) document.querySelector('.student-title').innerText = currentUser.title;
+}
 
-    function appendMsg(text, type) {
-        const chatBox = document.getElementById('chatBox');
-        const div = document.createElement('div');
-        div.className = type === 'user' ? 'user-msg' : 'meme-msg';
-        div.innerHTML = text.replace(/\n/g, '<br>');
-        chatBox.appendChild(div);
-        chatBox.scrollTop = chatBox.scrollHeight;
-    }
-
-    function sendPinned(text) {
-        document.getElementById('userInput').value = text;
-        askMeMe();
-    }
-
-    function startVoice() {
-        const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-        recognition.lang = 'ar-SA';
-        recognition.start();
-        recognition.onresult = (event) => {
-            document.getElementById('userInput').value = event.results[0][0].transcript;
-            askMeMe();
-        };
-    }
-
-    // --- 6. واجهة المستخدم والتنقل ---
-    function renderHeader() {
-        const header = document.getElementById('heroBanner');
-        if (isLoggedIn) {
-            document.getElementById('logoutBtn').style.display = "block";
-            header.innerHTML = `
-                <div class="profile-card">
-                    <div class="avatar-wrapper">
-                        <div class="avatar-main" style="background-image: url('${currentUser.avatar}')"></div>
-                        <div class="rank-tag">RANK #${currentUser.rank}</div>
-                    </div>
-                    <h1 class="student-name">${currentUser.name}</h1>
-                    <p class="student-title">${currentUser.title}</p>
-                    <div class="stats-row">
-                        <div class="stat-item"><img src="${IMG.tk}" class="stat-icon"> <span>${currentUser.tokens}</span></div>
-                        <div class="stat-item"><img src="${IMG.star}" class="stat-icon"> <span>${currentUser.stars}</span></div>
-                        <div class="stat-item"><img src="${IMG.gt}" class="stat-icon"> <span>${currentUser.goldTickets}</span></div>
-                    </div>
-                </div>`;
-            syncNotifications();
-        } else {
-            header.innerHTML = `<h1 class="student-name">ARENA ACCESS</h1><button class="btn-exit" style="width:auto; margin-top:20px;" onclick="openLogin()">AUTHORIZE LOGIN</button>`;
-        }
-    }
-
-    function generateCards() {
-        const grid = document.getElementById('cardsGrid'); grid.innerHTML = '';
-        const activeTab = document.querySelector('.tab-btn.active');
-        const type = activeTab && activeTab.innerText.toLowerCase().includes('royal') ? 'royal' : 'season';
-        activities[type].forEach(act => {
-            const card = document.createElement('div');
-            card.className = 'activity-card';
-            card.innerHTML = `<i class="fa-solid ${act.icon} card-icon"></i><h3>${act.name}</h3><div class="tk-activity-badge">${act.tk} TK</div>`;
-            card.onclick = () => openTasks(act.name, act.code);
-            grid.appendChild(card);
+function handleLogin() {
+    const email = document.getElementById('loginEmail').value;
+    const code = document.getElementById('loginCode').value;
+    const btn = document.getElementById('loginSubmitBtn');
+    if(!email || !code) return alert("Fill all fields");
+    
+    btn.innerText = "LINKING...";
+    fetch(`${PROFILE_URL}?action=getProfile&email=${email}&code=${code}`)
+        .then(r => r.json()).then(res => {
+            if(res.status === "success") {
+                currentUser = res; 
+                currentUser.email = email; 
+                currentUser.code = code; 
+                isLoggedIn = true;
+                localStorage.setItem('eyc_user', JSON.stringify(currentUser));
+                closeModal('loginModal'); 
+                renderHeader(); 
+                generateCards();
+                startLiveSync();
+            } else alert(res.message);
+            btn.innerText = "SIGN IN";
         });
-    }
+}
 
-    function switchType(type, btn) {
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        generateCards();
-    }
+function handleLogout() {
+    localStorage.removeItem('eyc_user');
+    location.reload();
+}
 
-    function openTasks(name, code) {
-        document.getElementById('mTitle').innerText = name;
-        const tGrid = document.getElementById('tGrid'); tGrid.innerHTML = '';
-        for (let i = 1; i <= 10; i++) {
-            const node = document.createElement('div');
-            node.className = 'task-node'; node.innerText = i;
-            node.onclick = () => {
-                if (!isLoggedIn) return openLogin();
-                window.location.href = `EYCArena.html?email=${currentUser.email}&act=${code}&task=${i}`;
-            };
-            tGrid.appendChild(node);
+async function handleForgotCode() {
+    const email = document.getElementById('loginEmail').value;
+    if (!email) { alert("Please enter your email first!"); return; }
+    const btn = document.querySelector('.btn-forgot');
+    btn.innerText = "SENDING...";
+    try {
+        const response = await fetch(`${PROFILE_URL}?action=forgotCode&email=${email}`);
+        const result = await response.json();
+        if (result.status === "success") alert("Code sent! Check your inbox.");
+        else alert("Email not found.");
+    } catch (e) { alert("Connection Error"); }
+    finally { btn.innerText = "Forgot your access code?"; }
+}
+
+function openMeMe() { 
+    document.getElementById('guideOverlay').style.display = 'flex'; 
+    document.body.style.overflow = 'hidden';
+}
+function closeGuide() { 
+    document.getElementById('guideOverlay').style.display = 'none'; 
+    document.body.style.overflow = 'auto';
+}
+
+async function askMeMe() {
+    const input = document.getElementById('userInput');
+    const query = input.value.trim();
+    if (!query) return;
+
+    appendMsg(query, 'user');
+    input.value = '';
+
+    const welcomeResponses = {
+        "ازيك": "بخير يا بطل! مستعدين لرحلة النهاردة؟",
+        "عامل ايه": "كله تمام! متحمس جداً أشوف إنجازاتك في Arena.",
+        "مين": "أنا ميمي (MeMe)، مساعدك الذكي في EYC Super Stars.. أنا هنا عشان أسهل عليك المهام!",
+        "انت مين": "أنا ميمي (MeMe)، مساعدك الذكي في EYC Super Stars.. أنا هنا عشان أسهل عليك المهام!",
+        "ايه دا": "دي منصة الأبطال! هنا تقدر تخلص مهامك، تجمع توكنز، وتنافس على المركز الأول.",
+        "سلام": "مع السلامة يا بطل، مستنيك ترجع أقوى!",
+        "شكرا": "العفو! دا واجبي يا نجم."
+    };
+
+    for (let key in welcomeResponses) {
+        if (query.includes(key)) {
+            setTimeout(() => {
+                appendMsg(welcomeResponses[key], 'meme');
+                appendGeminiOption();
+            }, 400);
+            return;
         }
-        document.getElementById('taskModal').style.display = 'flex';
     }
 
-    function openLogin() { document.getElementById('loginModal').style.display = 'flex'; }
-    function closeModal(id) { document.getElementById(id).style.display = 'none'; }
-    function openMailbox() { document.getElementById('mailDrawer').classList.add('active'); }
-    function closeMailbox() { document.getElementById('mailDrawer').classList.remove('active'); }
+    const loader = document.getElementById('loadingChat');
+    loader.style.display = 'block';
 
-    // --- 7. تهيئة الصفحة ---
-    const container = document.getElementById('star-container');
-    if (container) {
-        for(let i=0; i<150; i++) {
-            const star = document.createElement('div');
-            star.className = 'star';
-            star.style.width = star.style.height = Math.random() * 3 + 'px';
-            star.style.left = Math.random() * 100 + '%';
-            star.style.top = Math.random() * 100 + '%';
-            star.style.setProperty('--duration', Math.random() * 3 + 2 + 's');
-            container.appendChild(star);
-        }
-    }
+    try {
+        const sName = currentUser ? currentUser.name : "Student";
+        const res = await fetch(`${SCRIPT_URL}?action=askMeMe&query=${encodeURIComponent(query)}&studentName=${encodeURIComponent(sName)}`);
+        const data = await res.json();
+        
+        appendMsg(data.answer || "عذراً يا بطل، لم أستطع فهم ذلك.", 'meme');
+        appendGeminiOption();
 
-    const savedUser = localStorage.getItem('eyc_user');
-    if(savedUser) {
-        currentUser = JSON.parse(savedUser);
-        isLoggedIn = true;
-        startLiveSync();
+    } catch (e) {
+        appendMsg("يا بطل حصل مشكلة في الاتصال، جرب تاني.", 'meme');
+    } finally {
+        loader.style.display = 'none';
     }
-    renderHeader();
+}
+
+function appendGeminiOption() {
+    const chatBox = document.getElementById('chatBox');
+    const oldBtn = document.getElementById('geminiLinkBtn');
+    if(oldBtn) oldBtn.remove(); 
+
+    const div = document.createElement('div');
+    div.id = 'geminiLinkBtn';
+    div.style.textAlign = "center";
+    div.style.margin = "10px 0";
+    div.style.animation = "slideIn 0.5s ease";
+    div.innerHTML = `
+        <p style="font-size:0.75rem; color:var(--gold); margin-bottom:8px; opacity:0.8;">
+            ✨ لمزيد من التفاصيل أو المساعدة المتقدمة:
+        </p>
+        <a href="${GEMINI_LINK}" target="_blank" class="pin-btn" style="background:var(--gold-gradient); color:#000; border:none; font-weight:bold; padding:10px 25px; text-decoration:none; border-radius:20px; display:inline-block; box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);">
+            <i class="fas fa-robot"></i> اسأل ميمي على Gemini
+        </a>
+    `;
+    chatBox.appendChild(div);
+    chatBox.scrollTop = chatBox.scrollHeight;
+}
+
+function appendMsg(text, type) {
+    const chatBox = document.getElementById('chatBox');
+    const div = document.createElement('div');
+    div.className = type === 'user' ? 'user-msg' : 'meme-msg';
+    div.innerHTML = text.replace(/\n/g, '<br>');
+    chatBox.appendChild(div);
+    chatBox.scrollTop = chatBox.scrollHeight;
+}
+
+function sendPinned(text) {
+    document.getElementById('userInput').value = text;
+    askMeMe();
+}
+
+function startVoice() {
+    const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+    recognition.lang = 'ar-SA';
+    recognition.start();
+    recognition.onresult = (event) => {
+        document.getElementById('userInput').value = event.results[0][0].transcript;
+        askMeMe();
+    };
+}
+
+function renderHeader() {
+    const header = document.getElementById('heroBanner');
+    if (isLoggedIn) {
+        document.getElementById('logoutBtn').style.display = "block";
+        header.innerHTML = `
+            <div class="profile-card">
+                <div class="avatar-wrapper">
+                    <div class="avatar-main" style="background-image: url('${currentUser.avatar}')"></div>
+                    <div class="rank-tag">RANK #${currentUser.rank}</div>
+                </div>
+                <h1 class="student-name">${currentUser.name}</h1>
+                <p class="student-title">${currentUser.title}</p>
+                <div class="stats-row">
+                    <div class="stat-item"><img src="${IMG.tk}" class="stat-icon"> <span>${currentUser.tokens}</span></div>
+                    <div class="stat-item"><img src="${IMG.star}" class="stat-icon"> <span>${currentUser.stars}</span></div>
+                    <div class="stat-item"><img src="${IMG.gt}" class="stat-icon"> <span>${currentUser.goldTickets}</span></div>
+                </div>
+            </div>`;
+        syncNotifications();
+    } else {
+        header.innerHTML = `<h1 class="student-name">ARENA ACCESS</h1><button class="btn-exit" style="width:auto; margin-top:20px;" onclick="openLogin()">AUTHORIZE LOGIN</button>`;
+    }
+}
+
+function generateCards() {
+    const grid = document.getElementById('cardsGrid'); grid.innerHTML = '';
+    const activeTab = document.querySelector('.tab-btn.active');
+    const type = activeTab && activeTab.innerText.toLowerCase().includes('royal') ? 'royal' : 'season';
+    activities[type].forEach(act => {
+        const card = document.createElement('div');
+        card.className = 'activity-card';
+        card.innerHTML = `<i class="fa-solid ${act.icon} card-icon"></i><h3>${act.name}</h3><div class="tk-activity-badge">${act.tk} TK</div>`;
+        card.onclick = () => openTasks(act.name, act.code);
+        grid.appendChild(card);
+    });
+}
+
+function switchType(type, btn) {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
     generateCards();
-</script>
+}
+
+function openTasks(name, code) {
+    document.getElementById('mTitle').innerText = name;
+    const tGrid = document.getElementById('tGrid'); tGrid.innerHTML = '';
+    for (let i = 1; i <= 10; i++) {
+        const node = document.createElement('div');
+        node.className = 'task-node'; node.innerText = i;
+        node.onclick = () => {
+            if (!isLoggedIn) return openLogin();
+            window.location.href = `EYCArena.html?email=${currentUser.email}&act=${code}&task=${i}`;
+        };
+        tGrid.appendChild(node);
+    }
+    document.getElementById('taskModal').style.display = 'flex';
+}
+
+function openLogin() { document.getElementById('loginModal').style.display = 'flex'; }
+function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+
+const container = document.getElementById('star-container');
+if (container) {
+    for(let i=0; i<150; i++) {
+        const star = document.createElement('div');
+        star.className = 'star';
+        star.style.width = star.style.height = Math.random() * 3 + 'px';
+        star.style.left = Math.random() * 100 + '%';
+        star.style.top = Math.random() * 100 + '%';
+        star.style.setProperty('--duration', Math.random() * 3 + 2 + 's');
+        container.appendChild(star);
+    }
+}
+
+const savedUser = localStorage.getItem('eyc_user');
+if(savedUser) {
+    currentUser = JSON.parse(savedUser);
+    isLoggedIn = true;
+    startLiveSync();
+}
+renderHeader();
+generateCards();
 </body>
 </html>
