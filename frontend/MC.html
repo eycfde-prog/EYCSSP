@@ -252,18 +252,23 @@
     </div>
 
 <div id="mailDrawer">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-        <h2 style="font-family:'Orbitron'; color:var(--gold); font-size:1.1rem;">Comms Center</h2>
-        <i class="fas fa-times" onclick="closeMailbox()" style="cursor:pointer; color:var(--gold);"></i>
-    </div>
-    
-    <div id="backToInbox" class="back-btn" onclick="showMailList()">
-        <i class="fas fa-arrow-left"></i> Back to Messages
-    </div>
-
-    <div id="mailList">
+        <div id="mailMainView" style="display: flex; flex-direction: column; height: 100%;">
+            <div class="mail-header">
+                <h2 style="font-family:'Orbitron'; color:var(--gold); font-size:1.1rem;">INBOX</h2>
+                <i class="fas fa-times" onclick="closeMailbox()" style="cursor:pointer; color:var(--gold);"></i>
+            </div>
+            <div id="mailList" class="mail-list-container"></div>
         </div>
-</div>
+
+        <div id="mailDetail">
+            <div class="detail-header" onclick="backToList()">
+                <i class="fas fa-chevron-left"></i>
+                <span>Back to Inbox</span>
+            </div>
+            <div class="msg-time" id="detailTime"></div>
+            <div class="detail-body" id="detailBody"></div>
+        </div>
+    </div>
 
     <div class="modal" id="taskModal">
         <div class="modal-content">
@@ -347,100 +352,90 @@
         if(document.querySelector('.student-title')) document.querySelector('.student-title').innerText = currentUser.title;
     }
 
+function openMailbox() {
+        document.getElementById('mailDrawer').classList.add('active');
+        // Stop bell animation on open
+        document.querySelector('.fa-bell').classList.remove('bell-active');
+        document.getElementById('notifDot').style.display = 'none';
+    }
+
+    function closeMailbox() {
+        document.getElementById('mailDrawer').classList.remove('active');
+        backToList();
+    }
+
     async function syncNotifications() {
         if (!isLoggedIn) return;
         try {
             const res = await fetch(`${PROFILE_URL}?action=getMail&email=${currentUser.email}`);
             const data = await res.json();
             
-            if(data && data.length > 0) {
-                localMessages = data;
-                const bell = document.getElementById('notifBell');
-                const notifDot = document.getElementById('notifDot');
+            if(data && Array.isArray(data)) {
+                messages = data;
+                const readMessages = JSON.parse(localStorage.getItem(`read_msg_${currentUser.email}`)) || [];
+                const mailList = document.getElementById('mailList');
+                const bellIcon = document.querySelector('.fa-bell');
                 
-                const readIds = JSON.parse(localStorage.getItem('read_msgs') || "[]");
-                
-                const hasNew = data.some(msg => !readIds.includes(msg.date + msg.text.substring(0,10)));
+                mailList.innerHTML = '';
+                let hasNew = false;
 
-                if (hasNew) {
-                    notifDot.style.display = 'block';
-                    bell.classList.add('bell-active');
-                    bell.classList.add('fa-bounce');
-                } else {
-                    notifDot.style.display = 'none';
-                    bell.classList.remove('bell-active');
-                    bell.classList.remove('fa-bounce');
+                messages.forEach((msg, index) => {
+                    const isRead = readMessages.includes(msg.date + msg.text.substring(0,10));
+                    if(!isRead) hasNew = true;
+
+                    const div = document.createElement('div');
+                    div.className = `msg-bubble ${isRead ? '' : 'unread'}`;
+                    div.onclick = () => showDetail(index);
+                    div.innerHTML = `
+                        <span class="msg-time">${msg.date}</span>
+                        <p class="msg-preview">${msg.text}</p>
+                    `;
+                    mailList.appendChild(div);
+                });
+
+                if(hasNew) {
+                    bellIcon.classList.add('bell-active');
+                    document.getElementById('notifDot').style.display = 'block';
                 }
-                
-                renderMailList();
             }
-        } catch(e) { console.log("Mail Sync Error"); }
+        } catch(e) { console.error("Mail Sync Fail"); }
     }
 
-    function renderMailList() {
-        const mailList = document.getElementById('mailList');
-        const readIds = JSON.parse(localStorage.getItem('read_msgs') || "[]");
+    function showDetail(index) {
+        const msg = messages[index];
+        const detailView = document.getElementById('mailDetail');
+        const readMessages = JSON.parse(localStorage.getItem(`read_msg_${currentUser.email}`)) || [];
         
-        mailList.innerHTML = '';
-        const backToInbox = document.getElementById('backToInbox');
-        if(backToInbox) backToInbox.style.display = 'none';
-
-        localMessages.forEach((msg, index) => {
-            const msgId = msg.date + msg.text.substring(0,10);
-            const isRead = readIds.includes(msgId);
-            
-            const div = document.createElement('div');
-            div.className = `msg-bubble ${isRead ? 'read' : ''}`;
-            div.onclick = () => openSingleMsg(index, msgId);
-            
-            const shortText = msg.text.length > 50 ? msg.text.substring(0, 50) + "..." : msg.text;
-            
-            div.innerHTML = `
-                <span class="msg-time">${msg.date}</span>
-                <p class="msg-text">${shortText}</p>
-                ${!isRead ? '<span style="color:red; font-size:0.6rem;">NEW</span>' : ''}
-            `;
-            mailList.appendChild(div);
-        });
-    }
-
-    function openSingleMsg(index, msgId) {
-        const msg = localMessages[index];
-        const mailList = document.getElementById('mailList');
-        const backBtn = document.getElementById('backToInbox');
-        
-        let readIds = JSON.parse(localStorage.getItem('read_msgs') || "[]");
-        if(!readIds.includes(msgId)) {
-            readIds.push(msgId);
-            localStorage.setItem('read_msgs', JSON.stringify(readIds));
+        // Mark as read
+        const msgId = msg.date + msg.text.substring(0,10);
+        if(!readMessages.includes(msgId)) {
+            readMessages.push(msgId);
+            localStorage.setItem(`read_msg_${currentUser.email}`, JSON.stringify(readMessages));
         }
 
-        mailList.classList.add('viewing-msg');
-        if(backBtn) backBtn.style.display = 'block';
-        mailList.innerHTML = `
-            <div class="msg-bubble read" style="cursor:default; border:none; background:none;">
-                <span class="msg-time" style="font-size:0.8rem;">${msg.date}</span>
-                <p class="msg-text" style="font-size:1.1rem; line-height:1.6; color:#fff;">${msg.text}</p>
-            </div>
-        `;
+        document.getElementById('detailTime').innerText = msg.date;
+        document.getElementById('detailBody').innerText = msg.text;
+        detailView.style.display = 'flex';
         
+        // Refresh list to update UI
         syncNotifications();
     }
 
-    function showMailList() {
-        document.getElementById('mailList').classList.remove('viewing-msg');
-        renderMailList();
+    function backToList() {
+        document.getElementById('mailDetail').style.display = 'none';
     }
 
-    function openMailbox() {
-        document.getElementById('mailDrawer').classList.add('active');
-        showMailList();
-    }
-
-    function closeMailbox() {
-        document.getElementById('mailDrawer').classList.remove('active');
-    }
-
+    // --- Standard Functions ---
+    window.onload = () => {
+        if(isLoggedIn) {
+            renderHeader();
+            generateCards();
+            startLiveSync();
+            syncNotifications();
+        } else {
+            renderHeader();
+        }
+    };
     function handleLogin() {
         const email = document.getElementById('loginEmail').value;
         const code = document.getElementById('loginCode').value;
