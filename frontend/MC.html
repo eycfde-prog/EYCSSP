@@ -242,13 +242,152 @@
         </div>
     </div>
 
-<script>
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxpfdvcXHUGfXOlBPpj-V0Q1z5WGYfYEROCrySDuNvgapBnfpgfpQJqlyzdQ1KQAfTgeg/exec";
-        const PROFILE_URL = "https://script.google.com/macros/s/AKfycbx7cXPJHkBCAgmuqEK7g90ksakbQujKrKRoGC3a48xhNiYPJjKUdA4BW8RZ2sx6ba1l/exec";
+    <script>
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxpfdvcXHUGfXOlBPpj-V0Q1z5WGYfYEROCrySDuNvgapBnfpgfpQJqlyzdQ1KQAfTgeg/exec"; 
+        const PROFILE_URL = "https://script.google.com/macros/s/AKfycbwTfSh4YsdcnlsrUGVzUShzwdCKvWUtJ2DBlecGLJv7sKD8p1u3pQ254k3lMnL-Ay6i/exec"; 
         const GEMINI_LINK = "https://gemini.google.com/gem/1YilbB-J3XlwZjO2qalSldKnA5u-R0DP3?usp=sharing";
 
         let currentUser = null;
         let isLoggedIn = false;
+
+        function openMeMe() { 
+            document.getElementById('guideOverlay').style.display = 'flex'; 
+            document.body.style.overflow = 'hidden';
+        }
+        function closeGuide() { 
+            document.getElementById('guideOverlay').style.display = 'none'; 
+            document.body.style.overflow = 'auto';
+        }
+
+        async function askMeMe() {
+            const input = document.getElementById('userInput');
+            const query = input.value.trim();
+            if (!query) return;
+
+            appendMsg(query, 'user');
+            input.value = '';
+
+            // 1. التعامل مع الأسئلة البديهية والترحيبية محلياً (Quick Response)
+            const lowerQuery = query.toLowerCase();
+            const welcomeResponses = {
+                "ازيك": "بخير يا بطل! مستعدين لرحلة النهاردة؟",
+                "عامل ايه": "كله تمام! متحمس جداً أشوف إنجازاتك في Arena.",
+                "مين": "أنا ميمي (MeMe)، مساعدك الذكي في EYC Super Stars.. أنا هنا عشان أسهل عليك المهام!",
+                "انت مين": "أنا ميمي (MeMe)، مساعدك الذكي في EYC Super Stars.. أنا هنا عشان أسهل عليك المهام!",
+                "ايه دا": "دي منصة الأبطال! هنا تقدر تخلص مهامك، تجمع توكنز، وتنافس على المركز الأول.",
+                "سلام": "مع السلامة يا بطل، مستنيك ترجع أقوى!",
+                "شكرا": "العفو! دا واجبي يا نجم."
+            };
+
+            // التحقق من وجود رد جاهز
+            for (let key in welcomeResponses) {
+                if (query.includes(key)) {
+                    setTimeout(() => {
+                        appendMsg(welcomeResponses[key], 'meme');
+                        appendGeminiOption(); // إظهار الزر دائماً
+                    }, 400);
+                    return; // إنهاء الدالة هنا لأننا ردينا بالفعل
+                }
+            }
+
+            // 2. إذا لم يكن سؤالاً ترحيبياً، نرسله للسيرفر
+            const loader = document.getElementById('loadingChat');
+            loader.style.display = 'block';
+
+            try {
+                const sName = currentUser ? currentUser.name : "Student";
+                const res = await fetch(`${SCRIPT_URL}?action=askMeMe&query=${encodeURIComponent(query)}&studentName=${encodeURIComponent(sName)}`);
+                const data = await res.json();
+                
+                appendMsg(data.answer || "عذراً يا بطل، لم أستطع فهم ذلك.", 'meme');
+                appendGeminiOption(); // إظهار الزر دائماً بعد رد السيرفر
+
+            } catch (e) {
+                appendMsg("يا بطل حصل مشكلة في الاتصال، جرب تاني.", 'meme');
+            } finally {
+                loader.style.display = 'none';
+            }
+        }
+
+        function appendGeminiOption() {
+            const chatBox = document.getElementById('chatBox');
+            
+            // إزالة أي زر قديم لضمان وجود زر واحد فقط في نهاية المحادثة (اختياري)
+            const oldBtn = document.getElementById('geminiLinkBtn');
+            if(oldBtn) oldBtn.remove(); 
+
+            const div = document.createElement('div');
+            div.id = 'geminiLinkBtn';
+            div.style.textAlign = "center";
+            div.style.margin = "10px 0";
+            div.style.animation = "slideIn 0.5s ease";
+            div.innerHTML = `
+                <p style="font-size:0.75rem; color:var(--gold); margin-bottom:8px; opacity:0.8;">
+                    ✨ لمزيد من التفاصيل أو المساعدة المتقدمة:
+                </p>
+                <a href="${GEMINI_LINK}" target="_blank" class="pin-btn" style="background:var(--gold-gradient); color:#000; border:none; font-weight:bold; padding:10px 25px; text-decoration:none; border-radius:20px; display:inline-block; box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);">
+                    <i class="fas fa-robot"></i> اسأل ميمي على Gemini
+                </a>
+            `;
+            chatBox.appendChild(div);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        function appendMsg(text, type) {
+            const chatBox = document.getElementById('chatBox');
+            const div = document.createElement('div');
+            div.className = type === 'user' ? 'user-msg' : 'meme-msg';
+            div.innerHTML = text.replace(/\n/g, '<br>');
+            chatBox.appendChild(div);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        function sendPinned(text) {
+            document.getElementById('userInput').value = text;
+            askMeMe();
+        }
+
+        function startVoice() {
+            const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+            recognition.lang = 'ar-SA';
+            recognition.start();
+            recognition.onresult = (event) => {
+                document.getElementById('userInput').value = event.results[0][0].transcript;
+                askMeMe();
+            };
+        }
+
+        // --- Core Logic Refactored for Mapping ---
+        function handleLogin() {
+            const email = document.getElementById('loginEmail').value;
+            const code = document.getElementById('loginCode').value;
+            const btn = document.getElementById('loginSubmitBtn');
+            if(!email || !code) return alert("Fill all fields");
+            btn.innerText = "LINKING...";
+            fetch(`${PROFILE_URL}?action=getProfile&email=${email}&code=${code}`)
+                .then(r => r.json()).then(res => {
+                    if(res.status === "success") {
+                        currentUser = res; currentUser.email = email; currentUser.code = code; isLoggedIn = true;
+                        localStorage.setItem('eyc_user', JSON.stringify(currentUser));
+                        closeModal('loginModal'); renderHeader(); generateCards();
+                    } else alert(res.message);
+                    btn.innerText = "SIGN IN";
+                });
+        }
+
+        async function handleForgotCode() {
+            const email = document.getElementById('loginEmail').value;
+            if (!email) { alert("Please enter your email first!"); return; }
+            const btn = document.querySelector('.btn-forgot');
+            btn.innerText = "SENDING...";
+            try {
+                const response = await fetch(`${PROFILE_URL}?action=forgotCode&email=${email}`);
+                const result = await response.json();
+                if (result.status === "success") alert("Code sent! Check your inbox.");
+                else alert("Email not found.");
+            } catch (e) { alert("Connection Error"); }
+            finally { btn.innerText = "Forgot your access code?"; }
+        }
 
         const IMG = {
             tk: "https://raw.githubusercontent.com/eycfde-prog/EYCSSP/047aeca8ef0fa0d95627552cfb62fd8300531134/frontend/eyclgos/Token.png",
@@ -278,151 +417,10 @@
             ]
         };
 
-        async function startLiveSync() {
-            if (!isLoggedIn) return;
-            setInterval(async () => {
-                try {
-                    const res = await fetch(`${PROFILE_URL}?action=getProfile&email=${currentUser.email}&code=${currentUser.code}`);
-                    const data = await res.json();
-                    if (data.status === "success") {
-                        currentUser.tokens = data.tokens;
-                        currentUser.stars = data.stars;
-                        currentUser.goldTickets = data.goldTickets;
-                        currentUser.rank = data.rank;
-                        currentUser.title = data.title;
-                        updateStatDisplay();
-                        await syncNotifications();
-                    }
-                } catch (e) {
-                    console.error("Sync Error:", e);
-                }
-            }, 15000);
-        }
-
-        function updateStatDisplay() {
-            const statsRow = document.querySelector('.stats-row');
-            if (statsRow) {
-                statsRow.innerHTML = `
-                    <div class="stat-item"><img src="${IMG.tk}" class="stat-icon"> <span>${currentUser.tokens}</span></div>
-                    <div class="stat-item"><img src="${IMG.star}" class="stat-icon"> <span>${currentUser.stars}</span></div>
-                    <div class="stat-item"><img src="${IMG.gt}" class="stat-icon"> <span>${currentUser.goldTickets}</span></div>
-                `;
-            }
-            if(document.querySelector('.rank-tag')) document.querySelector('.rank-tag').innerText = `RANK #${currentUser.rank}`;
-            if(document.querySelector('.student-title')) document.querySelector('.student-title').innerText = currentUser.title;
-        }
-
-        async function syncNotifications() {
-            if (!isLoggedIn) return;
-            try {
-                const res = await fetch(`${PROFILE_URL}?action=getMail&email=${currentUser.email}`);
-                const data = await res.json();
-                const mailList = document.getElementById('mailList');
-                const notifDot = document.getElementById('notifDot');
-                const bell = document.getElementById('notifBell');
-                
-                if(data && data.length > 0) {
-                    const lastMsg = data[0].text;
-                    const cachedMsg = localStorage.getItem('last_notif');
-
-                    if (lastMsg !== cachedMsg) {
-                        if(notifDot) notifDot.style.display = 'block';
-                        if(bell) bell.classList.add('fa-bounce');
-                        localStorage.setItem('last_notif', lastMsg);
-                    }
-
-                    mailList.innerHTML = '';
-                    data.forEach(msg => {
-                        const div = document.createElement('div');
-                        div.className = 'msg-bubble';
-                        div.innerHTML = `<span class="msg-time">${msg.date}</span><p class="msg-text">${msg.text}</p>`;
-                        mailList.appendChild(div);
-                    });
-                }
-            } catch(e) {
-                console.log("Mail Sync Error");
-            }
-        }
-
-        async function askMeMe() {
-            const input = document.getElementById('userInput');
-            const query = input.value.trim();
-            if (!query) return;
-
-            appendMsg(query, 'user');
-            input.value = '';
-
-            const welcomeResponses = {
-                "ازيك": "بخير يا بطل! مستعدين لرحلة النهاردة؟",
-                "عامل ايه": "كله تمام! متحمس جداً أشوف إنجازاتك في Arena.",
-                "مين": "أنا ميمي (MeMe)، مساعدك الذكي في EYC Super Stars.. أنا هنا عشان أسهل عليك المهام!",
-                "انت مين": "أنا ميمي (MeMe)، مساعدك الذكي في EYC Super Stars.. أنا هنا عشان أسهل عليك المهام!",
-                "ايه دا": "دي منصة الأبطال! هنا تقدر تخلص مهامك، تجمع توكنز، وتنافس على المركز الأول.",
-                "سلام": "مع السلامة يا بطل، مستنيك ترجع أقوى!",
-                "شكرا": "العفو! دا واجبي يا نجم."
-            };
-
-            for (let key in welcomeResponses) {
-                if (query.includes(key)) {
-                    setTimeout(() => {
-                        appendMsg(welcomeResponses[key], 'meme');
-                        appendGeminiOption();
-                    }, 400);
-                    return;
-                }
-            }
-
-            const loader = document.getElementById('loadingChat');
-            if(loader) loader.style.display = 'block';
-
-            try {
-                const sName = currentUser ? currentUser.name : "Student";
-                const res = await fetch(`${SCRIPT_URL}?action=askMeMe&query=${encodeURIComponent(query)}&studentName=${encodeURIComponent(sName)}`);
-                const data = await res.json();
-                appendMsg(data.answer || "عذراً يا بطل، لم أستطع فهم ذلك.", 'meme');
-                appendGeminiOption();
-            } catch (e) {
-                appendMsg("يا بطل حصل مشكلة في الاتصال، جرب تاني.", 'meme');
-            } finally {
-                if(loader) loader.style.display = 'none';
-            }
-        }
-
-        function appendGeminiOption() {
-            const chatBox = document.getElementById('chatBox');
-            if(!chatBox) return;
-            const oldBtn = document.getElementById('geminiLinkBtn');
-            if(oldBtn) oldBtn.remove(); 
-
-            const div = document.createElement('div');
-            div.id = 'geminiLinkBtn';
-            div.style.textAlign = "center";
-            div.style.margin = "10px 0";
-            div.innerHTML = `
-                <p style="font-size:0.75rem; color:var(--gold); margin-bottom:8px; opacity:0.8;">
-                    ✨ لمزيد من التفاصيل أو المساعدة المتقدمة:
-                </p>
-                <a href="${GEMINI_LINK}" target="_blank" class="pin-btn" style="background:var(--gold-gradient); color:#000; border:none; font-weight:bold; padding:10px 25px; text-decoration:none; border-radius:20px; display:inline-block;">
-                    اسأل ميمي على Gemini
-                </a>
-            `;
-            chatBox.appendChild(div);
-            chatBox.scrollTop = chatBox.scrollHeight;
-        }
-
-        function appendMsg(text, type) {
-            const chatBox = document.getElementById('chatBox');
-            if(!chatBox) return;
-            const div = document.createElement('div');
-            div.className = type === 'user' ? 'user-msg' : 'meme-msg';
-            div.innerHTML = text.replace(/\n/g, '<br>');
-            chatBox.appendChild(div);
-            chatBox.scrollTop = chatBox.scrollHeight;
-        }
-
         function renderHeader() {
             const header = document.getElementById('heroBanner');
             if (isLoggedIn) {
+                document.getElementById('logoutBtn').style.display = "block";
                 header.innerHTML = `
                     <div class="profile-card">
                         <div class="avatar-wrapper">
@@ -439,33 +437,126 @@
                     </div>`;
                 syncNotifications();
             } else {
-                header.innerHTML = `<h1 class="student-name">ARENA ACCESS</h1><button onclick="openLogin()">AUTHORIZE LOGIN</button>`;
+                header.innerHTML = `<h1 class="student-name">ARENA ACCESS</h1><button class="btn-exit" style="width:auto; margin-top:20px;" onclick="openLogin()">AUTHORIZE LOGIN</button>`;
             }
         }
 
         function generateCards() {
-            const grid = document.getElementById('cardsGrid'); 
-            if(!grid) return;
-            grid.innerHTML = '';
-            const type = 'season'; 
+            const grid = document.getElementById('cardsGrid'); grid.innerHTML = '';
+            const type = document.querySelector('.tab-btn.active').innerText.toLowerCase().includes('royal') ? 'royal' : 'season';
             activities[type].forEach(act => {
                 const card = document.createElement('div');
                 card.className = 'activity-card';
-                card.innerHTML = `<h3>${act.name}</h3>`;
+                card.innerHTML = `<i class="fa-solid ${act.icon} card-icon"></i><h3>${act.name}</h3><div class="tk-activity-badge">${act.tk} TK</div>`;
+                card.onclick = () => openTasks(act.name, act.code);
                 grid.appendChild(card);
             });
         }
 
-        const savedUser = localStorage.getItem('eyc_user');
-        if(savedUser) {
-            currentUser = JSON.parse(savedUser);
-            isLoggedIn = true;
-            startLiveSync();
+        function switchType(type, btn) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            generateCards();
         }
 
-        renderHeader();
-        generateCards();
+        function openTasks(name, code) {
+            document.getElementById('mTitle').innerText = name;
+            const tGrid = document.getElementById('tGrid'); tGrid.innerHTML = '';
+            for (let i = 1; i <= 10; i++) {
+                const node = document.createElement('div');
+                node.className = 'task-node'; node.innerText = i;
+                node.onclick = () => {
+                    if (!isLoggedIn) return openLogin();
+                    window.location.href = `EYCArena.html?email=${currentUser.email}&act=${code}&task=${i}`;
+                };
+                tGrid.appendChild(node);
+            }
+            document.getElementById('taskModal').style.display = 'flex';
+        }
 
+        function openLogin() { document.getElementById('loginModal').style.display = 'flex'; }
+        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+        function openMailbox() { document.getElementById('mailDrawer').classList.add('active'); }
+        function closeMailbox() { document.getElementById('mailDrawer').classList.remove('active'); }
+
+        function handleLogout() {
+            localStorage.removeItem('eyc_user');
+            location.reload();
+        }
+
+        // 1. نظام التحديث التلقائي (Background Sync)
+async function startLiveSync() {
+    if (!isLoggedIn) return;
+
+    setInterval(async () => {
+        try {
+            // جلب البيانات الجديدة (Tokens, Stars, Rank)
+            const res = await fetch(`${PROFILE_URL}?action=getProfile&email=${currentUser.email}&code=${currentUser.code}`);
+            const data = await res.json();
+            
+            if (data.status === "success") {
+                // تحديث الكائن المحلي
+                currentUser.tokens = data.tokens;
+                currentUser.stars = data.stars;
+                currentUser.goldTickets = data.goldTickets;
+                currentUser.rank = data.rank;
+                currentUser.title = data.title;
+                
+                // تحديث الواجهة فوراً بدون إعادة تحميل
+                updateStatDisplay();
+                
+                // فحص الإشعارات الجديدة
+                await syncNotifications();
+            }
+        } catch (e) {
+            console.log("Sync Error: ", e);
+        }
+    }, 30000); // تحديث كل 30 ثانية
+}
+
+// 2. تحديث أرقام الـ UI فقط
+function updateStatDisplay() {
+    const statsContainer = document.querySelector('.stats-row');
+    if (statsContainer) {
+        statsContainer.innerHTML = `
+            <div class="stat-item"><img src="${IMG.tk}" class="stat-icon"> <span>${currentUser.tokens}</span></div>
+            <div class="stat-item"><img src="${IMG.star}" class="stat-icon"> <span>${currentUser.stars}</span></div>
+            <div class="stat-item"><img src="${IMG.gt}" class="stat-icon"> <span>${currentUser.goldTickets}</span></div>
+        `;
+    }
+    // تحديث الرانك والعنوان
+    if(document.querySelector('.rank-tag')) document.querySelector('.rank-tag').innerText = `RANK #${currentUser.rank}`;
+    if(document.querySelector('.student-title')) document.querySelector('.student-title').innerText = currentUser.title;
+}
+
+// 3. تعديل دالة الإشعارات لتكون أكثر ذكاءً
+async function syncNotifications() {
+    if (!isLoggedIn) return;
+    try {
+        const res = await fetch(`${PROFILE_URL}?action=getMail&email=${currentUser.email}`);
+        const data = await res.json();
+        const mailList = document.getElementById('mailList');
+        const notifDot = document.getElementById('notifDot');
+        
+        // إذا كان هناك رسائل جديدة لم تكن موجودة
+        if(data.length > 0) {
+            notifDot.style.display = 'block';
+            // إضافة تأثير نبض للـ Bell في حالة وجود إشعار جديد
+            document.getElementById('notifBell').classList.add('fa-bounce'); 
+            
+            mailList.innerHTML = '';
+            data.reverse().forEach(msg => {
+                const div = document.createElement('div');
+                div.className = 'msg-bubble';
+                div.innerHTML = `<span class="msg-time">${msg.date}</span><p class="msg-text">${msg.text}</p>`;
+                mailList.appendChild(div);
+            });
+        }
+    } catch(e) {}
+}
+
+
+        // Initialize Stars
         const container = document.getElementById('star-container');
         for(let i=0; i<150; i++) {
             const star = document.createElement('div');
@@ -473,8 +564,20 @@
             star.style.width = star.style.height = Math.random() * 3 + 'px';
             star.style.left = Math.random() * 100 + '%';
             star.style.top = Math.random() * 100 + '%';
-            if(container) container.appendChild(star);
+            star.style.setProperty('--duration', Math.random() * 3 + 2 + 's');
+            container.appendChild(star);
         }
+
+        // تعديل الجزء الأخير في السكريبت
+const savedUser = localStorage.getItem('eyc_user');
+if(savedUser) {
+    currentUser = JSON.parse(savedUser);
+    isLoggedIn = true;
+    startLiveSync(); // تفعيل التحديث التلقائي بمجرد الدخول
+}
+renderHeader();
+generateCards();
+
     </script>
 </body>
 </html>
