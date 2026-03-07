@@ -354,7 +354,6 @@
 
 function openMailbox() {
         document.getElementById('mailDrawer').classList.add('active');
-        // Stop bell animation on open
         document.querySelector('.fa-bell').classList.remove('bell-active');
         document.getElementById('notifDot').style.display = 'none';
     }
@@ -371,7 +370,7 @@ function openMailbox() {
             const data = await res.json();
             
             if(data && Array.isArray(data)) {
-                messages = data;
+                localMessages = data; // FIXED: assigned to localMessages instead of undeclared messages
                 const readMessages = JSON.parse(localStorage.getItem(`read_msg_${currentUser.email}`)) || [];
                 const mailList = document.getElementById('mailList');
                 const bellIcon = document.querySelector('.fa-bell');
@@ -379,7 +378,7 @@ function openMailbox() {
                 mailList.innerHTML = '';
                 let hasNew = false;
 
-                messages.forEach((msg, index) => {
+                localMessages.forEach((msg, index) => {
                     const isRead = readMessages.includes(msg.date + msg.text.substring(0,10));
                     if(!isRead) hasNew = true;
 
@@ -402,11 +401,10 @@ function openMailbox() {
     }
 
     function showDetail(index) {
-        const msg = messages[index];
+        const msg = localMessages[index]; // FIXED: using localMessages
         const detailView = document.getElementById('mailDetail');
         const readMessages = JSON.parse(localStorage.getItem(`read_msg_${currentUser.email}`)) || [];
         
-        // Mark as read
         const msgId = msg.date + msg.text.substring(0,10);
         if(!readMessages.includes(msgId)) {
             readMessages.push(msgId);
@@ -417,7 +415,6 @@ function openMailbox() {
         document.getElementById('detailBody').innerText = msg.text;
         detailView.style.display = 'flex';
         
-        // Refresh list to update UI
         syncNotifications();
     }
 
@@ -425,7 +422,6 @@ function openMailbox() {
         document.getElementById('mailDetail').style.display = 'none';
     }
 
-    // --- Standard Functions ---
     window.onload = () => {
         if(isLoggedIn) {
             renderHeader();
