@@ -484,23 +484,77 @@
             location.reload();
         }
 
-        async function syncNotifications() {
-            try {
-                const res = await fetch(`${PROFILE_URL}?action=getMail&email=${currentUser.email}`);
-                const data = await res.json();
-                const mailList = document.getElementById('mailList');
-                mailList.innerHTML = '';
-                if(data.length > 0) {
-                    document.getElementById('notifDot').style.display = 'block';
-                    data.reverse().forEach(msg => {
-                        const div = document.createElement('div');
-                        div.className = 'msg-bubble';
-                        div.innerHTML = `<span class="msg-time">${msg.date}</span><p class="msg-text">${msg.text}</p>`;
-                        mailList.appendChild(div);
-                    });
-                }
-            } catch(e) {}
+        // 1. نظام التحديث التلقائي (Background Sync)
+async function startLiveSync() {
+    if (!isLoggedIn) return;
+
+    setInterval(async () => {
+        try {
+            // جلب البيانات الجديدة (Tokens, Stars, Rank)
+            const res = await fetch(`${PROFILE_URL}?action=getProfile&email=${currentUser.email}&code=${currentUser.code}`);
+            const data = await res.json();
+            
+            if (data.status === "success") {
+                // تحديث الكائن المحلي
+                currentUser.tokens = data.tokens;
+                currentUser.stars = data.stars;
+                currentUser.goldTickets = data.goldTickets;
+                currentUser.rank = data.rank;
+                currentUser.title = data.title;
+                
+                // تحديث الواجهة فوراً بدون إعادة تحميل
+                updateStatDisplay();
+                
+                // فحص الإشعارات الجديدة
+                await syncNotifications();
+            }
+        } catch (e) {
+            console.log("Sync Error: ", e);
         }
+    }, 30000); // تحديث كل 30 ثانية
+}
+
+// 2. تحديث أرقام الـ UI فقط
+function updateStatDisplay() {
+    const statsContainer = document.querySelector('.stats-row');
+    if (statsContainer) {
+        statsContainer.innerHTML = `
+            <div class="stat-item"><img src="${IMG.tk}" class="stat-icon"> <span>${currentUser.tokens}</span></div>
+            <div class="stat-item"><img src="${IMG.star}" class="stat-icon"> <span>${currentUser.stars}</span></div>
+            <div class="stat-item"><img src="${IMG.gt}" class="stat-icon"> <span>${currentUser.goldTickets}</span></div>
+        `;
+    }
+    // تحديث الرانك والعنوان
+    if(document.querySelector('.rank-tag')) document.querySelector('.rank-tag').innerText = `RANK #${currentUser.rank}`;
+    if(document.querySelector('.student-title')) document.querySelector('.student-title').innerText = currentUser.title;
+}
+
+// 3. تعديل دالة الإشعارات لتكون أكثر ذكاءً
+async function syncNotifications() {
+    if (!isLoggedIn) return;
+    try {
+        const res = await fetch(`${PROFILE_URL}?action=getMail&email=${currentUser.email}`);
+        const data = await res.json();
+        const mailList = document.getElementById('mailList');
+        const notifDot = document.getElementById('notifDot');
+        
+        // إذا كان هناك رسائل جديدة لم تكن موجودة
+        if(data.length > 0) {
+            notifDot.style.display = 'block';
+            // إضافة تأثير نبض للـ Bell في حالة وجود إشعار جديد
+            document.getElementById('notifBell').classList.add('fa-bounce'); 
+            
+            mailList.innerHTML = '';
+            data.reverse().forEach(msg => {
+                const div = document.createElement('div');
+                div.className = 'msg-bubble';
+                div.innerHTML = `<span class="msg-time">${msg.date}</span><p class="msg-text">${msg.text}</p>`;
+                mailList.appendChild(div);
+            });
+        }
+    } catch(e) {}
+}
+
 
         // Initialize Stars
         const container = document.getElementById('star-container');
@@ -514,13 +568,16 @@
             container.appendChild(star);
         }
 
-        const savedUser = localStorage.getItem('eyc_user');
-        if(savedUser) {
-            currentUser = JSON.parse(savedUser);
-            isLoggedIn = true;
-        }
-        renderHeader();
-        generateCards();
+        // تعديل الجزء الأخير في السكريبت
+const savedUser = localStorage.getItem('eyc_user');
+if(savedUser) {
+    currentUser = JSON.parse(savedUser);
+    isLoggedIn = true;
+    startLiveSync(); // تفعيل التحديث التلقائي بمجرد الدخول
+}
+renderHeader();
+generateCards();
+
     </script>
 </body>
 </html>
