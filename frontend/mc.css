@@ -9,7 +9,7 @@
     --ramadan-gold: #E29E2E;
 }
 * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; -webkit-tap-highlight-color: transparent; }
-body { background: var(--bg-deep); color: white; min-height: 100vh; overflow-x: hidden; }
+body { background: var(--bg-deep); color: white; min-height: 100vh; overflow-x: hidden; user-select: none; }
 
 /* --- Bell Shake Animation --- */
 @keyframes bellShake {
