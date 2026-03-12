@@ -56,101 +56,115 @@
         </div>
     </div>
 
-    <script>
-        const scriptURL = 'https://script.google.com/macros/s/AKfycbyhM0HAV37p5ChjQyh8MBezy87EEcFgvZOShT_8fquZO0sNEK8e98JOsfyv-FJFJilL/exec';
-        let allStudents = [];
+<script>
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbyhM0HAV37p5ChjQyh8MBezy87EEcFgvZOShT_8fquZO0sNEK8e98JOsfyv-FJFJilL/exec';
+    let allStudents = [];
 
-        async function fetchRanks() {
-            const loader = document.getElementById('matrix-loader');
-            const percentText = document.getElementById('loading-percent');
+    async function fetchRanks() {
+        const loader = document.getElementById('matrix-loader');
+        const percentText = document.getElementById('loading-percent');
+        
+        try {
+            // محاكاة تحميل واقعي
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += Math.random() * 30;
+                if (progress > 90) progress = 90;
+                percentText.innerText = Math.floor(progress) + "%";
+            }, 200);
+
+            const response = await fetch(scriptURL + "?action=leaderboard&t=" + new Date().getTime());
+            const data = await response.json();
             
-            try {
-                const response = await fetch(scriptURL + "?action=leaderboard&t=" + new Date().getTime());
-                const data = await response.json();
-                
-                if (Array.isArray(data)) {
-                    renderData(data);
-                } else if (data.status === "error") {
-                    throw new Error(data.message);
-                }
+            clearInterval(interval);
+            percentText.innerText = "100%";
 
-                percentText.innerText = "100%";
-                setTimeout(() => {
-                    loader.style.opacity = '0';
-                    setTimeout(() => loader.remove(), 1000);
-                }, 500);
-
-            } catch (error) {
-                percentText.innerText = "SYSTEM OFFLINE";
-                console.error('WOLF Error Report:', error);
+            if (Array.isArray(data)) {
+                // ترتيب البيانات حسب الـ Rank احتياطياً
+                data.sort((a, b) => a.Rank - b.Rank);
+                renderData(data);
             }
+
+            setTimeout(() => {
+                loader.style.opacity = '0';
+                setTimeout(() => loader.remove(), 1000);
+            }, 500);
+
+        } catch (error) {
+            percentText.innerText = "SYSTEM ERROR";
+            console.error('WOLF Error Report:', error);
         }
+    }
 
-        function renderData(data) {
-            allStudents = data;
-            const podiumContainer = document.getElementById('podium-container');
-            const ranksContainer = document.getElementById('ranks-container');
-            
-            const top3 = data.slice(0, 3);
-            const displayIndices = [1, 0, 2];
+    function renderData(data) {
+        allStudents = data;
+        const podiumContainer = document.getElementById('podium-container');
+        const ranksContainer = document.getElementById('ranks-container');
+        
+        // الثلاثة الأوائل
+        const top3 = data.slice(0, 3);
+        const displayIndices = [1, 0, 2]; // ترتيب الظهور: الثاني، الأول، الثالث
 
-            let podiumHTML = '';
-            displayIndices.forEach(idx => {
-                if(!top3[idx]) return;
-                const student = top3[idx];
-                podiumHTML += `
-                    <div class="podium-item rank-${idx + 1}" onclick="showProfile('${student.Rank}')" style="cursor:pointer">
-                        ${idx === 0 ? '<i class="fas fa-crown crown-icon"></i>' : ''}
-                        <div class="tier-tag">${student.Title}</div>
-                        <div class="avatar-frame"><img src="${student.Image}" class="avatar"></div>
-                        <h3 style="font-family:'Cinzel'">${student.Name}</h3>
-                        <div class="tk-text">${student.Tokens} TK</div>
-                    </div>`;
-            });
-            podiumContainer.innerHTML = podiumHTML;
+        let podiumHTML = '';
+        displayIndices.forEach(idx => {
+            if(!top3[idx]) return;
+            const student = top3[idx];
+            podiumHTML += `
+                <div class="podium-item rank-${idx + 1}" onclick="showProfile('${student.Rank}')" style="cursor:pointer">
+                    ${idx === 0 ? '<i class="fas fa-crown crown-icon"></i>' : ''}
+                    <div class="tier-tag">${student.Title || 'ELITE'}</div>
+                    <div class="avatar-frame">
+                        <img src="${student.Image || 'https://via.placeholder.com/150'}" class="avatar" onerror="this.src='https://ui-avatars.com/api/?name=${student.Name}'">
+                    </div>
+                    <h3 style="font-family:'Cinzel'">${student.Name}</h3>
+                    <div class="tk-text">${student.Tokens} TK</div>
+                </div>`;
+        });
+        podiumContainer.innerHTML = podiumHTML;
 
-            let listHTML = '';
-            data.slice(3).forEach((student) => {
-                listHTML += `
-                    <div class="rank-row" onclick="showProfile('${student.Rank}')" style="cursor:pointer">
-                        <div style="color:var(--gold); font-weight:900;">#${student.Rank}</div>
-                        <div class="avatar-frame" style="width:45px; height:45px; margin:0; border-radius:10px;">
-                            <img src="${student.Image}" class="avatar" style="border-radius:8px;">
-                        </div>
-                        <div>
-                            <div style="font-family:'Cinzel'; font-size:0.9rem;">${student.Name}</div>
-                            <div style="font-size:0.6rem; color:var(--gold);">${student.Title}</div>
-                        </div>
-                        <div class="tk-text">${student.Tokens} <span style="font-size:0.6rem">TK</span></div>
-                        <div class="row-achievement" style="font-size:0.7rem; color:#666; text-align:right;">VIEW PROFILE</div>
-                    </div>`;
-            });
-            ranksContainer.innerHTML = listHTML;
-            
-            podiumContainer.style.display = 'flex';
-            ranksContainer.style.display = 'flex';
-        }
+        // باقي القائمة
+        let listHTML = '';
+        data.slice(3).forEach((student) => {
+            listHTML += `
+                <div class="rank-row" onclick="showProfile('${student.Rank}')" style="cursor:pointer">
+                    <div style="color:var(--gold); font-weight:900;">#${student.Rank}</div>
+                    <div class="avatar-frame" style="width:45px; height:45px; margin:0; border-radius:10px;">
+                        <img src="${student.Image || 'https://via.placeholder.com/50'}" class="avatar" style="border-radius:8px;">
+                    </div>
+                    <div>
+                        <div style="font-family:'Cinzel'; font-size:0.9rem;">${student.Name}</div>
+                        <div style="font-size:0.6rem; color:var(--gold);">${student.Title || 'AGENT'}</div>
+                    </div>
+                    <div class="tk-text">${student.Tokens} <span style="font-size:0.6rem">TK</span></div>
+                    <div class="row-achievement" style="font-size:0.7rem; color:#666; text-align:right;">DETAILED INTEL</div>
+                </div>`;
+        });
+        ranksContainer.innerHTML = listHTML;
+        
+        podiumContainer.style.display = 'flex';
+        ranksContainer.style.display = 'flex';
+    }
 
-        function showProfile(rank) {
-            const student = allStudents.find(s => s.Rank == rank);
-            if(!student) return;
+    function showProfile(rank) {
+        const student = allStudents.find(s => s.Rank == rank);
+        if(!student) return;
 
-            document.getElementById('m-avatar').src = student.Image;
-            document.getElementById('m-name').innerText = student.Name;
-            document.getElementById('m-title').innerText = student.Title;
-            document.getElementById('m-rank').innerText = '#' + student.Rank;
-            document.getElementById('m-tokens').innerText = student.Tokens;
-            document.getElementById('m-stars').innerText = student.Stars || '0';
-            document.getElementById('m-tickets').innerText = student.Tickets || '0';
+        document.getElementById('m-avatar').src = student.Image || 'https://via.placeholder.com/150';
+        document.getElementById('m-name').innerText = student.Name;
+        document.getElementById('m-title').innerText = student.Title || 'ELITE AGENT';
+        document.getElementById('m-rank').innerText = '#' + student.Rank;
+        document.getElementById('m-tokens').innerText = student.Tokens;
+        document.getElementById('m-stars').innerText = student.Stars || '0';
+        document.getElementById('m-tickets').innerText = student.Tickets || '0';
 
-            document.getElementById('profileOverlay').style.display = 'flex';
-        }
+        document.getElementById('profileOverlay').style.display = 'flex';
+    }
 
-        function closeProfile() {
-            document.getElementById('profileOverlay').style.display = 'none';
-        }
+    function closeProfile() {
+        document.getElementById('profileOverlay').style.display = 'none';
+    }
 
-        fetchRanks();
-    </script>
+    fetchRanks();
+</script>
 </body>
 </html>
