@@ -6,13 +6,82 @@
     <title>Global Ranks | EYC Elite</title>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Orbitron:wght@400;700;900&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" href="RNKS.css">
+    <style>
+        /* RNKS.css content would be embedded here */
+        :root {
+            --gold: #d4af37;
+            --dark-bg: #0a0a0a;
+        }
+        body {
+            background-color: var(--dark-bg);
+            color: #fff;
+            margin: 0;
+            font-family: 'Poppins', sans-serif;
+            overflow-x: hidden;
+        }
+        #matrix-loader {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: #000;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 1s ease;
+        }
+        .scan-bar {
+            width: 200px;
+            height: 2px;
+            background: var(--gold);
+            box-shadow: 0 0 15px var(--gold);
+            position: relative;
+            overflow: hidden;
+        }
+        .scan-bar::after {
+            content: '';
+            position: absolute;
+            width: 50px;
+            height: 100%;
+            background: #fff;
+            animation: scan 1.5s linear infinite;
+        }
+        @keyframes scan {
+            0% { left: -50px; }
+            100% { left: 200px; }
+        }
+        .container { padding: 20px; max-width: 800px; margin: auto; }
+        .rank-header { text-align: center; margin-bottom: 40px; }
+        .rank-header p { font-family: 'Orbitron'; color: var(--gold); font-size: 0.8rem; letter-spacing: 5px; }
+        .rank-header h1 { font-family: 'Cinzel'; font-size: 2.5rem; margin: 10px 0; }
+        .podium { display: none; justify-content: center; align-items: flex-end; gap: 10px; margin-bottom: 40px; min-height: 300px; }
+        .podium-item { text-align: center; flex: 1; padding: 20px; background: rgba(255,255,255,0.05); border: 1px solid rgba(212,175,55,0.2); border-radius: 15px; transition: 0.3s; }
+        .rank-1 { order: 2; transform: scale(1.1); z-index: 2; border-color: var(--gold); }
+        .rank-2 { order: 1; }
+        .rank-3 { order: 3; }
+        .avatar-frame { width: 80px; height: 80px; margin: auto; border: 2px solid var(--gold); border-radius: 50%; padding: 5px; margin-bottom: 15px; }
+        .avatar { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+        .crown-icon { color: var(--gold); font-size: 1.5rem; margin-bottom: 10px; }
+        .tier-tag { font-family: 'Orbitron'; font-size: 0.6rem; color: #000; background: var(--gold); padding: 2px 8px; border-radius: 4px; display: inline-block; margin-bottom: 5px; }
+        .tk-text { color: var(--gold); font-weight: bold; }
+        .rank-list { display: none; flex-direction: column; gap: 10px; }
+        .rank-row { display: grid; grid-template-columns: 40px 45px 1fr 80px 100px; align-items: center; gap: 15px; background: rgba(255,255,255,0.03); padding: 10px 20px; border-radius: 12px; transition: 0.3s; }
+        .rank-row:hover { background: rgba(212,175,55,0.1); }
+        .profile-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); display:none; justify-content:center; align-items:center; z-index:10000; }
+        .profile-card { background:#111; border:1px solid var(--gold); padding:40px; border-radius:20px; text-align:center; position:relative; width:90%; max-width:400px; }
+        .close-profile { position:absolute; top:20px; right:20px; color:var(--gold); cursor:pointer; font-size:1.5rem; }
+        .modal-avatar { width:120px; height:120px; border-radius:50%; border:3px solid var(--gold); margin-bottom:20px; }
+        .modal-stats { display:grid; grid-template-columns: 1fr 1fr; gap:15px; margin-top:30px; }
+        .stat-box { background:rgba(255,255,255,0.05); padding:15px; border-radius:10px; }
+        .stat-val { display:block; color:var(--gold); font-family:'Orbitron'; font-size:1.1rem; }
+        .stat-lbl { font-size:0.7rem; color:#888; text-transform:uppercase; }
+    </style>
 </head>
 <body>
 
     <div id="matrix-loader">
         <div class="scan-bar"></div>
-        <p style="font-family: 'Orbitron'; color: var(--gold); margin-top: 20px; font-size: 0.7rem; letter-spacing: 3px;">FETCHING ELITE DATA</p>
+        <p id="loader-text" style="font-family: 'Orbitron'; color: var(--gold); margin-top: 20px; font-size: 0.7rem; letter-spacing: 3px;">INITIALIZING SECURE LINK...</p>
         <div id="loading-percent" style="font-family: 'Orbitron'; color: #fff; margin-top: 10px; font-size: 0.9rem;">0%</div>
     </div>
 
@@ -60,12 +129,28 @@
     const scriptURL = 'https://script.google.com/macros/s/AKfycbyhM0HAV37p5ChjQyh8MBezy87EEcFgvZOShT_8fquZO0sNEK8e98JOsfyv-FJFJilL/exec';
     let allStudents = [];
 
+    const loadingPhrases = [
+        "ESTABLISHING ENCRYPTED CONNECTION...",
+        "AUTHENTICATING AGENT CREDENTIALS...",
+        "SYNCING ELITE DATABASE...",
+        "GENERATING HALL OF FAME...",
+        "ACCESS GRANTED."
+    ];
+
+    let phraseIdx = 0;
+    const phraseInterval = setInterval(() => {
+        if(phraseIdx < loadingPhrases.length) {
+            const el = document.getElementById('loader-text');
+            if(el) el.innerText = loadingPhrases[phraseIdx];
+            phraseIdx++;
+        }
+    }, 600);
+
     async function fetchRanks() {
         const loader = document.getElementById('matrix-loader');
         const percentText = document.getElementById('loading-percent');
         
         try {
-            // محاكاة تحميل واقعي
             let progress = 0;
             const interval = setInterval(() => {
                 progress += Math.random() * 30;
@@ -80,7 +165,6 @@
             percentText.innerText = "100%";
 
             if (Array.isArray(data)) {
-                // ترتيب البيانات حسب الـ Rank احتياطياً
                 data.sort((a, b) => a.Rank - b.Rank);
                 renderData(data);
             }
@@ -88,6 +172,7 @@
             setTimeout(() => {
                 loader.style.opacity = '0';
                 setTimeout(() => loader.remove(), 1000);
+                clearInterval(phraseInterval);
             }, 500);
 
         } catch (error) {
@@ -101,9 +186,8 @@
         const podiumContainer = document.getElementById('podium-container');
         const ranksContainer = document.getElementById('ranks-container');
         
-        // الثلاثة الأوائل
         const top3 = data.slice(0, 3);
-        const displayIndices = [1, 0, 2]; // ترتيب الظهور: الثاني، الأول، الثالث
+        const displayIndices = [1, 0, 2]; 
 
         let podiumHTML = '';
         displayIndices.forEach(idx => {
@@ -122,7 +206,6 @@
         });
         podiumContainer.innerHTML = podiumHTML;
 
-        // باقي القائمة
         let listHTML = '';
         data.slice(3).forEach((student) => {
             listHTML += `
